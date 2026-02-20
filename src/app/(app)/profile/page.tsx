@@ -66,7 +66,7 @@ export default function ProfilePage() {
       </section>
 
       {/* ── Stats Grid ── */}
-      <section className="px-4 mt-4 grid grid-cols-2 gap-2.5">
+      <section className="px-4 mt-4 grid grid-cols-2 lg:grid-cols-4 gap-2.5">
         {[
           { v: `${ME.hours}h`, l: "Advocacy Hours", icon: "🕐" },
           { v: String(ME.moots), l: "Sessions Done", icon: "📋" },

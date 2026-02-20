@@ -14,8 +14,10 @@ export default function CreateSessionPage() {
   const [endTime, setEndTime] = useState("15:30");
   const [location, setLocation] = useState("");
   const [crossUni, setCrossUni] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   const roles = sessionType === "mock_trial" ? MOCK_TRIAL_ROLES : MOOT_ROLES;
+  const isValid = title.trim().length > 0 && module !== "" && date !== "";
 
   const inputClass = "w-full bg-navy-card border border-court-border rounded-xl px-3.5 py-2.5 text-[13px] text-court-text outline-none focus:border-gold/40 transition-colors placeholder:text-court-text-ter";
   const labelClass = "text-[10px] text-court-text-ter uppercase tracking-widest mb-1.5 block";
@@ -143,8 +145,31 @@ export default function CreateSessionPage() {
           </Card>
         </div>
 
+        {/* Validation hints */}
+        {submitted && !isValid && (
+          <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">
+            <p className="text-[12px] text-red-400 font-semibold mb-1">Please complete required fields:</p>
+            <ul className="text-[11px] text-red-400/80 list-disc pl-4 space-y-0.5">
+              {!title.trim() && <li>Session title is required</li>}
+              {!module && <li>Select a module / area of law</li>}
+              {!date && <li>Set a date for the session</li>}
+            </ul>
+          </div>
+        )}
+
         {/* Submit */}
-        <Button fullWidth>Create Session</Button>
+        <Button
+          fullWidth
+          disabled={submitted && !isValid}
+          onClick={() => {
+            setSubmitted(true);
+            if (isValid) {
+              // In production: call Convex mutation
+            }
+          }}
+        >
+          Create Session
+        </Button>
       </div>
     </div>
   );

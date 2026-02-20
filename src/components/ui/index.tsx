@@ -274,3 +274,63 @@ export function EmptyState({
     </div>
   );
 }
+
+// ── Skeleton ──
+export function Skeleton({
+  className,
+  rounded = false,
+}: {
+  className?: string;
+  rounded?: boolean;
+}) {
+  return (
+    <div
+      className={cn(
+        "animate-pulse bg-white/[0.06]",
+        rounded ? "rounded-full" : "rounded-court",
+        className
+      )}
+    />
+  );
+}
+
+// ── CardSkeleton ──
+export function CardSkeleton() {
+  return (
+    <Card className="p-4">
+      <div className="flex gap-3 items-center">
+        <Skeleton rounded className="w-10 h-10 shrink-0" />
+        <div className="flex-1 space-y-2">
+          <Skeleton className="h-3 w-3/4" />
+          <Skeleton className="h-2.5 w-1/2" />
+        </div>
+      </div>
+      <Skeleton className="h-2.5 w-full mt-3" />
+      <Skeleton className="h-2.5 w-2/3 mt-1.5" />
+    </Card>
+  );
+}
+
+// ── ErrorState ──
+export function ErrorState({
+  title = "Something went wrong",
+  description = "Please try again later",
+  onRetry,
+}: {
+  title?: string;
+  description?: string;
+  onRetry?: () => void;
+}) {
+  return (
+    <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+      <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
+        <span className="text-2xl">!</span>
+      </div>
+      <h3 className="font-serif text-lg font-bold text-court-text mb-2">{title}</h3>
+      <p className="text-sm text-court-text-ter mb-6 max-w-xs">{description}</p>
+      {onRetry && (
+        <Button variant="outline" size="sm" onClick={onRetry}>Try Again</Button>
+      )}
+    </div>
+  );
+}

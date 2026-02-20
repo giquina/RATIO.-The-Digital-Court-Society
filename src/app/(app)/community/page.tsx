@@ -27,8 +27,20 @@ export default function CommunityPage() {
   const [tab, setTab] = useState(0);
   const [filterTab, setFilterTab] = useState(0);
   const [follows, setFollows] = useState<Record<string, boolean>>({});
+  const [search, setSearch] = useState("");
 
   const tabs = ["Discover", "Rankings", "Your Chamber"];
+
+  const filteredPeople = PEOPLE.filter((p) =>
+    !search || p.name.toLowerCase().includes(search.toLowerCase()) ||
+    p.uni.toLowerCase().includes(search.toLowerCase()) ||
+    p.chamber.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const filteredRankings = RANKINGS.filter((r) =>
+    !search || r.name.toLowerCase().includes(search.toLowerCase()) ||
+    r.uni.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <div className="pb-6">
@@ -37,7 +49,17 @@ export default function CommunityPage() {
         <p className="text-xs text-court-text-sec mb-3.5">184 followers · 96 following · Top 24% nationally</p>
         <div className="bg-white/[0.05] rounded-xl px-3.5 py-2.5 flex items-center gap-2 mb-3.5">
           <span className="opacity-30">🔍</span>
-          <span className="text-xs text-court-text-ter">Search advocates, universities...</span>
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search advocates, universities..."
+            className="flex-1 bg-transparent text-xs text-court-text outline-none placeholder:text-court-text-ter"
+            aria-label="Search community"
+          />
+          {search && (
+            <button onClick={() => setSearch("")} className="text-court-text-ter text-xs">✕</button>
+          )}
         </div>
         <div className="flex gap-1 bg-white/[0.04] rounded-xl p-0.5">
           {tabs.map((t, i) => (
@@ -63,7 +85,7 @@ export default function CommunityPage() {
             ))}
           </div>
           <div className="flex flex-col gap-2.5">
-            {PEOPLE.map((p, i) => (
+            {filteredPeople.map((p, i) => (
               <Card key={i} className="p-3.5">
                 <div className="flex gap-3 items-center">
                   <Avatar initials={p.initials} chamber={p.chamber} size="lg" online={i < 2} />
@@ -129,7 +151,7 @@ export default function CommunityPage() {
           </div>
           {/* Remaining rankings */}
           <div className="flex flex-col gap-2">
-            {RANKINGS.slice(3).map((r) => {
+            {filteredRankings.slice(3).map((r) => {
               const isMe = r.name === "Ali Giquina";
               return (
                 <Card key={r.name} highlight={isMe} className="px-3.5 py-3 flex items-center gap-3">

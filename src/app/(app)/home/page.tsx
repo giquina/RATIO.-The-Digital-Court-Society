@@ -99,7 +99,7 @@ export default function HomePage() {
 
       {/* ── Quick Actions ── */}
       <section className="px-4 mb-6">
-        <div className="grid grid-cols-2 gap-2.5">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
           {[
             { icon: "⚖️", label: "Create Session", sub: "Host a moot or trial", href: "/sessions/create" },
             { icon: "📅", label: "View Timetable", sub: "This week's sessions", href: "/sessions" },
@@ -117,8 +117,11 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── Desktop: two-column layout for session + feed ── */}
+      <div className="lg:grid lg:grid-cols-2 lg:gap-6 lg:px-4">
+
       {/* ── Upcoming Session ── */}
-      <section className="px-4 mb-6">
+      <section className="px-4 lg:px-0 mb-6">
         <SectionHeader title="Your Next Session" action="View all" onAction={() => {}} />
         <Card className="overflow-hidden">
           <div className="bg-burgundy/20 px-4 py-2.5 flex justify-between items-center">
@@ -147,7 +150,7 @@ export default function HomePage() {
       </section>
 
       {/* ── Activity Feed ── */}
-      <section className="px-4">
+      <section className="px-4 lg:px-0">
         <div className="flex justify-between items-center mb-3.5">
           <h2 className="font-serif text-lg font-bold text-court-text">Activity</h2>
           <div className="flex gap-3">
@@ -235,6 +238,8 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+
+      </div>{/* end desktop two-column */}
     </div>
   );
 }

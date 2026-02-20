@@ -29,7 +29,7 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className="bg-navy text-court-text font-sans antialiased min-h-screen">
         <ConvexClientProvider>
-          <div className="max-w-lg mx-auto min-h-screen relative">
+          <div className="max-w-lg lg:max-w-4xl xl:max-w-5xl mx-auto min-h-screen relative">
             {children}
           </div>
         </ConvexClientProvider>

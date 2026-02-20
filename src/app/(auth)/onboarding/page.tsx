@@ -1,17 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { UNIVERSITIES, LAW_MODULES, CHAMBERS } from "@/lib/constants/app";
 
 type Step = 1 | 2 | 3 | 4;
 
+const STORAGE_KEY = "ratio_onboarding";
+
+function loadSaved() {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch { return null; }
+}
+
 export default function OnboardingPage() {
-  const [step, setStep] = useState<Step>(1);
-  const [university, setUniversity] = useState("");
-  const [year, setYear] = useState<number | null>(null);
-  const [modules, setModules] = useState<string[]>([]);
-  const [chamber, setChamber] = useState("");
+  const saved = loadSaved();
+  const [step, setStep] = useState<Step>(saved?.step ?? 1);
+  const [university, setUniversity] = useState(saved?.university ?? "");
+  const [year, setYear] = useState<number | null>(saved?.year ?? null);
+  const [modules, setModules] = useState<string[]>(saved?.modules ?? []);
+  const [chamber, setChamber] = useState(saved?.chamber ?? "");
   const [search, setSearch] = useState("");
+
+  // Persist progress to localStorage
+  const persist = useCallback(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ step, university, year, modules, chamber }));
+    } catch {}
+  }, [step, university, year, modules, chamber]);
+
+  useEffect(() => { persist(); }, [persist]);
 
   const filteredUnis = UNIVERSITIES.filter((u) =>
     u.name.toLowerCase().includes(search.toLowerCase()) || u.short.toLowerCase().includes(search.toLowerCase())
@@ -27,10 +47,19 @@ export default function OnboardingPage() {
   return (
     <div className="min-h-screen flex flex-col px-6 pt-8 pb-12">
       {/* Progress */}
-      <div className="flex gap-1.5 mb-8">
-        {[1, 2, 3, 4].map((s) => (
-          <div key={s} className={`flex-1 h-1 rounded-full transition-all duration-500 ${s <= step ? "bg-gold" : "bg-white/[0.06]"}`} />
-        ))}
+      <div className="mb-8">
+        <div className="flex gap-1.5 mb-2">
+          {[1, 2, 3, 4].map((s) => (
+            <div key={s} className={`flex-1 h-1 rounded-full transition-all duration-500 ${s <= step ? "bg-gold" : "bg-white/[0.06]"}`} />
+          ))}
+        </div>
+        <div className="flex justify-between">
+          {["University", "Year", "Modules", "Chamber"].map((label, i) => (
+            <span key={label} className={`text-[9px] tracking-wider ${i + 1 <= step ? "text-gold" : "text-court-text-ter"}`}>
+              {label}
+            </span>
+          ))}
+        </div>
       </div>
 
       {/* ── Step 1: University ── */}
@@ -160,7 +189,7 @@ export default function OnboardingPage() {
           </button>
         )}
         <button
-          onClick={step === 4 ? () => (window.location.href = "/home") : next}
+          onClick={step === 4 ? () => { localStorage.removeItem(STORAGE_KEY); window.location.href = "/home"; } : next}
           disabled={(step === 1 && !university) || (step === 2 && year === null) || (step === 3 && modules.length === 0) || (step === 4 && !chamber)}
           className="flex-1 py-3 text-sm font-bold bg-gold text-navy rounded-xl disabled:opacity-40"
         >

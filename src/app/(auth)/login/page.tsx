@@ -30,10 +30,16 @@ export default function LoginPage() {
           <div className="flex-1 h-px bg-court-border" />
         </div>
 
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email address" className={inputClass} />
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" className={inputClass} />
+        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email address" className={inputClass} aria-label="Email address" />
+        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" className={inputClass} aria-label="Password" />
 
-        <button className="w-full bg-gold text-navy font-bold rounded-xl py-3 text-sm tracking-wide">
+        <div className="flex justify-end -mt-1">
+          <button className="text-[11px] text-gold font-semibold hover:underline">
+            Forgot password?
+          </button>
+        </div>
+
+        <button className="w-full bg-gold text-navy font-bold rounded-xl py-3 text-sm tracking-wide hover:bg-gold/90 transition-colors">
           Sign In
         </button>
 

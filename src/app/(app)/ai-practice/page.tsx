@@ -240,7 +240,7 @@ export default function AIPracticePage() {
   // ── LIVE SESSION ──
   if (screen === "session") {
     return (
-      <div className="flex flex-col h-screen max-h-screen">
+      <div className="flex flex-col h-[calc(100dvh-80px)]">
         <div className="px-4 pt-3 pb-2 flex justify-between items-center border-b border-court-border-light shrink-0">
           <div className="flex items-center gap-2">
             <span className="text-base">{persona.icon}</span>

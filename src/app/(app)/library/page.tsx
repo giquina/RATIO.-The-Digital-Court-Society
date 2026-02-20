@@ -12,16 +12,26 @@ const CATEGORIES = [
   { key: "exam_skills", label: "Exam Skills", icon: "🧠", count: 15, color: "red" },
 ];
 
-const POPULAR = [
-  { title: "IRAC Structure Template", cat: "IRAC Guide", type: "PDF", downloads: 342, isPremium: false },
-  { title: "Skeleton Argument — Standard Format", cat: "Moot Template", type: "DOCX", downloads: 287, isPremium: false },
-  { title: "SQE2 Advocacy Marking Criteria", cat: "SQE2 Prep", type: "PDF", downloads: 524, isPremium: false },
-  { title: "Cross-Examination Technique Guide", cat: "Exam Skills", type: "PDF", downloads: 198, isPremium: true },
-  { title: "Bundle of Authorities — Template", cat: "Moot Template", type: "DOCX", downloads: 156, isPremium: false },
+const ALL_RESOURCES = [
+  { title: "IRAC Structure Template", cat: "IRAC Guide", catKey: "irac_guide", type: "PDF", downloads: 342, isPremium: false },
+  { title: "Skeleton Argument — Standard Format", cat: "Moot Template", catKey: "moot_template", type: "DOCX", downloads: 287, isPremium: false },
+  { title: "SQE2 Advocacy Marking Criteria", cat: "SQE2 Prep", catKey: "sqe2_prep", type: "PDF", downloads: 524, isPremium: false },
+  { title: "Cross-Examination Technique Guide", cat: "Exam Skills", catKey: "exam_skills", type: "PDF", downloads: 198, isPremium: true },
+  { title: "Bundle of Authorities — Template", cat: "Moot Template", catKey: "moot_template", type: "DOCX", downloads: 156, isPremium: false },
+  { title: "Case Analysis: Donoghue v Stevenson", cat: "Case Bank", catKey: "case_bank", type: "PDF", downloads: 89, isPremium: false },
+  { title: "Judgment Writing Template", cat: "Judgment Writing", catKey: "judgment_writing", type: "DOCX", downloads: 45, isPremium: true },
+  { title: "SQE2 Mock Advocacy Scripts", cat: "SQE2 Prep", catKey: "sqe2_prep", type: "PDF", downloads: 312, isPremium: false },
 ];
 
 export default function LibraryPage() {
   const [selectedCat, setSelectedCat] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+
+  const filteredResources = ALL_RESOURCES.filter((r) => {
+    const matchesCat = !selectedCat || r.catKey === selectedCat;
+    const matchesSearch = !search || r.title.toLowerCase().includes(search.toLowerCase()) || r.cat.toLowerCase().includes(search.toLowerCase());
+    return matchesCat && matchesSearch;
+  });
 
   return (
     <div className="pb-6">
@@ -34,14 +44,24 @@ export default function LibraryPage() {
       <div className="px-4 mb-5">
         <div className="bg-white/[0.05] rounded-xl px-3.5 py-2.5 flex items-center gap-2">
           <span className="opacity-30">🔍</span>
-          <span className="text-xs text-court-text-ter">Search resources...</span>
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search resources..."
+            className="flex-1 bg-transparent text-xs text-court-text outline-none placeholder:text-court-text-ter"
+            aria-label="Search library"
+          />
+          {search && (
+            <button onClick={() => setSearch("")} className="text-court-text-ter text-xs">✕</button>
+          )}
         </div>
       </div>
 
       {/* Categories Grid */}
       <section className="px-4 mb-6">
         <SectionHeader title="Categories" />
-        <div className="grid grid-cols-2 gap-2.5">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-2.5">
           {CATEGORIES.map((c) => (
             <Card
               key={c.key}
@@ -58,11 +78,16 @@ export default function LibraryPage() {
         </div>
       </section>
 
-      {/* Popular Resources */}
+      {/* Resources */}
       <section className="px-4">
-        <SectionHeader title="Most Downloaded" action="View all" />
+        <SectionHeader title={selectedCat ? CATEGORIES.find(c => c.key === selectedCat)?.label ?? "Resources" : "Most Downloaded"} action={selectedCat ? "Clear filter" : undefined} onAction={() => setSelectedCat(null)} />
         <div className="flex flex-col gap-2">
-          {POPULAR.map((r, i) => (
+          {filteredResources.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-court-text-ter text-sm">No resources found</p>
+            </div>
+          ) : null}
+          {filteredResources.map((r, i) => (
             <Card key={i} className="px-3.5 py-3 flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-white/[0.04] flex items-center justify-center text-xs font-bold text-court-text-sec shrink-0">
                 {r.type}

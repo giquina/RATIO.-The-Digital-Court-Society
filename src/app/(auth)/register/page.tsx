@@ -7,6 +7,8 @@ export default function RegisterPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const inputClass = "w-full bg-navy-card border border-court-border rounded-xl px-3.5 py-3 text-[13px] text-court-text outline-none focus:border-gold/40 transition-colors placeholder:text-court-text-ter";
 
@@ -30,11 +32,25 @@ export default function RegisterPage() {
           <div className="flex-1 h-px bg-court-border" />
         </div>
 
-        <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Full name" className={inputClass} />
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="University email" className={inputClass} />
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Create password" className={inputClass} />
+        <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Full name" className={inputClass} aria-label="Full name" />
+        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="University email" className={inputClass} aria-label="University email" />
+        <div>
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Create password" className={inputClass} aria-label="Create password" />
+          {password && password.length < 8 && (
+            <p className="text-[10px] text-orange-400 mt-1">Password must be at least 8 characters</p>
+          )}
+        </div>
+        <div>
+          <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Confirm password" className={inputClass} aria-label="Confirm password" />
+          {confirmPassword && password !== confirmPassword && (
+            <p className="text-[10px] text-red-400 mt-1">Passwords do not match</p>
+          )}
+        </div>
 
-        <button className="w-full bg-gold text-navy font-bold rounded-xl py-3 text-sm tracking-wide">
+        <button
+          className="w-full bg-gold text-navy font-bold rounded-xl py-3 text-sm tracking-wide hover:bg-gold/90 transition-colors disabled:opacity-40"
+          disabled={!name || !email || password.length < 8 || password !== confirmPassword}
+        >
           Create Account
         </button>
 

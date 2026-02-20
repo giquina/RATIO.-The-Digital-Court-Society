@@ -1,15 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 
 export default function LandingPage() {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [count, setCount] = useState(247); // social proof seed
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => { setVisible(true); }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,7 +36,7 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero */}
-      <section className={`relative z-10 text-center px-6 pt-16 pb-12 max-w-2xl mx-auto transition-all duration-1000 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}>
+      <section className="relative z-10 text-center px-6 pt-16 pb-12 max-w-2xl mx-auto animate-slide-up">
         {/* Social proof pill */}
         <div className="inline-flex items-center gap-2 bg-gold-dim border border-gold/20 rounded-full px-4 py-1.5 mb-8">
           <div className="flex -space-x-1.5">
@@ -91,7 +88,7 @@ export default function LandingPage() {
       </section>
 
       {/* Feature Grid */}
-      <section className={`relative z-10 px-6 pb-16 max-w-3xl mx-auto transition-all duration-1000 delay-200 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}>
+      <section className="relative z-10 px-6 pb-16 max-w-3xl mx-auto animate-slide-up" style={{ animationDelay: "0.15s", animationFillMode: "both" }}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {[
             {
