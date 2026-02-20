@@ -1,0 +1,134 @@
+import { v } from "convex/values";
+import { query, mutation } from "../_generated/server";
+
+// ═══════════════════════════════════════════
+// MODERATION
+// ═══════════════════════════════════════════
+
+export const reportContent = mutation({
+  args: {
+    reportedById: v.id("profiles"),
+    targetProfileId: v.id("profiles"),
+    targetContentType: v.string(),
+    targetContentId: v.optional(v.string()),
+    reason: v.string(),
+  },
+  handler: async (ctx, args) => {
+    return ctx.db.insert("moderationActions", {
+      ...args,
+      status: "reported",
+      action: undefined,
+      reviewedById: undefined,
+      proportionalityAssessment: undefined,
+      respondentStatement: undefined,
+    });
+  },
+});
+
+export const listModerationActions = query({
+  args: { status: v.optional(v.string()) },
+  handler: async (ctx, args) => {
+    let q = ctx.db.query("moderationActions");
+    if (args.status) {
+      q = q.withIndex("by_status", (idx) => idx.eq("status", args.status!));
+    }
+    const actions = await q.order("desc").take(50);
+    return Promise.all(
+      actions.map(async (a) => {
+        const reporter = await ctx.db.get(a.reportedById);
+        const target = await ctx.db.get(a.targetProfileId);
+        const reviewer = a.reviewedById ? await ctx.db.get(a.reviewedById) : null;
+        return { ...a, reporter, target, reviewer };
+      })
+    );
+  },
+});
+
+export const reviewModerationAction = mutation({
+  args: {
+    actionId: v.id("moderationActions"),
+    reviewedById: v.id("profiles"),
+    status: v.string(), // "action_taken" or "dismissed"
+    action: v.optional(v.string()),
+    proportionalityAssessment: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.actionId, {
+      status: args.status,
+      action: args.action,
+      reviewedById: args.reviewedById,
+      proportionalityAssessment: args.proportionalityAssessment,
+    });
+
+    await ctx.db.insert("auditLog", {
+      actorId: args.reviewedById,
+      action: "moderation_reviewed",
+      targetType: "moderation",
+      targetId: args.actionId,
+      details: `${args.status}: ${args.action ?? "no action"}`,
+    });
+  },
+});
+
+// ═══════════════════════════════════════════
+// GOVERNANCE ROLES
+// ═══════════════════════════════════════════
+
+export const listGovernanceRoles = query({
+  args: {},
+  handler: async (ctx) => {
+    const roles = await ctx.db.query("governanceRoles").collect();
+    return Promise.all(
+      roles.map(async (r) => {
+        const profile = await ctx.db.get(r.profileId);
+        return { ...r, profile };
+      })
+    );
+  },
+});
+
+export const assignRole = mutation({
+  args: {
+    profileId: v.id("profiles"),
+    role: v.string(),
+    appointedBy: v.optional(v.id("motions")),
+  },
+  handler: async (ctx, args) => {
+    return ctx.db.insert("governanceRoles", {
+      ...args,
+      appointedAt: new Date().toISOString(),
+      status: "active",
+    });
+  },
+});
+
+// ═══════════════════════════════════════════
+// CONDUCT CODE
+// ═══════════════════════════════════════════
+
+export const listConductCode = query({
+  args: {},
+  handler: async (ctx) => {
+    return ctx.db.query("conductCode").withIndex("by_section").collect();
+  },
+});
+
+// ═══════════════════════════════════════════
+// AUDIT LOG
+// ═══════════════════════════════════════════
+
+export const getAuditLog = query({
+  args: { limit: v.optional(v.number()) },
+  handler: async (ctx, args) => {
+    const entries = await ctx.db
+      .query("auditLog")
+      .order("desc")
+      .take(args.limit ?? 50);
+    return Promise.all(
+      entries.map(async (e) => {
+        const actor = await ctx.db.get(e.actorId);
+        return { ...e, actor };
+      })
+    );
+  },
+});

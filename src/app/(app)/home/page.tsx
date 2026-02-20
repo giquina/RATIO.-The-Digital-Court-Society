@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Avatar,
   Tag,
@@ -13,6 +14,8 @@ import {
   FollowButton,
 } from "@/components/ui";
 import { CHAMBER_COLORS } from "@/lib/constants/app";
+import { Bell, Scale, Calendar, Target, Trophy, Flame, Award, MessageCircle, ExternalLink } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 // Demo data — replaced by Convex queries in production
 const ME = {
@@ -32,6 +35,7 @@ const FEED = [
 ];
 
 export default function HomePage() {
+  const router = useRouter();
   const [commended, setCommended] = useState<Record<string, boolean>>({});
   const [follows, setFollows] = useState<Record<string, boolean>>({});
   const [feedTab, setFeedTab] = useState<"following" | "discover" | "chamber">("following");
@@ -39,16 +43,16 @@ export default function HomePage() {
   return (
     <div className="pb-6">
       {/* ── Header ── */}
-      <header className="flex justify-between items-center px-5 pt-3 pb-4">
+      <header className="flex justify-between items-center px-4 pt-3 pb-4">
         <div>
           <h1 className="font-serif text-sm text-gold tracking-[0.14em] uppercase font-bold">
-            RATIO<span style={{color:'#C9A84C'}}>.</span>
+            RATIO<span className="text-gold">.</span>
           </h1>
-          <p className="text-[11px] text-court-text-ter mt-0.5">UCL · Gray&apos;s Chamber</p>
+          <p className="text-court-sm text-court-text-ter mt-0.5">UCL · Gray&apos;s Chamber</p>
         </div>
         <div className="flex items-center gap-3">
-          <Link href="/notifications" className="relative w-9 h-9 rounded-full bg-gold-dim flex items-center justify-center text-base">
-            🔔
+          <Link href="/notifications" className="relative w-9 h-9 rounded-full bg-gold-dim flex items-center justify-center">
+            <Bell size={18} className="text-gold" />
             <span className="absolute top-0.5 right-0.5 w-2 h-2 rounded-full bg-red-500 border-2 border-navy" />
           </Link>
           <Link href="/profile">
@@ -59,16 +63,16 @@ export default function HomePage() {
 
       {/* ── Streak + Stats Card ── */}
       <section className="px-4 mb-5">
-        <Card highlight className="p-5 relative overflow-hidden">
+        <Card highlight className="p-3 md:p-4 relative overflow-hidden">
           <div className="absolute -top-8 -right-5 w-32 h-32 rounded-full bg-gold/[0.04]" />
           <div className="flex justify-between items-start">
             <div>
-              <p className="text-[10px] text-court-text-ter uppercase tracking-widest mb-1">Practice Streak</p>
+              <p className="text-court-xs text-court-text-ter uppercase tracking-widest mb-1">Practice Streak</p>
               <div className="flex items-baseline gap-1.5">
                 <span className="font-serif text-4xl font-bold text-gold">{ME.streak}</span>
                 <span className="text-sm text-court-text-sec">days</span>
               </div>
-              <p className="text-[10px] text-court-text-ter mt-1">🔥 Personal best · Top {ME.topPercent}%</p>
+              <p className="text-court-xs text-court-text-ter mt-1 flex items-center gap-1"><Flame size={12} className="text-orange-400" /> Personal best · Top {ME.topPercent}%</p>
             </div>
             <div className="text-center">
               <div className="w-14 h-14 rounded-full flex items-center justify-center"
@@ -77,7 +81,7 @@ export default function HomePage() {
                   <span className="text-sm font-bold text-court-text">{ME.readiness}%</span>
                 </div>
               </div>
-              <p className="text-[8px] text-court-text-ter uppercase tracking-wider mt-1">SQE2 Ready</p>
+              <p className="text-court-xs text-court-text-ter uppercase tracking-wider mt-1">SQE2 Ready</p>
             </div>
           </div>
           {/* Social stats row */}
@@ -90,7 +94,7 @@ export default function HomePage() {
             ].map((s) => (
               <div key={s.l} className="flex-1 text-center">
                 <div className="font-serif text-base font-bold text-court-text">{s.v}</div>
-                <div className="text-[8px] text-court-text-ter uppercase tracking-wider mt-0.5">{s.l}</div>
+                <div className="text-court-xs text-court-text-ter uppercase tracking-wider mt-0.5">{s.l}</div>
               </div>
             ))}
           </div>
@@ -100,17 +104,17 @@ export default function HomePage() {
       {/* ── Quick Actions ── */}
       <section className="px-4 mb-6">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
-          {[
-            { icon: "⚖️", label: "Create Session", sub: "Host a moot or trial", href: "/sessions/create" },
-            { icon: "📅", label: "View Timetable", sub: "This week's sessions", href: "/sessions" },
-            { icon: "🎯", label: "AI Practice", sub: "Train with AI Judge", href: "/ai-practice" },
-            { icon: "🏆", label: "League Table", sub: "National rankings", href: "/community" },
-          ].map((a) => (
+          {([
+            { Icon: Scale, label: "Create Session", sub: "Host a moot or trial", href: "/sessions/create" },
+            { Icon: Calendar, label: "View Timetable", sub: "This week's sessions", href: "/sessions" },
+            { Icon: Target, label: "AI Practice", sub: "Train with AI Judge", href: "/ai-practice" },
+            { Icon: Trophy, label: "League Table", sub: "National rankings", href: "/community" },
+          ] as { Icon: LucideIcon; label: string; sub: string; href: string }[]).map((a) => (
             <Link key={a.label} href={a.href}>
               <Card className="p-3.5 hover:border-white/10">
-                <span className="text-xl">{a.icon}</span>
-                <p className="text-[13px] font-bold text-court-text mt-1.5 mb-0.5">{a.label}</p>
-                <p className="text-[10px] text-court-text-ter">{a.sub}</p>
+                <a.Icon size={20} className="text-gold" />
+                <p className="text-court-base font-bold text-court-text mt-1.5 mb-0.5">{a.label}</p>
+                <p className="text-court-xs text-court-text-ter">{a.sub}</p>
               </Card>
             </Link>
           ))}
@@ -122,17 +126,17 @@ export default function HomePage() {
 
       {/* ── Upcoming Session ── */}
       <section className="px-4 lg:px-0 mb-6">
-        <SectionHeader title="Your Next Session" action="View all" onAction={() => {}} />
+        <SectionHeader title="Your Next Session" action="View all" onAction={() => router.push("/sessions")} />
         <Card className="overflow-hidden">
           <div className="bg-burgundy/20 px-4 py-2.5 flex justify-between items-center">
             <Tag color="burgundy">MOOT · PUBLIC LAW</Tag>
-            <span className="text-[11px] text-court-text-sec">Tue 25 Feb · 14:00</span>
+            <span className="text-court-sm text-court-text-sec">Tue 25 Feb · 14:00</span>
           </div>
           <div className="p-4">
             <h3 className="font-serif text-base font-bold text-court-text mb-2.5 leading-tight">
               Judicial Review of Executive Power
             </h3>
-            <div className="bg-gold-dim text-gold text-[11px] font-bold px-2.5 py-1 rounded-md w-fit mb-3">
+            <div className="bg-gold-dim text-gold text-court-sm font-bold px-2.5 py-1 rounded-md w-fit mb-3">
               Your role: Leading Counsel (App.)
             </div>
             <div className="flex items-center gap-0 mb-4">
@@ -141,8 +145,8 @@ export default function HomePage() {
                   <Avatar initials={i} chamber={["Gray's", "Lincoln's", "Inner"][idx]} size="xs" />
                 </div>
               ))}
-              <span className="text-[11px] text-court-text-sec ml-2.5">3 of 4 filled</span>
-              <span className="text-[11px] text-gold font-bold ml-auto">1 open →</span>
+              <span className="text-court-sm text-court-text-sec ml-2.5">3 of 4 filled</span>
+              <span className="text-court-sm text-gold font-bold ml-auto">1 open →</span>
             </div>
             <Button fullWidth>View Preparation Checklist</Button>
           </div>
@@ -158,7 +162,7 @@ export default function HomePage() {
               <button
                 key={t}
                 onClick={() => setFeedTab(t)}
-                className={`text-[11px] font-semibold pb-0.5 capitalize ${
+                className={`text-court-sm font-semibold pb-0.5 capitalize ${
                   feedTab === t ? "text-gold border-b-[1.5px] border-gold" : "text-court-text-ter"
                 }`}
               >
@@ -177,8 +181,8 @@ export default function HomePage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-center">
                     <div>
-                      <span className="text-[13px] font-bold text-court-text">{item.user}</span>
-                      <span className="text-[10px] text-court-text-ter ml-1.5">{item.time}</span>
+                      <span className="text-court-base font-bold text-court-text">{item.user}</span>
+                      <span className="text-court-xs text-court-text-ter ml-1.5">{item.time}</span>
                     </div>
                     <FollowButton
                       isFollowing={!!follows[item.id]}
@@ -186,38 +190,38 @@ export default function HomePage() {
                       small
                     />
                   </div>
-                  <p className="text-[10px] text-court-text-ter mt-0.5">{item.uni} · {item.chamber} Chamber</p>
+                  <p className="text-court-xs text-court-text-ter mt-0.5">{item.uni} · {item.chamber} Chamber</p>
                 </div>
               </div>
 
               {/* Content */}
               {item.type === "moot" && (
                 <>
-                  <p className="text-[13px] text-court-text-sec mb-1">
+                  <p className="text-court-base text-court-text-sec mb-1">
                     Completed a moot as <span className="text-court-text font-semibold">{item.role}</span>
                   </p>
                   <div className="bg-white/[0.03] rounded-lg p-2.5 border-l-[3px] mb-2.5"
                     style={{ borderColor: CHAMBER_COLORS[item.chamber] }}>
-                    <p className="text-[13px] font-bold text-court-text mb-1">{item.topic}</p>
+                    <p className="text-court-base font-bold text-court-text mb-1">{item.topic}</p>
                     <Tag>{item.role!}</Tag>
                   </div>
                 </>
               )}
               {item.type === "badge" && (
                 <div className="bg-green-500/[0.08] rounded-lg p-3 border border-green-500/20 flex gap-2.5 items-center mb-2.5">
-                  <span className="text-2xl">🏅</span>
+                  <Award size={24} className="text-green-500 shrink-0" />
                   <div>
-                    <p className="text-[11px] text-green-500 font-semibold mb-0.5">Distinction Earned</p>
-                    <p className="text-[13px] font-bold text-court-text">{item.badge}</p>
+                    <p className="text-court-sm text-green-500 font-semibold mb-0.5">Distinction Earned</p>
+                    <p className="text-court-base font-bold text-court-text">{item.badge}</p>
                   </div>
                 </div>
               )}
               {item.type === "milestone" && (
                 <div className="bg-orange-400/[0.08] rounded-lg p-3 border border-orange-400/20 flex gap-2.5 items-center mb-2.5">
-                  <span className="text-2xl">🔥</span>
+                  <Flame size={24} className="text-orange-400 shrink-0" />
                   <div>
-                    <p className="text-[11px] text-orange-400 font-semibold mb-0.5">Milestone Reached</p>
-                    <p className="text-[13px] font-bold text-court-text">{item.milestone}</p>
+                    <p className="text-court-sm text-orange-400 font-semibold mb-0.5">Milestone Reached</p>
+                    <p className="text-court-base font-bold text-court-text">{item.milestone}</p>
                   </div>
                 </div>
               )}
@@ -230,8 +234,8 @@ export default function HomePage() {
                   onToggle={() => setCommended((p) => ({ ...p, [item.id]: !p[item.id] }))}
                 />
                 <div className="flex gap-3">
-                  <span className="text-[11px] text-court-text-ter cursor-pointer">💬</span>
-                  <span className="text-[11px] text-court-text-ter cursor-pointer">↗</span>
+                  <button type="button" className="text-court-text-ter cursor-pointer" aria-label="Comment"><MessageCircle size={14} /></button>
+                  <button type="button" className="text-court-text-ter cursor-pointer" aria-label="Share"><ExternalLink size={14} /></button>
                 </div>
               </div>
             </Card>

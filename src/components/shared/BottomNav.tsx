@@ -8,8 +8,8 @@ import { cn } from "@/lib/utils/helpers";
 const tabs = [
   { href: "/home", label: "Home", Icon: Home },
   { href: "/sessions", label: "Sessions", Icon: Scale },
+  { href: "/law-book", label: "Law Book", Icon: BookOpen },
   { href: "/community", label: "Social", Icon: Users },
-  { href: "/library", label: "Library", Icon: BookOpen },
   { href: "/profile", label: "Profile", Icon: User },
 ];
 
@@ -18,11 +18,11 @@ export function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 bg-navy-mid/95 backdrop-blur-md border-t border-court-border"
+      className="fixed bottom-0 left-0 right-0 z-50 bg-navy-mid/95 backdrop-blur-md border-t border-court-border md:hidden"
       role="navigation"
       aria-label="Main navigation"
     >
-      <div className="max-w-lg lg:max-w-4xl xl:max-w-5xl mx-auto flex justify-around items-center px-2 pt-2 pb-7">
+      <div className="max-w-screen-sm md:max-w-screen-md mx-auto flex justify-around items-center px-2 pt-2 pb-7">
         {tabs.map((tab) => {
           const isActive = pathname?.startsWith(tab.href);
           return (
@@ -45,7 +45,7 @@ export function BottomNav() {
               />
               <span
                 className={cn(
-                  "text-[9px] font-bold tracking-wider transition-colors duration-200",
+                  "text-court-xs font-bold tracking-wider transition-colors duration-200",
                   isActive ? "text-gold" : "text-court-text-ter"
                 )}
               >

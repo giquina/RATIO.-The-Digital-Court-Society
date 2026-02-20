@@ -1,6 +1,21 @@
 import type { Metadata, Viewport } from "next";
+import { Cormorant_Garamond, DM_Sans } from "next/font/google";
 import { ConvexClientProvider } from "@/components/shared/ConvexProvider";
 import "./globals.css";
+
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-cormorant",
+  display: "swap",
+});
+
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-dm-sans",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Ratio",
@@ -26,10 +41,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className={`dark ${cormorant.variable} ${dmSans.variable}`}>
       <body className="bg-navy text-court-text font-sans antialiased min-h-screen">
         <ConvexClientProvider>
-          <div className="max-w-lg lg:max-w-4xl xl:max-w-5xl mx-auto min-h-screen relative">
+          <div className="min-h-screen relative">
             {children}
           </div>
         </ConvexClientProvider>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Avatar, Tag, Card, FollowButton, SectionHeader } from "@/components/ui";
+import { Search, Scale, Medal, Trophy } from "lucide-react";
 
 const PEOPLE = [
   { name: "Priya Sharma", initials: "PS", uni: "KCL", year: "Year 3", chamber: "Lincoln's",
@@ -44,11 +45,11 @@ export default function CommunityPage() {
 
   return (
     <div className="pb-6">
-      <div className="px-5 pt-3 pb-4">
+      <div className="px-4 pt-3 pb-4">
         <h1 className="font-serif text-2xl font-bold text-court-text mb-1">Community</h1>
         <p className="text-xs text-court-text-sec mb-3.5">184 followers · 96 following · Top 24% nationally</p>
         <div className="bg-white/[0.05] rounded-xl px-3.5 py-2.5 flex items-center gap-2 mb-3.5">
-          <span className="opacity-30">🔍</span>
+          <Search size={14} className="text-court-text-ter opacity-50" />
           <input
             type="text"
             value={search}
@@ -64,7 +65,7 @@ export default function CommunityPage() {
         <div className="flex gap-1 bg-white/[0.04] rounded-xl p-0.5">
           {tabs.map((t, i) => (
             <button key={t} onClick={() => setTab(i)}
-              className={`flex-1 py-2 rounded-lg text-[11px] font-bold transition-all ${tab === i ? "bg-gold text-navy" : "text-court-text-sec"}`}>
+              className={`flex-1 py-2 rounded-lg text-court-sm font-bold transition-all ${tab === i ? "bg-gold text-navy" : "text-court-text-sec"}`}>
               {t}
             </button>
           ))}
@@ -77,7 +78,7 @@ export default function CommunityPage() {
           <div className="flex gap-1.5 mb-3.5 flex-wrap">
             {["Suggested", "Same Modules", "Same Year", "Rising Stars"].map((f, i) => (
               <button key={f} onClick={() => setFilterTab(i)}
-                className={`px-3 py-1 rounded-full text-[10px] font-semibold border transition-all ${
+                className={`px-3 py-1 rounded-full text-court-xs font-semibold border transition-all ${
                   filterTab === i ? "border-gold/40 bg-gold-dim text-gold" : "border-court-border text-court-text-ter"
                 }`}>
                 {f}
@@ -93,7 +94,7 @@ export default function CommunityPage() {
                     <div className="flex justify-between items-center">
                       <div>
                         <p className="text-sm font-bold text-court-text">{p.name}</p>
-                        <p className="text-[10px] text-court-text-ter mt-0.5">{p.uni} · {p.year} · {p.chamber} Chamber</p>
+                        <p className="text-court-xs text-court-text-ter mt-0.5">{p.uni} · {p.year} · {p.chamber} Chamber</p>
                       </div>
                       <FollowButton isFollowing={!!follows[`p${i}`]} onToggle={() => setFollows(s => ({ ...s, [`p${i}`]: !s[`p${i}`] }))} />
                     </div>
@@ -107,8 +108,8 @@ export default function CommunityPage() {
                     { v: p.mutual, l: "mutual" },
                   ].map((s) => (
                     <div key={s.l} className="flex-1">
-                      <span className="text-[13px] font-bold text-court-text">{s.v}</span>
-                      <span className="text-[10px] text-court-text-ter ml-1">{s.l}</span>
+                      <span className="text-court-base font-bold text-court-text">{s.v}</span>
+                      <span className="text-court-xs text-court-text-ter ml-1">{s.l}</span>
                     </div>
                   ))}
                   <Tag>{p.rank}</Tag>
@@ -125,7 +126,7 @@ export default function CommunityPage() {
           <div className="flex gap-1.5 mb-4 flex-wrap">
             {["National", "Your University", "Your Chamber", "This Month"].map((f, i) => (
               <button key={f} onClick={() => setFilterTab(i)}
-                className={`px-3 py-1 rounded-full text-[10px] font-semibold border transition-all ${
+                className={`px-3 py-1 rounded-full text-court-xs font-semibold border transition-all ${
                   filterTab === i ? "border-gold/40 bg-gold-dim text-gold" : "border-court-border text-court-text-ter"
                 }`}>
                 {f}
@@ -139,11 +140,15 @@ export default function CommunityPage() {
               return (
                 <div key={r.name} className="flex-1 text-center">
                   <Avatar initials={r.initials} size={isFirst ? "xl" : "lg"} chamber={r.chamber} border={isFirst} />
-                  <p className={`${isFirst ? "text-[13px]" : "text-[11px]"} font-bold text-court-text mt-1.5`}>{r.name.split(" ")[0]}</p>
-                  <p className="text-[9px] text-court-text-ter">{r.uni}</p>
+                  <p className={`${isFirst ? "text-court-base" : "text-court-sm"} font-bold text-court-text mt-1.5`}>{r.name.split(" ")[0]}</p>
+                  <p className="text-court-xs text-court-text-ter">{r.uni}</p>
                   <div className={`mt-1.5 py-1 rounded-lg ${isFirst ? "bg-gold-dim border border-gold/25" : "bg-white/[0.04] border border-court-border-light"}`}>
-                    <span className={isFirst ? "text-base" : "text-sm"}>{["🥈", "🥇", "🥉"][i]}</span>
-                    <p className="text-[9px] text-court-text-ter">{r.score} pts</p>
+                    <div className="flex justify-center">{[
+                      <Medal key="silver" size={16} className="text-gray-300" />,
+                      <Trophy key="gold" size={20} className="text-gold" />,
+                      <Medal key="bronze" size={16} className="text-orange-400" />,
+                    ][i]}</div>
+                    <p className="text-court-xs text-court-text-ter">{r.score} pts</p>
                   </div>
                 </div>
               );
@@ -158,14 +163,14 @@ export default function CommunityPage() {
                   <span className="text-sm font-bold text-court-text-ter w-6 text-center font-serif">{r.pos}</span>
                   <Avatar initials={r.initials} chamber={r.chamber} size="sm" />
                   <div className="flex-1">
-                    <p className={`text-[13px] font-bold ${isMe ? "text-gold" : "text-court-text"}`}>
-                      {r.name} {isMe && <span className="text-[10px] font-normal">(You)</span>}
+                    <p className={`text-court-base font-bold ${isMe ? "text-gold" : "text-court-text"}`}>
+                      {r.name} {isMe && <span className="text-court-xs font-normal">(You)</span>}
                     </p>
-                    <p className="text-[10px] text-court-text-ter">{r.uni} · {r.moots} moots</p>
+                    <p className="text-court-xs text-court-text-ter">{r.uni} · {r.moots} moots</p>
                   </div>
                   <div className="text-right">
                     <p className="text-sm font-bold text-court-text font-serif">{r.score}</p>
-                    <p className="text-[8px] text-court-text-ter uppercase">points</p>
+                    <p className="text-court-xs text-court-text-ter uppercase">points</p>
                   </div>
                 </Card>
               );
@@ -178,14 +183,14 @@ export default function CommunityPage() {
       {tab === 2 && (
         <div className="px-4">
           <Card highlight className="p-5 text-center mb-4">
-            <span className="text-4xl">⚖️</span>
+            <Scale size={36} className="text-gold mx-auto" />
             <h2 className="font-serif text-xl font-bold text-court-text mt-2">Gray&apos;s Chamber</h2>
-            <p className="text-[11px] text-court-text-sec mt-1">Est. 2026 · 342 members · Ranked #2 nationally</p>
+            <p className="text-court-sm text-court-text-sec mt-1">Est. 2026 · 342 members · Ranked #2 nationally</p>
             <div className="flex justify-center gap-7 mt-4">
               {[{ v: "342", l: "Members" }, { v: "1,847", l: "Total Moots" }, { v: "#2", l: "Rank" }].map(s => (
                 <div key={s.l} className="text-center">
                   <p className="font-serif text-base font-bold text-court-text">{s.v}</p>
-                  <p className="text-[9px] text-court-text-ter uppercase tracking-wider mt-0.5">{s.l}</p>
+                  <p className="text-court-xs text-court-text-ter uppercase tracking-wider mt-0.5">{s.l}</p>
                 </div>
               ))}
             </div>
@@ -193,11 +198,11 @@ export default function CommunityPage() {
           <SectionHeader title="Top Advocates" />
           {PEOPLE.filter(p => p.chamber === "Gray's").map((p, i) => (
             <Card key={i} className="px-3.5 py-3 flex items-center gap-3 mb-2">
-              <span className="text-[13px] font-bold text-gold w-5 font-serif">{i + 1}</span>
+              <span className="text-court-base font-bold text-gold w-5 font-serif">{i + 1}</span>
               <Avatar initials={p.initials} chamber={p.chamber} size="sm" />
               <div className="flex-1">
-                <p className="text-[13px] font-bold text-court-text">{p.name}</p>
-                <p className="text-[10px] text-court-text-ter">{p.uni} · {p.moots} moots</p>
+                <p className="text-court-base font-bold text-court-text">{p.name}</p>
+                <p className="text-court-xs text-court-text-ter">{p.uni} · {p.moots} moots</p>
               </div>
               <Tag>{p.rank}</Tag>
             </Card>

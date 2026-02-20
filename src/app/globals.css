@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap");
+/* Fonts loaded via next/font/google in layout.tsx — no render-blocking @import */
 
 @layer base {
   body {
@@ -73,6 +73,6 @@
   }
 
   .tag {
-    @apply text-[10px] font-bold tracking-wider px-2 py-0.5 rounded;
+    @apply text-court-xs font-bold tracking-wider px-2 py-0.5 rounded;
   }
 }

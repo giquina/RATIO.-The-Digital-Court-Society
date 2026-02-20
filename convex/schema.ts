@@ -237,4 +237,279 @@ export default defineSchema({
   })
     .index("by_profile", ["profileId"])
     .index("by_unread", ["profileId", "read"]),
+
+  // ═══════════════════════════════════════════
+  // LAW BOOK
+  // ═══════════════════════════════════════════
+  lawBookModules: defineTable({
+    title: v.string(), // "Contract Law", "Criminal Law", etc.
+    slug: v.string(),
+    description: v.string(),
+    iconName: v.string(), // Lucide icon name
+    sortOrder: v.number(),
+    topicCount: v.number(),
+    status: v.string(), // "active", "draft", "archived"
+  })
+    .index("by_slug", ["slug"])
+    .index("by_status", ["status"]),
+
+  lawBookTopics: defineTable({
+    moduleId: v.id("lawBookModules"),
+    title: v.string(),
+    slug: v.string(),
+    summary: v.string(), // Short description for listing
+    status: v.string(), // "draft", "review", "published", "archived"
+    currentVersionId: v.optional(v.id("lawBookVersions")),
+    contributorCount: v.number(),
+    citationCount: v.number(),
+    viewCount: v.number(),
+  })
+    .index("by_module", ["moduleId"])
+    .index("by_slug", ["slug"])
+    .index("by_status", ["status"]),
+
+  lawBookVersions: defineTable({
+    topicId: v.id("lawBookTopics"),
+    authorId: v.id("profiles"),
+    content: v.string(), // Markdown content
+    versionNumber: v.number(),
+    changeNote: v.string(),
+    status: v.string(), // "draft", "pending_review", "approved", "rejected"
+    approvedAt: v.optional(v.string()),
+    approvedBy: v.optional(v.id("profiles")),
+  })
+    .index("by_topic", ["topicId"])
+    .index("by_author", ["authorId"])
+    .index("by_status", ["status"]),
+
+  lawBookContributions: defineTable({
+    userId: v.id("profiles"),
+    topicId: v.id("lawBookTopics"),
+    versionId: v.optional(v.id("lawBookVersions")),
+    type: v.string(), // "create", "edit", "review", "cite"
+    pointsAwarded: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_topic", ["topicId"]),
+
+  lawBookReviews: defineTable({
+    versionId: v.id("lawBookVersions"),
+    reviewerId: v.id("profiles"),
+    status: v.string(), // "pending", "approved", "changes_requested", "rejected"
+    feedback: v.optional(v.string()),
+    reviewedAt: v.optional(v.string()),
+  })
+    .index("by_version", ["versionId"])
+    .index("by_reviewer", ["reviewerId"]),
+
+  lawBookCitations: defineTable({
+    topicId: v.id("lawBookTopics"),
+    versionId: v.optional(v.id("lawBookVersions")),
+    citationType: v.string(), // "case", "statute", "article", "textbook"
+    citationText: v.string(), // Human-readable
+    oscolaFormatted: v.string(), // OSCOLA-compliant format
+    url: v.optional(v.string()),
+  })
+    .index("by_topic", ["topicId"])
+    .index("by_type", ["citationType"]),
+
+  editorialBoard: defineTable({
+    userId: v.id("profiles"),
+    role: v.string(), // "editor", "senior_editor", "chief_editor"
+    moduleId: v.optional(v.id("lawBookModules")), // null = all modules
+    appointedAt: v.string(),
+    status: v.string(), // "active", "inactive"
+  })
+    .index("by_module", ["moduleId"])
+    .index("by_user", ["userId"]),
+
+  // ═══════════════════════════════════════════
+  // GOVERNANCE — LEGISLATIVE
+  // ═══════════════════════════════════════════
+  parliamentarySessions: defineTable({
+    title: v.string(),
+    description: v.optional(v.string()),
+    scheduledDate: v.string(),
+    status: v.string(), // "scheduled", "in_progress", "completed", "cancelled"
+    speakerId: v.optional(v.id("profiles")),
+    clerkId: v.optional(v.id("profiles")),
+    attendeeCount: v.number(),
+  })
+    .index("by_status", ["status"])
+    .index("by_date", ["scheduledDate"]),
+
+  motions: defineTable({
+    proposerId: v.id("profiles"),
+    secondedById: v.optional(v.id("profiles")),
+    sessionId: v.optional(v.id("parliamentarySessions")),
+    title: v.string(),
+    issue: v.string(), // IRAC: Issue
+    rule: v.string(), // IRAC: Rule
+    application: v.string(), // IRAC: Application
+    conclusion: v.string(), // IRAC: Conclusion
+    status: v.string(), // "draft", "tabled", "seconded", "debating", "voting", "passed", "defeated", "withdrawn"
+    category: v.string(), // "policy", "constitutional", "procedural", "conduct"
+    votesAye: v.number(),
+    votesNo: v.number(),
+    votesAbstain: v.number(),
+    quorumRequired: v.number(),
+    votingDeadline: v.optional(v.string()),
+  })
+    .index("by_status", ["status"])
+    .index("by_proposer", ["proposerId"])
+    .index("by_session", ["sessionId"]),
+
+  amendments: defineTable({
+    motionId: v.id("motions"),
+    proposerId: v.id("profiles"),
+    text: v.string(),
+    status: v.string(), // "proposed", "accepted", "rejected"
+  })
+    .index("by_motion", ["motionId"]),
+
+  votes: defineTable({
+    motionId: v.id("motions"),
+    profileId: v.id("profiles"),
+    vote: v.string(), // "aye", "no", "abstain"
+    votedAt: v.string(),
+  })
+    .index("by_motion", ["motionId"])
+    .index("by_voter", ["profileId"])
+    .index("by_motion_and_voter", ["motionId", "profileId"]),
+
+  debates: defineTable({
+    motionId: v.id("motions"),
+    sessionId: v.optional(v.id("parliamentarySessions")),
+    speakerId: v.id("profiles"),
+    content: v.string(),
+    position: v.string(), // "for", "against", "point_of_order", "question"
+    speakingOrder: v.number(),
+  })
+    .index("by_motion", ["motionId"])
+    .index("by_session", ["sessionId"]),
+
+  // ═══════════════════════════════════════════
+  // GOVERNANCE — EXECUTIVE
+  // ═══════════════════════════════════════════
+  standingOrders: defineTable({
+    orderNumber: v.number(),
+    title: v.string(),
+    content: v.string(), // Markdown
+    category: v.string(), // "procedure", "conduct", "membership", "governance"
+    lastAmendedBy: v.optional(v.id("motions")),
+    status: v.string(), // "active", "amended", "repealed"
+  })
+    .index("by_category", ["category"])
+    .index("by_number", ["orderNumber"]),
+
+  governanceRoles: defineTable({
+    profileId: v.id("profiles"),
+    role: v.string(), // "speaker", "deputy_speaker", "whip", "clerk", "moderator"
+    appointedBy: v.optional(v.id("motions")),
+    appointedAt: v.string(),
+    status: v.string(), // "active", "resigned", "removed"
+  })
+    .index("by_role", ["role"])
+    .index("by_profile", ["profileId"]),
+
+  moderationActions: defineTable({
+    reportedById: v.id("profiles"),
+    targetProfileId: v.id("profiles"),
+    targetContentType: v.string(), // "debate", "motion", "comment", "profile"
+    targetContentId: v.optional(v.string()),
+    reason: v.string(),
+    status: v.string(), // "reported", "under_review", "action_taken", "dismissed"
+    action: v.optional(v.string()), // "warning", "content_removed", "restricted", "referred_to_tribunal"
+    reviewedById: v.optional(v.id("profiles")),
+    proportionalityAssessment: v.optional(v.string()),
+    respondentStatement: v.optional(v.string()),
+  })
+    .index("by_target", ["targetProfileId"])
+    .index("by_status", ["status"]),
+
+  auditLog: defineTable({
+    actorId: v.id("profiles"),
+    action: v.string(), // "motion_proposed", "vote_cast", "role_assigned", "sanction_applied", etc.
+    targetType: v.string(), // "motion", "profile", "session", "standing_order"
+    targetId: v.optional(v.string()),
+    details: v.optional(v.string()),
+  })
+    .index("by_actor", ["actorId"])
+    .index("by_action", ["action"]),
+
+  // ═══════════════════════════════════════════
+  // GOVERNANCE — JUDICIAL
+  // ═══════════════════════════════════════════
+  cases: defineTable({
+    filedById: v.id("profiles"),
+    respondentId: v.id("profiles"),
+    title: v.string(),
+    issue: v.string(), // IRAC
+    rule: v.string(),
+    application: v.string(),
+    conclusion: v.string(),
+    status: v.string(), // "filed", "acknowledged", "served", "submissions", "hearing", "judgment", "appeal", "closed"
+    assignedJudgeId: v.optional(v.id("profiles")),
+    relatedMotionId: v.optional(v.id("motions")),
+    remedySought: v.string(),
+  })
+    .index("by_filer", ["filedById"])
+    .index("by_respondent", ["respondentId"])
+    .index("by_status", ["status"])
+    .index("by_judge", ["assignedJudgeId"]),
+
+  caseSubmissions: defineTable({
+    caseId: v.id("cases"),
+    submittedById: v.id("profiles"),
+    type: v.string(), // "initial_filing", "response", "reply", "evidence", "skeleton_argument"
+    content: v.string(), // Markdown
+    submittedAt: v.string(),
+  })
+    .index("by_case", ["caseId"]),
+
+  hearings: defineTable({
+    caseId: v.id("cases"),
+    scheduledDate: v.string(),
+    status: v.string(), // "scheduled", "in_progress", "completed", "adjourned"
+    presidingJudgeId: v.id("profiles"),
+    transcript: v.optional(v.string()),
+  })
+    .index("by_case", ["caseId"])
+    .index("by_date", ["scheduledDate"]),
+
+  judgments: defineTable({
+    caseId: v.id("cases"),
+    hearingId: v.optional(v.id("hearings")),
+    judgeId: v.id("profiles"),
+    outcome: v.string(), // "granted", "dismissed", "partially_granted"
+    reasoning: v.string(), // Full judgment text
+    remedy: v.optional(v.string()),
+    isAppealable: v.boolean(),
+    publishedAt: v.string(),
+  })
+    .index("by_case", ["caseId"])
+    .index("by_judge", ["judgeId"]),
+
+  // ═══════════════════════════════════════════
+  // GOVERNANCE — META
+  // ═══════════════════════════════════════════
+  governanceTiers: defineTable({
+    profileId: v.id("profiles"),
+    tier: v.string(), // "member", "accredited", "voting", "constitutional", "judicial"
+    calculatedAt: v.string(),
+    contributionPoints: v.number(),
+    mootCount: v.number(),
+    averageScore: v.number(),
+  })
+    .index("by_profile", ["profileId"])
+    .index("by_tier", ["tier"]),
+
+  conductCode: defineTable({
+    sectionNumber: v.number(),
+    title: v.string(),
+    content: v.string(), // Markdown
+    lastAmendedBy: v.optional(v.id("motions")),
+    status: v.string(), // "active", "amended"
+  })
+    .index("by_section", ["sectionNumber"]),
 });

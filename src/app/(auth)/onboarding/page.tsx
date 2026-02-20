@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { UNIVERSITIES, LAW_MODULES, CHAMBERS } from "@/lib/constants/app";
 
 type Step = 1 | 2 | 3 | 4;
@@ -16,6 +17,7 @@ function loadSaved() {
 }
 
 export default function OnboardingPage() {
+  const router = useRouter();
   const saved = loadSaved();
   const [step, setStep] = useState<Step>(saved?.step ?? 1);
   const [university, setUniversity] = useState(saved?.university ?? "");
@@ -45,7 +47,7 @@ export default function OnboardingPage() {
   const back = () => setStep((s) => Math.max(1, s - 1) as Step);
 
   return (
-    <div className="min-h-screen flex flex-col px-6 pt-8 pb-12">
+    <div className="min-h-screen flex flex-col px-4 md:px-6 lg:px-8 pt-8 pb-12">
       {/* Progress */}
       <div className="mb-8">
         <div className="flex gap-1.5 mb-2">
@@ -55,7 +57,7 @@ export default function OnboardingPage() {
         </div>
         <div className="flex justify-between">
           {["University", "Year", "Modules", "Chamber"].map((label, i) => (
-            <span key={label} className={`text-[9px] tracking-wider ${i + 1 <= step ? "text-gold" : "text-court-text-ter"}`}>
+            <span key={label} className={`text-court-xs tracking-wider ${i + 1 <= step ? "text-gold" : "text-court-text-ter"}`}>
               {label}
             </span>
           ))}
@@ -72,7 +74,7 @@ export default function OnboardingPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search universities..."
-            className="w-full bg-navy-card border border-court-border rounded-xl px-3.5 py-2.5 text-[13px] text-court-text outline-none focus:border-gold/40 mb-3 placeholder:text-court-text-ter"
+            className="w-full bg-navy-card border border-court-border rounded-xl px-3.5 py-2.5 text-court-base text-court-text outline-none focus:border-gold/40 mb-3 placeholder:text-court-text-ter"
           />
           <div className="flex-1 overflow-y-auto no-scrollbar">
             {filteredUnis.map((u) => (
@@ -86,8 +88,8 @@ export default function OnboardingPage() {
                 }`}
               >
                 <div>
-                  <p className="text-[13px] font-semibold">{u.name}</p>
-                  <p className="text-[10px] text-court-text-ter mt-0.5">{u.city}</p>
+                  <p className="text-court-base font-semibold">{u.name}</p>
+                  <p className="text-court-xs text-court-text-ter mt-0.5">{u.city}</p>
                 </div>
                 <span className="text-xs font-bold text-court-text-ter">{u.short}</span>
               </button>
@@ -171,8 +173,8 @@ export default function OnboardingPage() {
                     {c.icon}
                   </div>
                   <div>
-                    <p className="text-[15px] font-serif font-bold text-court-text">{c.name} Chamber</p>
-                    <p className="text-[11px] text-court-text-ter italic mt-0.5">&ldquo;{c.motto}&rdquo;</p>
+                    <p className="text-court-md font-serif font-bold text-court-text">{c.name} Chamber</p>
+                    <p className="text-court-sm text-court-text-ter italic mt-0.5">&ldquo;{c.motto}&rdquo;</p>
                   </div>
                 </div>
               </button>
@@ -189,7 +191,7 @@ export default function OnboardingPage() {
           </button>
         )}
         <button
-          onClick={step === 4 ? () => { localStorage.removeItem(STORAGE_KEY); window.location.href = "/home"; } : next}
+          onClick={step === 4 ? () => { localStorage.removeItem(STORAGE_KEY); router.push("/home"); } : next}
           disabled={(step === 1 && !university) || (step === 2 && year === null) || (step === 3 && modules.length === 0) || (step === 4 && !chamber)}
           className="flex-1 py-3 text-sm font-bold bg-gold text-navy rounded-xl disabled:opacity-40"
         >

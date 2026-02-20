@@ -32,9 +32,22 @@ const config: Config = {
           middle: "#8B6914",
         },
       },
+      fontSize: {
+        "court-xs": ["10px", { lineHeight: "14px", letterSpacing: "0.02em" }],
+        "court-sm": ["11px", { lineHeight: "16px" }],
+        "court-base": ["13px", { lineHeight: "20px" }],
+        "court-md": ["15px", { lineHeight: "22px" }],
+        "court-lg": ["16px", { lineHeight: "24px" }],
+        "court-xl": ["18px", { lineHeight: "26px" }],
+      },
       fontFamily: {
-        serif: ["Cormorant Garamond", "Georgia", "serif"],
-        sans: ["DM Sans", "system-ui", "sans-serif"],
+        serif: ["var(--font-cormorant)", "Cormorant Garamond", "Georgia", "serif"],
+        sans: ["var(--font-dm-sans)", "DM Sans", "system-ui", "sans-serif"],
+      },
+      maxWidth: {
+        "content-narrow": "672px",
+        "content-medium": "1024px",
+        "content-wide": "1280px",
       },
       borderRadius: {
         court: "14px",

@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Card, Button, Tag } from "@/components/ui";
+import { useRouter } from "next/navigation";
+import { Card, Button, Tag, DynamicIcon } from "@/components/ui";
 import { SESSION_TYPES, LAW_MODULES, MOOT_ROLES, MOCK_TRIAL_ROLES } from "@/lib/constants/app";
 
 export default function CreateSessionPage() {
+  const router = useRouter();
   const [sessionType, setSessionType] = useState("moot");
   const [module, setModule] = useState("");
   const [title, setTitle] = useState("");
@@ -15,21 +17,35 @@ export default function CreateSessionPage() {
   const [location, setLocation] = useState("");
   const [crossUni, setCrossUni] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
 
   const roles = sessionType === "mock_trial" ? MOCK_TRIAL_ROLES : MOOT_ROLES;
   const isValid = title.trim().length > 0 && module !== "" && date !== "";
 
-  const inputClass = "w-full bg-navy-card border border-court-border rounded-xl px-3.5 py-2.5 text-[13px] text-court-text outline-none focus:border-gold/40 transition-colors placeholder:text-court-text-ter";
-  const labelClass = "text-[10px] text-court-text-ter uppercase tracking-widest mb-1.5 block";
+  const inputClass = "w-full bg-navy-card border border-court-border rounded-xl px-3.5 py-2.5 text-court-base text-court-text outline-none focus:border-gold/40 transition-colors placeholder:text-court-text-ter";
+  const labelClass = "text-court-xs text-court-text-ter uppercase tracking-widest mb-1.5 block";
+
+  const handleCreate = () => {
+    setSubmitted(true);
+    if (!isValid) return;
+
+    setIsCreating(true);
+    // Simulate API call
+    setTimeout(() => {
+      setIsCreating(false);
+      alert(`Session "${title}" created successfully!`);
+      router.push("/sessions");
+    }, 1000);
+  };
 
   return (
     <div className="pb-6">
-      <div className="px-5 pt-3 pb-4">
+      <div className="px-4 pt-3 pb-4">
         <h1 className="font-serif text-2xl font-bold text-court-text mb-1">Create Session</h1>
         <p className="text-xs text-court-text-sec">Organise a moot, mock trial, or workshop</p>
       </div>
 
-      <div className="px-4 flex flex-col gap-4">
+      <div className="px-4 flex flex-col gap-3 md:gap-4">
         {/* Type */}
         <div>
           <label className={labelClass}>Session Type</label>
@@ -38,13 +54,13 @@ export default function CreateSessionPage() {
               <button
                 key={t.value}
                 onClick={() => setSessionType(t.value)}
-                className={`py-2.5 rounded-xl text-center border text-[11px] font-bold transition-all ${
+                className={`py-2.5 rounded-xl text-center border text-court-sm font-bold transition-all ${
                   sessionType === t.value
                     ? "border-gold/40 bg-gold-dim text-gold"
                     : "border-court-border text-court-text-sec"
                 }`}
               >
-                <span className="block text-lg mb-0.5">{t.icon}</span>
+                <span className="flex justify-center mb-0.5"><DynamicIcon name={t.icon} size={18} className={sessionType === t.value ? "text-gold" : "text-court-text-sec"} /></span>
                 {t.label}
               </button>
             ))}
@@ -121,8 +137,8 @@ export default function CreateSessionPage() {
         {/* Cross-university */}
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-[13px] font-semibold text-court-text">Open to all universities</p>
-            <p className="text-[10px] text-court-text-ter">Allow students from other universities to join</p>
+            <p className="text-court-base font-semibold text-court-text">Open to all universities</p>
+            <p className="text-court-xs text-court-text-ter">Allow students from other universities to join</p>
           </div>
           <button
             onClick={() => setCrossUni(!crossUni)}
@@ -138,8 +154,8 @@ export default function CreateSessionPage() {
           <Card className="p-3">
             {roles.map((r, i) => (
               <div key={i} className="flex justify-between items-center py-2 border-b border-court-border-light last:border-0">
-                <span className="text-[12px] text-court-text-sec">{r}</span>
-                <span className="text-[10px] text-court-text-ter">Open</span>
+                <span className="text-court-base text-court-text-sec">{r}</span>
+                <span className="text-court-xs text-court-text-ter">Open</span>
               </div>
             ))}
           </Card>
@@ -148,8 +164,8 @@ export default function CreateSessionPage() {
         {/* Validation hints */}
         {submitted && !isValid && (
           <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">
-            <p className="text-[12px] text-red-400 font-semibold mb-1">Please complete required fields:</p>
-            <ul className="text-[11px] text-red-400/80 list-disc pl-4 space-y-0.5">
+            <p className="text-court-base text-red-400 font-semibold mb-1">Please complete required fields:</p>
+            <ul className="text-court-sm text-red-400/80 list-disc pl-4 space-y-0.5">
               {!title.trim() && <li>Session title is required</li>}
               {!module && <li>Select a module / area of law</li>}
               {!date && <li>Set a date for the session</li>}
@@ -160,15 +176,10 @@ export default function CreateSessionPage() {
         {/* Submit */}
         <Button
           fullWidth
-          disabled={submitted && !isValid}
-          onClick={() => {
-            setSubmitted(true);
-            if (isValid) {
-              // In production: call Convex mutation
-            }
-          }}
+          disabled={isCreating}
+          onClick={handleCreate}
         >
-          Create Session
+          {isCreating ? "Creating..." : "Create Session"}
         </Button>
       </div>
     </div>

@@ -2,17 +2,18 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { Scale } from "lucide-react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const inputClass = "w-full bg-navy-card border border-court-border rounded-xl px-3.5 py-3 text-[13px] text-court-text outline-none focus:border-gold/40 transition-colors placeholder:text-court-text-ter";
+  const inputClass = "w-full bg-navy-card border border-court-border rounded-xl px-3.5 py-3 text-court-base text-court-text outline-none focus:border-gold/40 transition-colors placeholder:text-court-text-ter";
 
   return (
-    <div className="min-h-screen flex flex-col justify-center px-6">
+    <div className="min-h-screen flex flex-col justify-center px-4 md:px-6 lg:px-8">
       <div className="text-center mb-10">
-        <div className="text-4xl mb-3">⚖️</div>
+        <div className="flex justify-center mb-3"><Scale size={36} className="text-gold" /></div>
         <h1 className="font-serif text-2xl font-bold text-court-text">Welcome Back</h1>
         <p className="text-xs text-court-text-sec mt-1">Sign in to Ratio</p>
       </div>
@@ -26,7 +27,7 @@ export default function LoginPage() {
 
         <div className="flex items-center gap-3">
           <div className="flex-1 h-px bg-court-border" />
-          <span className="text-[10px] text-court-text-ter uppercase tracking-wider">or</span>
+          <span className="text-court-xs text-court-text-ter uppercase tracking-wider">or</span>
           <div className="flex-1 h-px bg-court-border" />
         </div>
 
@@ -34,7 +35,7 @@ export default function LoginPage() {
         <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" className={inputClass} aria-label="Password" />
 
         <div className="flex justify-end -mt-1">
-          <button className="text-[11px] text-gold font-semibold hover:underline">
+          <button className="text-court-sm text-gold font-semibold hover:underline">
             Forgot password?
           </button>
         </div>

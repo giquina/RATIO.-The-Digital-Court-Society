@@ -24,11 +24,11 @@ export const RANKS = [
 
 // ── Session Types ──
 export const SESSION_TYPES = [
-  { value: "moot", label: "Moot", icon: "⚖️" },
-  { value: "mock_trial", label: "Mock Trial", icon: "🏛️" },
-  { value: "sqe2_prep", label: "SQE2 Prep", icon: "🎯" },
-  { value: "debate", label: "Debate", icon: "🗣️" },
-  { value: "workshop", label: "Workshop", icon: "📝" },
+  { value: "moot", label: "Moot", icon: "Scale" },
+  { value: "mock_trial", label: "Mock Trial", icon: "Landmark" },
+  { value: "sqe2_prep", label: "SQE2 Prep", icon: "Target" },
+  { value: "debate", label: "Debate", icon: "Mic" },
+  { value: "workshop", label: "Workshop", icon: "PenLine" },
 ] as const;
 
 // ── Default Role Templates ──
@@ -96,27 +96,27 @@ export const UNIVERSITIES = [
 
 // ── Feedback Dimensions ──
 export const FEEDBACK_DIMENSIONS = [
-  { key: "argumentStructure", label: "Argument Structure (IRAC)", icon: "📐" },
-  { key: "useOfAuthorities", label: "Use of Authorities", icon: "📖" },
-  { key: "oralDelivery", label: "Oral Delivery & Clarity", icon: "🗣️" },
-  { key: "judicialHandling", label: "Response to Interventions", icon: "⚖️" },
-  { key: "courtManner", label: "Court Manner & Etiquette", icon: "🎩" },
-  { key: "persuasiveness", label: "Persuasiveness", icon: "💡" },
-  { key: "timeManagement", label: "Time Management", icon: "⏱️" },
+  { key: "argumentStructure", label: "Argument Structure (IRAC)", icon: "Target" },
+  { key: "useOfAuthorities", label: "Use of Authorities", icon: "Book" },
+  { key: "oralDelivery", label: "Oral Delivery & Clarity", icon: "Mic" },
+  { key: "judicialHandling", label: "Response to Interventions", icon: "Scale" },
+  { key: "courtManner", label: "Court Manner & Etiquette", icon: "GraduationCap" },
+  { key: "persuasiveness", label: "Persuasiveness", icon: "Lightbulb" },
+  { key: "timeManagement", label: "Time Management", icon: "Timer" },
 ] as const;
 
 // ── Badge Definitions ──
 export const BADGE_DEFINITIONS = [
-  { name: "First Moot", icon: "⚖️", category: "moots", requirement: { type: "moots_completed", threshold: 1 } },
-  { name: "Regular Advocate", icon: "📋", category: "moots", requirement: { type: "moots_completed", threshold: 5 } },
-  { name: "Seasoned Counsel", icon: "🏛️", category: "moots", requirement: { type: "moots_completed", threshold: 20 } },
-  { name: "7-Day Streak", icon: "🔥", category: "streak", requirement: { type: "streak_days", threshold: 7 } },
-  { name: "30-Day Streak", icon: "🔥", category: "streak", requirement: { type: "streak_days", threshold: 30 } },
-  { name: "100-Day Streak", icon: "💎", category: "streak", requirement: { type: "streak_days", threshold: 100 } },
-  { name: "First Commendation", icon: "⭐", category: "community", requirement: { type: "commendations_received", threshold: 1 } },
-  { name: "Respected Advocate", icon: "🌟", category: "community", requirement: { type: "commendations_received", threshold: 50 } },
-  { name: "AI Sparring Partner", icon: "🤖", category: "skill", requirement: { type: "ai_sessions", threshold: 5 } },
-  { name: "50 Followers", icon: "👥", category: "community", requirement: { type: "followers", threshold: 50 } },
+  { name: "First Moot", icon: "Scale", category: "moots", requirement: { type: "moots_completed", threshold: 1 } },
+  { name: "Regular Advocate", icon: "FileText", category: "moots", requirement: { type: "moots_completed", threshold: 5 } },
+  { name: "Seasoned Counsel", icon: "Landmark", category: "moots", requirement: { type: "moots_completed", threshold: 20 } },
+  { name: "7-Day Streak", icon: "Flame", category: "streak", requirement: { type: "streak_days", threshold: 7 } },
+  { name: "30-Day Streak", icon: "Flame", category: "streak", requirement: { type: "streak_days", threshold: 30 } },
+  { name: "100-Day Streak", icon: "Trophy", category: "streak", requirement: { type: "streak_days", threshold: 100 } },
+  { name: "First Commendation", icon: "Star", category: "community", requirement: { type: "commendations_received", threshold: 1 } },
+  { name: "Respected Advocate", icon: "Star", category: "community", requirement: { type: "commendations_received", threshold: 50 } },
+  { name: "AI Sparring Partner", icon: "Bot", category: "skill", requirement: { type: "ai_sessions", threshold: 5 } },
+  { name: "50 Followers", icon: "Users", category: "community", requirement: { type: "followers", threshold: 50 } },
 ] as const;
 
 // ── AI Personas ──
@@ -124,28 +124,28 @@ export const AI_PERSONAS = {
   judge: {
     name: "The Honourable Justice AI",
     subtitle: "High Court Judge",
-    icon: "⚖️",
+    icon: "Scale",
     color: "#C9A84C",
     gradient: ["#2C1810", "#4A2C20"],
   },
   mentor: {
     name: "Senior Counsel AI",
     subtitle: "Chambers Mentor",
-    icon: "📘",
+    icon: "BookOpen",
     color: "#4A8FE7",
     gradient: ["#1A2744", "#2E5090"],
   },
   examiner: {
     name: "SQE2 Examiner AI",
     subtitle: "Assessment Panel",
-    icon: "🎯",
+    icon: "Target",
     color: "#6B2D3E",
     gradient: ["#3D1A2A", "#6B2D3E"],
   },
   opponent: {
     name: "Opposing Counsel AI",
     subtitle: "Adversary",
-    icon: "🗣️",
+    icon: "Mic",
     color: "#4CAF50",
     gradient: ["#1A3D2A", "#3D6B45"],
   },

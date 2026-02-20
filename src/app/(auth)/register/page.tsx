@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { Scale } from "lucide-react";
 
 export default function RegisterPage() {
   const [name, setName] = useState("");
@@ -10,12 +11,12 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const inputClass = "w-full bg-navy-card border border-court-border rounded-xl px-3.5 py-3 text-[13px] text-court-text outline-none focus:border-gold/40 transition-colors placeholder:text-court-text-ter";
+  const inputClass = "w-full bg-navy-card border border-court-border rounded-xl px-3.5 py-3 text-court-base text-court-text outline-none focus:border-gold/40 transition-colors placeholder:text-court-text-ter";
 
   return (
-    <div className="min-h-screen flex flex-col justify-center px-6">
+    <div className="min-h-screen flex flex-col justify-center px-4 md:px-6 lg:px-8">
       <div className="text-center mb-10">
-        <div className="text-4xl mb-3">⚖️</div>
+        <div className="flex justify-center mb-3"><Scale size={36} className="text-gold" /></div>
         <h1 className="font-serif text-2xl font-bold text-court-text">Join Ratio</h1>
         <p className="text-xs text-court-text-sec mt-1">Start your advocacy journey</p>
       </div>
@@ -28,7 +29,7 @@ export default function RegisterPage() {
 
         <div className="flex items-center gap-3">
           <div className="flex-1 h-px bg-court-border" />
-          <span className="text-[10px] text-court-text-ter uppercase tracking-wider">or</span>
+          <span className="text-court-xs text-court-text-ter uppercase tracking-wider">or</span>
           <div className="flex-1 h-px bg-court-border" />
         </div>
 
@@ -37,13 +38,13 @@ export default function RegisterPage() {
         <div>
           <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Create password" className={inputClass} aria-label="Create password" />
           {password && password.length < 8 && (
-            <p className="text-[10px] text-orange-400 mt-1">Password must be at least 8 characters</p>
+            <p className="text-court-xs text-orange-400 mt-1">Password must be at least 8 characters</p>
           )}
         </div>
         <div>
           <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Confirm password" className={inputClass} aria-label="Confirm password" />
           {confirmPassword && password !== confirmPassword && (
-            <p className="text-[10px] text-red-400 mt-1">Passwords do not match</p>
+            <p className="text-court-xs text-red-400 mt-1">Passwords do not match</p>
           )}
         </div>
 
@@ -54,7 +55,7 @@ export default function RegisterPage() {
           Create Account
         </button>
 
-        <p className="text-[10px] text-court-text-ter text-center mt-1">
+        <p className="text-court-xs text-court-text-ter text-center mt-1">
           By joining, you agree to the Ratio Code of Conduct.
         </p>
 

@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Tag, Card, Button, ProgressBar } from "@/components/ui";
+import { Tag, Card, Button, ProgressBar, DynamicIcon } from "@/components/ui";
 import { AI_PERSONAS, FEEDBACK_DIMENSIONS } from "@/lib/constants/app";
+import { Lightbulb, Book, Mic, Pause, ArrowUp } from "lucide-react";
 
 type Screen = "select" | "briefing" | "session" | "feedback";
 type Mode = "judge" | "mentor" | "examiner" | "opponent";
@@ -129,7 +130,7 @@ export default function AIPracticePage() {
   if (screen === "select") {
     return (
       <div className="pb-6">
-        <div className="px-5 pt-3 pb-4">
+        <div className="px-4 pt-3 pb-4">
           <h1 className="font-serif text-2xl font-bold text-court-text mb-1">AI Practice</h1>
           <p className="text-xs text-court-text-sec">Train with AI-powered legal personas. No judgement, just improvement.</p>
         </div>
@@ -149,20 +150,20 @@ export default function AIPracticePage() {
               >
                 <div className="flex gap-3.5 items-center">
                   <div
-                    className="w-14 h-14 rounded-court flex items-center justify-center text-2xl shrink-0"
+                    className="w-14 h-14 rounded-court flex items-center justify-center shrink-0"
                     style={{ background: `linear-gradient(135deg, ${p.gradient[0]}, ${p.gradient[1]})` }}
                   >
-                    {p.icon}
+                    <DynamicIcon name={p.icon} size={24} className="text-court-text" />
                   </div>
                   <div className="flex-1">
                     <div className="flex justify-between items-start">
                       <div>
                         <h3 className="font-serif text-base font-bold text-court-text">{p.name}</h3>
-                        <p className="text-[11px] text-court-text-ter mt-0.5">{p.subtitle}</p>
+                        <p className="text-court-sm text-court-text-ter mt-0.5">{p.subtitle}</p>
                       </div>
                       {key === "opponent" && <Tag color="orange" small>COMING SOON</Tag>}
                     </div>
-                    <p className="text-[12px] text-court-text-sec mt-1.5 leading-relaxed">{descriptions[key]}</p>
+                    <p className="text-court-base text-court-text-sec mt-1.5 leading-relaxed">{descriptions[key]}</p>
                   </div>
                 </div>
               </Card>
@@ -172,10 +173,10 @@ export default function AIPracticePage() {
         <div className="px-4 mt-5">
           <Card className="p-4 bg-green-500/[0.06] border-green-500/15">
             <div className="flex gap-2.5 items-center">
-              <span className="text-2xl">💡</span>
+              <Lightbulb size={24} className="text-green-500 shrink-0" />
               <div>
-                <p className="text-[12px] font-semibold text-court-text">Free tier: 3 sessions / month</p>
-                <p className="text-[11px] text-court-text-ter">Upgrade to Premium for unlimited AI practice</p>
+                <p className="text-court-base font-semibold text-court-text">Free tier: 3 sessions / month</p>
+                <p className="text-court-sm text-court-text-ter">Upgrade to Premium for unlimited AI practice</p>
               </div>
             </div>
           </Card>
@@ -188,16 +189,16 @@ export default function AIPracticePage() {
   if (screen === "briefing") {
     return (
       <div className="pb-6">
-        <div className="px-5 pt-3 pb-4">
+        <div className="px-4 pt-3 pb-4">
           <button onClick={() => setScreen("select")} className="text-xs text-court-text-ter mb-3">← Back to modes</button>
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 rounded-court flex items-center justify-center text-xl"
+            <div className="w-12 h-12 rounded-court flex items-center justify-center"
               style={{ background: `linear-gradient(135deg, ${persona.gradient[0]}, ${persona.gradient[1]})` }}>
-              {persona.icon}
+              <DynamicIcon name={persona.icon} size={20} className="text-court-text" />
             </div>
             <div>
               <h1 className="font-serif text-xl font-bold text-court-text">{persona.name}</h1>
-              <p className="text-[11px] text-court-text-ter">{persona.subtitle}</p>
+              <p className="text-court-sm text-court-text-ter">{persona.subtitle}</p>
             </div>
           </div>
         </div>
@@ -210,21 +211,21 @@ export default function AIPracticePage() {
               { label: "Your Role", value: brief.yourRole },
             ].map((item) => (
               <div key={item.label} className="mb-3 last:mb-0">
-                <p className="text-[10px] text-court-text-ter uppercase tracking-widest mb-0.5">{item.label}</p>
-                <p className="text-[13px] text-court-text leading-relaxed">{item.value}</p>
+                <p className="text-court-xs text-court-text-ter uppercase tracking-widest mb-0.5">{item.label}</p>
+                <p className="text-court-base text-court-text leading-relaxed">{item.value}</p>
               </div>
             ))}
           </Card>
           <Card className="p-4 mb-3">
-            <p className="text-[10px] text-court-text-ter uppercase tracking-widest mb-2">Instructions</p>
-            <p className="text-[13px] text-court-text-sec leading-relaxed">{brief.instructions}</p>
+            <p className="text-court-xs text-court-text-ter uppercase tracking-widest mb-2">Instructions</p>
+            <p className="text-court-base text-court-text-sec leading-relaxed">{brief.instructions}</p>
           </Card>
           <Card className="p-4 mb-5">
-            <p className="text-[10px] text-court-text-ter uppercase tracking-widest mb-2">Key Authorities</p>
+            <p className="text-court-xs text-court-text-ter uppercase tracking-widest mb-2">Key Authorities</p>
             {brief.authorities.map((a) => (
               <div key={a} className="flex items-start gap-2 mb-1.5 last:mb-0">
-                <span className="text-gold text-xs mt-0.5">📖</span>
-                <p className="text-[12px] text-court-text font-medium">{a}</p>
+                <Book size={12} className="text-gold mt-0.5 shrink-0" />
+                <p className="text-court-base text-court-text font-medium">{a}</p>
               </div>
             ))}
           </Card>
@@ -243,14 +244,14 @@ export default function AIPracticePage() {
       <div className="flex flex-col h-[calc(100dvh-80px)]">
         <div className="px-4 pt-3 pb-2 flex justify-between items-center border-b border-court-border-light shrink-0">
           <div className="flex items-center gap-2">
-            <span className="text-base">{persona.icon}</span>
+            <DynamicIcon name={persona.icon} size={16} className="text-court-text" />
             <span className="text-xs font-bold text-court-text">{persona.name}</span>
           </div>
           <div className="flex items-center gap-3">
             <div className="bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-1 text-xs font-bold text-red-400 font-mono">
               {formatTime(timer)}
             </div>
-            <button onClick={() => { setTimerActive(false); setScreen("feedback"); }} className="text-[10px] text-red-400 font-bold">
+            <button onClick={() => { setTimerActive(false); setScreen("feedback"); }} className="text-court-xs text-red-400 font-bold">
               End
             </button>
           </div>
@@ -266,16 +267,16 @@ export default function AIPracticePage() {
               </>
             )}
             <div
-              className="w-20 h-20 rounded-full flex items-center justify-center text-3xl relative z-10 transition-all duration-500"
+              className="w-20 h-20 rounded-full flex items-center justify-center relative z-10 transition-all duration-500"
               style={{
                 background: `linear-gradient(135deg, ${persona.gradient[0]}, ${persona.gradient[1]})`,
                 boxShadow: aiSpeaking ? `0 0 30px ${persona.color}40` : `0 0 15px ${persona.color}15`,
               }}
             >
-              {persona.icon}
+              <DynamicIcon name={persona.icon} size={32} className="text-court-text" />
             </div>
           </div>
-          <p className="absolute bottom-2 text-[10px] text-court-text-ter">
+          <p className="absolute bottom-2 text-court-xs text-court-text-ter">
             {aiSpeaking ? "Judge is speaking..." : "Awaiting your submissions..."}
           </p>
         </div>
@@ -289,10 +290,10 @@ export default function AIPracticePage() {
                   ? "bg-gold/15 border border-gold/20 rounded-br-md"
                   : "bg-navy-card border border-court-border-light rounded-bl-md"
               }`}>
-                <p className={`text-[10px] font-bold mb-1 ${msg.role === "user" ? "text-gold" : "text-court-text-ter"}`}>
+                <p className={`text-court-xs font-bold mb-1 ${msg.role === "user" ? "text-gold" : "text-court-text-ter"}`}>
                   {msg.role === "user" ? "You" : persona.name} · {msg.time}
                 </p>
-                <p className="text-[13px] text-court-text leading-relaxed">{msg.text}</p>
+                <p className="text-court-base text-court-text leading-relaxed">{msg.text}</p>
               </div>
             </div>
           ))}
@@ -308,7 +309,7 @@ export default function AIPracticePage() {
                 isListening ? "bg-red-500 animate-pulse" : "bg-gold-dim border border-gold/25"
               }`}
             >
-              <span className="text-sm">{isListening ? "⏸" : "🎙"}</span>
+              {isListening ? <Pause size={16} className="text-white" /> : <Mic size={16} className="text-gold" />}
             </button>
             <div className="flex-1 bg-navy-card border border-court-border rounded-xl flex items-end">
               <textarea
@@ -316,12 +317,12 @@ export default function AIPracticePage() {
                 onChange={(e) => setInputText(e.target.value)}
                 placeholder="Make your submissions..."
                 rows={1}
-                className="flex-1 bg-transparent text-[13px] text-court-text px-3 py-2.5 resize-none outline-none placeholder:text-court-text-ter"
+                className="flex-1 bg-transparent text-court-base text-court-text px-3 py-2.5 resize-none outline-none placeholder:text-court-text-ter"
                 onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
               />
             </div>
             <button onClick={sendMessage} className="w-10 h-10 rounded-full bg-gold flex items-center justify-center shrink-0">
-              <span className="text-navy font-bold text-sm">↑</span>
+              <ArrowUp size={16} className="text-navy" />
             </button>
           </div>
         </div>
@@ -338,13 +339,13 @@ export default function AIPracticePage() {
 
   return (
     <div className="pb-6">
-      <div className="px-5 pt-3 pb-4">
+      <div className="px-4 pt-3 pb-4">
         <h1 className="font-serif text-2xl font-bold text-court-text mb-1">Session Feedback</h1>
         <p className="text-xs text-court-text-sec">{persona.name} · {brief.area}</p>
       </div>
       <section className="px-4 mb-4">
         <Card highlight className="p-6 text-center">
-          <p className="text-[10px] text-court-text-ter uppercase tracking-widest mb-2">Overall Score</p>
+          <p className="text-court-xs text-court-text-ter uppercase tracking-widest mb-2">Overall Score</p>
           <div className="relative w-24 h-24 mx-auto">
             <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
               <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="6" />
@@ -366,8 +367,8 @@ export default function AIPracticePage() {
             return (
               <div key={dim.key} className="mb-3 last:mb-0">
                 <div className="flex justify-between items-center mb-1">
-                  <span className="text-[11px] text-court-text-sec">{dim.icon} {dim.label}</span>
-                  <span className="text-[11px] font-bold text-court-text">{score.toFixed(1)}</span>
+                  <span className="text-court-sm text-court-text-sec flex items-center gap-1"><DynamicIcon name={dim.icon} size={12} className="text-court-text-sec" /> {dim.label}</span>
+                  <span className="text-court-sm font-bold text-court-text">{score.toFixed(1)}</span>
                 </div>
                 <ProgressBar pct={(score / 5) * 100} color={score >= 4 ? "green" : score >= 3 ? "gold" : "red"} />
               </div>
@@ -378,15 +379,15 @@ export default function AIPracticePage() {
       <section className="px-4 mb-4">
         <Card className="p-4">
           <h3 className="font-serif text-sm font-bold text-court-text mb-2">Judgment</h3>
-          <p className="text-[12px] text-court-text-sec leading-relaxed">
+          <p className="text-court-base text-court-text-sec leading-relaxed">
             Counsel demonstrated a solid understanding of the constitutional principles at play. The opening submissions were well-structured, following IRAC methodology competently. However, when pressed on the distinction between reviewability and unlawfulness of prerogative power, Counsel&apos;s response lacked the precision this court would expect. Court manner was exemplary throughout.
           </p>
         </Card>
       </section>
       <section className="px-4 mb-4">
         <Card className="p-4 bg-gold-dim border-gold/25">
-          <h3 className="text-[10px] text-gold uppercase tracking-widest font-bold mb-2">Key Improvement</h3>
-          <p className="text-[12px] text-court-text leading-relaxed">
+          <h3 className="text-court-xs text-gold uppercase tracking-widest font-bold mb-2">Key Improvement</h3>
+          <p className="text-court-base text-court-text leading-relaxed">
             When facing a judicial intervention, take a moment before responding. Your instinct to answer immediately led to imprecise language when discussing the GCHQ distinction. Pause, consider the exact question, then respond with specificity.
           </p>
         </Card>

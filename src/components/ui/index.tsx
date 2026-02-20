@@ -2,6 +2,41 @@
 
 import { cn, getInitials } from "@/lib/utils/helpers";
 import { CHAMBER_COLORS } from "@/lib/constants/app";
+import {
+  Scale, Calendar, Users, Target, Trophy, Bell, Flame, Award,
+  BookOpen, Search, Settings, Mic, FileText, MessageCircle,
+  ExternalLink, Bot, BarChart3, PenLine, Shield, Gavel, User as UserIcon,
+  Check, X, Star, GraduationCap, Book, Landmark, Lightbulb,
+  FolderOpen, Link as LinkIcon, Download, Upload, Vote, Timer, Medal,
+  TrendingUp, type LucideIcon as LucideIconType,
+} from "lucide-react";
+
+// ── Icon Name → Component map ──
+const ICON_MAP: Record<string, LucideIconType> = {
+  Scale, Calendar, Users, Target, Trophy, Bell, Flame, Award,
+  BookOpen, Search, Settings, Mic, FileText, MessageCircle,
+  ExternalLink, Bot, BarChart3, PenLine, Shield, Gavel,
+  User: UserIcon, Check, X, Star, GraduationCap, Book, Landmark,
+  Lightbulb, FolderOpen, Link: LinkIcon, Download, Upload, Vote,
+  Timer, Medal, TrendingUp,
+};
+
+// Renders a Lucide icon from a string name (used by constants that store icon names as strings)
+export function DynamicIcon({
+  name,
+  size = 20,
+  className,
+  strokeWidth,
+}: {
+  name: string;
+  size?: number;
+  className?: string;
+  strokeWidth?: number;
+}) {
+  const Icon = ICON_MAP[name];
+  if (!Icon) return <span className={className}>{name}</span>;
+  return <Icon size={size} className={className} strokeWidth={strokeWidth} />;
+}
 
 // ── Avatar ──
 export function Avatar({
@@ -21,7 +56,7 @@ export function Avatar({
 }) {
   const display = initials ?? (name ? getInitials(name) : "?");
   const color = chamber ? CHAMBER_COLORS[chamber] ?? "#6B2D3E" : "#6B2D3E";
-  const sizes = { xs: "w-6 h-6 text-[9px]", sm: "w-8 h-8 text-xs", md: "w-10 h-10 text-sm", lg: "w-12 h-12 text-base", xl: "w-16 h-16 text-lg" };
+  const sizes = { xs: "w-6 h-6 text-court-xs", sm: "w-8 h-8 text-xs", md: "w-10 h-10 text-sm", lg: "w-12 h-12 text-base", xl: "w-16 h-16 text-lg" };
 
   return (
     <div className="relative shrink-0">
@@ -65,7 +100,7 @@ export function Tag({
     <span
       className={cn(
         "font-bold tracking-wider border rounded whitespace-nowrap",
-        small ? "text-[9px] px-1.5 py-0" : "text-[10px] px-2 py-0.5",
+        small ? "text-court-xs px-1.5 py-0" : "text-court-xs px-2 py-0.5",
         colorMap[color] ?? colorMap.gold
       )}
     >
@@ -214,7 +249,7 @@ export function FollowButton({
       onClick={onToggle}
       className={cn(
         "font-bold rounded-lg transition-all duration-200",
-        small ? "px-3 py-1 text-[10px]" : "px-4 py-1.5 text-xs",
+        small ? "px-3 py-1 text-court-xs" : "px-4 py-1.5 text-xs",
         isFollowing
           ? "border border-white/10 text-court-text-sec hover:border-red-400/30 hover:text-red-400"
           : "border border-gold bg-gold text-navy hover:bg-gold/90"
@@ -246,9 +281,9 @@ export function CommendButton({
             : "text-court-text-ter hover:text-gold hover:bg-gold-dim"
         )}
       >
-        ⚖️ {isCommended ? "Commended" : "Commend"}
+        <Scale size={14} className="inline-block" /> {isCommended ? "Commended" : "Commend"}
       </button>
-      <span className="text-[11px] text-court-text-ter">{count}</span>
+      <span className="text-court-sm text-court-text-ter">{count}</span>
     </div>
   );
 }
@@ -260,14 +295,16 @@ export function EmptyState({
   description,
   action,
 }: {
-  icon: string;
+  icon: React.ReactNode;
   title: string;
   description: string;
   action?: React.ReactNode;
 }) {
   return (
     <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
-      <span className="text-4xl mb-4">{icon}</span>
+      <div className="w-16 h-16 rounded-full bg-white/[0.04] flex items-center justify-center mb-4 text-court-text-ter">
+        {icon}
+      </div>
       <h3 className="font-serif text-lg font-bold text-court-text mb-2">{title}</h3>
       <p className="text-sm text-court-text-ter mb-6 max-w-xs">{description}</p>
       {action}
@@ -308,6 +345,77 @@ export function CardSkeleton() {
       <Skeleton className="h-2.5 w-full mt-3" />
       <Skeleton className="h-2.5 w-2/3 mt-1.5" />
     </Card>
+  );
+}
+
+// ── SessionCardSkeleton ──
+export function SessionCardSkeleton() {
+  return (
+    <Card className="p-4">
+      <div className="flex justify-between items-start mb-3">
+        <Skeleton className="h-3.5 w-1/3" />
+        <Skeleton className="h-5 w-16 rounded" />
+      </div>
+      <Skeleton className="h-3 w-2/3 mb-2" />
+      <Skeleton className="h-3 w-1/2 mb-4" />
+      <div className="flex gap-2">
+        <Skeleton rounded className="w-8 h-8" />
+        <Skeleton rounded className="w-8 h-8" />
+        <Skeleton rounded className="w-8 h-8" />
+      </div>
+    </Card>
+  );
+}
+
+// ── FeedItemSkeleton ──
+export function FeedItemSkeleton() {
+  return (
+    <Card className="p-4">
+      <div className="flex gap-3">
+        <Skeleton rounded className="w-10 h-10 shrink-0" />
+        <div className="flex-1">
+          <Skeleton className="h-3 w-1/2 mb-2" />
+          <Skeleton className="h-2.5 w-full mb-1.5" />
+          <Skeleton className="h-2.5 w-3/4" />
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+// ── ProfileSkeleton ──
+export function ProfileSkeleton() {
+  return (
+    <div className="flex flex-col items-center py-8 px-4">
+      <Skeleton rounded className="w-20 h-20 mb-4" />
+      <Skeleton className="h-4 w-40 mb-2" />
+      <Skeleton className="h-3 w-32 mb-4" />
+      <div className="flex gap-6 mb-6">
+        <Skeleton className="h-3 w-20" />
+        <Skeleton className="h-3 w-20" />
+      </div>
+      <div className="w-full grid grid-cols-2 gap-3">
+        <Skeleton className="h-20 rounded-court" />
+        <Skeleton className="h-20 rounded-court" />
+        <Skeleton className="h-20 rounded-court" />
+        <Skeleton className="h-20 rounded-court" />
+      </div>
+    </div>
+  );
+}
+
+// ── PageSkeleton ── (full page loading state)
+export function PageSkeleton({ rows = 3 }: { rows?: number }) {
+  return (
+    <div className="px-4 pt-3 pb-4 space-y-4">
+      <div className="space-y-2 mb-6">
+        <Skeleton className="h-5 w-48" />
+        <Skeleton className="h-3 w-32" />
+      </div>
+      {Array.from({ length: rows }).map((_, i) => (
+        <CardSkeleton key={i} />
+      ))}
+    </div>
   );
 }
 

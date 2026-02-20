@@ -1,23 +1,25 @@
 "use client";
 
 import { useState } from "react";
-import { Tag, Card, Button, SectionHeader } from "@/components/ui";
+import { Tag, Card, Button, SectionHeader, DynamicIcon } from "@/components/ui";
+import { Search, Download, Upload, FileText, Target, Book, PenLine, GraduationCap, BookOpen } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 const CATEGORIES = [
-  { key: "moot_template", label: "Moot Templates", icon: "📋", count: 12, color: "gold" },
-  { key: "irac_guide", label: "IRAC / CLEO Guides", icon: "📐", count: 8, color: "blue" },
-  { key: "sqe2_prep", label: "SQE2 Preparation", icon: "🎯", count: 24, color: "green" },
-  { key: "case_bank", label: "Case Bank", icon: "📖", count: 156, color: "burgundy" },
-  { key: "judgment_writing", label: "Judgment Writing", icon: "✍️", count: 6, color: "orange" },
-  { key: "exam_skills", label: "Exam Skills", icon: "🧠", count: 15, color: "red" },
+  { key: "moot_template", label: "Moot Templates", icon: "FileText", count: 12, color: "gold" },
+  { key: "irac_guide", label: "IRAC / CLEO Guides", icon: "BookOpen", count: 8, color: "blue" },
+  { key: "sqe2_prep", label: "SQE2 Preparation", icon: "Target", count: 24, color: "green" },
+  { key: "case_bank", label: "Case Bank", icon: "Book", count: 156, color: "burgundy" },
+  { key: "judgment_writing", label: "Judgment Writing", icon: "PenLine", count: 6, color: "orange" },
+  { key: "exam_skills", label: "Exam Skills", icon: "GraduationCap", count: 15, color: "red" },
 ];
 
 const ALL_RESOURCES = [
   { title: "IRAC Structure Template", cat: "IRAC Guide", catKey: "irac_guide", type: "PDF", downloads: 342, isPremium: false },
-  { title: "Skeleton Argument — Standard Format", cat: "Moot Template", catKey: "moot_template", type: "DOCX", downloads: 287, isPremium: false },
+  { title: "Skeleton Argument \u2014 Standard Format", cat: "Moot Template", catKey: "moot_template", type: "DOCX", downloads: 287, isPremium: false },
   { title: "SQE2 Advocacy Marking Criteria", cat: "SQE2 Prep", catKey: "sqe2_prep", type: "PDF", downloads: 524, isPremium: false },
   { title: "Cross-Examination Technique Guide", cat: "Exam Skills", catKey: "exam_skills", type: "PDF", downloads: 198, isPremium: true },
-  { title: "Bundle of Authorities — Template", cat: "Moot Template", catKey: "moot_template", type: "DOCX", downloads: 156, isPremium: false },
+  { title: "Bundle of Authorities \u2014 Template", cat: "Moot Template", catKey: "moot_template", type: "DOCX", downloads: 156, isPremium: false },
   { title: "Case Analysis: Donoghue v Stevenson", cat: "Case Bank", catKey: "case_bank", type: "PDF", downloads: 89, isPremium: false },
   { title: "Judgment Writing Template", cat: "Judgment Writing", catKey: "judgment_writing", type: "DOCX", downloads: 45, isPremium: true },
   { title: "SQE2 Mock Advocacy Scripts", cat: "SQE2 Prep", catKey: "sqe2_prep", type: "PDF", downloads: 312, isPremium: false },
@@ -25,66 +27,123 @@ const ALL_RESOURCES = [
 
 export default function LibraryPage() {
   const [selectedCat, setSelectedCat] = useState<string | null>(null);
-  const [search, setSearch] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [downloadingIdx, setDownloadingIdx] = useState<number | null>(null);
+
+  const filteredCategories = CATEGORIES.filter((c) => {
+    if (!searchTerm) return true;
+    return c.label.toLowerCase().includes(searchTerm.toLowerCase());
+  });
 
   const filteredResources = ALL_RESOURCES.filter((r) => {
     const matchesCat = !selectedCat || r.catKey === selectedCat;
-    const matchesSearch = !search || r.title.toLowerCase().includes(search.toLowerCase()) || r.cat.toLowerCase().includes(search.toLowerCase());
+    const matchesSearch =
+      !searchTerm ||
+      r.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      r.cat.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesCat && matchesSearch;
   });
 
+  const handleDownload = (index: number, title: string) => {
+    setDownloadingIdx(index);
+    // Simulate download delay
+    setTimeout(() => {
+      setDownloadingIdx(null);
+      alert(`Downloaded: ${title}`);
+    }, 800);
+  };
+
+  const handleUpload = () => {
+    alert("Upload feature coming soon! This will allow you to contribute templates, notes, or guides.");
+  };
+
   return (
     <div className="pb-6">
-      <div className="px-5 pt-3 pb-4">
+      <div className="px-4 pt-3 pb-4">
         <h1 className="font-serif text-2xl font-bold text-court-text mb-1">Library</h1>
         <p className="text-xs text-court-text-sec">Templates, guides, and preparation materials</p>
       </div>
 
       {/* Search */}
       <div className="px-4 mb-5">
-        <div className="bg-white/[0.05] rounded-xl px-3.5 py-2.5 flex items-center gap-2">
-          <span className="opacity-30">🔍</span>
+        <div className="relative">
+          <span className="absolute left-3.5 top-1/2 -translate-y-1/2"><Search size={14} className="text-court-text-ter opacity-50" /></span>
           <input
             type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search resources..."
-            className="flex-1 bg-transparent text-xs text-court-text outline-none placeholder:text-court-text-ter"
+            className="w-full bg-white/[0.05] border border-court-border rounded-xl px-3.5 py-2.5 pl-9 text-sm text-court-text outline-none focus:border-gold/40 placeholder:text-court-text-ter"
             aria-label="Search library"
           />
-          {search && (
-            <button onClick={() => setSearch("")} className="text-court-text-ter text-xs">✕</button>
+          {searchTerm && (
+            <button
+              onClick={() => setSearchTerm("")}
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-court-text-ter text-xs hover:text-court-text transition-colors"
+            >
+              &#x2715;
+            </button>
           )}
         </div>
       </div>
 
       {/* Categories Grid */}
       <section className="px-4 mb-6">
-        <SectionHeader title="Categories" />
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-2.5">
-          {CATEGORIES.map((c) => (
-            <Card
-              key={c.key}
-              onClick={() => setSelectedCat(selectedCat === c.key ? null : c.key)}
-              className={`p-3.5 cursor-pointer transition-all ${selectedCat === c.key ? "border-gold/30" : ""}`}
-            >
-              <div className="flex justify-between items-start">
-                <span className="text-2xl">{c.icon}</span>
-                <Tag color={c.color} small>{c.count}</Tag>
-              </div>
-              <p className="text-[13px] font-bold text-court-text mt-2">{c.label}</p>
-            </Card>
-          ))}
-        </div>
+        <SectionHeader
+          title="Categories"
+          action={selectedCat ? "Clear filter" : undefined}
+          onAction={() => setSelectedCat(null)}
+        />
+        {filteredCategories.length === 0 ? (
+          <div className="text-center py-6">
+            <p className="text-court-text-ter text-sm">No categories match &quot;{searchTerm}&quot;</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-2.5">
+            {filteredCategories.map((c) => (
+              <Card
+                key={c.key}
+                onClick={() => setSelectedCat(selectedCat === c.key ? null : c.key)}
+                className={`p-3.5 cursor-pointer transition-all ${selectedCat === c.key ? "border-gold/30" : ""}`}
+              >
+                <div className="flex justify-between items-start">
+                  <DynamicIcon name={c.icon} size={24} className="text-gold" />
+                  <Tag color={c.color} small>{c.count}</Tag>
+                </div>
+                <p className="text-court-base font-bold text-court-text mt-2">{c.label}</p>
+              </Card>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Resources */}
       <section className="px-4">
-        <SectionHeader title={selectedCat ? CATEGORIES.find(c => c.key === selectedCat)?.label ?? "Resources" : "Most Downloaded"} action={selectedCat ? "Clear filter" : undefined} onAction={() => setSelectedCat(null)} />
+        <SectionHeader
+          title={selectedCat ? CATEGORIES.find(c => c.key === selectedCat)?.label ?? "Resources" : "Most Downloaded"}
+          action={selectedCat ? "Clear filter" : filteredResources.length > 4 ? "View all" : undefined}
+          onAction={() => {
+            if (selectedCat) {
+              setSelectedCat(null);
+            } else {
+              // View all: clear search to show everything
+              setSearchTerm("");
+              setSelectedCat(null);
+            }
+          }}
+        />
         <div className="flex flex-col gap-2">
           {filteredResources.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-court-text-ter text-sm">No resources found</p>
+              {(searchTerm || selectedCat) && (
+                <button
+                  onClick={() => { setSearchTerm(""); setSelectedCat(null); }}
+                  className="text-xs text-gold font-semibold mt-2"
+                >
+                  Clear filters
+                </button>
+              )}
             </div>
           ) : null}
           {filteredResources.map((r, i) => (
@@ -93,14 +152,21 @@ export default function LibraryPage() {
                 {r.type}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[13px] font-bold text-court-text truncate">{r.title}</p>
-                <p className="text-[10px] text-court-text-ter mt-0.5">{r.cat} · {r.downloads} downloads</p>
+                <p className="text-court-base font-bold text-court-text truncate">{r.title}</p>
+                <p className="text-court-xs text-court-text-ter mt-0.5">{r.cat} · {r.downloads} downloads</p>
               </div>
               <div className="shrink-0">
                 {r.isPremium ? (
                   <Tag color="gold" small>PREMIUM</Tag>
                 ) : (
-                  <button className="text-[10px] text-gold font-bold">↓</button>
+                  <button
+                    onClick={() => handleDownload(i, r.title)}
+                    disabled={downloadingIdx === i}
+                    className="text-court-xs text-gold font-bold hover:text-gold/80 transition-colors disabled:opacity-50"
+                    title={`Download ${r.title}`}
+                  >
+                    {downloadingIdx === i ? "..." : <Download size={14} className="text-gold" />}
+                  </button>
                 )}
               </div>
             </Card>
@@ -111,10 +177,10 @@ export default function LibraryPage() {
       {/* Upload CTA */}
       <section className="px-4 mt-5">
         <Card className="p-4 text-center">
-          <span className="text-2xl">📤</span>
-          <p className="text-[13px] font-bold text-court-text mt-2">Contribute to the Library</p>
-          <p className="text-[11px] text-court-text-ter mt-1 mb-3">Share templates, notes, or guides with fellow advocates</p>
-          <Button size="sm">Upload Resource</Button>
+          <Upload size={24} className="text-gold mx-auto" />
+          <p className="text-court-base font-bold text-court-text mt-2">Contribute to the Library</p>
+          <p className="text-court-sm text-court-text-ter mt-1 mb-3">Share templates, notes, or guides with fellow advocates</p>
+          <Button size="sm" onClick={handleUpload}>Upload Resource</Button>
         </Card>
       </section>
     </div>
