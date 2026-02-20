@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap");
+
+@layer base {
+  body {
+    @apply bg-navy text-court-text font-sans antialiased;
+  }
+
+  /* Hide scrollbar but keep functionality */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-navy-card border border-court-border rounded-court;
+  }
+
+  .gold-border {
+    border: 1px solid rgba(201, 168, 76, 0.25);
+  }
+
+  .gold-glow {
+    box-shadow: 0 0 20px rgba(201, 168, 76, 0.15);
+  }
+
+  .btn-gold {
+    @apply bg-gold text-navy font-bold rounded-xl px-6 py-3 text-sm tracking-wide;
+  }
+
+  .btn-outline {
+    @apply border border-court-border text-court-text-sec font-semibold rounded-xl px-6 py-3 text-sm;
+  }
+
+  .text-heading {
+    @apply font-serif font-bold text-court-text;
+  }
+
+  .tag {
+    @apply text-[10px] font-bold tracking-wider px-2 py-0.5 rounded;
+  }
+}
