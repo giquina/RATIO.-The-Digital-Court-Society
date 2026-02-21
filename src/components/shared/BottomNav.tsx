@@ -22,7 +22,7 @@ export function BottomNav() {
       role="navigation"
       aria-label="Main navigation"
     >
-      <div className="max-w-screen-sm md:max-w-screen-md mx-auto flex justify-around items-center px-2 pt-2 pb-7">
+      <div className="mx-auto flex justify-around items-center px-1 pt-2 pb-[env(safe-area-inset-bottom,8px)]">
         {tabs.map((tab) => {
           const isActive = pathname?.startsWith(tab.href);
           return (
@@ -30,7 +30,7 @@ export function BottomNav() {
               key={tab.href}
               href={tab.href}
               aria-current={isActive ? "page" : undefined}
-              className="flex flex-col items-center gap-0.5 relative px-3 py-1"
+              className="flex flex-col items-center gap-0.5 relative px-1.5 py-1 min-w-0"
             >
               {isActive && (
                 <div className="absolute -top-2 w-5 h-0.5 rounded-full bg-gold" />
@@ -39,13 +39,13 @@ export function BottomNav() {
                 size={20}
                 strokeWidth={isActive ? 2.5 : 1.5}
                 className={cn(
-                  "transition-all duration-200",
+                  "transition-all duration-200 shrink-0",
                   isActive ? "text-gold" : "text-court-text-ter"
                 )}
               />
               <span
                 className={cn(
-                  "text-court-xs font-bold tracking-wider transition-colors duration-200",
+                  "text-[10px] leading-tight font-bold tracking-wider transition-colors duration-200 truncate max-w-[56px] text-center",
                   isActive ? "text-gold" : "text-court-text-ter"
                 )}
               >

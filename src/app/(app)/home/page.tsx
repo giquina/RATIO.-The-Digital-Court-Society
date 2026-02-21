@@ -85,16 +85,16 @@ export default function HomePage() {
             </div>
           </div>
           {/* Social stats row */}
-          <div className="flex mt-4 pt-3.5 border-t border-court-border">
+          <div className="grid grid-cols-4 gap-1 mt-4 pt-3.5 border-t border-court-border">
             {[
               { v: ME.followers, l: "Followers" },
-              { v: ME.commendations, l: "Commendations" },
+              { v: ME.commendations, l: "Comms" },
               { v: ME.moots, l: "Sessions" },
               { v: `${ME.hours}h`, l: "Advocacy" },
             ].map((s) => (
-              <div key={s.l} className="flex-1 text-center">
+              <div key={s.l} className="text-center min-w-0">
                 <div className="font-serif text-base font-bold text-court-text">{s.v}</div>
-                <div className="text-court-xs text-court-text-ter uppercase tracking-wider mt-0.5">{s.l}</div>
+                <div className="text-[9px] text-court-text-ter uppercase tracking-wider mt-0.5 truncate">{s.l}</div>
               </div>
             ))}
           </div>

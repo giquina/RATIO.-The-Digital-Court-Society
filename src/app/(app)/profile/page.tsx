@@ -24,22 +24,24 @@ export default function ProfilePage() {
     <div className="pb-6">
       {/* ── Profile Card ── */}
       <section className="px-4 pt-3">
-        <Card highlight className="p-3 md:p-4 text-center relative overflow-hidden">
+        <Card highlight className="p-3 md:p-4 relative overflow-hidden">
           <div className="absolute -top-10 -right-10 w-36 h-36 rounded-full bg-gold/[0.06]" />
-          <Avatar initials={ME.initials} chamber={ME.chamber} size="xl" border />
-          <h1 className="font-serif text-xl font-bold text-court-text mt-3">{ME.name}</h1>
-          <p className="text-xs text-court-text-sec mt-1">{ME.university}</p>
-          <p className="text-court-sm text-court-text-ter mt-0.5">{ME.year} · {ME.chamber} Chamber</p>
+          <div className="flex flex-col items-center text-center">
+            <Avatar initials={ME.initials} chamber={ME.chamber} size="xl" border />
+            <h1 className="font-serif text-xl font-bold text-court-text mt-3">{ME.name}</h1>
+            <p className="text-xs text-court-text-sec mt-1">{ME.university}</p>
+            <p className="text-court-sm text-court-text-ter mt-0.5">{ME.year} · {ME.chamber} Chamber</p>
+          </div>
 
-          <div className="flex justify-center gap-7 mt-5">
+          <div className="grid grid-cols-3 gap-2 mt-5">
             {[
               { v: ME.followers, l: "Followers" },
               { v: ME.following, l: "Following" },
-              { v: ME.commendations, l: "Commendations" },
+              { v: ME.commendations, l: "Comms" },
             ].map((s) => (
-              <div key={s.l} className="text-center">
+              <div key={s.l} className="text-center min-w-0">
                 <p className="font-serif text-lg font-bold text-court-text">{s.v}</p>
-                <p className="text-court-xs text-court-text-ter uppercase tracking-wider mt-0.5">{s.l}</p>
+                <p className="text-[10px] text-court-text-ter uppercase tracking-wider mt-0.5 truncate">{s.l}</p>
               </div>
             ))}
           </div>

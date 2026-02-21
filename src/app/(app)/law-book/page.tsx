@@ -239,7 +239,7 @@ export default function LawBookIndexPage() {
       {/* ── Floating Contribute button ── */}
       <Link
         href="/law-book/contribute"
-        className="fixed bottom-24 md:bottom-8 right-5 z-40 bg-gold text-navy font-bold rounded-full w-14 h-14 flex items-center justify-center shadow-lg hover:bg-gold/90 transition-all duration-200"
+        className="fixed bottom-20 md:bottom-8 right-4 z-40 bg-gold text-navy font-bold rounded-full w-12 h-12 flex items-center justify-center shadow-lg hover:bg-gold/90 transition-all duration-200"
         aria-label="Contribute to the Law Book"
       >
         <Plus size={24} />

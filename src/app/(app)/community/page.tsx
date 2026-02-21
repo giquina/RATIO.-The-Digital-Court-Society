@@ -65,7 +65,7 @@ export default function CommunityPage() {
         <div className="flex gap-1 bg-white/[0.04] rounded-xl p-0.5">
           {tabs.map((t, i) => (
             <button key={t} onClick={() => setTab(i)}
-              className={`flex-1 py-2 rounded-lg text-court-sm font-bold transition-all ${tab === i ? "bg-gold text-navy" : "text-court-text-sec"}`}>
+              className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all truncate px-1 ${tab === i ? "bg-gold text-navy" : "text-court-text-sec"}`}>
               {t}
             </button>
           ))}
@@ -101,13 +101,13 @@ export default function CommunityPage() {
                   </div>
                 </div>
                 <p className="text-xs text-court-text-sec mt-2 leading-relaxed">{p.bio}</p>
-                <div className="flex gap-0 mt-3 pt-2.5 border-t border-court-border-light items-center">
+                <div className="flex flex-wrap gap-x-3 gap-y-1 mt-3 pt-2.5 border-t border-court-border-light items-center">
                   {[
                     { v: p.followers, l: "followers" },
                     { v: p.moots, l: "moots" },
                     { v: p.mutual, l: "mutual" },
                   ].map((s) => (
-                    <div key={s.l} className="flex-1">
+                    <div key={s.l} className="shrink-0">
                       <span className="text-court-base font-bold text-court-text">{s.v}</span>
                       <span className="text-court-xs text-court-text-ter ml-1">{s.l}</span>
                     </div>
@@ -186,11 +186,11 @@ export default function CommunityPage() {
             <Scale size={36} className="text-gold mx-auto" />
             <h2 className="font-serif text-xl font-bold text-court-text mt-2">Gray&apos;s Chamber</h2>
             <p className="text-court-sm text-court-text-sec mt-1">Est. 2026 · 342 members · Ranked #2 nationally</p>
-            <div className="flex justify-center gap-7 mt-4">
-              {[{ v: "342", l: "Members" }, { v: "1,847", l: "Total Moots" }, { v: "#2", l: "Rank" }].map(s => (
-                <div key={s.l} className="text-center">
+            <div className="grid grid-cols-3 gap-2 mt-4">
+              {[{ v: "342", l: "Members" }, { v: "1,847", l: "Moots" }, { v: "#2", l: "Rank" }].map(s => (
+                <div key={s.l} className="text-center min-w-0">
                   <p className="font-serif text-base font-bold text-court-text">{s.v}</p>
-                  <p className="text-court-xs text-court-text-ter uppercase tracking-wider mt-0.5">{s.l}</p>
+                  <p className="text-[10px] text-court-text-ter uppercase tracking-wider mt-0.5 truncate">{s.l}</p>
                 </div>
               ))}
             </div>
