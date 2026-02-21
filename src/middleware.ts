@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const PUBLIC_PATHS = ["/", "/login", "/register"];
+const PUBLIC_PATHS = ["/", "/login", "/register", "/onboarding", "/verify"];
 const AUTH_PATHS = ["/login", "/register"];
 
 export function middleware(request: NextRequest) {
@@ -18,7 +18,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Check for auth token (Convex stores this as a cookie)
+  // Check for auth token
   const token = request.cookies.get("convex-auth-token")?.value;
 
   // If no token and trying to access protected route, redirect to login

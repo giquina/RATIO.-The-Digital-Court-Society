@@ -9,6 +9,7 @@ import {
   BookOpen,
   Wrench,
   Trophy,
+  Swords,
   Landmark,
   Users,
   User,
@@ -54,6 +55,7 @@ const sections: NavSection[] = [
     title: "COMPETE",
     items: [
       { href: "/rankings", label: "Rankings", icon: Trophy },
+      { href: "/sessions/tournaments", label: "Tournaments", icon: Swords },
       { href: "/chambers", label: "Chambers", icon: Landmark },
       { href: "/community", label: "Community", icon: Users },
     ],

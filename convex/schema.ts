@@ -512,4 +512,113 @@ export default defineSchema({
     status: v.string(), // "active", "amended"
   })
     .index("by_section", ["sectionNumber"]),
+
+  // ═══════════════════════════════════════════
+  // TOURNAMENTS
+  // ═══════════════════════════════════════════
+  tournaments: defineTable({
+    name: v.string(),
+    module: v.string(),
+    format: v.string(), // "single_elimination", "round_robin", "swiss"
+    maxParticipants: v.number(),
+    currentRound: v.string(),
+    status: v.string(), // "registration", "active", "completed"
+    startDate: v.string(),
+    endDate: v.optional(v.string()),
+    organizer: v.id("profiles"),
+    university: v.optional(v.string()),
+    isCrossUniversity: v.boolean(),
+    rules: v.optional(v.string()),
+  })
+    .index("by_status", ["status"]),
+
+  tournamentEntries: defineTable({
+    tournamentId: v.id("tournaments"),
+    profileId: v.id("profiles"),
+    seed: v.optional(v.number()),
+    eliminated: v.boolean(),
+    wins: v.number(),
+    losses: v.number(),
+  })
+    .index("by_tournament", ["tournamentId"])
+    .index("by_profile", ["profileId"]),
+
+  tournamentMatches: defineTable({
+    tournamentId: v.id("tournaments"),
+    round: v.string(),
+    matchNumber: v.number(),
+    participant1: v.optional(v.id("profiles")),
+    participant2: v.optional(v.id("profiles")),
+    winner: v.optional(v.id("profiles")),
+    videoSessionId: v.optional(v.id("videoSessions")),
+    scheduledDate: v.optional(v.string()),
+    status: v.string(), // "pending", "scheduled", "completed"
+  })
+    .index("by_tournament", ["tournamentId"])
+    .index("by_round", ["tournamentId", "round"]),
+
+  // ═══════════════════════════════════════════
+  // VIDEO SESSIONS (DAILY.CO)
+  // ═══════════════════════════════════════════
+  videoSessions: defineTable({
+    sessionId: v.optional(v.id("sessions")), // links to existing session
+    hostId: v.id("profiles"),
+    format: v.string(), // "1v1_moot", "2v2_moot", "practice", "ai_judge"
+    title: v.string(),
+    caseDescription: v.optional(v.string()),
+    module: v.optional(v.string()),
+    // Scheduling
+    scheduledStart: v.number(), // UTC timestamp
+    scheduledEnd: v.number(),
+    timezone: v.string(), // "Europe/London"
+    actualStart: v.optional(v.number()),
+    actualEnd: v.optional(v.number()),
+    // Video provider
+    provider: v.string(), // "daily"
+    roomName: v.string(),
+    roomUrl: v.string(),
+    // Status
+    status: v.string(), // "pending", "confirmed", "in_progress", "completed", "cancelled", "no_show"
+    // Participants
+    participants: v.array(v.object({
+      profileId: v.id("profiles"),
+      role: v.string(), // "appellant", "respondent", "judge", "observer"
+      inviteStatus: v.string(), // "invited", "accepted", "declined"
+      joinedAt: v.optional(v.number()),
+      leftAt: v.optional(v.number()),
+    })),
+    // Recording & AI
+    recordingEnabled: v.boolean(),
+    recordingUrl: v.optional(v.string()),
+    transcriptUrl: v.optional(v.string()),
+    aiSummary: v.optional(v.string()),
+    // Cancellation
+    cancellationReason: v.optional(v.string()),
+    cancelledBy: v.optional(v.id("profiles")),
+  })
+    .index("by_host", ["hostId"])
+    .index("by_status", ["status"])
+    .index("by_scheduled_start", ["scheduledStart"]),
+
+  videoSessionRatings: defineTable({
+    videoSessionId: v.id("videoSessions"),
+    raterId: v.id("profiles"),
+    rateeId: v.id("profiles"),
+    advocacySkill: v.number(), // 1-5
+    preparation: v.number(),
+    professionalism: v.number(),
+    overallRating: v.number(),
+    comments: v.optional(v.string()),
+  })
+    .index("by_session", ["videoSessionId"])
+    .index("by_ratee", ["rateeId"]),
+
+  videoSessionEvents: defineTable({
+    videoSessionId: v.id("videoSessions"),
+    profileId: v.optional(v.id("profiles")),
+    event: v.string(), // "created", "invited", "accepted", "declined", "joined", "left", "completed", etc.
+    metadata: v.optional(v.string()),
+    timestamp: v.number(),
+  })
+    .index("by_session", ["videoSessionId"]),
 });

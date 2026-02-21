@@ -61,15 +61,50 @@ const config: Config = {
           "0%": { transform: "translateY(12px)", opacity: "0" },
           "100%": { transform: "translateY(0)", opacity: "1" },
         },
+        "slide-down": {
+          "0%": { transform: "translateY(-12px)", opacity: "0" },
+          "100%": { transform: "translateY(0)", opacity: "1" },
+        },
+        "fade-in": {
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
+        "scale-in": {
+          "0%": { transform: "scale(0.8)", opacity: "0" },
+          "100%": { transform: "scale(1)", opacity: "1" },
+        },
         "glow-breathe": {
           "0%, 100%": { boxShadow: "0 0 20px rgba(201,168,76,0.15)" },
           "50%": { boxShadow: "0 0 40px rgba(201,168,76,0.3)" },
+        },
+        "glow-pulse": {
+          "0%, 100%": { opacity: "0.4" },
+          "50%": { opacity: "1" },
+        },
+        "spin-slow": {
+          "0%": { transform: "rotate(0deg)" },
+          "100%": { transform: "rotate(360deg)" },
+        },
+        "recording-pulse": {
+          "0%, 100%": { opacity: "1", transform: "scale(1)" },
+          "50%": { opacity: "0.5", transform: "scale(1.2)" },
+        },
+        "connection-wave": {
+          "0%": { height: "4px" },
+          "50%": { height: "12px" },
+          "100%": { height: "4px" },
         },
       },
       animation: {
         "pulse-ring": "pulse-ring 2.4s ease-out infinite",
         "slide-up": "slide-up 0.3s ease-out",
+        "slide-down": "slide-down 0.3s ease-out",
+        "fade-in": "fade-in 0.4s ease-out",
+        "scale-in": "scale-in 0.3s ease-out",
         "glow-breathe": "glow-breathe 2s ease-in-out infinite",
+        "glow-pulse": "glow-pulse 1.5s ease-in-out infinite",
+        "spin-slow": "spin-slow 8s linear infinite",
+        "recording-pulse": "recording-pulse 2s ease-in-out infinite",
       },
     },
   },
