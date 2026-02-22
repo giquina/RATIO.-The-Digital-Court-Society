@@ -45,7 +45,7 @@ export default function HomePage() {
   const initials = profile ? getInitials(profile.fullName) : "??";
 
   return (
-    <div className="pb-6">
+    <div className="pb-24 md:pb-6">
       {/* ── Header ── */}
       <header className="flex justify-between items-center px-4 pt-3 pb-4">
         <div>
@@ -61,10 +61,10 @@ export default function HomePage() {
           )}
         </div>
         <div className="flex items-center gap-3">
-          <Link href="/notifications" className="relative w-9 h-9 rounded-full bg-gold-dim flex items-center justify-center">
+          <Link href="/notifications" aria-label="Notifications" className="relative w-9 h-9 rounded-full bg-gold-dim flex items-center justify-center">
             <Bell size={18} className="text-gold" />
           </Link>
-          <Link href="/profile">
+          <Link href="/profile" aria-label="View profile">
             <Avatar initials={initials} chamber={profile?.chamber ?? "Gray's"} size="sm" border />
           </Link>
         </div>
@@ -159,7 +159,7 @@ export default function HomePage() {
               <button
                 key={t}
                 onClick={() => setFeedTab(t)}
-                className={`text-court-sm font-semibold pb-0.5 capitalize ${
+                className={`text-court-sm font-semibold pb-0.5 capitalize focus:outline-none focus:ring-1 focus:ring-gold/30 rounded-sm ${
                   feedTab === t ? "text-gold border-b-[1.5px] border-gold" : "text-court-text-ter"
                 }`}
               >

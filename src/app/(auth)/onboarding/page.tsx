@@ -81,12 +81,12 @@ export default function OnboardingPage() {
             placeholder="Search universities..."
             className="w-full bg-navy-card border border-court-border rounded-xl px-3.5 py-2.5 text-court-base text-court-text outline-none focus:border-gold/40 mb-3 placeholder:text-court-text-ter"
           />
-          <div className="flex-1 overflow-y-auto no-scrollbar">
+          <div className="flex-1 overflow-y-auto">
             {filteredUnis.map((u) => (
               <button
                 key={u.short}
                 onClick={() => setUniversity(u.name)}
-                className={`w-full text-left px-3.5 py-3 rounded-xl mb-1.5 flex justify-between items-center transition-all ${
+                className={`w-full text-left px-3.5 py-3 rounded-xl mb-1.5 flex justify-between items-center transition-all focus:outline-none focus:ring-1 focus:ring-gold/30 ${
                   university === u.name
                     ? "bg-gold-dim border border-gold/25 text-gold"
                     : "hover:bg-white/[0.03] text-court-text-sec"
@@ -119,7 +119,7 @@ export default function OnboardingPage() {
               <button
                 key={y.v}
                 onClick={() => setYear(y.v)}
-                className={`w-full text-left px-4 py-3.5 rounded-xl transition-all ${
+                className={`w-full text-left px-4 py-3.5 rounded-xl transition-all focus:outline-none focus:ring-1 focus:ring-gold/30 ${
                   year === y.v
                     ? "bg-gold-dim border border-gold/25 text-gold font-bold"
                     : "bg-navy-card border border-court-border text-court-text-sec"
@@ -142,7 +142,7 @@ export default function OnboardingPage() {
               <button
                 key={m}
                 onClick={() => toggleModule(m)}
-                className={`px-3.5 py-2 rounded-xl text-xs font-semibold border transition-all ${
+                className={`px-3.5 py-2 rounded-xl text-xs font-semibold border transition-all focus:outline-none focus:ring-1 focus:ring-gold/30 ${
                   modules.includes(m)
                     ? "border-gold/40 bg-gold-dim text-gold"
                     : "border-court-border text-court-text-sec hover:border-white/10"
@@ -165,7 +165,7 @@ export default function OnboardingPage() {
               <button
                 key={c.name}
                 onClick={() => setChamber(c.name)}
-                className={`w-full text-left px-4 py-4 rounded-court border transition-all ${
+                className={`w-full text-left px-4 py-4 rounded-court border transition-all focus:outline-none focus:ring-1 focus:ring-gold/30 ${
                   chamber === c.name ? "border-2" : "border border-court-border-light"
                 }`}
                 style={{ borderColor: chamber === c.name ? c.color : undefined }}
@@ -200,14 +200,17 @@ export default function OnboardingPage() {
             setSaving(true);
             try {
               const uni = UNIVERSITIES.find((u) => u.name === university);
+              const pendingName = typeof window !== "undefined" ? localStorage.getItem("ratio_pending_name") ?? undefined : undefined;
               await createProfile({
                 university,
                 universityShort: uni?.short ?? university.substring(0, 5),
                 yearOfStudy: year ?? 1,
                 chamber,
                 modules,
+                fullName: pendingName,
               });
               localStorage.removeItem(STORAGE_KEY);
+              localStorage.removeItem("ratio_pending_name");
               router.push("/home");
             } catch (err) {
               console.error("Failed to create profile:", err);

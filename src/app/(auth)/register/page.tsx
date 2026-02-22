@@ -27,9 +27,16 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       // Create account via Convex Auth
-      await signIn("password", { email, password, flow: "signUp" });
-      // Update the user's name (Convex Auth only stores email)
-      await updateName({ name });
+      await signIn("password", { email: email.toLowerCase().trim(), password, flow: "signUp" });
+      // Store name for onboarding (updateName may fail due to auth propagation delay)
+      try {
+        await updateName({ name });
+      } catch {
+        // Name will be set during onboarding if this fails
+        if (typeof window !== "undefined") {
+          localStorage.setItem("ratio_pending_name", name);
+        }
+      }
       router.push("/onboarding");
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "";
@@ -84,13 +91,14 @@ export default function RegisterPage() {
         </div>
 
         {error && (
-          <p className="text-court-xs text-red-400 text-center">{error}</p>
+          <p className="text-court-xs text-red-400 text-center" role="alert">{error}</p>
         )}
 
         <button
           type="submit"
           disabled={!canSubmit || loading}
-          className="w-full bg-gold text-navy font-bold rounded-xl py-3 text-sm tracking-wide hover:bg-gold/90 transition-colors disabled:opacity-40 flex items-center justify-center gap-2 mt-1"
+          aria-busy={loading}
+          className="w-full bg-gold text-navy font-bold rounded-xl py-3 text-sm tracking-wide hover:bg-gold/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-1"
         >
           {loading && <Loader2 size={16} className="animate-spin" />}
           {loading ? "Creating account..." : "Create Account"}

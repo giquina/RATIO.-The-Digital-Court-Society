@@ -57,6 +57,7 @@ export const createProfile = mutation({
     yearOfStudy: v.number(),
     chamber: v.string(),
     modules: v.array(v.string()),
+    fullName: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const userId = await auth.getUserId(ctx);
@@ -69,9 +70,13 @@ export const createProfile = mutation({
       .first();
     if (existing) return existing._id;
 
-    // Get user name from users table
+    // Get user name from users table, fall back to provided name or "Advocate"
     const user = await ctx.db.get(userId);
-    const fullName = user?.name ?? "Advocate";
+    const fullName = user?.name || args.fullName || "Advocate";
+    // If name wasn't set during registration, patch the user record now
+    if (!user?.name && args.fullName) {
+      await ctx.db.patch(userId, { name: args.fullName });
+    }
 
     const profileId = await ctx.db.insert("profiles", {
       userId,

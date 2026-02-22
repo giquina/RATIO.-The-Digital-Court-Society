@@ -49,12 +49,12 @@ export function BottomNav() {
                   )}
                 />
                 {tab.showNotifDot && hasUnread && (
-                  <div className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-gold" />
+                  <div className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-gold" aria-label="Unread notifications" />
                 )}
               </div>
               <span
                 className={cn(
-                  "text-[10px] leading-tight font-bold tracking-wider transition-colors duration-200 truncate max-w-[56px] text-center",
+                  "text-[11px] leading-tight font-bold tracking-wider transition-colors duration-200 truncate max-w-[56px] text-center",
                   isActive ? "text-gold" : "text-court-text-ter"
                 )}
               >

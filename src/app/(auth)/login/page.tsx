@@ -21,7 +21,7 @@ function LoginForm() {
     setError("");
     setLoading(true);
     try {
-      await signIn("password", { email, password, flow: "signIn" });
+      await signIn("password", { email: email.toLowerCase().trim(), password, flow: "signIn" });
       router.push(redirect);
     } catch {
       setError("Invalid email or password. Please try again.");
@@ -54,13 +54,14 @@ function LoginForm() {
         <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" className={inputClass} aria-label="Password" required />
 
         {error && (
-          <p className="text-court-xs text-red-400 text-center">{error}</p>
+          <p className="text-court-xs text-red-400 text-center" role="alert">{error}</p>
         )}
 
         <button
           type="submit"
           disabled={loading || !email || !password}
-          className="w-full bg-gold text-navy font-bold rounded-xl py-3 text-sm tracking-wide hover:bg-gold/90 transition-colors disabled:opacity-40 flex items-center justify-center gap-2 mt-1"
+          aria-busy={loading}
+          className="w-full bg-gold text-navy font-bold rounded-xl py-3 text-sm tracking-wide hover:bg-gold/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-1"
         >
           {loading && <Loader2 size={16} className="animate-spin" />}
           {loading ? "Signing in..." : "Sign In"}

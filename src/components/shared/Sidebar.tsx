@@ -228,9 +228,9 @@ export function Sidebar() {
         {sections.map((section) => (
           <div key={section.title} className="mb-4">
             {!collapsed && (
-              <p className="hidden lg:block text-court-xs font-bold tracking-[0.15em] text-court-text-ter px-3 mb-2">
+              <h3 className="hidden lg:block text-court-xs font-bold tracking-[0.15em] text-court-text-ter px-3 mb-2" role="heading" aria-level={3}>
                 {section.title}
-              </p>
+              </h3>
             )}
             {section.items.map((item) => {
               const isActive = pathname?.startsWith(item.href);
@@ -299,8 +299,9 @@ export function Sidebar() {
       {/* Collapse toggle */}
       <button
         onClick={toggleCollapsed}
-        className="hidden lg:flex items-center justify-center h-12 border-t border-court-border text-court-text-ter hover:text-court-text transition-colors"
+        className="hidden lg:flex items-center justify-center h-12 border-t border-court-border text-court-text-ter hover:text-court-text transition-colors focus:outline-none focus:ring-1 focus:ring-gold/20"
         aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+        aria-expanded={!collapsed}
       >
         {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
       </button>

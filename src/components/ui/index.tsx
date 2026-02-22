@@ -94,7 +94,7 @@ export function Tag({
     green: "text-green-500 bg-green-500/10 border-green-500/20",
     red: "text-red-500 bg-red-500/10 border-red-500/20",
     blue: "text-blue-400 bg-blue-400/10 border-blue-400/20",
-    burgundy: "text-[#E0D0A8] bg-burgundy/20 border-burgundy/30",
+    burgundy: "text-court-text bg-burgundy/20 border-burgundy/30",
     orange: "text-orange-400 bg-orange-400/10 border-orange-400/20",
   };
 
@@ -180,7 +180,7 @@ export function ProgressBar({
   return (
     <div className="bg-white/[0.06] rounded-full overflow-hidden" style={{ height }}>
       <div
-        className={cn("h-full rounded-full bg-gradient-to-r transition-all duration-1000 ease-out", colors[color] ?? colors.gold)}
+        className={cn("h-full rounded-full bg-gradient-to-r transition-all duration-500 ease-out", colors[color] ?? colors.gold)}
         style={{ width: `${Math.min(100, Math.max(0, pct))}%` }}
       />
     </div>
@@ -250,7 +250,7 @@ export function FollowButton({
     <button
       onClick={onToggle}
       className={cn(
-        "font-bold rounded-lg transition-all duration-200",
+        "font-bold rounded-xl transition-all duration-200",
         small ? "px-3 py-1 text-court-xs" : "px-4 py-1.5 text-xs",
         isFollowing
           ? "border border-white/10 text-court-text-sec hover:border-red-400/30 hover:text-red-400"
@@ -277,7 +277,7 @@ export function CommendButton({
       <button
         onClick={onToggle}
         className={cn(
-          "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200",
+          "flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all duration-200",
           isCommended
             ? "bg-gold-dim border border-gold/25 text-gold"
             : "text-court-text-ter hover:text-gold hover:bg-gold-dim"
@@ -325,7 +325,7 @@ export function Skeleton({
   return (
     <div
       className={cn(
-        "animate-pulse bg-white/[0.06]",
+        "animate-pulse bg-white/[0.08]",
         rounded ? "rounded-full" : "rounded-court",
         className
       )}
@@ -452,7 +452,7 @@ export function Tooltip({
   const triggerRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const show = () => {
+  const show = (instant = false) => {
     if (disabled) return;
     timerRef.current = setTimeout(() => {
       if (!triggerRef.current) return;
@@ -464,7 +464,7 @@ export function Tooltip({
       else { pos.x = rect.left + rect.width / 2; pos.y = rect.bottom + 8; }
       setCoords(pos);
       setOpen(true);
-    }, delay);
+    }, instant ? 0 : delay);
   };
 
   const hide = () => {
@@ -482,7 +482,7 @@ export function Tooltip({
     : { left: coords.x, top: coords.y, transform: "translateX(-50%)" };
 
   return (
-    <div ref={triggerRef} onMouseEnter={show} onMouseLeave={hide} onFocus={show} onBlur={hide}>
+    <div ref={triggerRef} onMouseEnter={() => show()} onMouseLeave={hide} onFocus={() => show(true)} onBlur={hide}>
       {children}
       {open && typeof document !== "undefined" && createPortal(
         <div
@@ -492,7 +492,7 @@ export function Tooltip({
           )}
           style={originStyle}
         >
-          <div className="bg-navy-card border border-court-border rounded-lg px-3 py-2 shadow-lg shadow-black/30 max-w-[200px]">
+          <div className="bg-navy-card border border-court-border rounded-lg px-3 py-2 shadow-lg shadow-black/30 max-w-[min(200px,calc(100vw-2rem))]">
             <p className="text-court-xs font-semibold text-court-text whitespace-nowrap">{content}</p>
             {description && <p className="text-court-xs text-court-text-ter mt-0.5">{description}</p>}
           </div>
@@ -516,7 +516,7 @@ export function ErrorState({
   return (
     <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
       <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
-        <span className="text-2xl">!</span>
+        <X size={28} className="text-red-500" />
       </div>
       <h3 className="font-serif text-lg font-bold text-court-text mb-2">{title}</h3>
       <p className="text-sm text-court-text-ter mb-6 max-w-xs">{description}</p>

@@ -10,8 +10,8 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
   const pathname = usePathname();
 
   useEffect(() => {
-    // Allow onboarding for authenticated users (they just registered)
-    if (pathname === "/onboarding") return;
+    // Allow onboarding and register for authenticated users (registration flow)
+    if (pathname === "/onboarding" || pathname === "/register") return;
     // If user is already authenticated, redirect to home
     if (!isLoading && isAuthenticated) {
       router.push("/home");
