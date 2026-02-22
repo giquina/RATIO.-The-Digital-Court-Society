@@ -50,7 +50,7 @@ export default function RegisterPage() {
     }
   };
 
-  const inputClass = "w-full bg-navy-card border border-court-border rounded-xl px-3.5 py-3 text-court-base text-court-text outline-none focus:border-gold/60 focus:ring-1 focus:ring-gold/20 transition-colors placeholder:text-court-text-ter";
+  const inputClass = "w-full bg-white/[0.06] border border-white/[0.12] rounded-xl px-3.5 py-3 text-court-base text-court-text outline-none focus:border-gold/60 focus:ring-1 focus:ring-gold/20 transition-colors placeholder:text-court-text-sec";
 
   return (
     <div className="min-h-screen flex flex-col justify-center px-4 md:px-6 lg:px-8">

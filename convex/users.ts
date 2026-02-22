@@ -121,3 +121,83 @@ export const createProfile = mutation({
     return profileId;
   },
 });
+
+// Update profile fields (post-onboarding editing)
+export const updateProfile = mutation({
+  args: {
+    fullName: v.optional(v.string()),
+    university: v.optional(v.string()),
+    universityShort: v.optional(v.string()),
+    yearOfStudy: v.optional(v.number()),
+    chamber: v.optional(v.string()),
+    bio: v.optional(v.string()),
+    modules: v.optional(v.array(v.string())),
+    isPublic: v.optional(v.boolean()),
+  },
+  handler: async (ctx, args) => {
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!profile) throw new Error("Profile not found");
+
+    // Build patch object with only provided fields
+    const patch: Record<string, unknown> = {};
+    if (args.fullName !== undefined) patch.fullName = args.fullName;
+    if (args.university !== undefined) patch.university = args.university;
+    if (args.universityShort !== undefined) patch.universityShort = args.universityShort;
+    if (args.yearOfStudy !== undefined) patch.yearOfStudy = args.yearOfStudy;
+    if (args.chamber !== undefined) patch.chamber = args.chamber;
+    if (args.bio !== undefined) patch.bio = args.bio;
+    if (args.modules !== undefined) patch.modules = args.modules;
+    if (args.isPublic !== undefined) patch.isPublic = args.isPublic;
+
+    if (Object.keys(patch).length === 0) return profile._id;
+
+    // Also update user name if fullName changed
+    if (args.fullName !== undefined) {
+      await ctx.db.patch(userId, { name: args.fullName });
+    }
+
+    await ctx.db.patch(profile._id, patch);
+    return profile._id;
+  },
+});
+
+// Update user notification and privacy settings
+export const updateSettings = mutation({
+  args: {
+    settings: v.object({
+      profileVisible: v.optional(v.boolean()),
+      showFollowerCount: v.optional(v.boolean()),
+      emailNotifications: v.optional(v.boolean()),
+      pushNotifications: v.optional(v.boolean()),
+      sessionReminders: v.optional(v.boolean()),
+    }),
+  },
+  handler: async (ctx, args) => {
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!profile) throw new Error("Profile not found");
+
+    // Map settings to profile fields
+    const patch: Record<string, unknown> = {};
+    if (args.settings.profileVisible !== undefined) {
+      patch.isPublic = args.settings.profileVisible;
+    }
+
+    if (Object.keys(patch).length > 0) {
+      await ctx.db.patch(profile._id, patch);
+    }
+
+    return profile._id;
+  },
+});

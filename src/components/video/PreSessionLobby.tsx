@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, Button, Avatar, Tag } from "@/components/ui";
+import { Scale, Clock, Calendar, Bell, Video, Mic, Globe, Check } from "lucide-react";
 import { playTick, playCountdownFinal, resumeAudio } from "@/lib/utils/sounds";
 import { downloadICS, getGoogleCalendarUrl } from "@/lib/utils/calendar";
 
@@ -110,7 +111,7 @@ export function PreSessionLobby({
             animate={{ boxShadow: ["0 0 0 0 rgba(201,168,76,0)", "0 0 0 12px rgba(201,168,76,0.08)", "0 0 0 0 rgba(201,168,76,0)"] }}
             transition={{ duration: 2.5, repeat: Infinity }}
           >
-            <span className="text-2xl">&#9878;&#65039;</span>
+            <Scale size={28} className="text-gold" />
           </motion.div>
           <h1 className="font-serif text-xl font-bold text-court-text mb-1">Pre-Session Lobby</h1>
           <p className="text-xs text-court-text-sec">Prepare to enter chambers</p>
@@ -126,9 +127,12 @@ export function PreSessionLobby({
             <h2 className="font-serif text-base font-bold text-court-text leading-tight mb-1.5">
               {session.title}
             </h2>
-            <p className="text-[11px] text-court-text-sec">&#128336; {session.scheduledTime}</p>
+            <p className="text-court-sm text-court-text-sec flex items-center gap-1">
+              <Clock size={12} className="shrink-0" />
+              {session.scheduledTime}
+            </p>
             {session.caseDescription && (
-              <p className="text-[11px] text-court-text-ter mt-2 leading-relaxed border-t border-court-border-light pt-2">
+              <p className="text-court-sm text-court-text-ter mt-2 leading-relaxed border-t border-court-border-light pt-2">
                 {session.caseDescription}
               </p>
             )}
@@ -142,7 +146,7 @@ export function PreSessionLobby({
               onClick={handleCalendarExport}
               className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-white/[0.03] border border-court-border text-xs text-court-text-sec"
             >
-              &#128197; Add to Calendar
+              <Calendar size={14} className="shrink-0" /> Add to Calendar
             </button>
             <button
               onClick={handleEnableNotifications}
@@ -152,7 +156,7 @@ export function PreSessionLobby({
                   : "bg-white/[0.03] border-court-border text-court-text-sec"
               }`}
             >
-              &#128276; {notificationsEnabled ? "Reminders On" : "Enable Reminders"}
+              <Bell size={14} className="shrink-0" /> {notificationsEnabled ? "Reminders On" : "Enable Reminders"}
             </button>
           </div>
         </motion.div>
@@ -162,21 +166,21 @@ export function PreSessionLobby({
           <Card className="p-4 mb-3">
             <h3 className="text-xs font-bold text-court-text tracking-wider uppercase mb-3">Device Check</h3>
             <div className="flex flex-col gap-3">
-              {[
-                { icon: "&#128249;", label: "Camera", ready: cameraReady, checking: checking && !cameraReady },
-                { icon: "&#127908;", label: "Microphone", ready: micReady, checking: checking && !micReady },
-                { icon: "&#127760;", label: "Connection", ready: true, checking: false },
-              ].map((item, i) => (
+              {([
+                { icon: Video, label: "Camera", ready: cameraReady, checking: checking && !cameraReady },
+                { icon: Mic, label: "Microphone", ready: micReady, checking: checking && !micReady },
+                { icon: Globe, label: "Connection", ready: true, checking: false },
+              ] as { icon: React.ElementType; label: string; ready: boolean; checking: boolean }[]).map((item, i) => (
                 <div key={i} className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
-                    <span className="text-base" dangerouslySetInnerHTML={{ __html: item.icon }} />
+                    <item.icon size={18} className="text-court-text" />
                     <span className="text-xs text-court-text">{item.label}</span>
                   </div>
                   <AnimatePresence mode="wait">
                     {item.checking ? (
                       <motion.span
                         key="checking"
-                        className="text-[10px] text-court-text-ter"
+                        className="text-court-xs text-court-text-ter"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: [0.3, 1, 0.3] }}
                         transition={{ duration: 1.2, repeat: Infinity }}
@@ -186,11 +190,11 @@ export function PreSessionLobby({
                     ) : (
                       <motion.span
                         key="ready"
-                        className="text-[10px] text-green-500 font-bold"
+                        className="text-court-xs text-green-500 font-bold"
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                       >
-                        &#10003; Ready
+                        <Check size={12} className="inline-block mr-0.5" /> Ready
                       </motion.span>
                     )}
                   </AnimatePresence>
@@ -210,7 +214,7 @@ export function PreSessionLobby({
               </div>
               <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-black/40 backdrop-blur-sm rounded-full px-2.5 py-1">
                 <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                <span className="text-[9px] text-white font-medium">Live</span>
+                <span className="text-court-xs text-white font-medium">Live</span>
               </div>
             </div>
           </Card>
@@ -230,23 +234,23 @@ export function PreSessionLobby({
                 />
                 <div>
                   <p className="text-xs font-semibold text-court-text">{session.opponent.name}</p>
-                  <p className="text-[10px] text-court-text-ter">{session.opponent.university}</p>
+                  <p className="text-court-xs text-court-text-ter">{session.opponent.university}</p>
                 </div>
               </div>
               <AnimatePresence mode="wait">
                 {opponentOnline ? (
                   <motion.span
                     key="online"
-                    className="text-[10px] text-green-500 font-bold bg-green-500/10 px-2.5 py-1 rounded-full"
+                    className="text-court-xs text-green-500 font-bold bg-green-500/10 px-2.5 py-1 rounded-full"
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                   >
-                    &#10003; In lobby
+                    <Check size={12} className="inline-block mr-0.5" /> In lobby
                   </motion.span>
                 ) : (
                   <motion.span
                     key="waiting"
-                    className="text-[10px] text-court-text-ter"
+                    className="text-court-xs text-court-text-ter"
                     animate={{ opacity: [0.3, 1, 0.3] }}
                     transition={{ duration: 1.5, repeat: Infinity }}
                   >
@@ -272,13 +276,13 @@ export function PreSessionLobby({
                 animate={consentGiven ? { scale: [1, 1.2, 1] } : {}}
                 transition={{ duration: 0.2 }}
               >
-                {consentGiven && <span className="text-[10px] font-bold">&#10003;</span>}
+                {consentGiven && <Check size={12} className="text-navy" />}
               </motion.div>
               <div>
                 <p className="text-xs font-semibold text-court-text mb-0.5">
                   I consent to camera &amp; microphone access
                 </p>
-                <p className="text-[10px] text-court-text-ter leading-relaxed">
+                <p className="text-court-xs text-court-text-ter leading-relaxed">
                   Video and audio shared with participants during this session.
                   No recording unless explicitly enabled and consented to by all parties.
                 </p>
@@ -312,7 +316,7 @@ export function PreSessionLobby({
                   <span className="font-serif text-4xl font-bold text-gold">{countdown}</span>
                 </motion.div>
                 <p className="text-sm font-semibold text-court-text">Entering Chambers...</p>
-                <p className="text-[10px] text-court-text-ter mt-1">Prepare your submissions</p>
+                <p className="text-court-xs text-court-text-ter mt-1">Prepare your submissions</p>
               </motion.div>
             ) : (
               <motion.div key="buttons" className="flex flex-col gap-2.5">

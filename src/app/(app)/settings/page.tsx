@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useQuery } from "convex/react";
+import { useQuery, useMutation } from "convex/react";
+import { courtToast } from "@/lib/utils/toast";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { api } from "../../../../convex/_generated/api";
 import { Card, Button, SectionHeader, Skeleton } from "@/components/ui";
@@ -90,6 +91,7 @@ export default function SettingsPage() {
   const { signOut } = useAuthActions();
   const user = useQuery(api.users.currentUser);
   const profile = useQuery(api.users.myProfile);
+  const updateSettings = useMutation(api.users.updateSettings);
   const [signingOut, setSigningOut] = useState(false);
 
   const [toggles, setToggles] = useState<Record<string, boolean>>({
@@ -101,9 +103,28 @@ export default function SettingsPage() {
     darkMode: true,
   });
 
+  // Sync toggle state from real profile data
+  useEffect(() => {
+    if (profile) {
+      setToggles((prev) => ({
+        ...prev,
+        profileVisible: profile.isPublic ?? true,
+      }));
+    }
+  }, [profile]);
+
   const handleToggle = (key: string) => {
     if (key === "darkMode") return; // always on
-    setToggles((prev) => ({ ...prev, [key]: !prev[key] }));
+    const newValue = !toggles[key];
+    setToggles((prev) => ({ ...prev, [key]: newValue }));
+
+    // Persist privacy/notification settings that map to profile fields
+    if (key === "profileVisible") {
+      updateSettings({ settings: { profileVisible: newValue } }).catch(() => {
+        setToggles((prev) => ({ ...prev, [key]: !newValue }));
+        courtToast.error("Failed to update setting");
+      });
+    }
   };
 
   const handleSignOut = async () => {
@@ -113,6 +134,7 @@ export default function SettingsPage() {
       router.push("/login");
     } catch {
       setSigningOut(false);
+      courtToast.error("Failed to sign out");
     }
   };
 

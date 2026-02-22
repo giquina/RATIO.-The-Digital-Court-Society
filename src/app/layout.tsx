@@ -3,6 +3,7 @@ import { Cormorant_Garamond, DM_Sans } from "next/font/google";
 import { ConvexClientProvider } from "@/components/shared/ConvexProvider";
 import { Analytics } from "@/components/shared/Analytics";
 import { CookieConsent } from "@/components/shared/CookieConsent";
+import { Toaster } from "sonner";
 import "./globals.css";
 
 const cormorant = Cormorant_Garamond({
@@ -102,11 +103,28 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`dark ${cormorant.variable} ${dmSans.variable}`}>
+      <head>
+        {/* Prevent FOUC: critical background color before CSS loads */}
+        <style dangerouslySetInnerHTML={{ __html: `html,body{background:#0C1220;color:#F2EDE6}` }} />
+      </head>
       <body className="bg-navy text-court-text font-sans antialiased min-h-screen">
         <ConvexClientProvider>
           <div className="min-h-screen relative">
             {children}
           </div>
+          <Toaster
+            theme="dark"
+            position="top-center"
+            toastOptions={{
+              style: {
+                background: "#131E30",
+                border: "1px solid rgba(255,255,255,0.06)",
+                color: "#F2EDE6",
+                fontFamily: "var(--font-dm-sans), system-ui, sans-serif",
+                fontSize: "0.8125rem",
+              },
+            }}
+          />
         </ConvexClientProvider>
         <Analytics />
         <CookieConsent />

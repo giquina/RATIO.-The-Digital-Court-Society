@@ -1,9 +1,11 @@
 "use client";
 
-import { useQuery } from "convex/react";
+import { useState } from "react";
+import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { Avatar, Tag, Card, Button, ProgressBar, SectionHeader, Skeleton } from "@/components/ui";
-import { Flame, Timer, FileText, Star, Trophy, FolderOpen, Link as LinkIcon, Landmark, Settings } from "lucide-react";
+import { courtToast } from "@/lib/utils/toast";
+import { Flame, Timer, FileText, Star, Trophy, FolderOpen, Link as LinkIcon, Landmark, Settings, X, Loader2 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
 
@@ -22,6 +24,11 @@ const YEAR_LABELS: Record<number, string> = {
 export default function ProfilePage() {
   const profile = useQuery(api.users.myProfile);
   const isLoading = profile === undefined;
+  const updateProfile = useMutation(api.users.updateProfile);
+  const [editing, setEditing] = useState(false);
+  const [editName, setEditName] = useState("");
+  const [editBio, setEditBio] = useState("");
+  const [saving, setSaving] = useState(false);
 
   if (isLoading) {
     return (
@@ -49,6 +56,29 @@ export default function ProfilePage() {
     );
   }
 
+  const startEdit = () => {
+    setEditName(profile.fullName);
+    setEditBio(profile.bio ?? "");
+    setEditing(true);
+  };
+
+  const saveEdit = async () => {
+    if (!editName.trim()) return;
+    setSaving(true);
+    try {
+      await updateProfile({
+        fullName: editName.trim(),
+        bio: editBio.trim(),
+      });
+      courtToast.success("Profile updated");
+      setEditing(false);
+    } catch {
+      courtToast.error("Failed to update profile");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const initials = getInitials(profile.fullName);
   const yearLabel = YEAR_LABELS[profile.yearOfStudy] ?? `Year ${profile.yearOfStudy}`;
 
@@ -71,6 +101,44 @@ export default function ProfilePage() {
 
   return (
     <div className="pb-6">
+      {/* Edit Profile Overlay */}
+      {editing && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+          <Card className="w-full max-w-sm p-5 relative">
+            <button onClick={() => setEditing(false)} className="absolute top-3 right-3 text-court-text-ter hover:text-court-text transition-colors">
+              <X size={18} />
+            </button>
+            <h2 className="font-serif text-lg font-bold text-court-text mb-4">Edit Profile</h2>
+            <div className="space-y-3">
+              <div>
+                <label className="text-court-xs text-court-text-ter uppercase tracking-widest block mb-1">Full Name</label>
+                <input
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  className="w-full bg-white/[0.05] border border-court-border rounded-xl px-3 py-2.5 text-court-base text-court-text focus:outline-none focus:border-gold/40 transition-colors"
+                />
+              </div>
+              <div>
+                <label className="text-court-xs text-court-text-ter uppercase tracking-widest block mb-1">Bio</label>
+                <textarea
+                  value={editBio}
+                  onChange={(e) => setEditBio(e.target.value)}
+                  rows={3}
+                  placeholder="A brief introduction..."
+                  className="w-full bg-white/[0.05] border border-court-border rounded-xl px-3 py-2.5 text-court-base text-court-text focus:outline-none focus:border-gold/40 transition-colors resize-none"
+                />
+              </div>
+            </div>
+            <div className="flex gap-2.5 mt-4">
+              <Button variant="outline" size="sm" onClick={() => setEditing(false)} className="flex-1">Cancel</Button>
+              <Button size="sm" onClick={saveEdit} disabled={saving || !editName.trim()} className="flex-1">
+                {saving ? <Loader2 size={14} className="animate-spin" /> : "Save"}
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
+
       {/* ── Profile Card ── */}
       <section className="px-4 pt-3">
         <Card highlight className="p-3 md:p-4 relative overflow-hidden">
@@ -80,6 +148,9 @@ export default function ProfilePage() {
             <h1 className="font-serif text-xl font-bold text-court-text mt-3">{profile.fullName}</h1>
             <p className="text-xs text-court-text-sec mt-1">{profile.university}</p>
             <p className="text-court-sm text-court-text-ter mt-0.5">{yearLabel}{profile.chamber ? ` · ${profile.chamber} Chamber` : ""}</p>
+            {profile.bio && (
+              <p className="text-court-sm text-court-text-sec mt-2 max-w-xs leading-relaxed">{profile.bio}</p>
+            )}
           </div>
 
           <div className="grid grid-cols-3 gap-2 mt-5">
@@ -90,13 +161,13 @@ export default function ProfilePage() {
             ].map((s) => (
               <div key={s.l} className="text-center min-w-0">
                 <p className="font-serif text-lg font-bold text-court-text">{s.v}</p>
-                <p className="text-[10px] text-court-text-ter uppercase tracking-wider mt-0.5 truncate">{s.l}</p>
+                <p className="text-court-xs text-court-text-ter uppercase tracking-wider mt-0.5 truncate">{s.l}</p>
               </div>
             ))}
           </div>
 
           <div className="flex gap-2.5 justify-center mt-4">
-            <Button variant="outline" size="sm">Edit Profile</Button>
+            <Button variant="outline" size="sm" onClick={startEdit}>Edit Profile</Button>
             <Button size="sm">Share Profile</Button>
           </div>
         </Card>

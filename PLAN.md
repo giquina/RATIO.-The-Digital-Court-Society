@@ -1,25 +1,34 @@
 # RATIO — High-Level Plan
-Last updated: 2026-02-20
+Last updated: 2026-02-22
 
-## Status: Day 2 of 14
+## Status: Days 1-6 complete. Production live.
 
 ### Phase Summary
 | Day | Focus | Status |
 |-----|-------|--------|
 | 1 | Critical Fixes (max-w-lg, SSR, dead buttons, search inputs) | DONE |
-| 2 | Typography + Fonts + Spacing | IN PROGRESS |
-| 3 | Emoji → Lucide Icons (88 instances across 13 files) | Pending |
-| 4 | Empty states + Skeletons + Mobile breathing room | Pending |
-| 5 | Convex Auth + Middleware route protection | Pending |
-| 6 | Home + Profile + Notifications → Convex backend | Pending |
+| 2 | Typography + Fonts + Spacing | DONE |
+| 3 | Emoji → Lucide Icons (50 instances across 5 files) | DONE |
+| 4 | Empty states + Skeletons + Mobile breathing room | DONE |
+| — | Production Infrastructure (domain, GA4, Sentry, SEO, deploy) | DONE |
+| 5 | Convex Auth + Route protection (layout-client pattern) | DONE |
+| 6 | Home + Profile + Community → Convex backend | DONE |
 | 7 | Sessions + AI Judge Enhancement (caching + streaming) | Pending |
-| 8 | Follow System + Community growth signals | Pending |
+| 8 | Follow System + Community growth signals | PARTIAL (toggleFollow, FollowButton exist) |
 | 9 | Law Book Schema + MVP Pages (7 new tables) | Pending |
-| 10 | Desktop Sidebar + Responsive Layout | Pending |
+| 10 | Desktop Sidebar + Responsive Layout | DONE |
 | 11 | New Pages: Settings, Rankings, Chambers, Tools, About | Pending |
 | 12 | AI Tools: Case Brief + Argument Builder | Pending |
-| 13 | Homepage Institutional Rebuild (12 section components) | Pending |
+| 13 | Homepage Institutional Rebuild (section components) | PARTIAL (PricingSection exists) |
 | 14 | Governance MVP + Verification + CI/CD + QA | Pending |
+
+### Production Details
+- Domain: ratiothedigitalcourtsociety.com (GoDaddy → Vercel)
+- Analytics: Google Analytics 4 (G-NG49LD1FXR) with GDPR consent gating
+- Error tracking: Sentry (org: armora, project: ratio)
+- Deployment: Vercel, auto-deploy from main branch
+- SEO: Full OG/Twitter metadata, dynamic sitemap (14 routes), robots.txt
+- Security: HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy
 
 ### Core Identity
 Ratio is ONE thing: A constitutional training ground for UK law students.

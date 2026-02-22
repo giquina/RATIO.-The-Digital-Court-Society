@@ -24,7 +24,7 @@ export function RescheduleModal({
   const [newEnd, setNewEnd] = useState("15:30");
   const [reason, setReason] = useState("");
 
-  const inputClass = "w-full bg-navy-card border border-court-border rounded-xl px-3.5 py-2.5 text-[13px] text-court-text outline-none focus:border-gold/40 transition-colors placeholder:text-court-text-ter";
+  const inputClass = "w-full bg-navy-card border border-court-border rounded-xl px-3.5 py-2.5 text-court-base text-court-text outline-none focus:border-gold/40 transition-colors placeholder:text-court-text-ter";
 
   return (
     <motion.div
@@ -45,27 +45,27 @@ export function RescheduleModal({
         <h2 className="font-serif text-lg font-bold text-court-text mb-1">Reschedule Session</h2>
         <p className="text-xs text-court-text-sec mb-4">{sessionTitle}</p>
 
-        <p className="text-[10px] text-court-text-ter mb-4">
+        <p className="text-court-xs text-court-text-ter mb-4">
           Currently: {currentDate} &middot; {currentTime}
         </p>
 
         <div className="flex flex-col gap-3 mb-4">
           <div>
-            <label className="text-[10px] text-court-text-ter uppercase tracking-widest mb-1.5 block">New Date</label>
+            <label className="text-court-xs text-court-text-ter uppercase tracking-widest mb-1.5 block">New Date</label>
             <input type="date" value={newDate} onChange={(e) => setNewDate(e.target.value)} className={inputClass} />
           </div>
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="text-[10px] text-court-text-ter uppercase tracking-widest mb-1.5 block">Start</label>
+              <label className="text-court-xs text-court-text-ter uppercase tracking-widest mb-1.5 block">Start</label>
               <input type="time" value={newStart} onChange={(e) => setNewStart(e.target.value)} className={inputClass} />
             </div>
             <div>
-              <label className="text-[10px] text-court-text-ter uppercase tracking-widest mb-1.5 block">End</label>
+              <label className="text-court-xs text-court-text-ter uppercase tracking-widest mb-1.5 block">End</label>
               <input type="time" value={newEnd} onChange={(e) => setNewEnd(e.target.value)} className={inputClass} />
             </div>
           </div>
           <div>
-            <label className="text-[10px] text-court-text-ter uppercase tracking-widest mb-1.5 block">Reason (optional)</label>
+            <label className="text-court-xs text-court-text-ter uppercase tracking-widest mb-1.5 block">Reason (optional)</label>
             <textarea
               value={reason}
               onChange={(e) => setReason(e.target.value)}

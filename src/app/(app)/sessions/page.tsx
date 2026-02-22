@@ -1,48 +1,160 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Avatar, Tag, Card, Button, ProgressBar, EmptyState } from "@/components/ui";
+import { useQuery, useMutation } from "convex/react";
+import { api } from "../../../../convex/_generated/api";
+import type { Id } from "../../../../convex/_generated/dataModel";
+import { Avatar, Tag, Card, Button, ProgressBar, EmptyState, SessionCardSkeleton } from "@/components/ui";
 import { Calendar, Clock, Check, BookOpen } from "lucide-react";
+import { courtToast } from "@/lib/utils/toast";
 
-const SESSIONS = [
-  { id: "1", type: "Moot", module: "Public Law", title: "Judicial Review of Executive Power",
-    date: "Tue 25 Feb", time: "14:00\u201315:30", uni: "UCL", status: "upcoming",
-    roles: [
-      { role: "Presiding Judge", filled: true, user: "Dr. Patel", initials: "DP" },
-      { role: "Leading Counsel (App.)", filled: true, user: "You", initials: "AG" },
-      { role: "Leading Counsel (Res.)", filled: true, user: "Priya S.", initials: "PS" },
-      { role: "Junior Counsel (Res.)", filled: false, user: null, initials: null },
-    ] },
-  { id: "2", type: "Mock Trial", module: "Criminal Law", title: "R v Daniels \u2014 Theft & Handling",
-    date: "Thu 27 Feb", time: "16:00\u201317:45", uni: "UCL", status: "upcoming",
-    roles: [
-      { role: "Judge", filled: true, user: "Prof. Ahmadi", initials: "PA" },
-      { role: "Prosecution", filled: true, user: "James O.", initials: "JO" },
-      { role: "Defence", filled: true, user: "Sophie C.", initials: "SC" },
-      { role: "Witness 1", filled: true, user: "Alex T.", initials: "AT" },
-      { role: "Witness 2", filled: false, user: null, initials: null },
-      { role: "Clerk", filled: false, user: null, initials: null },
-    ] },
-  { id: "3", type: "SQE2 Prep", module: "Dispute Resolution", title: "Summary Judgment Application",
-    date: "Sat 1 Mar", time: "10:00\u201311:00", uni: "Cross-University", status: "upcoming",
-    filled: 7, total: 12, roles: null },
-];
+function formatSessionDate(isoDate: string) {
+  const d = new Date(isoDate);
+  return d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" });
+}
 
-const PAST_SESSIONS = [
-  { id: "p1", type: "Moot", module: "Contract Law", title: "Anticipatory Breach \u2014 Hochster v De La Tour",
-    date: "Mon 17 Feb", time: "14:00\u201315:30", uni: "UCL", status: "past",
-    roles: null, filled: 6, total: 6 },
-  { id: "p2", type: "Mock Trial", module: "Tort Law", title: "Negligence \u2014 Caparo Industries v Dickman",
-    date: "Thu 13 Feb", time: "10:00\u201311:30", uni: "UCL", status: "past",
-    roles: null, filled: 8, total: 8 },
-];
+function formatSessionTime(startTime: string, endTime: string) {
+  return `${startTime}\u2013${endTime}`;
+}
+
+function formatSessionType(type: string) {
+  const map: Record<string, string> = {
+    moot: "Moot",
+    mock_trial: "Mock Trial",
+    sqe2_prep: "SQE2 Prep",
+    debate: "Debate",
+    workshop: "Workshop",
+  };
+  return map[type] ?? type;
+}
+
+function getTypeTagColor(type: string): "gold" | "burgundy" | "green" | "blue" | "orange" {
+  const map: Record<string, "gold" | "burgundy" | "green" | "blue" | "orange"> = {
+    moot: "gold",
+    mock_trial: "burgundy",
+    sqe2_prep: "green",
+    debate: "blue",
+    workshop: "orange",
+  };
+  return map[type] ?? "gold";
+}
+
+// ── Role list sub-component (fetches roles per session) ──
+function SessionRolesList({
+  sessionId,
+  profileId,
+}: {
+  sessionId: Id<"sessions">;
+  profileId: Id<"profiles"> | undefined;
+}) {
+  const roles = useQuery(api.sessions.getRoles, { sessionId });
+  const claimRole = useMutation(api.sessions.claimRole);
+  const unclaimRole = useMutation(api.sessions.unclaimRole);
+  const [claiming, setClaiming] = useState<string | null>(null);
+
+  if (roles === undefined) {
+    return (
+      <div className="mb-3.5 space-y-2">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="flex justify-between items-center py-1.5">
+            <div className="h-3 w-1/3 bg-white/[0.08] rounded animate-pulse" />
+            <div className="h-3 w-16 bg-white/[0.08] rounded animate-pulse" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (roles.length === 0) return null;
+
+  const handleClaim = async (roleId: Id<"sessionRoles">) => {
+    if (!profileId) {
+      courtToast.error("Profile not loaded", "Please wait and try again.");
+      return;
+    }
+    setClaiming(roleId);
+    try {
+      await claimRole({ roleId, profileId, sessionId });
+      courtToast.success("Role claimed", "You have been assigned to this role.");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Could not claim role.";
+      courtToast.error("Failed to claim role", message);
+    } finally {
+      setClaiming(null);
+    }
+  };
+
+  const handleUnclaim = async (roleId: Id<"sessionRoles">) => {
+    if (!profileId) return;
+    setClaiming(roleId);
+    try {
+      await unclaimRole({ roleId, profileId, sessionId });
+      courtToast.success("Role released", "You have been removed from this role.");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Could not release role.";
+      courtToast.error("Failed to release role", message);
+    } finally {
+      setClaiming(null);
+    }
+  };
+
+  const sortedRoles = [...roles].sort((a, b) => a.sortOrder - b.sortOrder);
+
+  return (
+    <div className="mb-3.5">
+      {sortedRoles.map((r) => {
+        const isClaimedByMe = r.claimedBy === profileId;
+        return (
+          <div key={r._id} className="flex justify-between items-center py-1.5 border-b border-court-border-light last:border-0">
+            <div className="flex gap-2 items-center">
+              {r.isClaimed && (
+                <Avatar
+                  initials={isClaimedByMe ? "You" : "??"}
+                  chamber="Gray's"
+                  size="xs"
+                />
+              )}
+              <span className="text-xs text-court-text-sec">{r.roleName}</span>
+            </div>
+            {r.isClaimed ? (
+              isClaimedByMe ? (
+                <button
+                  onClick={() => handleUnclaim(r._id)}
+                  disabled={claiming === r._id}
+                  className="text-court-xs text-green-500 font-semibold flex items-center gap-0.5 hover:text-red-400 transition-colors"
+                >
+                  <Check size={12} /> You
+                </button>
+              ) : (
+                <span className="text-court-sm text-green-500 font-semibold flex items-center gap-0.5">
+                  <Check size={12} /> Claimed
+                </span>
+              )
+            ) : (
+              <button
+                onClick={() => handleClaim(r._id)}
+                disabled={claiming === r._id}
+                className="text-court-xs text-gold font-bold bg-gold-dim border border-gold/25 rounded-md px-2.5 py-0.5 hover:bg-gold/20 transition-colors disabled:opacity-50"
+              >
+                {claiming === r._id ? "Claiming..." : "Claim Role"}
+              </button>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 export default function SessionsPage() {
   const [tab, setTab] = useState(0);
   const router = useRouter();
-  const [claimedRoles, setClaimedRoles] = useState<Record<string, string[]>>({});
+
+  // ── Real Convex data ──
+  const profile = useQuery(api.users.myProfile);
+  const upcomingSessions = useQuery(api.sessions.list, { status: "upcoming" });
+  const pastSessions = useQuery(api.sessions.list, { status: "completed" });
 
   const handleTabClick = (index: number) => {
     if (index === 1) {
@@ -53,96 +165,82 @@ export default function SessionsPage() {
     setTab(index);
   };
 
-  const handleClaimRole = (sessionId: string, role: string) => {
-    setClaimedRoles((prev) => ({
-      ...prev,
-      [sessionId]: [...(prev[sessionId] || []), role],
-    }));
-  };
-
-  const isRoleClaimed = (sessionId: string, role: string) => {
-    return claimedRoles[sessionId]?.includes(role) ?? false;
-  };
-
   const handleViewDetails = (sessionId: string) => {
     router.push(`/sessions/${sessionId}`);
   };
 
-  const handleJoinSession = (sessionId: string) => {
-    alert(`Joining session! You will be added to the participant list.`);
-  };
+  const renderSessionCard = (s: NonNullable<typeof upcomingSessions>[number], isPast = false) => {
+    const displayType = formatSessionType(s.type);
+    const displayDate = formatSessionDate(s.date);
+    const displayTime = formatSessionTime(s.startTime, s.endTime);
+    const uni = s.isCrossUniversity ? "Cross-University" : s.university;
+    const hasMax = s.maxParticipants !== undefined && s.maxParticipants > 0;
+    const spotsLeft = hasMax ? s.maxParticipants! - s.participantCount : 0;
 
-  const renderSessionCard = (s: typeof SESSIONS[number] | typeof PAST_SESSIONS[number], isPast = false) => (
-    <Card key={s.id} className="overflow-hidden">
-      <div className="px-4 py-2.5 flex justify-between items-center border-b border-court-border-light">
-        <div className="flex gap-2 items-center">
-          <Tag color={s.type === "Moot" ? "gold" : s.type === "Mock Trial" ? "burgundy" : "green"}>
-            {s.type.toUpperCase()}
-          </Tag>
-          <span className="text-court-sm text-court-text-ter">{s.module}</span>
+    return (
+      <Card key={s._id} className="overflow-hidden">
+        <div className="px-4 py-2.5 flex justify-between items-center border-b border-court-border-light">
+          <div className="flex gap-2 items-center">
+            <Tag color={getTypeTagColor(s.type)}>
+              {displayType.toUpperCase()}
+            </Tag>
+            <span className="text-court-sm text-court-text-ter">{s.module}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            {isPast && <Tag color="blue" small>COMPLETED</Tag>}
+            <span className="text-court-sm text-court-text-sec">{uni}</span>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          {isPast && <Tag color="blue" small>COMPLETED</Tag>}
-          <span className="text-court-sm text-court-text-sec">{s.uni}</span>
-        </div>
-      </div>
-      <div className="p-4">
-        <h3 className="font-serif text-base font-bold text-court-text mb-2 leading-tight">{s.title}</h3>
-        <div className="flex gap-4 text-court-sm text-court-text-sec mb-3.5">
-          <span className="flex items-center gap-1"><Calendar size={12} className="text-court-text-ter" /> {s.date}</span>
-          <span className="flex items-center gap-1"><Clock size={12} className="text-court-text-ter" /> {s.time}</span>
-        </div>
+        <div className="p-4">
+          <h3 className="font-serif text-base font-bold text-court-text mb-2 leading-tight">{s.title}</h3>
+          <div className="flex gap-4 text-court-sm text-court-text-sec mb-3.5">
+            <span className="flex items-center gap-1"><Calendar size={12} className="text-court-text-ter" /> {displayDate}</span>
+            <span className="flex items-center gap-1"><Clock size={12} className="text-court-text-ter" /> {displayTime}</span>
+          </div>
 
-        {s.roles ? (
-          <div className="mb-3.5">
-            {s.roles.map((r, i) => (
-              <div key={i} className="flex justify-between items-center py-1.5 border-b border-court-border-light last:border-0">
-                <div className="flex gap-2 items-center">
-                  {(r.filled || isRoleClaimed(s.id, r.role)) && r.initials && <Avatar initials={isRoleClaimed(s.id, r.role) ? "AG" : r.initials} chamber="Gray's" size="xs" />}
-                  <span className="text-xs text-court-text-sec">{r.role}</span>
-                </div>
-                {r.filled || isRoleClaimed(s.id, r.role) ? (
-                  <span className="text-court-sm text-green-500 font-semibold flex items-center gap-0.5">
-                    <Check size={12} /> {isRoleClaimed(s.id, r.role) ? "You" : r.user}
-                  </span>
-                ) : (
-                  <button
-                    onClick={() => handleClaimRole(s.id, r.role)}
-                    className="text-court-xs text-gold font-bold bg-gold-dim border border-gold/25 rounded-md px-2.5 py-0.5 hover:bg-gold/20 transition-colors"
-                  >
-                    Claim Role
-                  </button>
+          {/* Roles list — fetched per session */}
+          {!isPast && (
+            <SessionRolesList sessionId={s._id} profileId={profile?._id} />
+          )}
+
+          {/* Participant progress bar (always shown) */}
+          {hasMax && (
+            <div className="mb-3.5">
+              <div className="flex justify-between mb-1.5">
+                <span className="text-xs text-court-text-sec">{s.participantCount}/{s.maxParticipants} participants</span>
+                {!isPast && spotsLeft > 0 && (
+                  <span className="text-court-sm text-gold font-semibold">{spotsLeft} spots left</span>
                 )}
               </div>
-            ))}
-          </div>
-        ) : (
-          <div className="mb-3.5">
-            <div className="flex justify-between mb-1.5">
-              <span className="text-xs text-court-text-sec">{s.filled}/{s.total} participants</span>
-              {!isPast && s.total! - s.filled! > 0 && (
-                <span className="text-court-sm text-gold font-semibold">{s.total! - s.filled!} spots left</span>
-              )}
+              <ProgressBar pct={(s.participantCount / s.maxParticipants!) * 100} />
             </div>
-            <ProgressBar pct={(s.filled! / s.total!) * 100} />
-          </div>
-        )}
+          )}
 
-        {isPast ? (
-          <Button fullWidth variant="secondary" onClick={() => handleViewDetails(s.id)}>
-            View Session Summary
-          </Button>
-        ) : (
-          <Button
-            fullWidth
-            variant={s.roles ? "secondary" : "primary"}
-            onClick={() => s.roles ? handleViewDetails(s.id) : handleJoinSession(s.id)}
-          >
-            {s.roles ? "View Session Details" : "Join Session"}
-          </Button>
-        )}
-      </div>
-    </Card>
+          {isPast ? (
+            <Button fullWidth variant="secondary" onClick={() => handleViewDetails(s._id)}>
+              View Session Summary
+            </Button>
+          ) : (
+            <Button
+              fullWidth
+              variant="secondary"
+              onClick={() => handleViewDetails(s._id)}
+            >
+              View Session Details
+            </Button>
+          )}
+        </div>
+      </Card>
+    );
+  };
+
+  // ── Loading skeletons ──
+  const renderSkeletons = () => (
+    <>
+      {[1, 2, 3].map((i) => (
+        <SessionCardSkeleton key={i} />
+      ))}
+    </>
   );
 
   return (
@@ -167,7 +265,9 @@ export default function SessionsPage() {
       <div className="px-4 flex flex-col gap-3 md:gap-4">
         {tab === 0 && (
           <>
-            {SESSIONS.length === 0 ? (
+            {upcomingSessions === undefined ? (
+              renderSkeletons()
+            ) : upcomingSessions.length === 0 ? (
               <EmptyState
                 icon={<Calendar size={32} className="text-court-text-ter" />}
                 title="No Upcoming Sessions"
@@ -179,14 +279,16 @@ export default function SessionsPage() {
                 }
               />
             ) : (
-              SESSIONS.map((s) => renderSessionCard(s))
+              upcomingSessions.map((s) => renderSessionCard(s))
             )}
           </>
         )}
 
         {tab === 2 && (
           <>
-            {PAST_SESSIONS.length === 0 ? (
+            {pastSessions === undefined ? (
+              renderSkeletons()
+            ) : pastSessions.length === 0 ? (
               <EmptyState
                 icon={<BookOpen size={32} className="text-court-text-ter" />}
                 title="No Past Sessions"
@@ -198,7 +300,7 @@ export default function SessionsPage() {
                 }
               />
             ) : (
-              PAST_SESSIONS.map((s) => renderSessionCard(s, true))
+              pastSessions.map((s) => renderSessionCard(s, true))
             )}
           </>
         )}

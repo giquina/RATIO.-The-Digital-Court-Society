@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { Users, Trophy, Calendar, Scale } from "lucide-react";
 import { Card, Button, Avatar, Tag, ProgressBar } from "@/components/ui";
 
 const TOURNAMENTS = [
@@ -77,11 +78,11 @@ export default function TournamentsPage() {
             </div>
             <div className="p-4">
               <h1 className="font-serif text-lg font-bold text-court-text mb-2">{tournament.name}</h1>
-              <div className="grid grid-cols-2 gap-3 text-[11px] text-court-text-sec">
-                <div>&#128101; {tournament.participants} participants</div>
-                <div>&#127942; {tournament.format}</div>
-                <div>&#128197; {tournament.startDate} &ndash; {tournament.endDate}</div>
-                <div>&#9878;&#65039; {tournament.currentRound}</div>
+              <div className="grid grid-cols-2 gap-3 text-court-sm text-court-text-sec">
+                <div className="flex items-center gap-1.5"><Users size={13} className="text-court-text-ter" /> {tournament.participants} participants</div>
+                <div className="flex items-center gap-1.5"><Trophy size={13} className="text-court-text-ter" /> {tournament.format}</div>
+                <div className="flex items-center gap-1.5"><Calendar size={13} className="text-court-text-ter" /> {tournament.startDate} &ndash; {tournament.endDate}</div>
+                <div className="flex items-center gap-1.5"><Scale size={13} className="text-court-text-ter" /> {tournament.currentRound}</div>
               </div>
             </div>
           </Card>
@@ -92,19 +93,19 @@ export default function TournamentsPage() {
           <Card className="p-4">
             <div className="flex justify-between items-center mb-3">
               <h3 className="text-xs font-bold text-court-text tracking-wider uppercase">Your Status</h3>
-              <span className="text-[10px] font-bold text-green-500 bg-green-500/10 px-2.5 py-0.5 rounded-full">
+              <span className="text-court-xs font-bold text-green-500 bg-green-500/10 px-2.5 py-0.5 rounded-full">
                 {tournament.yourStatus}
               </span>
             </div>
             {tournament.nextMatch && (
               <div className="bg-white/[0.02] rounded-xl p-3">
-                <p className="text-[10px] text-court-text-ter uppercase tracking-wider mb-2">Next Match</p>
+                <p className="text-court-xs text-court-text-ter uppercase tracking-wider mb-2">Next Match</p>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Avatar initials={tournament.nextMatch.opponent.initials} chamber={tournament.nextMatch.opponent.chamber} size="sm" />
                     <div>
                       <p className="text-xs font-semibold text-court-text">vs {tournament.nextMatch.opponent.name}</p>
-                      <p className="text-[10px] text-court-text-ter">{tournament.nextMatch.date} &middot; {tournament.nextMatch.time}</p>
+                      <p className="text-court-xs text-court-text-ter">{tournament.nextMatch.date} &middot; {tournament.nextMatch.time}</p>
                     </div>
                   </div>
                   <Link href="/sessions/1">
@@ -125,7 +126,7 @@ export default function TournamentsPage() {
                 <Card key={i} className="px-3.5 py-2.5">
                   <div className="flex justify-between items-center mb-1.5">
                     <span className="text-xs font-semibold text-court-text">{round.round}</span>
-                    <span className="text-[10px] text-court-text-sec">{round.completed}/{round.matches}</span>
+                    <span className="text-court-xs text-court-text-sec">{round.completed}/{round.matches}</span>
                   </div>
                   <ProgressBar pct={(round.completed / round.matches) * 100} height={2} />
                 </Card>
@@ -140,7 +141,7 @@ export default function TournamentsPage() {
           <div className="flex flex-col gap-2">
             {BRACKET_DEMO.map((match, i) => (
               <Card key={i} className="p-3">
-                <p className="text-[10px] text-court-text-ter uppercase tracking-wider mb-2">{match.round}</p>
+                <p className="text-court-xs text-court-text-ter uppercase tracking-wider mb-2">{match.round}</p>
                 <div className="flex flex-col gap-1.5">
                   <div className={"flex items-center justify-between py-1.5 rounded-lg px-2 " + (match.p1.result === "W" ? "bg-green-500/5" : "")}>
                     <div className="flex items-center gap-2">
@@ -148,17 +149,17 @@ export default function TournamentsPage() {
                       <span className={"text-xs " + (match.p1.result === "W" ? "font-bold text-court-text" : "text-court-text-sec")}>{match.p1.name}</span>
                     </div>
                     {match.p1.result && (
-                      <span className={"text-[10px] font-bold " + (match.p1.result === "W" ? "text-green-500" : "text-red-400")}>{match.p1.result}</span>
+                      <span className={"text-court-xs font-bold " + (match.p1.result === "W" ? "text-green-500" : "text-red-400")}>{match.p1.result}</span>
                     )}
                   </div>
-                  <div className="text-center text-[9px] text-court-text-ter">vs</div>
+                  <div className="text-center text-court-xs text-court-text-ter">vs</div>
                   <div className={"flex items-center justify-between py-1.5 rounded-lg px-2 " + (match.p2.result === "W" ? "bg-green-500/5" : "")}>
                     <div className="flex items-center gap-2">
                       <Avatar initials={match.p2.initials} chamber="Lincoln's" size="xs" />
                       <span className={"text-xs " + (match.p2.result === "W" ? "font-bold text-court-text" : "text-court-text-sec")}>{match.p2.name}</span>
                     </div>
                     {match.p2.result && (
-                      <span className={"text-[10px] font-bold " + (match.p2.result === "W" ? "text-green-500" : "text-red-400")}>{match.p2.result}</span>
+                      <span className={"text-court-xs font-bold " + (match.p2.result === "W" ? "text-green-500" : "text-red-400")}>{match.p2.result}</span>
                     )}
                   </div>
                 </div>
@@ -199,19 +200,19 @@ export default function TournamentsPage() {
                     {t.status === "active" ? "LIVE" : "UPCOMING"}
                   </Tag>
                 </div>
-                <span className="text-[10px] text-court-text-ter">{t.participants} entrants</span>
+                <span className="text-court-xs text-court-text-ter">{t.participants} entrants</span>
               </div>
               <div className="p-4">
                 <h3 className="font-serif text-base font-bold text-court-text mb-2">{t.name}</h3>
-                <div className="flex gap-4 text-[11px] text-court-text-sec mb-3">
-                  <span>&#127942; {t.format}</span>
-                  <span>&#128197; {t.startDate}</span>
+                <div className="flex gap-4 text-court-sm text-court-text-sec mb-3">
+                  <span className="flex items-center gap-1"><Trophy size={12} className="text-court-text-ter" /> {t.format}</span>
+                  <span className="flex items-center gap-1"><Calendar size={12} className="text-court-text-ter" /> {t.startDate}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-[11px] text-court-text-sec">
-                    &#9878;&#65039; {t.currentRound}
+                  <span className="flex items-center gap-1 text-court-sm text-court-text-sec">
+                    <Scale size={12} className="text-court-text-ter" /> {t.currentRound}
                   </span>
-                  <span className={"text-[10px] font-bold px-2.5 py-0.5 rounded-full " +
+                  <span className={"text-court-xs font-bold px-2.5 py-0.5 rounded-full " +
                     (t.yourStatus === "Advancing" ? "text-green-500 bg-green-500/10" : "text-blue-400 bg-blue-400/10")
                   }>
                     {t.yourStatus}

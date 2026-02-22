@@ -1,57 +1,178 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Avatar, Tag, Card, Button, ProgressBar } from "@/components/ui";
+import { useQuery, useMutation } from "convex/react";
+import { api } from "../../../../../convex/_generated/api";
+import { Id } from "../../../../../convex/_generated/dataModel";
+import { Avatar, Tag, Card, Button, ProgressBar, Skeleton } from "@/components/ui";
 import {
   MootRoom, PreSessionLobby, PostSessionRating,
   CourtroomEntrance, AIFeedback, RescheduleModal,
 } from "@/components/video";
 import type { RatingData } from "@/components/video";
 import { downloadICS, getGoogleCalendarUrl } from "@/lib/utils/calendar";
+import { courtToast } from "@/lib/utils/toast";
+import { getInitials } from "@/lib/utils/helpers";
 import { Calendar, Clock, Video, Timer, Check } from "lucide-react";
-
-const SESSION = {
-  title: "Judicial Review of Executive Power",
-  type: "Moot", module: "Public Law", date: "Tuesday, 25 February 2026",
-  time: "14:00 \u2013 15:30", location: "Virtual \u2014 Video Session", uni: "UCL",
-  isVirtual: true,
-  description: "Whether the exercise of prerogative power to trigger Article 50 TEU without Parliamentary authority is unlawful. Based on the facts of R (Miller) v Secretary of State [2017] UKSC 5.",
-  createdBy: { name: "Ali Giquina", initials: "AG", chamber: "Gray's" },
-  opponent: { name: "Priya Sharma", initials: "PS", chamber: "Lincoln's", university: "KCL" },
-};
-
-const ROLES = [
-  { role: "Presiding Judge", filled: true, user: "Dr. Sarah Patel", initials: "SP", chamber: "Inner", timeLimit: null },
-  { role: "Leading Counsel (Appellant)", filled: true, user: "Ali Giquina (You)", initials: "AG", chamber: "Gray's", timeLimit: 15 },
-  { role: "Leading Counsel (Respondent)", filled: true, user: "Priya Sharma", initials: "PS", chamber: "Lincoln's", timeLimit: 15 },
-  { role: "Junior Counsel (Appellant)", filled: false, user: null, initials: null, chamber: null, timeLimit: 10 },
-  { role: "Junior Counsel (Respondent)", filled: false, user: null, initials: null, chamber: null, timeLimit: 10 },
-  { role: "Clerk", filled: false, user: null, initials: null, chamber: null, timeLimit: null },
-];
 
 type Phase = "details" | "lobby" | "entrance" | "live" | "rating" | "ai_feedback" | "done";
 
+/** Format session type for display: "moot" -> "Moot", "mock_trial" -> "Mock Trial" */
+function formatSessionType(type: string): string {
+  return type
+    .split("_")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+}
+
+/** Format an ISO date string for display: "2026-02-25" -> "Tuesday, 25 February 2026" */
+function formatSessionDate(dateStr: string): string {
+  try {
+    const date = new Date(dateStr + "T00:00:00");
+    return date.toLocaleDateString("en-GB", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  } catch {
+    return dateStr;
+  }
+}
+
+/** Build Date objects from session date + time strings */
+function buildDateFromSession(dateStr: string, timeStr: string): Date {
+  try {
+    const [hours, minutes] = timeStr.split(":").map(Number);
+    const date = new Date(dateStr + "T00:00:00");
+    date.setHours(hours, minutes, 0, 0);
+    return date;
+  } catch {
+    return new Date();
+  }
+}
+
 export default function SessionDetailPage() {
-  const [claimed, setClaimed] = useState<Record<number, boolean>>({});
+  const params = useParams();
+  const sessionId = params.id as Id<"sessions">;
+
+  // ── Convex queries ──
+  const session = useQuery(api.sessions.getById, { sessionId });
+  const roles = useQuery(api.sessions.getRoles, { sessionId });
+  const participants = useQuery(api.sessions.getParticipants, { sessionId });
+  const profile = useQuery(api.users.myProfile);
+
+  // ── Convex mutations ──
+  const claimRoleMutation = useMutation(api.sessions.claimRole);
+  const unclaimRoleMutation = useMutation(api.sessions.unclaimRole);
+
+  // ── Local UI state ──
   const [phase, setPhase] = useState<Phase>("details");
   const [sessionDuration, setSessionDuration] = useState("00:00");
   const [showReschedule, setShowReschedule] = useState(false);
   const [spectatorMode, setSpectatorMode] = useState(false);
   const [rescheduled, setRescheduled] = useState(false);
 
-  const filled = ROLES.filter((r) => r.filled || claimed[ROLES.indexOf(r)]).length;
+  // ── Derived data ──
+  const participantProfileMap = useMemo(() => {
+    const map: Record<string, { fullName: string; chamber?: string }> = {};
+    if (participants) {
+      for (const p of participants) {
+        if (p.profile) {
+          map[p.profileId] = {
+            fullName: p.profile.fullName,
+            chamber: p.profile.chamber,
+          };
+        }
+      }
+    }
+    return map;
+  }, [participants]);
+
+  const mappedRoles = useMemo(() => {
+    return (roles ?? []).map((r) => {
+      const claimerProfile = r.claimedBy ? participantProfileMap[r.claimedBy] : undefined;
+      const isCurrentUser = profile && r.claimedBy === profile._id;
+      return {
+        id: r._id,
+        role: r.roleName,
+        filled: r.isClaimed,
+        user: claimerProfile?.fullName ?? (r.isClaimed ? "Claimed" : undefined),
+        initials: claimerProfile ? getInitials(claimerProfile.fullName) : undefined,
+        chamber: claimerProfile?.chamber,
+        timeLimit: r.speakingTimeLimit,
+        isCurrentUser,
+        claimedBy: r.claimedBy,
+      };
+    });
+  }, [roles, participantProfileMap, profile]);
+
+  const filledCount = mappedRoles.filter((r) => r.filled).length;
+  const totalRoles = mappedRoles.length;
+
+  // Formatted session display values
+  const displayType = session ? formatSessionType(session.type) : "";
+  const displayDate = session ? formatSessionDate(session.date) : "";
+  const displayTime = session ? `${session.startTime} \u2013 ${session.endTime}` : "";
+  const displayLocation = session?.location || "Virtual \u2014 Video Session";
+  const isVirtual = !session?.location || session.location.toLowerCase().includes("virtual");
+  const displayDescription = session?.description || session?.issueSummary || "";
+
+  // Creator profile from participants
+  const creatorProfile = session?.createdBy ? participantProfileMap[session.createdBy] : undefined;
+  const creatorName = creatorProfile?.fullName ?? "Unknown";
+  const creatorInitials = creatorProfile ? getInitials(creatorProfile.fullName) : "?";
+  const creatorChamber = creatorProfile?.chamber;
+
+  // Current user info
+  const userName = profile?.fullName ?? "Advocate";
+  const userInitials = profile ? getInitials(profile.fullName) : "?";
+  const userChamber = profile?.chamber ?? "";
+
+  // Calendar dates
+  const calendarStartDate = session ? buildDateFromSession(session.date, session.startTime) : new Date();
+  const calendarEndDate = session ? buildDateFromSession(session.date, session.endTime) : new Date();
+
+  // ── Role claim/unclaim handlers ──
+  const handleClaim = async (roleId: string) => {
+    if (!profile) return;
+    try {
+      await claimRoleMutation({
+        roleId: roleId as Id<"sessionRoles">,
+        profileId: profile._id,
+        sessionId,
+      });
+      courtToast.success("Role claimed");
+    } catch {
+      courtToast.error("Failed to claim role");
+    }
+  };
+
+  const handleUnclaim = async (roleId: string) => {
+    if (!profile) return;
+    try {
+      await unclaimRoleMutation({
+        roleId: roleId as Id<"sessionRoles">,
+        profileId: profile._id,
+        sessionId,
+      });
+      courtToast.success("Role released");
+    } catch {
+      courtToast.error("Failed to release role");
+    }
+  };
 
   const handleCalendarExport = () => {
-    const start = new Date(2026, 1, 25, 14, 0);
-    const end = new Date(2026, 1, 25, 15, 30);
+    if (!session) return;
     downloadICS({
-      title: "Ratio Moot: " + SESSION.title,
-      description: SESSION.type + " \u2014 " + SESSION.module + "\nOpponent: " + SESSION.opponent.name + "\n\n" + SESSION.description,
-      location: "Ratio App \u2014 Virtual Session",
-      startDate: start,
-      endDate: end,
+      title: `Ratio ${displayType}: ${session.title}`,
+      description: `${displayType} \u2014 ${session.module}\n\n${displayDescription}`,
+      location: displayLocation,
+      startDate: calendarStartDate,
+      endDate: calendarEndDate,
     });
   };
 
@@ -59,22 +180,70 @@ export default function SessionDetailPage() {
     setPhase("live");
   }, []);
 
+  // ── Loading state ──
+  if (session === undefined) {
+    return (
+      <div className="pb-6">
+        <div className="px-5 pt-3 pb-2">
+          <Link href="/sessions" className="text-xs text-court-text-ter">&larr; Sessions</Link>
+        </div>
+        <section className="px-4 space-y-3">
+          <Card className="overflow-hidden">
+            <div className="bg-burgundy/20 px-4 py-2.5 flex gap-2">
+              <Skeleton className="h-5 w-16" />
+              <Skeleton className="h-5 w-20" />
+            </div>
+            <div className="p-4 space-y-3">
+              <Skeleton className="h-6 w-3/4" />
+              <Skeleton className="h-4 w-48" />
+              <Skeleton className="h-4 w-40" />
+              <Skeleton className="h-4 w-44" />
+              <Skeleton className="h-16 w-full" />
+            </div>
+          </Card>
+          <Card className="p-4 space-y-3">
+            <Skeleton className="h-5 w-24" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+          </Card>
+        </section>
+      </div>
+    );
+  }
+
+  // ── Not found state ──
+  if (session === null) {
+    return (
+      <div className="pb-6">
+        <div className="px-5 pt-3 pb-2">
+          <Link href="/sessions" className="text-xs text-court-text-ter">&larr; Sessions</Link>
+        </div>
+        <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
+          <h2 className="font-serif text-xl font-bold text-court-text mb-2">Session not found</h2>
+          <p className="text-sm text-court-text-sec mb-6">This session may have been removed or the link is invalid.</p>
+          <Link href="/sessions"><Button>Back to Sessions</Button></Link>
+        </div>
+      </div>
+    );
+  }
+
   // ── Phase: Lobby ──
   if (phase === "lobby") {
     return (
       <PreSessionLobby
         session={{
-          title: SESSION.title,
-          module: SESSION.module,
-          type: SESSION.type,
-          scheduledTime: SESSION.date + " \u00B7 " + SESSION.time,
-          scheduledDate: new Date(2026, 1, 25, 14, 0),
-          opponent: SESSION.opponent,
-          caseDescription: SESSION.description,
+          title: session.title,
+          module: session.module,
+          type: displayType,
+          scheduledTime: displayDate + " \u00B7 " + displayTime,
+          scheduledDate: calendarStartDate,
+          opponent: undefined as any,
+          caseDescription: displayDescription,
         }}
-        userName="Ali Giquina"
-        userInitials="AG"
-        userChamber="Gray's"
+        userName={userName}
+        userInitials={userInitials}
+        userChamber={userChamber}
         onJoin={() => setPhase("entrance")}
         onCancel={() => setPhase("details")}
       />
@@ -86,7 +255,7 @@ export default function SessionDetailPage() {
     return (
       <CourtroomEntrance
         onComplete={handleEntranceComplete}
-        sessionTitle={SESSION.title}
+        sessionTitle={session.title}
       />
     );
   }
@@ -95,11 +264,11 @@ export default function SessionDetailPage() {
   if (phase === "live") {
     return (
       <MootRoom
-        userName="Ali Giquina"
-        sessionTitle={SESSION.title}
-        opponent={SESSION.opponent.name}
-        opponentInitials={SESSION.opponent.initials}
-        opponentChamber={SESSION.opponent.chamber}
+        userName={userName}
+        sessionTitle={session.title}
+        opponent="Opponent"
+        opponentInitials="?"
+        opponentChamber=""
         spectatorMode={spectatorMode}
         onLeave={() => {
           setSessionDuration("28:47");
@@ -113,9 +282,9 @@ export default function SessionDetailPage() {
   if (phase === "rating") {
     return (
       <PostSessionRating
-        sessionTitle={SESSION.title}
+        sessionTitle={session.title}
         duration={sessionDuration}
-        opponent={SESSION.opponent}
+        opponent={{ name: "Opponent", initials: "?", chamber: "" }}
         onSubmit={(data: RatingData) => setPhase("ai_feedback")}
         onSkip={() => setPhase("ai_feedback")}
         onViewAIFeedback={() => setPhase("ai_feedback")}
@@ -127,8 +296,8 @@ export default function SessionDetailPage() {
   if (phase === "ai_feedback") {
     return (
       <AIFeedback
-        sessionTitle={SESSION.title}
-        module={SESSION.module}
+        sessionTitle={session.title}
+        module={session.module}
         duration={sessionDuration}
         onClose={() => setPhase("done")}
       />
@@ -199,29 +368,29 @@ export default function SessionDetailPage() {
         <Card className="overflow-hidden">
           <div className="bg-burgundy/20 px-4 py-2.5 flex justify-between items-center">
             <div className="flex gap-2 items-center">
-              <Tag color="burgundy">{SESSION.type.toUpperCase()}</Tag>
-              <Tag color="gold">{SESSION.module}</Tag>
+              <Tag color="burgundy">{displayType.toUpperCase()}</Tag>
+              <Tag color="gold">{session.module}</Tag>
             </div>
             <div className="flex gap-1.5 items-center">
-              {SESSION.isVirtual && <Tag color="blue">VIRTUAL</Tag>}
+              {isVirtual && <Tag color="blue">VIRTUAL</Tag>}
               {rescheduled ? (
                 <Tag color="orange" small>RESCHEDULED</Tag>
               ) : (
-                <Tag color="green" small>UPCOMING</Tag>
+                <Tag color="green" small>{session.status?.toUpperCase() ?? "UPCOMING"}</Tag>
               )}
             </div>
           </div>
           <div className="p-4">
-            <h1 className="font-serif text-xl font-bold text-court-text leading-tight mb-3">{SESSION.title}</h1>
+            <h1 className="font-serif text-xl font-bold text-court-text leading-tight mb-3">{session.title}</h1>
             <div className="flex flex-col gap-1.5 text-court-base text-court-text-sec mb-3.5">
-              <span className="flex items-center gap-1.5"><Calendar size={12} className="text-court-text-ter" /> {SESSION.date}</span>
-              <span className="flex items-center gap-1.5"><Clock size={12} className="text-court-text-ter" /> {SESSION.time}</span>
-              <span className="flex items-center gap-1.5"><Video size={12} className="text-court-text-ter" /> {SESSION.location}</span>
+              <span className="flex items-center gap-1.5"><Calendar size={12} className="text-court-text-ter" /> {displayDate}</span>
+              <span className="flex items-center gap-1.5"><Clock size={12} className="text-court-text-ter" /> {displayTime}</span>
+              <span className="flex items-center gap-1.5"><Video size={12} className="text-court-text-ter" /> {displayLocation}</span>
             </div>
-            <p className="text-court-base text-court-text-sec leading-relaxed">{SESSION.description}</p>
+            <p className="text-court-base text-court-text-sec leading-relaxed">{displayDescription}</p>
             <div className="mt-3.5 pt-3 border-t border-court-border-light flex items-center gap-2">
-              <Avatar initials={SESSION.createdBy.initials} chamber={SESSION.createdBy.chamber} size="xs" />
-              <span className="text-court-sm text-court-text-ter">Created by {SESSION.createdBy.name}</span>
+              <Avatar initials={creatorInitials} chamber={creatorChamber} size="xs" />
+              <span className="text-court-sm text-court-text-ter">Created by {creatorName}</span>
             </div>
           </div>
         </Card>
@@ -238,11 +407,11 @@ export default function SessionDetailPage() {
           </button>
           <a
             href={getGoogleCalendarUrl({
-              title: "Ratio: " + SESSION.title,
-              description: SESSION.description,
-              location: "Ratio App",
-              startDate: new Date(2026, 1, 25, 14, 0),
-              endDate: new Date(2026, 1, 25, 15, 30),
+              title: `Ratio: ${session.title}`,
+              description: displayDescription,
+              location: displayLocation,
+              startDate: calendarStartDate,
+              endDate: calendarEndDate,
             })}
             target="_blank"
             rel="noopener noreferrer"
@@ -254,7 +423,7 @@ export default function SessionDetailPage() {
       </section>
 
       {/* Join Video / Spectator */}
-      {SESSION.isVirtual && (
+      {isVirtual && (
         <section className="px-4 mb-3">
           <button
             onClick={() => { setSpectatorMode(false); setPhase("lobby"); }}
@@ -265,7 +434,7 @@ export default function SessionDetailPage() {
                 <Video size={24} className="text-gold" />
               </div>
               <div className="flex-1 text-left">
-                <p className="text-base font-bold text-gold font-serif">Join Video Moot</p>
+                <p className="text-base font-bold text-gold font-serif">Join Video {displayType}</p>
                 <p className="text-court-sm text-court-text-sec mt-0.5">
                   Lobby &rarr; All Rise &rarr; Live Session
                 </p>
@@ -287,40 +456,19 @@ export default function SessionDetailPage() {
         </section>
       )}
 
-      {/* Opponent */}
-      {SESSION.isVirtual && SESSION.opponent && (
-        <section className="px-4 mb-3">
-          <Card className="p-4">
-            <h3 className="text-xs font-bold text-court-text tracking-wider uppercase mb-3">Your Opponent</h3>
-            <div className="flex items-center gap-3">
-              <Avatar initials={SESSION.opponent.initials} chamber={SESSION.opponent.chamber} size="md" />
-              <div className="flex-1">
-                <p className="text-sm font-semibold text-court-text">{SESSION.opponent.name}</p>
-                <p className="text-court-sm text-court-text-ter">{SESSION.opponent.university}</p>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <div className="w-2 h-2 rounded-full bg-green-500" />
-                <span className="text-court-xs text-green-500 font-semibold">Online</span>
-              </div>
-            </div>
-          </Card>
-        </section>
-      )}
-
       {/* Roles */}
       <section className="px-4 mb-3">
         <div className="flex justify-between items-center mb-3">
           <h2 className="font-serif text-lg font-bold text-court-text">Roles</h2>
-          <span className="text-court-sm text-court-text-sec">{filled}/{ROLES.length} filled</span>
+          <span className="text-court-sm text-court-text-sec">{filledCount}/{totalRoles} filled</span>
         </div>
-        <ProgressBar pct={(filled / ROLES.length) * 100} height={3} />
+        {totalRoles > 0 && <ProgressBar pct={(filledCount / totalRoles) * 100} height={3} />}
         <div className="mt-3 flex flex-col gap-2">
-          {ROLES.map((r, i) => {
-            const isClaimed = r.filled || claimed[i];
+          {mappedRoles.map((r) => {
             return (
-              <Card key={i} className={`px-3.5 py-3 flex items-center gap-3 ${isClaimed ? "" : "border-dashed"}`}>
-                {isClaimed && r.initials ? (
-                  <Avatar initials={claimed[i] ? "AG" : r.initials} chamber={claimed[i] ? "Gray's" : r.chamber!} size="sm" />
+              <Card key={r.id} className={`px-3.5 py-3 flex items-center gap-3 ${r.filled ? "" : "border-dashed"}`}>
+                {r.filled && r.initials ? (
+                  <Avatar initials={r.initials} chamber={r.chamber} size="sm" />
                 ) : (
                   <div className="w-8 h-8 rounded-full border-2 border-dashed border-court-border flex items-center justify-center shrink-0">
                     <span className="text-court-text-ter text-xs">?</span>
@@ -330,12 +478,15 @@ export default function SessionDetailPage() {
                   <p className="text-court-base font-bold text-court-text">{r.role}</p>
                   {r.timeLimit && <p className="text-court-xs text-court-text-ter mt-0.5 flex items-center gap-1"><Timer size={10} /> {r.timeLimit} min</p>}
                 </div>
-                {isClaimed ? (
+                {r.filled ? (
                   <span className="text-court-sm text-green-500 font-semibold whitespace-nowrap flex items-center gap-1">
-                    <Check size={12} /> {claimed[i] ? "You" : r.user?.split(" ")[0]}
+                    <Check size={12} /> {r.isCurrentUser ? "You" : r.user?.split(" ")[0]}
                   </span>
                 ) : (
-                  <button onClick={() => setClaimed((p) => ({ ...p, [i]: true }))} className="text-court-xs text-gold font-bold bg-gold-dim border border-gold/25 rounded-lg px-3 py-1.5 whitespace-nowrap">
+                  <button
+                    onClick={() => handleClaim(r.id)}
+                    className="text-court-xs text-gold font-bold bg-gold-dim border border-gold/25 rounded-lg px-3 py-1.5 whitespace-nowrap"
+                  >
                     Claim
                   </button>
                 )}
@@ -380,9 +531,9 @@ export default function SessionDetailPage() {
       <AnimatePresence>
         {showReschedule && (
           <RescheduleModal
-            sessionTitle={SESSION.title}
-            currentDate={SESSION.date}
-            currentTime={SESSION.time}
+            sessionTitle={session.title}
+            currentDate={displayDate}
+            currentTime={displayTime}
             onReschedule={(d, s, e) => {
               setRescheduled(true);
               setShowReschedule(false);

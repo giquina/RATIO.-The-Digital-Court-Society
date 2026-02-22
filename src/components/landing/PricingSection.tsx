@@ -125,18 +125,18 @@ export function PricingSection() {
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 pt-4">
         {TIERS.map((tier) => (
           <div
             key={tier.name}
-            className={`bg-navy-card border ${tier.accent} rounded-court p-4 flex flex-col relative ${
+            className={`bg-navy-card border ${tier.accent} rounded-court p-4 flex flex-col relative overflow-visible ${
               tier.highlight ? "shadow-[0_0_20px_rgba(201,168,76,0.06)]" : ""
             }`}
           >
             {/* Most Popular badge */}
             {tier.highlight && (
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                <span className="bg-gold text-navy text-[10px] font-bold tracking-[0.15em] uppercase px-3 py-1 rounded-full">
+              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
+                <span className="bg-gold text-navy text-court-xs font-bold tracking-[0.15em] uppercase px-4 py-1 rounded-full whitespace-nowrap shadow-lg">
                   Most Popular
                 </span>
               </div>

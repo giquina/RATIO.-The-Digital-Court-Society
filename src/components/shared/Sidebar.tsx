@@ -113,7 +113,7 @@ function SidebarBadge({ count, collapsed }: { count: number; collapsed: boolean 
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.6, opacity: 0 }}
         transition={{ duration: 0.2, ease: "easeOut" }}
-        className="ml-auto min-w-[18px] h-[18px] px-1.5 rounded-full bg-gold/15 text-gold text-[10px] font-bold flex items-center justify-center"
+        className="ml-auto min-w-[18px] h-[18px] px-1.5 rounded-full bg-gold/15 text-gold text-court-xs font-bold flex items-center justify-center"
       >
         {count > 9 ? "9+" : count}
       </motion.span>

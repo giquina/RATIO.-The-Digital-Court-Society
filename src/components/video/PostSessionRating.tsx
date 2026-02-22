@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Scale, BookOpen, GraduationCap, Star, Bot, Check } from "lucide-react";
 import { Card, Button, Avatar } from "@/components/ui";
 import { playStarTap, playChime } from "@/lib/utils/sounds";
 
@@ -22,10 +23,10 @@ export interface RatingData {
   comments: string;
 }
 
-const DIMENSIONS = [
-  { key: "advocacySkill", label: "Advocacy Skill", desc: "Legal arguments and case law usage", icon: "&#9878;&#65039;" },
-  { key: "preparation", label: "Preparation", desc: "Knowledge of the case and authorities", icon: "&#128214;" },
-  { key: "professionalism", label: "Professionalism", desc: "Court manner and conduct", icon: "&#127891;" },
+const DIMENSIONS: { key: string; label: string; desc: string; icon: React.ElementType }[] = [
+  { key: "advocacySkill", label: "Advocacy Skill", desc: "Legal arguments and case law usage", icon: Scale },
+  { key: "preparation", label: "Preparation", desc: "Knowledge of the case and authorities", icon: BookOpen },
+  { key: "professionalism", label: "Professionalism", desc: "Court manner and conduct", icon: GraduationCap },
 ];
 
 function StarRating({ value, onChange }: { value: number; onChange: (v: number) => void }) {
@@ -44,9 +45,10 @@ function StarRating({ value, onChange }: { value: number; onChange: (v: number) 
           animate={star <= value ? { scale: [1, 1.15, 1] } : {}}
           transition={{ duration: 0.2 }}
         >
-          <span className={star <= value ? "text-gold" : "text-court-text-ter"}>
-            {star <= value ? "\u2605" : "\u2606"}
-          </span>
+          {star <= value
+            ? <Star size={18} className="text-gold fill-gold" />
+            : <Star size={18} className="text-court-text-ter" />
+          }
         </motion.button>
       ))}
     </div>
@@ -109,7 +111,7 @@ export function PostSessionRating({
             animate={{ scale: 1 }}
             transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
           >
-            <span className="text-4xl">&#10003;</span>
+            <Check size={40} className="text-green-500" />
           </motion.div>
           <motion.h2
             className="font-serif text-xl font-bold text-court-text mb-2"
@@ -147,7 +149,7 @@ export function PostSessionRating({
             animate={{ scale: 1 }}
             transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
           >
-            <span className="text-2xl">&#10003;</span>
+            <Check size={28} className="text-green-500" />
           </motion.div>
           <h1 className="font-serif text-xl font-bold text-court-text mb-1">Session Complete</h1>
           <p className="text-xs text-court-text-sec">Duration: {duration}</p>
@@ -163,7 +165,7 @@ export function PostSessionRating({
               <Avatar initials={opponent.initials} chamber={opponent.chamber} size="sm" />
               <div>
                 <p className="text-xs font-semibold text-court-text">{opponent.name}</p>
-                <p className="text-[10px] text-court-text-ter">Opposing Counsel</p>
+                <p className="text-court-xs text-court-text-ter">Opposing Counsel</p>
               </div>
             </div>
           </Card>
@@ -178,11 +180,11 @@ export function PostSessionRating({
             >
               <div className="flex items-center gap-3">
                 <div className="w-11 h-11 rounded-xl bg-gold/20 border border-gold/30 flex items-center justify-center shrink-0">
-                  <span className="text-xl">&#129302;</span>
+                  <Bot size={22} className="text-gold" />
                 </div>
                 <div className="flex-1 text-left">
                   <p className="text-sm font-bold text-gold">View AI Judge Feedback</p>
-                  <p className="text-[10px] text-court-text-sec mt-0.5">
+                  <p className="text-court-xs text-court-text-sec mt-0.5">
                     Detailed analysis of your advocacy performance
                   </p>
                 </div>
@@ -208,10 +210,10 @@ export function PostSessionRating({
               >
                 <Card className="p-3.5">
                   <div className="flex items-start gap-2.5 mb-2.5">
-                    <span className="text-base" dangerouslySetInnerHTML={{ __html: dim.icon }} />
+                    <dim.icon size={18} className="text-gold" />
                     <div>
                       <p className="text-xs font-semibold text-court-text">{dim.label}</p>
-                      <p className="text-[10px] text-court-text-ter">{dim.desc}</p>
+                      <p className="text-court-xs text-court-text-ter">{dim.desc}</p>
                     </div>
                   </div>
                   <StarRating
@@ -237,7 +239,7 @@ export function PostSessionRating({
         {/* Comments */}
         <motion.div custom={7} variants={stagger} initial="hidden" animate="visible">
           <Card className="p-4 mb-5">
-            <label className="text-[10px] text-court-text-ter uppercase tracking-widest mb-2 block">
+            <label className="text-court-xs text-court-text-ter uppercase tracking-widest mb-2 block">
               Additional Comments (Optional)
             </label>
             <textarea
@@ -245,7 +247,7 @@ export function PostSessionRating({
               onChange={(e) => setComments(e.target.value)}
               placeholder="Any feedback for your opponent..."
               rows={3}
-              className="w-full bg-white/[0.03] border border-court-border rounded-xl px-3.5 py-2.5 text-[13px] text-court-text outline-none focus:border-gold/40 transition-colors placeholder:text-court-text-ter resize-none"
+              className="w-full bg-white/[0.03] border border-court-border rounded-xl px-3.5 py-2.5 text-court-base text-court-text outline-none focus:border-gold/40 transition-colors placeholder:text-court-text-ter resize-none"
             />
           </Card>
         </motion.div>

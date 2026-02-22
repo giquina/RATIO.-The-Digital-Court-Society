@@ -123,7 +123,7 @@ export function CourtroomEntrance({ onComplete, sessionTitle }: CourtroomEntranc
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <p className="text-gold/60 text-[10px] font-bold tracking-[0.4em] uppercase mb-2">
+              <p className="text-gold/60 text-court-xs font-bold tracking-[0.4em] uppercase mb-2">
                 Ratio &middot; The Digital Court Society
               </p>
               <h1 className="font-serif text-3xl font-bold text-gold tracking-wide">

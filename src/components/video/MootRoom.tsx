@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Mic, MicOff, Video, CameraOff, MonitorUp, MessageSquare, PhoneOff, X } from "lucide-react";
 import { Card } from "@/components/ui";
 import {
   playMessageSent,
@@ -208,14 +209,14 @@ export function MootRoom({
         <div className="flex items-center gap-2.5">
           <div className="flex items-center gap-1.5">
             <div className="w-2 h-2 rounded-full bg-red-500 animate-recording-pulse" />
-            <span className="text-[10px] font-bold text-court-text tracking-wide">LIVE</span>
+            <span className="text-court-xs font-bold text-court-text tracking-wide">LIVE</span>
           </div>
           {spectatorMode && (
-            <span className="text-[9px] font-bold text-blue-400 bg-blue-400/10 px-2 py-0.5 rounded-full">SPECTATOR</span>
+            <span className="text-court-xs font-bold text-blue-400 bg-blue-400/10 px-2 py-0.5 rounded-full">SPECTATOR</span>
           )}
         </div>
         <div className="text-center flex-1 mx-3">
-          <p className="text-[10px] text-court-text-sec font-semibold truncate">
+          <p className="text-court-xs text-court-text-sec font-semibold truncate">
             {sessionTitle}
           </p>
         </div>
@@ -239,12 +240,12 @@ export function MootRoom({
           {isRecording && (
             <div className="flex items-center gap-1">
               <div className="w-2 h-2 rounded-full bg-red-500 animate-recording-pulse" />
-              <span className="text-[9px] text-red-400 font-bold">REC</span>
+              <span className="text-court-xs text-red-400 font-bold">REC</span>
             </div>
           )}
           {/* Timer */}
           <div className="bg-white/5 rounded-lg px-2.5 py-1">
-            <span className="text-[11px] text-gold font-mono font-bold">{fmt(elapsed)}</span>
+            <span className="text-court-sm text-gold font-mono font-bold">{fmt(elapsed)}</span>
           </div>
         </div>
       </div>
@@ -281,7 +282,7 @@ export function MootRoom({
                           transition={{ duration: 0.5, repeat: Infinity, delay: i * 0.1 }}
                         />
                       ))}
-                      <span className="text-[10px] text-gold ml-1">Speaking</span>
+                      <span className="text-court-xs text-gold ml-1">Speaking</span>
                     </motion.div>
                   )}
                 </div>
@@ -289,7 +290,7 @@ export function MootRoom({
               {/* Name overlay */}
               <div className="absolute bottom-3 left-3 bg-black/40 backdrop-blur-sm rounded-lg px-3 py-1.5 flex items-center gap-2">
                 <div className={`w-1.5 h-1.5 rounded-full ${opponentSpeaking ? "bg-gold" : "bg-green-500"}`} />
-                <span className="text-[11px] text-white font-medium">{opponent}</span>
+                <span className="text-court-sm text-white font-medium">{opponent}</span>
               </div>
             </div>
 
@@ -300,13 +301,13 @@ export function MootRoom({
                   <div className="w-12 h-12 rounded-full bg-[#6B2D3E] flex items-center justify-center">
                     <span className="font-serif text-lg font-bold text-court-text">{userInitials}</span>
                   </div>
-                  <span className="text-[10px] text-court-text-ter">{isCamOff ? "Camera off" : "You"}</span>
+                  <span className="text-court-xs text-court-text-ter">{isCamOff ? "Camera off" : "You"}</span>
                 </div>
               </div>
               <div className="absolute bottom-2 left-2 bg-black/40 backdrop-blur-sm rounded-lg px-2 py-1 flex items-center gap-1.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                <span className="text-[10px] text-white font-medium">You</span>
-                {isMuted && <span className="text-[9px] text-red-400">&#128263;</span>}
+                <span className="text-court-xs text-white font-medium">You</span>
+                {isMuted && <MicOff size={10} className="text-red-400" />}
               </div>
             </div>
           </>
@@ -325,11 +326,11 @@ export function MootRoom({
           >
             <div className="px-4 py-2.5 border-b border-court-border flex justify-between items-center">
               <span className="text-xs font-bold text-court-text">Session Chat</span>
-              <button onClick={() => setShowChat(false)} className="text-court-text-ter text-sm">&#10005;</button>
+              <button onClick={() => setShowChat(false)} className="text-court-text-ter text-sm"><X size={14} /></button>
             </div>
             <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-2 min-h-[100px]">
               {messages.length === 0 && (
-                <p className="text-[11px] text-court-text-ter text-center py-4">No messages yet</p>
+                <p className="text-court-sm text-court-text-ter text-center py-4">No messages yet</p>
               )}
               {messages.map((m, i) => (
                 <motion.div
@@ -341,9 +342,9 @@ export function MootRoom({
                   <div className={`rounded-xl px-3 py-2 max-w-[80%] ${
                     m.from === "You" ? "bg-gold/20" : "bg-white/5"
                   }`}>
-                    <p className="text-[11px] text-court-text">{m.text}</p>
+                    <p className="text-court-sm text-court-text">{m.text}</p>
                   </div>
-                  <span className="text-[9px] text-court-text-ter mt-0.5">{m.from} &middot; {m.time}</span>
+                  <span className="text-court-xs text-court-text-ter mt-0.5">{m.from} &middot; {m.time}</span>
                 </motion.div>
               ))}
             </div>
@@ -384,10 +385,10 @@ export function MootRoom({
                 </div>
                 <div>
                   <p className="text-sm font-bold text-court-text">Enable Recording?</p>
-                  <p className="text-[10px] text-court-text-ter">Both parties must consent</p>
+                  <p className="text-court-xs text-court-text-ter">Both parties must consent</p>
                 </div>
               </div>
-              <p className="text-[11px] text-court-text-sec leading-relaxed mb-4">
+              <p className="text-court-sm text-court-text-sec leading-relaxed mb-4">
                 This session will be recorded and stored securely for 30 days. The recording can be used
                 for AI feedback analysis and will be saved to your portfolio. Your opponent will be notified
                 that recording is active.
@@ -427,7 +428,7 @@ export function MootRoom({
               exit={{ scale: 0.9 }}
             >
               <p className="text-sm font-bold text-court-text mb-1">Leave Session?</p>
-              <p className="text-[11px] text-court-text-sec mb-4">
+              <p className="text-court-sm text-court-text-sec mb-4">
                 This will end your participation. The session will be marked as complete.
               </p>
               <div className="flex gap-2">
@@ -459,7 +460,7 @@ export function MootRoom({
             exit={{ y: -30, opacity: 0 }}
           >
             <div className="w-2 h-2 rounded-full bg-red-500 animate-recording-pulse" />
-            <span className="text-[10px] text-red-400 font-bold">Recording active &middot; All parties have consented</span>
+            <span className="text-court-xs text-red-400 font-bold">Recording active &middot; All parties have consented</span>
           </motion.div>
         )}
       </AnimatePresence>
@@ -474,7 +475,7 @@ export function MootRoom({
               isMuted ? "bg-red-500/20 border border-red-500/40" : "bg-white/5 border border-court-border"
             } ${spectatorMode ? "opacity-40" : ""}`}
           >
-            <span className="text-base">{isMuted ? "&#128263;" : "&#127908;"}</span>
+            {isMuted ? <MicOff size={18} className="text-court-text" /> : <Mic size={18} className="text-court-text" />}
           </button>
 
           {/* Camera */}
@@ -484,7 +485,7 @@ export function MootRoom({
               isCamOff ? "bg-red-500/20 border border-red-500/40" : "bg-white/5 border border-court-border"
             } ${spectatorMode ? "opacity-40" : ""}`}
           >
-            <span className="text-base">{isCamOff ? "&#128247;" : "&#128249;"}</span>
+            {isCamOff ? <CameraOff size={18} className="text-court-text" /> : <Video size={18} className="text-court-text" />}
           </button>
 
           {/* Screen share */}
@@ -494,7 +495,7 @@ export function MootRoom({
               isScreenShare ? "bg-gold/20 border border-gold/40" : "bg-white/5 border border-court-border"
             }`}
           >
-            <span className="text-base">&#128421;&#65039;</span>
+            <MonitorUp size={18} className="text-court-text" />
           </button>
 
           {/* Chat */}
@@ -504,9 +505,9 @@ export function MootRoom({
               showChat ? "bg-gold/20 border border-gold/40" : "bg-white/5 border border-court-border"
             }`}
           >
-            <span className="text-base">&#128172;</span>
+            <MessageSquare size={18} className="text-court-text" />
             {messages.length > 0 && !showChat && (
-              <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-gold text-navy text-[8px] font-bold flex items-center justify-center">
+              <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-gold text-navy text-court-xs font-bold flex items-center justify-center">
                 {messages.length}
               </div>
             )}
@@ -529,7 +530,7 @@ export function MootRoom({
             onClick={handleLeave}
             className="w-13 h-11 rounded-full bg-red-500 flex items-center justify-center px-4"
           >
-            <span className="text-base">&#128222;</span>
+            <PhoneOff size={18} className="text-white" />
           </button>
         </div>
       </div>

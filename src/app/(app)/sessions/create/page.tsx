@@ -2,11 +2,16 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useQuery, useMutation } from "convex/react";
+import { api } from "../../../../../convex/_generated/api";
 import { Card, Button, Tag, DynamicIcon } from "@/components/ui";
 import { SESSION_TYPES, LAW_MODULES, MOOT_ROLES, MOCK_TRIAL_ROLES } from "@/lib/constants/app";
+import { courtToast } from "@/lib/utils/toast";
 
 export default function CreateSessionPage() {
   const router = useRouter();
+  const profile = useQuery(api.users.myProfile);
+  const createSession = useMutation(api.sessions.create);
   const [sessionType, setSessionType] = useState("moot");
   const [module, setModule] = useState("");
   const [title, setTitle] = useState("");
@@ -25,17 +30,34 @@ export default function CreateSessionPage() {
   const inputClass = "w-full bg-navy-card border border-court-border rounded-xl px-3.5 py-2.5 text-court-base text-court-text outline-none focus:border-gold/40 transition-colors placeholder:text-court-text-ter";
   const labelClass = "text-court-xs text-court-text-ter uppercase tracking-widest mb-1.5 block";
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     setSubmitted(true);
-    if (!isValid) return;
+    if (!isValid || !profile) return;
 
     setIsCreating(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsCreating(false);
-      alert(`Session "${title}" created successfully!`);
+    try {
+      await createSession({
+        createdBy: profile._id,
+        university: profile.university,
+        module,
+        type: sessionType,
+        title,
+        description: description || undefined,
+        issueSummary: description || undefined,
+        date,
+        startTime,
+        endTime,
+        location: location || undefined,
+        isCrossUniversity: crossUni,
+        roles,
+      });
+      courtToast.success("Session created");
       router.push("/sessions");
-    }, 1000);
+    } catch (err) {
+      courtToast.error("Failed to create session");
+    } finally {
+      setIsCreating(false);
+    }
   };
 
   return (
@@ -176,7 +198,7 @@ export default function CreateSessionPage() {
         {/* Submit */}
         <Button
           fullWidth
-          disabled={isCreating}
+          disabled={isCreating || !profile}
           onClick={handleCreate}
         >
           {isCreating ? "Creating..." : "Create Session"}

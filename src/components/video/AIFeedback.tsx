@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ChevronUp } from "lucide-react";
 import { Card, Button, ProgressBar, Tag } from "@/components/ui";
 
 interface AIFeedbackProps {
@@ -116,7 +117,7 @@ export function AIFeedback({ sessionTitle, module, duration, onClose }: AIFeedba
                 {loadingPhase === 2 && "Analysing arguments..."}
                 {loadingPhase === 3 && "Generating feedback..."}
               </p>
-              <p className="text-[11px] text-court-text-ter">
+              <p className="text-court-sm text-court-text-ter">
                 {loadingPhase === 0 && "Connecting to AI Judge"}
                 {loadingPhase === 1 && "Whisper API processing session recording"}
                 {loadingPhase === 2 && "Evaluating structure, authorities, and delivery"}
@@ -156,7 +157,7 @@ export function AIFeedback({ sessionTitle, module, duration, onClose }: AIFeedba
           transition={{ delay: 0.2 }}
         >
           <Card className="p-5 mb-4 text-center" highlight>
-            <p className="text-[10px] text-court-text-ter uppercase tracking-widest mb-2">Overall Performance</p>
+            <p className="text-court-xs text-court-text-ter uppercase tracking-widest mb-2">Overall Performance</p>
             <div className="relative w-24 h-24 mx-auto mb-3">
               <svg className="w-24 h-24 -rotate-90" viewBox="0 0 100 100">
                 <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="8" />
@@ -173,7 +174,7 @@ export function AIFeedback({ sessionTitle, module, duration, onClose }: AIFeedba
             <p className="text-sm font-semibold text-court-text">
               {overallScore >= 80 ? "Strong Performance" : overallScore >= 70 ? "Competent Showing" : "Room for Growth"}
             </p>
-            <p className="text-[10px] text-court-text-ter mt-1">
+            <p className="text-court-xs text-court-text-ter mt-1">
               Top {Math.max(5, 100 - overallScore + Math.floor(Math.random() * 10))}% of sessions this week
             </p>
           </Card>
@@ -223,12 +224,12 @@ export function AIFeedback({ sessionTitle, module, duration, onClose }: AIFeedba
                       >
                         <div className="px-3.5 pb-3.5 border-t border-court-border-light pt-3">
                           <div className="mb-3">
-                            <p className="text-[10px] text-gold font-bold uppercase tracking-wider mb-1">Analysis</p>
-                            <p className="text-[11px] text-court-text-sec leading-relaxed">{f.analysis}</p>
+                            <p className="text-court-xs text-gold font-bold uppercase tracking-wider mb-1">Analysis</p>
+                            <p className="text-court-sm text-court-text-sec leading-relaxed">{f.analysis}</p>
                           </div>
                           <div className="bg-gold/5 rounded-xl p-3">
-                            <p className="text-[10px] text-gold font-bold uppercase tracking-wider mb-1">Improvement</p>
-                            <p className="text-[11px] text-court-text leading-relaxed">{f.improvement}</p>
+                            <p className="text-court-xs text-gold font-bold uppercase tracking-wider mb-1">Improvement</p>
+                            <p className="text-court-sm text-court-text leading-relaxed">{f.improvement}</p>
                           </div>
                         </div>
                       </motion.div>
@@ -253,7 +254,7 @@ export function AIFeedback({ sessionTitle, module, duration, onClose }: AIFeedba
             >
               <div>
                 <p className="text-xs font-bold text-court-text">SQE2 Readiness Impact</p>
-                <p className="text-[10px] text-court-text-ter mt-0.5">How this session affects your exam preparedness</p>
+                <p className="text-court-xs text-court-text-ter mt-0.5">How this session affects your exam preparedness</p>
               </div>
               <span className="text-court-text-ter text-sm">{showSQE2 ? "−" : "+"}</span>
             </button>
@@ -270,8 +271,8 @@ export function AIFeedback({ sessionTitle, module, duration, onClose }: AIFeedba
                     {SQE2_COMPETENCIES.map((c) => (
                       <div key={c.name}>
                         <div className="flex justify-between mb-1">
-                          <span className="text-[11px] text-court-text-sec">{c.name}</span>
-                          <span className="text-[11px] text-court-text font-mono">{c.score}%</span>
+                          <span className="text-court-sm text-court-text-sec">{c.name}</span>
+                          <span className="text-court-sm text-court-text font-mono">{c.score}%</span>
                         </div>
                         <ProgressBar pct={c.score} height={2} color={c.score >= 75 ? "green" : c.score >= 60 ? "gold" : "orange"} />
                       </div>
@@ -291,23 +292,23 @@ export function AIFeedback({ sessionTitle, module, duration, onClose }: AIFeedba
         >
           <Card className="p-4 mb-4" highlight>
             <p className="text-xs font-bold text-gold tracking-wider uppercase mb-2">Judge&apos;s Summary</p>
-            <p className="text-[12px] text-court-text leading-relaxed mb-3">
+            <p className="text-court-base text-court-text leading-relaxed mb-3">
               Counsel demonstrated a solid grasp of constitutional principles and conducted themselves with proper decorum throughout.
               The primary area for development is time management and depth of authorities — a broader case base would significantly
               strengthen future submissions. The court was particularly impressed by the oral delivery and formal manner.
             </p>
             <div className="flex flex-col gap-1.5">
               <div className="flex items-start gap-2">
-                <span className="text-green-500 text-xs mt-0.5">&#9650;</span>
-                <p className="text-[11px] text-court-text-sec">Study: <strong className="text-court-text">Entick v Carrington</strong> and <strong className="text-court-text">CCSU v Minister</strong></p>
+                <ChevronUp size={14} className="text-green-500 shrink-0 mt-0.5" />
+                <p className="text-court-sm text-court-text-sec">Study: <strong className="text-court-text">Entick v Carrington</strong> and <strong className="text-court-text">CCSU v Minister</strong></p>
               </div>
               <div className="flex items-start gap-2">
-                <span className="text-green-500 text-xs mt-0.5">&#9650;</span>
-                <p className="text-[11px] text-court-text-sec">Practice: Timed submissions (use a stopwatch during prep)</p>
+                <ChevronUp size={14} className="text-green-500 shrink-0 mt-0.5" />
+                <p className="text-court-sm text-court-text-sec">Practice: Timed submissions (use a stopwatch during prep)</p>
               </div>
               <div className="flex items-start gap-2">
-                <span className="text-green-500 text-xs mt-0.5">&#9650;</span>
-                <p className="text-[11px] text-court-text-sec">Challenge: <strong className="text-court-text">Priya Sharma</strong> to a rematch (she scored 81)</p>
+                <ChevronUp size={14} className="text-green-500 shrink-0 mt-0.5" />
+                <p className="text-court-sm text-court-text-sec">Challenge: <strong className="text-court-text">Priya Sharma</strong> to a rematch (she scored 81)</p>
               </div>
             </div>
           </Card>
