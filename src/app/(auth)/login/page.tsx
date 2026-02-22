@@ -4,7 +4,7 @@ import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthActions } from "@convex-dev/auth/react";
 import Link from "next/link";
-import { Scale, Loader2 } from "lucide-react";
+import { Scale, Loader2, ArrowLeft } from "lucide-react";
 
 function LoginForm() {
   const router = useRouter();
@@ -75,6 +75,11 @@ function LoginForm() {
           Don&apos;t have an account?{" "}
           <Link href="/register" className="text-gold font-semibold">Join now</Link>
         </p>
+
+        <Link href="/" className="flex items-center justify-center gap-1.5 text-court-text-ter text-court-xs hover:text-court-text-sec transition-colors mt-2">
+          <ArrowLeft size={12} />
+          Return to home
+        </Link>
       </form>
     </div>
   );

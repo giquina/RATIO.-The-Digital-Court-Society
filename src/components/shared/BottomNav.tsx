@@ -54,7 +54,7 @@ export function BottomNav() {
               </div>
               <span
                 className={cn(
-                  "text-court-sm leading-tight font-bold tracking-wider transition-colors duration-200 truncate max-w-[56px] text-center",
+                  "text-[9px] leading-tight font-semibold tracking-wide transition-colors duration-200 text-center",
                   isActive ? "text-gold" : "text-court-text-ter"
                 )}
               >

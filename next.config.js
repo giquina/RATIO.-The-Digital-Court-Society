@@ -52,6 +52,16 @@ const nextConfig = {
       },
     ];
   },
+
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      config.ignoreWarnings = [
+        ...(config.ignoreWarnings || []),
+        { module: /@prisma\/instrumentation/ },
+      ];
+    }
+    return config;
+  },
 };
 
 // Only wrap with Sentry build plugin if auth token is available

@@ -4,9 +4,10 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Mic, MessageCircle, Scale } from "lucide-react";
 
-export function AIShowcase() {
+export function AIShowcase({ id }: { id?: string }) {
   return (
     <motion.section
+      id={id}
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}

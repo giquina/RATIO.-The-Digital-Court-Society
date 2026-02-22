@@ -20,22 +20,22 @@ const FOOTER_SECTIONS = [
   {
     title: "Platform",
     links: [
-      { name: "AI Judge", href: "/ai-practice" },
-      { name: "Live Mooting", href: "/sessions" },
-      { name: "Legal Research", href: "/research" },
-      { name: "Tournaments", href: "/sessions/tournaments" },
-      { name: "AI Tools", href: "/tools" },
-      { name: "Law Book", href: "/law-book" },
+      { name: "AI Judge", href: "/#ai-showcase" },
+      { name: "Live Mooting", href: "/#video-mooting" },
+      { name: "Legal Research", href: "/#features" },
+      { name: "Tournaments", href: "/#tournaments" },
+      { name: "AI Tools", href: "/#tools" },
+      { name: "Law Book", href: "/#law-book" },
     ],
   },
   {
     title: "Community",
     links: [
-      { name: "Chambers", href: "/chambers" },
-      { name: "Rankings", href: "/rankings" },
-      { name: "Parliament", href: "/parliament" },
-      { name: "Tribunal", href: "/tribunal" },
-      { name: "Community", href: "/community" },
+      { name: "Chambers", href: "/#chambers" },
+      { name: "Rankings", href: "/#features" },
+      { name: "Parliament", href: "/#governance" },
+      { name: "Tribunal", href: "/#governance" },
+      { name: "Community", href: "/#features" },
     ],
   },
   {

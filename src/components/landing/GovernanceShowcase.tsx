@@ -42,9 +42,10 @@ const MOTIONS_DEMO = [
   },
 ];
 
-export function GovernanceShowcase() {
+export function GovernanceShowcase({ id }: { id?: string }) {
   return (
     <motion.section
+      id={id}
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}

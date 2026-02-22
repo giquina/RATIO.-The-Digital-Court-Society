@@ -63,15 +63,15 @@ export default function LandingPage() {
         onSubmit={handleSubmit}
       />
       <TrustBar />
-      <FeaturesGrid />
+      <FeaturesGrid id="features" />
       <HowItWorks />
-      <AIShowcase />
-      <VideoMootingShowcase />
-      <TournamentShowcase />
-      <ToolsShowcase />
-      <LawBookPreview />
-      <GovernanceShowcase />
-      <ChambersPreview />
+      <AIShowcase id="ai-showcase" />
+      <VideoMootingShowcase id="video-mooting" />
+      <TournamentShowcase id="tournaments" />
+      <ToolsShowcase id="tools" />
+      <LawBookPreview id="law-book" />
+      <GovernanceShowcase id="governance" />
+      <ChambersPreview id="chambers" />
       <TestimonialSection />
       <PricingSection />
       <FAQSection />

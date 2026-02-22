@@ -6,7 +6,7 @@ import { useAuthActions } from "@convex-dev/auth/react";
 import { useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import Link from "next/link";
-import { Scale, Loader2 } from "lucide-react";
+import { Scale, Loader2, ArrowLeft } from "lucide-react";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -116,6 +116,11 @@ export default function RegisterPage() {
           Already a member?{" "}
           <Link href="/login" className="text-gold font-semibold">Sign in</Link>
         </p>
+
+        <Link href="/" className="flex items-center justify-center gap-1.5 text-court-text-ter text-court-xs hover:text-court-text-sec transition-colors mt-2">
+          <ArrowLeft size={12} />
+          Return to home
+        </Link>
       </form>
     </div>
   );
