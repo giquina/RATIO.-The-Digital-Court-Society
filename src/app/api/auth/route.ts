@@ -5,6 +5,14 @@ import type { NextRequest } from "next/server";
 // This provides working auth for development and demo purposes
 const users = new Map<string, { name: string; email: string; password: string }>();
 
+// Password reset tokens — token → { email, expiresAt }
+const resetTokens = new Map<string, { email: string; expiresAt: number }>();
+
+// Rate limiting for password reset — email → last request timestamp
+const resetRateLimit = new Map<string, number>();
+const RATE_LIMIT_MS = 60_000; // 1 minute between requests
+const TOKEN_EXPIRY_MS = 30 * 60_000; // 30 minutes
+
 // Pre-seed a demo account
 users.set("demo@ratio.law", {
   name: "Ali Giquina",
@@ -26,7 +34,15 @@ function parseToken(token: string): { email: string; name: string } | null {
   }
 }
 
-// POST /api/auth — handles login, register, logout
+function generateResetToken(): string {
+  const bytes = new Uint8Array(32);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes)
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+// POST /api/auth — handles login, register, logout, forgot-password, reset-password
 export async function POST(request: NextRequest) {
   const body = await request.json();
   const { action } = body;
@@ -92,6 +108,70 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ user: null });
     }
     return NextResponse.json({ user: parsed });
+  }
+
+  if (action === "forgot-password") {
+    const { email } = body;
+    if (!email) {
+      return NextResponse.json({ error: "Email is required" }, { status: 400 });
+    }
+
+    // Rate limiting
+    const lastRequest = resetRateLimit.get(email);
+    if (lastRequest && Date.now() - lastRequest < RATE_LIMIT_MS) {
+      // Always return success to prevent timing attacks / enumeration
+      return NextResponse.json({ success: true });
+    }
+    resetRateLimit.set(email, Date.now());
+
+    // Only generate token if user exists, but always return success (no account enumeration)
+    const user = users.get(email);
+    if (user) {
+      const resetToken = generateResetToken();
+      resetTokens.set(resetToken, {
+        email,
+        expiresAt: Date.now() + TOKEN_EXPIRY_MS,
+      });
+      // In production: send email with reset link via SendGrid/Resend/etc.
+      // For dev: log the token so it can be tested
+      console.log(`[DEV] Password reset token for ${email}: ${resetToken}`);
+      console.log(`[DEV] Reset URL: /reset-password?token=${resetToken}`);
+    }
+
+    return NextResponse.json({ success: true });
+  }
+
+  if (action === "reset-password") {
+    const { token, password } = body;
+    if (!token || !password) {
+      return NextResponse.json({ error: "Token and password are required" }, { status: 400 });
+    }
+    if (password.length < 8) {
+      return NextResponse.json({ error: "Password must be at least 8 characters" }, { status: 400 });
+    }
+
+    const resetData = resetTokens.get(token);
+    if (!resetData) {
+      return NextResponse.json({ error: "Invalid or expired reset token" }, { status: 400 });
+    }
+    if (Date.now() > resetData.expiresAt) {
+      resetTokens.delete(token);
+      return NextResponse.json({ error: "This reset link has expired. Please request a new one." }, { status: 400 });
+    }
+
+    const user = users.get(resetData.email);
+    if (!user) {
+      return NextResponse.json({ error: "Account not found" }, { status: 404 });
+    }
+
+    // Update password
+    user.password = password;
+    users.set(resetData.email, user);
+
+    // Invalidate the token (single use)
+    resetTokens.delete(token);
+
+    return NextResponse.json({ success: true });
   }
 
   return NextResponse.json({ error: "Invalid action" }, { status: 400 });

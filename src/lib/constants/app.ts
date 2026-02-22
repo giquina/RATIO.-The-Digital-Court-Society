@@ -70,29 +70,9 @@ export const LAW_MODULES = [
   "Dispute Resolution",
 ] as const;
 
-// ── UK Universities (pilot + expansion) ──
-export const UNIVERSITIES = [
-  { name: "University College London", short: "UCL", city: "London" },
-  { name: "King's College London", short: "KCL", city: "London" },
-  { name: "London School of Economics", short: "LSE", city: "London" },
-  { name: "University of Oxford", short: "Oxford", city: "Oxford" },
-  { name: "University of Cambridge", short: "Cambridge", city: "Cambridge" },
-  { name: "University of Bristol", short: "Bristol", city: "Bristol" },
-  { name: "University of Manchester", short: "Manchester", city: "Manchester" },
-  { name: "University of Birmingham", short: "Birmingham", city: "Birmingham" },
-  { name: "University of Edinburgh", short: "Edinburgh", city: "Edinburgh" },
-  { name: "University of Leeds", short: "Leeds", city: "Leeds" },
-  { name: "University of Exeter", short: "Exeter", city: "Exeter" },
-  { name: "University of Warwick", short: "Warwick", city: "Coventry" },
-  { name: "University of Nottingham", short: "Nottingham", city: "Nottingham" },
-  { name: "Durham University", short: "Durham", city: "Durham" },
-  { name: "Queen Mary University of London", short: "QMUL", city: "London" },
-  { name: "SOAS University of London", short: "SOAS", city: "London" },
-  { name: "City, University of London", short: "City", city: "London" },
-  { name: "University of Sheffield", short: "Sheffield", city: "Sheffield" },
-  { name: "University of Glasgow", short: "Glasgow", city: "Glasgow" },
-  { name: "Cardiff University", short: "Cardiff", city: "Cardiff" },
-] as const;
+// ── UK Universities ──
+// Re-exported from the comprehensive regional dataset (142 universities)
+export { UK_UNIVERSITIES as UNIVERSITIES, UK_UNIVERSITIES, UK_UNIVERSITIES_BY_REGION, UK_REGIONS, RUSSELL_GROUP_UNIVERSITIES, searchUniversities } from "./uk-universities";
 
 // ── Feedback Dimensions ──
 export const FEEDBACK_DIMENSIONS = [

@@ -53,6 +53,12 @@ function LoginForm() {
         <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email address" className={inputClass} aria-label="Email address" required />
         <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" className={inputClass} aria-label="Password" required />
 
+        <div className="text-right -mt-1">
+          <Link href="/forgot-password" className="text-court-xs text-court-text-ter hover:text-gold transition-colors">
+            Forgot password?
+          </Link>
+        </div>
+
         {error && (
           <p className="text-court-xs text-red-400 text-center" role="alert">{error}</p>
         )}
