@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Scale, Users, BookOpen, User } from "lucide-react";
+import { Home, Scale, Users, BookOpen, User, Search } from "lucide-react";
 import { cn } from "@/lib/utils/helpers";
 
 const tabs = [
   { href: "/home", label: "Home", Icon: Home },
   { href: "/sessions", label: "Sessions", Icon: Scale },
   { href: "/law-book", label: "Law Book", Icon: BookOpen },
+  { href: "/research", label: "Research", Icon: Search },
   { href: "/community", label: "Social", Icon: Users },
   { href: "/profile", label: "Profile", Icon: User },
 ];
@@ -30,7 +31,7 @@ export function BottomNav() {
               key={tab.href}
               href={tab.href}
               aria-current={isActive ? "page" : undefined}
-              className="flex flex-col items-center gap-0.5 relative px-1.5 py-1 min-w-0"
+              className="flex flex-col items-center gap-0.5 relative min-w-[48px] min-h-[44px] px-1.5 py-1.5 justify-center active:scale-95 transition-transform"
             >
               {isActive && (
                 <div className="absolute -top-2 w-5 h-0.5 rounded-full bg-gold" />

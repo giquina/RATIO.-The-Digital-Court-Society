@@ -21,6 +21,7 @@ import {
   Info,
   ChevronLeft,
   ChevronRight,
+  Bookmark,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils/helpers";
@@ -50,6 +51,7 @@ const sections: NavSection[] = [
     items: [
       { href: "/law-book", label: "Law Book", icon: BookOpen },
       { href: "/research", label: "Research", icon: Search },
+      { href: "/research/saved", label: "Saved", icon: Bookmark },
       { href: "/tools", label: "Tools", icon: Wrench },
     ],
   },

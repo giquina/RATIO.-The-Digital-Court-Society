@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useCallback, useRef, useEffect } from "react"
+import Link from "next/link"
 import {
   Search,
   Filter,
@@ -15,6 +16,7 @@ import {
   Check,
   Bookmark,
   Landmark,
+  Clock,
 } from "lucide-react"
 import { cn } from "@/lib/utils/helpers"
 import type {
@@ -40,6 +42,15 @@ const POPULAR_SEARCHES = [
   "Consumer Rights Act 2015",
   "R v Woollin",
   "Salomon v Salomon",
+]
+
+// Demo data for recent searches — replace with Convex query when auth is wired:
+// const recentSearches = useQuery(api.research.getRecentSearches)
+const RECENT_SEARCHES_DEMO = [
+  { query: "Entick v Carrington", resultCount: 3, searchedAt: "2 hours ago" },
+  { query: "Equality Act 2010", resultCount: 47, searchedAt: "Yesterday" },
+  { query: "R v Brown [1994]", resultCount: 12, searchedAt: "2 days ago" },
+  { query: "Occupiers Liability Act 1957", resultCount: 8, searchedAt: "3 days ago" },
 ]
 
 const COURT_GROUPS = [
@@ -147,9 +158,18 @@ export default function ResearchPage() {
           <h1 className="font-serif text-2xl sm:text-3xl font-bold text-court-text tracking-tight">
             Legal Research
           </h1>
-          <span className="text-court-xs font-bold tracking-[0.15em] text-gold bg-gold-dim border border-gold/20 rounded px-2 py-0.5">
-            OFFICIAL SOURCES
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="text-court-xs font-bold tracking-[0.15em] text-gold bg-gold-dim border border-gold/20 rounded px-2 py-0.5">
+              OFFICIAL SOURCES
+            </span>
+            <Link
+              href="/research/saved"
+              className="flex items-center gap-1.5 text-court-xs font-bold tracking-wider text-court-text-ter hover:text-gold transition-colors"
+            >
+              <Bookmark size={14} />
+              Saved
+            </Link>
+          </div>
         </div>
         <p className="text-court-base text-court-text-sec">
           Search every UK statute and court judgment. Powered by legislation.gov.uk & Find Case Law.
@@ -184,14 +204,14 @@ export default function ResearchPage() {
         </div>
 
         {/* Source Tabs + Filter Toggle */}
-        <div className="flex items-center gap-2 mt-3">
+        <div className="flex flex-wrap items-center gap-2 mt-3">
           {SOURCE_TABS.map((tab) => (
             <button
               key={tab.value}
               type="button"
               onClick={() => setSource(tab.value)}
               className={cn(
-                "px-3 py-1.5 rounded-xl text-court-xs font-bold tracking-wider transition-all flex items-center gap-1.5",
+                "px-4 py-2.5 rounded-xl text-court-xs font-bold tracking-wider transition-all flex items-center gap-1.5 active:scale-95",
                 source === tab.value
                   ? "bg-gold-dim text-gold border border-gold/20"
                   : "text-court-text-ter hover:text-court-text-sec border border-transparent"
@@ -206,7 +226,7 @@ export default function ResearchPage() {
             type="button"
             onClick={() => setShowFilters(!showFilters)}
             className={cn(
-              "px-3 py-1.5 rounded-xl text-court-xs font-bold tracking-wider transition-all flex items-center gap-1.5",
+              "px-4 py-2.5 rounded-xl text-court-xs font-bold tracking-wider transition-all flex items-center gap-1.5 active:scale-95",
               showFilters || hasActiveFilters
                 ? "bg-gold-dim text-gold border border-gold/20"
                 : "text-court-text-ter hover:text-court-text-sec border border-transparent"
@@ -231,7 +251,7 @@ export default function ResearchPage() {
             {hasActiveFilters && (
               <button
                 onClick={clearFilters}
-                className="text-court-xs text-gold/70 hover:text-gold transition flex items-center gap-1"
+                className="text-court-xs text-gold/70 hover:text-gold transition flex items-center gap-1 min-h-[44px] active:scale-95"
               >
                 <X size={12} />
                 Clear all
@@ -316,7 +336,7 @@ export default function ResearchPage() {
                           type="button"
                           onClick={() => toggleCourt(court.code)}
                           className={cn(
-                            "px-2 py-0.5 rounded text-court-xs font-bold transition-all",
+                            "px-3 py-2 rounded text-court-xs font-bold transition-all active:scale-95",
                             selectedCourts.includes(court.code)
                               ? "bg-gold-dim text-gold border border-gold/30"
                               : "bg-navy-mid text-court-text-ter hover:text-court-text-sec border border-court-border"
@@ -345,9 +365,33 @@ export default function ResearchPage() {
               <button
                 key={term}
                 onClick={() => handleQuickSearch(term)}
-                className="px-3 py-1.5 bg-navy-card border border-court-border-light rounded-xl text-court-sm text-court-text-sec hover:text-court-text hover:bg-navy-mid hover:border-court-border transition-all"
+                className="px-4 py-2.5 bg-navy-card border border-court-border-light rounded-xl text-court-sm text-court-text-sec hover:text-court-text hover:bg-navy-mid hover:border-court-border transition-all active:scale-95"
               >
                 {term}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Recent Searches — TODO: replace RECENT_SEARCHES_DEMO with useQuery(api.research.getRecentSearches) when Convex auth is wired */}
+      {!results && !isLoading && (
+        <div className="mb-8">
+          <p className="text-court-xs font-bold tracking-[0.15em] text-court-text-ter mb-3 flex items-center gap-2">
+            <Clock size={12} />
+            RECENT SEARCHES
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {RECENT_SEARCHES_DEMO.map((item) => (
+              <button
+                key={item.query}
+                onClick={() => handleQuickSearch(item.query)}
+                className="group/recent flex items-center gap-2 px-4 py-2.5 bg-navy-card border border-court-border-light rounded-xl text-court-sm text-court-text-sec hover:text-court-text hover:bg-navy-mid hover:border-court-border transition-all active:scale-95"
+              >
+                <span>{item.query}</span>
+                <span className="text-court-xs text-court-text-ter group-hover/recent:text-court-text-sec transition-colors">
+                  {item.resultCount} results · {item.searchedAt}
+                </span>
               </button>
             ))}
           </div>
@@ -416,7 +460,7 @@ export default function ResearchPage() {
               <button
                 onClick={() => handlePageChange(page - 1)}
                 disabled={page <= 1}
-                className="px-3 py-1.5 rounded-xl text-court-xs font-bold text-court-text-sec hover:text-court-text disabled:opacity-20 disabled:cursor-not-allowed transition flex items-center gap-1"
+                className="px-4 py-2.5 min-h-[44px] rounded-xl text-court-xs font-bold text-court-text-sec hover:text-court-text disabled:opacity-20 disabled:cursor-not-allowed transition flex items-center gap-1 active:scale-95"
               >
                 <ChevronLeft size={14} />
                 Previous
@@ -427,7 +471,7 @@ export default function ResearchPage() {
               <button
                 onClick={() => handlePageChange(page + 1)}
                 disabled={page >= results.totalPages}
-                className="px-3 py-1.5 rounded-xl text-court-xs font-bold text-court-text-sec hover:text-court-text disabled:opacity-20 disabled:cursor-not-allowed transition flex items-center gap-1"
+                className="px-4 py-2.5 min-h-[44px] rounded-xl text-court-xs font-bold text-court-text-sec hover:text-court-text disabled:opacity-20 disabled:cursor-not-allowed transition flex items-center gap-1 active:scale-95"
               >
                 Next
                 <ChevronRight size={14} />
@@ -549,7 +593,7 @@ function ResultCard({ result }: { result: UnifiedSearchResult }) {
             onClick={handleCopy}
             title={copied ? "Copied" : "Copy OSCOLA citation"}
             className={cn(
-              "p-1.5 rounded-lg transition-all",
+              "p-2.5 rounded-lg transition-all active:scale-95",
               copied
                 ? "text-gold bg-gold-dim"
                 : "text-court-text-ter hover:text-court-text-sec hover:bg-navy-mid"
@@ -561,7 +605,7 @@ function ResultCard({ result }: { result: UnifiedSearchResult }) {
             onClick={handleBookmark}
             title={bookmarked ? "Saved" : "Save authority"}
             className={cn(
-              "p-1.5 rounded-lg transition-all",
+              "p-2.5 rounded-lg transition-all active:scale-95",
               bookmarked
                 ? "text-gold bg-gold-dim"
                 : "text-court-text-ter hover:text-court-text-sec hover:bg-navy-mid"
@@ -573,7 +617,7 @@ function ResultCard({ result }: { result: UnifiedSearchResult }) {
             href={result.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="p-1.5 rounded-lg text-court-text-ter hover:text-court-text-sec hover:bg-navy-mid transition-all"
+            className="p-2.5 rounded-lg text-court-text-ter hover:text-court-text-sec hover:bg-navy-mid transition-all active:scale-95"
             onClick={(e) => e.stopPropagation()}
           >
             <ExternalLink size={14} />

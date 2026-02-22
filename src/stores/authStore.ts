@@ -25,6 +25,8 @@ interface Profile {
   modules: string[];
   bio?: string;
   avatarUrl?: string;
+  isVerified: boolean;
+  verificationStatus?: "none" | "pending" | "verified" | "expired";
 }
 
 interface AuthState {

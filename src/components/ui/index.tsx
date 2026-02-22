@@ -419,6 +419,16 @@ export function PageSkeleton({ rows = 3 }: { rows?: number }) {
   );
 }
 
+// ── VerifiedBadge ──
+export function VerifiedBadge({ size = "sm" }: { size?: "xs" | "sm" | "md" }) {
+  const sizes = { xs: 12, sm: 14, md: 18 };
+  return (
+    <span className="inline-flex items-center" title="Verified Advocate">
+      <Shield size={sizes[size]} className="text-gold fill-gold/20" />
+    </span>
+  );
+}
+
 // ── ErrorState ──
 export function ErrorState({
   title = "Something went wrong",

@@ -1,27 +1,21 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/stores/authStore";
 import { Card, Button } from "@/components/ui";
 import { Shield, AlertTriangle, ArrowRight } from "lucide-react";
 
-// TODO: Replace with real verification check from Convex auth/profile
-// For now, this uses a simple prop-based approach
-// In production, wrap with useQuery(api.profiles.getMyVerification)
-
 interface VerifiedOnlyProps {
   children: React.ReactNode;
-  isVerified?: boolean;
-  isExpired?: boolean;
   fallbackMessage?: string;
 }
 
-export function VerifiedOnly({
-  children,
-  isVerified = true, // Default to true for development — flip when auth is wired
-  isExpired = false,
-  fallbackMessage,
-}: VerifiedOnlyProps) {
+export function VerifiedOnly({ children, fallbackMessage }: VerifiedOnlyProps) {
   const router = useRouter();
+  const profile = useAuthStore((s) => s.profile);
+
+  const isVerified = profile?.isVerified ?? false;
+  const isExpired = profile?.verificationStatus === "expired";
 
   if (isExpired) {
     return (
@@ -34,7 +28,7 @@ export function VerifiedOnly({
         </h3>
         <p className="text-sm text-court-text-ter mb-6 max-w-xs">
           Your student verification has expired. Please re-verify to continue
-          accessing governance features.
+          accessing institutional features.
         </p>
         <Button onClick={() => router.push("/verify")}>
           <span className="flex items-center gap-2">
@@ -56,13 +50,13 @@ export function VerifiedOnly({
         </h3>
         <p className="text-sm text-court-text-ter mb-2 max-w-xs">
           {fallbackMessage ||
-            "This feature is available only to verified UK law students."}
+            "This feature is available to verified Advocates. Verify your university email to unlock it."}
         </p>
         <Card className="p-4 text-left mb-6 max-w-sm w-full">
           <p className="text-court-xs text-court-text-sec leading-relaxed">
-            Ratio is a constitutional institution. Governance features — including
-            parliamentary motions, voting, and tribunal proceedings — require
-            verified student status to maintain institutional integrity.
+            Verified Advocates gain access to Chambers, Rankings, Tournaments,
+            Parliament voting, and Tribunal proceedings. Verify your .ac.uk
+            email to confirm your university status.
           </p>
         </Card>
         <Button onClick={() => router.push("/verify")}>

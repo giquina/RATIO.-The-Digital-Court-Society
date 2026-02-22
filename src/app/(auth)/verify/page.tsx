@@ -12,6 +12,9 @@ import {
   AlertTriangle,
   ArrowRight,
   GraduationCap,
+  Trophy,
+  Landmark,
+  Gavel,
 } from "lucide-react";
 
 type VerifyStep = "method" | "email" | "manual" | "pending" | "verified";
@@ -39,6 +42,13 @@ export default function VerifyPage() {
     setStep("pending");
   };
 
+  const benefits = [
+    { icon: Shield, label: "Chamber membership and university representation" },
+    { icon: Trophy, label: "Inter-university rankings and tournaments" },
+    { icon: Landmark, label: "Parliament voting rights and governance" },
+    { icon: Gavel, label: "Tribunal participation" },
+  ];
+
   return (
     <div className="min-h-screen flex flex-col px-4 md:px-6 lg:px-8 pt-8 pb-12 max-w-lg mx-auto">
       {/* Header */}
@@ -50,13 +60,28 @@ export default function VerifyPage() {
           Student Verification
         </h1>
         <p className="text-xs text-court-text-sec">
-          Ratio membership is limited to verified UK law students and alumni associates.
+          Verify your university status to unlock exclusive features.
         </p>
       </div>
 
       {/* Step: Choose Method */}
       {step === "method" && (
         <div className="space-y-3">
+          {/* Benefits section */}
+          <Card className="p-5 mb-4">
+            <h3 className="text-court-sm font-bold text-court-text mb-3 text-center">
+              Verification unlocks
+            </h3>
+            <div className="space-y-3">
+              {benefits.map((b, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <b.icon size={18} className="text-gold shrink-0" />
+                  <span className="text-court-xs text-court-text-sec">{b.label}</span>
+                </div>
+              ))}
+            </div>
+          </Card>
+
           <p className="text-court-sm text-court-text-sec mb-4 text-center">
             Choose your verification method
           </p>
@@ -111,11 +136,17 @@ export default function VerifyPage() {
           <div className="flex items-start gap-2 px-3 py-2 rounded-xl bg-blue-400/5 border border-blue-400/10 mt-4">
             <GraduationCap size={14} className="text-blue-400 shrink-0 mt-0.5" />
             <p className="text-court-xs text-blue-400/80">
-              Verification is valid for 12 months. After expiry, you will have a
-              30-day grace period to re-verify before your account transitions to
-              Associate (read-only governance) status.
+              Verification confirms your university status and unlocks institutional features.
             </p>
           </div>
+
+          {/* Skip for now */}
+          <button
+            onClick={() => router.push("/home")}
+            className="w-full text-center text-court-sm text-court-text-ter hover:text-gold transition-colors mt-6"
+          >
+            Skip for now — you can verify later in Settings
+          </button>
         </div>
       )}
 
