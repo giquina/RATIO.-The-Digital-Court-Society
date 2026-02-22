@@ -2,7 +2,7 @@
 
 import { useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { HelpCircle, X, Info } from "lucide-react";
+import { Scale, X, Info } from "lucide-react";
 import { useClerkStore } from "@/stores/clerkStore";
 import { ClerkQuickHelp } from "./ClerkQuickHelp";
 import { ClerkGlossary } from "./ClerkGlossary";
@@ -49,10 +49,11 @@ export function TheClerk() {
             exit={{ scale: 0.8, opacity: 0 }}
             transition={{ duration: 0.2 }}
             onClick={() => open()}
-            className="fixed bottom-24 right-4 md:bottom-6 md:right-6 z-[70] w-12 h-12 rounded-full bg-navy-card border border-court-border hover:border-gold/30 flex items-center justify-center transition-colors duration-200 shadow-lg"
+            className="fixed bottom-24 right-4 md:bottom-6 md:right-6 z-[70] h-10 px-3.5 rounded-full bg-navy-card border border-court-border hover:border-gold/30 flex items-center gap-1.5 transition-colors duration-200 shadow-lg"
             aria-label="Open The Clerk help panel"
           >
-            <HelpCircle size={22} className="text-court-text-sec" />
+            <Scale size={16} className="text-gold" />
+            <span className="text-court-xs font-semibold text-court-text-sec">Clerk</span>
           </motion.button>
         )}
       </AnimatePresence>
@@ -71,7 +72,7 @@ export function TheClerk() {
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-court-border shrink-0">
               <div className="flex items-center gap-2">
-                <HelpCircle size={18} className="text-gold" />
+                <Scale size={18} className="text-gold" />
                 <h2 className="font-serif text-base font-bold text-court-text">The Clerk</h2>
               </div>
               <button onClick={close} className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-white/[0.06] transition-colors" aria-label="Close help panel">
