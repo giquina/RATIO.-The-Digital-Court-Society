@@ -56,7 +56,7 @@ export default function HomePage() {
             <Skeleton className="w-32 h-3.5 mt-1" />
           ) : (
             <p className="text-court-sm text-court-text-ter mt-0.5">
-              {profile?.universityShort ?? "—"} · {profile?.chamber ?? "—"} Chamber
+              {profile?.universityShort ?? "—"}{profile?.chamber ? ` · ${profile.chamber} Chamber` : ""}
             </p>
           )}
         </div>
@@ -65,7 +65,7 @@ export default function HomePage() {
             <Bell size={18} className="text-gold" />
           </Link>
           <Link href="/profile" aria-label="View profile">
-            <Avatar initials={initials} chamber={profile?.chamber ?? "Gray's"} size="sm" border />
+            <Avatar initials={initials} chamber={profile?.chamber} size="sm" border />
           </Link>
         </div>
       </header>

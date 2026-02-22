@@ -25,7 +25,7 @@ export default defineSchema({
     university: v.string(),
     universityShort: v.string(), // "UCL", "KCL"
     yearOfStudy: v.number(), // 0=foundation, 1-4
-    chamber: v.string(), // "Gray's", "Lincoln's", "Inner", "Middle"
+    chamber: v.optional(v.string()), // "Gray's", "Lincoln's", "Inner", "Middle" — optional, can choose later
     bio: v.optional(v.string()),
     avatarUrl: v.optional(v.string()),
     rank: v.string(), // Pupil → Junior Counsel → Senior Counsel → King's Counsel → Bencher

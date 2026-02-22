@@ -79,7 +79,7 @@ export default function ProfilePage() {
             <Avatar initials={initials} chamber={profile.chamber} size="xl" border />
             <h1 className="font-serif text-xl font-bold text-court-text mt-3">{profile.fullName}</h1>
             <p className="text-xs text-court-text-sec mt-1">{profile.university}</p>
-            <p className="text-court-sm text-court-text-ter mt-0.5">{yearLabel} · {profile.chamber} Chamber</p>
+            <p className="text-court-sm text-court-text-ter mt-0.5">{yearLabel}{profile.chamber ? ` · ${profile.chamber} Chamber` : ""}</p>
           </div>
 
           <div className="grid grid-cols-3 gap-2 mt-5">
@@ -157,7 +157,7 @@ export default function ProfilePage() {
         {([
           { Icon: FolderOpen, label: "Export Advocacy Portfolio", tag: "PDF" },
           { Icon: LinkIcon, label: "Copy Profile Link" },
-          { Icon: Landmark, label: `Your Chamber · ${profile.chamber}` },
+          { Icon: Landmark, label: profile.chamber ? `Your Chamber · ${profile.chamber}` : "Join a Chamber" },
           { Icon: FileText, label: "Digital Membership Card", tag: "WALLET" },
           { Icon: Settings, label: "Settings", href: "/settings" },
         ] as { Icon: LucideIcon; label: string; tag?: string; href?: string }[]).map((a) => (

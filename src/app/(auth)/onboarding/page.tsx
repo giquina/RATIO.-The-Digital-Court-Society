@@ -185,6 +185,14 @@ export default function OnboardingPage() {
               </button>
             ))}
           </div>
+          <button
+            onClick={() => setChamber("")}
+            className={`mt-2 text-center text-court-sm py-2 transition-colors ${
+              chamber === "" ? "text-gold font-semibold" : "text-court-text-ter hover:text-court-text-sec"
+            }`}
+          >
+            Choose later — I haven&apos;t joined a Chamber yet
+          </button>
         </>
       )}
 
@@ -205,7 +213,7 @@ export default function OnboardingPage() {
                 university,
                 universityShort: uni?.short ?? university.substring(0, 5),
                 yearOfStudy: year ?? 1,
-                chamber,
+                chamber: chamber || undefined,
                 modules,
                 fullName: pendingName,
               });
@@ -217,7 +225,7 @@ export default function OnboardingPage() {
               setSaving(false);
             }
           } : next}
-          disabled={(step === 1 && !university) || (step === 2 && year === null) || (step === 3 && modules.length === 0) || (step === 4 && !chamber) || saving}
+          disabled={(step === 1 && !university) || (step === 2 && year === null) || (step === 3 && modules.length === 0) || saving}
           className="flex-1 py-3 text-sm font-bold bg-gold text-navy rounded-xl disabled:opacity-40 flex items-center justify-center gap-2"
         >
           {saving && <Loader2 size={16} className="animate-spin" />}
