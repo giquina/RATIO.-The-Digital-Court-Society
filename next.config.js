@@ -54,11 +54,15 @@ const nextConfig = {
   },
 };
 
-module.exports = withSentryConfig(nextConfig, {
-  org: process.env.SENTRY_ORG,
-  project: process.env.SENTRY_PROJECT,
-  silent: !process.env.CI,
-  widenClientFileUpload: true,
-  hideSourceMaps: true,
-  tunnelRoute: "/monitoring",
-});
+// Only wrap with Sentry build plugin if auth token is available
+// (prevents build failures when SENTRY_AUTH_TOKEN is not set on Vercel)
+module.exports = process.env.SENTRY_AUTH_TOKEN
+  ? withSentryConfig(nextConfig, {
+      org: process.env.SENTRY_ORG,
+      project: process.env.SENTRY_PROJECT,
+      silent: !process.env.CI,
+      widenClientFileUpload: true,
+      hideSourceMaps: true,
+      tunnelRoute: "/monitoring",
+    })
+  : nextConfig;
