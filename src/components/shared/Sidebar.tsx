@@ -8,6 +8,7 @@ import {
   Mic,
   BookOpen,
   Wrench,
+  Search,
   Trophy,
   Swords,
   Landmark,
@@ -48,6 +49,7 @@ const sections: NavSection[] = [
     title: "LEARN",
     items: [
       { href: "/law-book", label: "Law Book", icon: BookOpen },
+      { href: "/research", label: "Research", icon: Search },
       { href: "/tools", label: "Tools", icon: Wrench },
     ],
   },

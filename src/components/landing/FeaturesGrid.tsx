@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Bot, Scale, Target, BarChart3, Trophy, Users } from "lucide-react";
+import { Bot, Scale, Target, BarChart3, Trophy, Users, Search } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 const FEATURES: {
@@ -45,6 +45,12 @@ const FEATURES: {
     title: "Advocate Network",
     desc: "Follow rising stars, commend performances, discover advocates from every UK law school. Your professional network starts here.",
     tag: "SOCIAL",
+  },
+  {
+    Icon: Search,
+    title: "Legal Research",
+    desc: "Search every UK statute and court judgment in one place. OSCOLA citations, direct links to legislation.gov.uk and Find Case Law.",
+    tag: "OFFICIAL SOURCES",
   },
 ];
 
