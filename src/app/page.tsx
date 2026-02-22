@@ -7,7 +7,11 @@ import { TrustBar } from "@/components/landing/TrustBar";
 import { HowItWorks } from "@/components/landing/HowItWorks";
 import { FeaturesGrid } from "@/components/landing/FeaturesGrid";
 import { AIShowcase } from "@/components/landing/AIShowcase";
+import { VideoMootingShowcase } from "@/components/landing/VideoMootingShowcase";
+import { TournamentShowcase } from "@/components/landing/TournamentShowcase";
+import { ToolsShowcase } from "@/components/landing/ToolsShowcase";
 import { LawBookPreview } from "@/components/landing/LawBookPreview";
+import { GovernanceShowcase } from "@/components/landing/GovernanceShowcase";
 import { ChambersPreview } from "@/components/landing/ChambersPreview";
 import { TestimonialSection } from "@/components/landing/TestimonialSection";
 import { PricingSection } from "@/components/landing/PricingSection";
@@ -62,7 +66,11 @@ export default function LandingPage() {
       <FeaturesGrid />
       <HowItWorks />
       <AIShowcase />
+      <VideoMootingShowcase />
+      <TournamentShowcase />
+      <ToolsShowcase />
       <LawBookPreview />
+      <GovernanceShowcase />
       <ChambersPreview />
       <TestimonialSection />
       <PricingSection />

@@ -8,12 +8,12 @@ const FAQ_ITEMS = [
   {
     question: "What is Ratio?",
     answer:
-      "Ratio is a digital court society built for UK law students. It combines AI-powered advocacy training, moot organisation tools, a peer-reviewed law book, and a national inter-university league. Think of it as the infrastructure your mooting society has always needed, combined with technology that lets you practise advocacy on your own terms.",
+      "Ratio is a digital court society built for UK law students. It combines AI-powered advocacy training, live video mooting, legal research, moot organisation, competitive tournaments, a peer-reviewed law book, democratic governance through Parliament and Tribunal, and a national inter-university league. It is the complete infrastructure for UK law student advocacy.",
   },
   {
     question: "Is Ratio free to use?",
     answer:
-      "Yes. The core platform is free forever. This includes unlimited moot organisation, role claiming, social features, Chamber membership, and 3 AI Judge sessions per month. Premium tiers at £5.99 and £7.99 per month unlock unlimited AI sessions, advanced analytics, exportable portfolios, and SQE2 preparation tools.",
+      "Yes. The core platform is free forever. This includes live video mooting, unlimited moot organisation, the Legal Research Engine, Parliament voting rights, role claiming, social features, Chamber membership, and 3 AI Judge sessions per month. Premium tiers unlock unlimited AI sessions, the Case Brief Generator, Argument Builder, tournament creation, advanced analytics, exportable portfolios, and SQE2 preparation tools.",
   },
   {
     question: "Who can join Ratio?",
@@ -21,14 +21,34 @@ const FAQ_ITEMS = [
       "Ratio is open to all UK law students. During the initial launch, we verify identity through .ac.uk university email addresses. This includes LLB, GDL, LPC, BPC, and LLM students at any UK university with a law programme. We plan to expand to international law students in future.",
   },
   {
+    question: "How does live video mooting work?",
+    answer:
+      "Sessions take place in virtual courtrooms with live video and audio. You join a pre-session lobby, enter through a formal courtroom entrance, and then present your submissions with timed speaking slots. Judges preside, leading and junior counsel take turns, and clerks manage procedure. After the session, you rate your opponent and receive AI-generated feedback on your performance.",
+  },
+  {
     question: "How does the AI Judge work?",
     answer:
       "The AI Judge simulates a High Court judge hearing oral submissions. You present your argument, and the AI intervenes with questions, challenges your reasoning, and tests your knowledge of authorities. After each session, you receive a detailed scorecard across 7 dimensions: argument structure, use of authorities, oral delivery, judicial handling, court manner, persuasiveness, and time management.",
   },
   {
+    question: "What is the Legal Research Engine?",
+    answer:
+      "The Research Engine lets you search every UK statute and court judgment in one place. It draws from official sources including legislation.gov.uk and the National Archives Find Case Law service. Results include OSCOLA-formatted citations, and you can filter by court hierarchy, year range, judge, or party name.",
+  },
+  {
+    question: "What are Parliament and Tribunal?",
+    answer:
+      "Parliament is the democratic governance system of Ratio. Any verified Advocate can propose motions, debate policy changes, and vote. Standing orders ensure fair procedure. The Tribunal handles disputes through a structured judicial process modelled on real court procedure: file a case, serve notice, exchange submissions, attend a hearing, and receive a binding judgment from elected judicial Advocates.",
+  },
+  {
     question: "What is a Chamber?",
     answer:
-      "Chambers are the four houses of Ratio, modelled on the historic Inns of Court: Gray's, Lincoln's, Inner, and Middle. When you join, you select a Chamber. Your Chamber is your team for national rankings and inter-university competition. Every moot you complete and every score you earn contributes to your Chamber's standing.",
+      "Chambers are the four houses of Ratio, modelled on the historic Inns of Court: Gray's, Lincoln's, Inner, and Middle. When you join, you select a Chamber. Your Chamber is your team for national rankings, inter-university competition, and tournaments. Every moot you complete and every score you earn contributes to your Chamber's standing.",
+  },
+  {
+    question: "How do tournaments work?",
+    answer:
+      "Mooting societies and Advocates can create structured tournaments with single elimination or round-robin formats. Participants are matched, results are tracked through live brackets, and winners advance through rounds. Inter-university tournaments let Chambers compete against law schools across the country, with all results feeding into the national league table.",
   },
   {
     question: "How is my data handled?",

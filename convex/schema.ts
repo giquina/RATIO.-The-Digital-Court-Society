@@ -621,4 +621,36 @@ export default defineSchema({
     timestamp: v.number(),
   })
     .index("by_session", ["videoSessionId"]),
+
+  // ═══════════════════════════════════════════
+  // LEGAL RESEARCH
+  // ═══════════════════════════════════════════
+  savedAuthorities: defineTable({
+    profileId: v.id("profiles"),
+    type: v.string(), // "case-law", "legislation", "parliament-debate", "parliament-bill"
+    title: v.string(),
+    citation: v.optional(v.string()), // OSCOLA formatted
+    url: v.string(),
+    subtitle: v.optional(v.string()), // court name, legislation type, etc.
+    date: v.optional(v.string()),
+    snippet: v.optional(v.string()),
+    notes: v.optional(v.string()), // advocate's personal notes
+    tags: v.optional(v.array(v.string())), // e.g. ["contract", "moot-prep"]
+    folder: v.optional(v.string()), // e.g. "Contract Law Moot 2026"
+    savedAt: v.string(), // ISO timestamp
+  })
+    .index("by_profile", ["profileId"])
+    .index("by_profile_type", ["profileId", "type"])
+    .index("by_profile_folder", ["profileId", "folder"]),
+
+  searchHistory: defineTable({
+    profileId: v.id("profiles"),
+    query: v.string(),
+    source: v.string(), // "all", "case-law", "legislation", "parliament"
+    resultCount: v.number(),
+    queryTime: v.number(), // ms
+    searchedAt: v.string(), // ISO timestamp
+  })
+    .index("by_profile", ["profileId"])
+    .index("by_profile_recent", ["profileId", "searchedAt"]),
 });

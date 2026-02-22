@@ -49,8 +49,9 @@ export function HeroSection({
         The Digital Constitutional Society for UK Law Students.
       </h1>
 
-      <p className="text-court-lg text-court-text-sec leading-relaxed max-w-md mx-auto mb-10">
-        Practice advocacy. Build your record. Govern your community.
+      <p className="text-court-lg text-court-text-sec leading-relaxed max-w-lg mx-auto mb-10">
+        AI advocacy training. Live video mooting. Legal research.
+        Tournaments. Democratic governance. One platform, built for the Bar.
       </p>
 
       {/* Email Capture */}

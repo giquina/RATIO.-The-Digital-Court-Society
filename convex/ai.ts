@@ -4,6 +4,40 @@ import { action } from "./_generated/server";
 // This action calls the external LLM API for AI Judge conversations.
 // Using Convex actions since they can make external HTTP requests.
 
+// Fetch real UK case law from Find Case Law API to ground AI responses
+async function fetchRelevantCaseLaw(areaOfLaw: string, matter: string): Promise<string> {
+  try {
+    const searchTerms = `${areaOfLaw} ${matter}`.replace(/[^\w\s]/g, " ").trim();
+    const params = new URLSearchParams({ query: searchTerms, per_page: "5" });
+    const response = await fetch(
+      `https://caselaw.nationalarchives.gov.uk/atom.xml?${params}`,
+      { headers: { Accept: "application/atom+xml" } }
+    );
+    if (!response.ok) return "";
+    const xml = await response.text();
+
+    // Extract case names and neutral citations
+    const entries: string[] = [];
+    const entryBlocks = xml.split("<entry>").slice(1);
+    for (const block of entryBlocks.slice(0, 5)) {
+      const titleMatch = block.match(/<title[^>]*>([^<]+)<\/title>/);
+      const citMatch = block.match(/<tna:identifier[^>]*type="ukncn"[^>]*>([^<]+)<\/tna:identifier>/);
+      const dateMatch = block.match(/<published>([^<]+)<\/published>/);
+      if (titleMatch) {
+        const name = titleMatch[1].trim();
+        const cit = citMatch ? citMatch[1].trim() : "";
+        const year = dateMatch ? dateMatch[1].substring(0, 4) : "";
+        entries.push(cit ? `${name} ${cit} (${year})` : `${name} (${year})`);
+      }
+    }
+    return entries.length > 0
+      ? `\n\nREAL UK AUTHORITIES (from Find Case Law — National Archives) relevant to this area:\n${entries.map((e) => `- ${e}`).join("\n")}\nYou should cite these real authorities when challenging or testing Counsel. Refer to their ratio decidendi and obiter dicta. If Counsel cites a case you have not seen, ask them to explain its relevance.`
+      : "";
+  } catch {
+    return "";
+  }
+}
+
 export const chat = action({
   args: {
     mode: v.string(), // "judge" | "mentor" | "examiner" | "opponent"
@@ -21,11 +55,17 @@ export const chat = action({
     }),
   },
   handler: async (ctx, args) => {
+    // Fetch real case law to ground the AI's responses
+    const caseLawContext = await fetchRelevantCaseLaw(
+      args.caseContext.areaOfLaw,
+      args.caseContext.matter
+    );
+
     const systemPrompts: Record<string, string> = {
-      judge: `You are The Honourable Justice AI, presiding over a moot court. You are a firm but fair High Court judge. Intervene with judicial questions every 2-3 responses. Challenge weak arguments. Never break character. The case concerns: ${args.caseContext.matter}. Counsel appears as ${args.caseContext.yourRole}. Key authorities: ${args.caseContext.authorities.join(", ")}.`,
-      mentor: `You are a Senior Counsel mentor at a UK Ratio. Be warm but rigorous. Ask Socratic questions. Help improve advocacy technique. The topic is: ${args.caseContext.matter}.`,
-      examiner: `You are an SQE2 Examiner. Assess advocacy competence clinically against SRA standards. Do not coach — assess. The case: ${args.caseContext.matter}. Candidate role: ${args.caseContext.yourRole}.`,
-      opponent: `You are Opposing Counsel. Argue against the user's position firmly but fairly. Exploit weaknesses, distinguish their authorities. Case: ${args.caseContext.matter}.`,
+      judge: `You are The Honourable Justice AI, presiding over a moot court. You are a firm but fair High Court judge. Intervene with judicial questions every 2-3 responses. Challenge weak arguments. Never break character. The case concerns: ${args.caseContext.matter}. Counsel appears as ${args.caseContext.yourRole}. Key authorities cited by Counsel: ${args.caseContext.authorities.join(", ")}.${caseLawContext}`,
+      mentor: `You are a Senior Counsel mentor at a UK Ratio. Be warm but rigorous. Ask Socratic questions. Help improve advocacy technique. The topic is: ${args.caseContext.matter}.${caseLawContext}`,
+      examiner: `You are an SQE2 Examiner. Assess advocacy competence clinically against SRA standards. Do not coach — assess. The case: ${args.caseContext.matter}. Candidate role: ${args.caseContext.yourRole}.${caseLawContext}`,
+      opponent: `You are Opposing Counsel. Argue against the user's position firmly but fairly. Exploit weaknesses, distinguish their authorities. Case: ${args.caseContext.matter}.${caseLawContext}`,
     };
 
     const apiMessages = [

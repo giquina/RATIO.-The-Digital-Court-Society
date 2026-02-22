@@ -12,10 +12,13 @@ const TIERS = [
     features: [
       "3 AI Judge sessions per month",
       "Unlimited moot organisation",
+      "Live video mooting rooms",
       "Role claiming and scheduling",
+      "Legal Research Engine access",
       "Basic advocacy portfolio",
-      "Chamber membership",
-      "Social features and feed",
+      "Chamber membership and rankings",
+      "Parliament voting rights",
+      "Social features and community feed",
     ],
     highlight: false,
     accent: "border-court-border-light",
@@ -29,9 +32,11 @@ const TIERS = [
     description: "For serious advocates preparing for the Bar.",
     features: [
       "Unlimited AI Judge sessions",
+      "AI Case Brief Generator",
+      "AI Argument Builder",
       "Advanced scoring analytics",
       "Exportable branded PDF portfolio",
-      "Priority session scheduling",
+      "Tournament creation and management",
       "Access to all AI personas",
       "Detailed performance trends",
     ],
@@ -50,7 +55,7 @@ const TIERS = [
       "Timed SQE2 advocacy assessments",
       "SRA competency scoring",
       "Mock oral examination mode",
-      "Personalised improvement plans",
+      "Personalised learning paths",
       "Priority support",
     ],
     highlight: false,
@@ -73,9 +78,9 @@ export function PricingSection() {
         Free. Forever.
       </h2>
       <p className="text-court-base text-court-text-sec text-center max-w-md mx-auto mb-10">
-        Core mooting, role claiming, feedback, social features, and 3 AI Judge
-        sessions per month. No credit card. No trial period. Just build your
-        advocacy.
+        Live video mooting, legal research, Parliament, social features,
+        and 3 AI Judge sessions per month. No credit card. No trial
+        period. Just build your advocacy.
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">

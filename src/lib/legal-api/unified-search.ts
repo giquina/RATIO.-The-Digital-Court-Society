@@ -1,10 +1,11 @@
 // ============================================================================
 // RATIO — Unified Legal Search Service
-// Combines legislation.gov.uk + Find Case Law into a single search API
+// Combines legislation.gov.uk + Find Case Law + UK Parliament into a single search API
 // ============================================================================
 
 import { searchLegislation } from "./legislation"
 import { searchCaseLaw } from "./case-law"
+import { searchDebates, searchBills } from "./parliament"
 import { generateCaseCitation, generateLegislationCitation } from "./oscola"
 import type { UnifiedSearchParams, UnifiedSearchResult, UnifiedSearchResponse } from "./types"
 
@@ -13,6 +14,8 @@ export async function unifiedSearch(params: UnifiedSearchParams): Promise<Unifie
   const results: UnifiedSearchResult[] = []
   let legislationCount = 0
   let caseLawCount = 0
+  let parliamentDebatesCount = 0
+  let parliamentBillsCount = 0
   const promises: Promise<void>[] = []
 
   if (params.source === "all" || params.source === "legislation") {
@@ -55,20 +58,92 @@ export async function unifiedSearch(params: UnifiedSearchParams): Promise<Unifie
     )
   }
 
+  if (params.source === "all" || params.source === "parliament") {
+    // Search Hansard debates
+    promises.push(
+      searchDebates({
+        searchTerm: params.query,
+        house: params.filters?.house,
+        startDate: params.filters?.yearFrom ? `${params.filters.yearFrom}-01-01` : undefined,
+        endDate: params.filters?.yearTo ? `${params.filters.yearTo}-12-31` : undefined,
+        take: params.perPage || 10,
+        skip: params.page ? (params.page - 1) * (params.perPage || 10) : 0,
+        orderBy: "SittingDateDesc",
+      }).then((res) => {
+        parliamentDebatesCount = res.totalResults
+        for (const item of res.items) {
+          results.push({
+            type: "parliament-debate",
+            id: item.debateSectionExtId,
+            title: item.title,
+            subtitle: `${item.house} - ${item.debateSection}`,
+            date: item.sittingDate,
+            citation: `HC Deb ${item.sittingDate}`,
+            url: item.url,
+            relevanceScore: item.rank,
+          })
+        }
+      }).catch((err) => { console.error("Hansard debate search error:", err) })
+    )
+
+    // Search Bills
+    promises.push(
+      searchBills({
+        searchTerm: params.query,
+        currentHouse: params.filters?.house,
+        take: params.perPage || 10,
+        skip: params.page ? (params.page - 1) * (params.perPage || 10) : 0,
+        sortOrder: "DateUpdatedDesc",
+      }).then((res) => {
+        parliamentBillsCount = res.totalResults
+        for (const item of res.items) {
+          const stageDesc = item.currentStage
+            ? `${item.currentStage.description} (${item.currentStage.house})`
+            : item.isAct ? "Royal Assent" : ""
+          results.push({
+            type: "parliament-bill",
+            id: item.billId.toString(),
+            title: item.shortTitle,
+            subtitle: stageDesc || `${item.originatingHouse} Bill`,
+            date: item.lastUpdate,
+            citation: item.shortTitle,
+            url: item.url,
+            snippet: item.isAct ? "Act of Parliament" : item.isDefeated ? "Defeated" : "In progress",
+          })
+        }
+      }).catch((err) => { console.error("Bills search error:", err) })
+    )
+  }
+
   await Promise.all(promises)
 
+  // Sort: case-law first, then parliament debates, then parliament bills, then legislation
+  // Within each type, sort by date descending
+  const typePriority: Record<string, number> = {
+    "case-law": 0,
+    "parliament-debate": 1,
+    "parliament-bill": 2,
+    "legislation": 3,
+  }
+
   results.sort((a, b) => {
-    if (a.type !== b.type) return a.type === "case-law" ? -1 : 1
+    const priorityDiff = (typePriority[a.type] ?? 4) - (typePriority[b.type] ?? 4)
+    if (priorityDiff !== 0) return priorityDiff
     return b.date.localeCompare(a.date)
   })
 
-  const totalResults = legislationCount + caseLawCount
+  const totalResults = legislationCount + caseLawCount + parliamentDebatesCount + parliamentBillsCount
   const perPage = params.perPage || 20
 
   return {
     results, totalResults, currentPage: params.page || 1,
     totalPages: Math.ceil(totalResults / perPage), queryTime: Date.now() - startTime,
-    sources: { legislation: legislationCount, caseLaw: caseLawCount },
+    sources: {
+      legislation: legislationCount,
+      caseLaw: caseLawCount,
+      parliamentDebates: parliamentDebatesCount,
+      parliamentBills: parliamentBillsCount,
+    },
   }
 }
 

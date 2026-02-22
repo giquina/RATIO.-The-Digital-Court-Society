@@ -1,11 +1,12 @@
 // ============================================================================
 // RATIO — Legal Search API Route
 // GET /api/legal/search?q=negligence&source=all&page=1
+// Sources: legislation, case-law, parliament, all
 // ============================================================================
 
 import { NextRequest, NextResponse } from "next/server"
 import { unifiedSearch } from "@/lib/legal-api"
-import type { LegalSourceType, CourtCode, LegislationType } from "@/lib/legal-api"
+import type { LegalSourceType, CourtCode, LegislationType, ParliamentHouse } from "@/lib/legal-api"
 
 export const runtime = "edge"
 
@@ -23,6 +24,7 @@ export async function GET(request: NextRequest) {
   const yearTo = searchParams.get("yearTo") ? parseInt(searchParams.get("yearTo")!, 10) : undefined
   const judge = searchParams.get("judge") || undefined
   const party = searchParams.get("party") || undefined
+  const house = searchParams.get("house") as ParliamentHouse | undefined
 
   if (!query) {
     return NextResponse.json({ error: "Query parameter 'q' is required" }, { status: 400 })
@@ -35,6 +37,7 @@ export async function GET(request: NextRequest) {
         court: court.length > 0 ? court : undefined,
         legislationType: legislationType.length > 0 ? legislationType : undefined,
         yearFrom, yearTo, judge, party,
+        house: house || undefined,
       },
     })
 

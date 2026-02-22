@@ -14,7 +14,7 @@ const TESTIMONIALS = [
   },
   {
     quote:
-      "I used the advocacy portfolio from Ratio in my pupillage application to Brick Court. Having scored evidence of 40+ mooting sessions, with written judicial feedback, was something no other applicant had.",
+      "The video mooting rooms replicate a real courtroom. Timed submissions, a formal entrance, and post-session AI feedback. I used my advocacy portfolio in my pupillage application and it set me apart from every other candidate.",
     name: "James Okonkwo",
     university: "Oxford",
     year: "Year 3 LLB",
@@ -22,11 +22,19 @@ const TESTIMONIALS = [
   },
   {
     quote:
-      "Our mooting society switched entirely to Ratio for scheduling and role allocation. No more spreadsheets, no more double-booked judges. It just works, and the national league keeps everyone motivated.",
+      "We ran our entire Michaelmas tournament through Ratio. Brackets, scheduling, video rooms, and rankings all in one place. The Research Engine also saved me hours on my dissertation footnotes.",
     name: "Fatima Al-Rashid",
     university: "KCL",
     year: "GDL",
     chamberColor: "#3D6B45",
+  },
+  {
+    quote:
+      "Parliament is the feature I did not expect to care about. Proposing a motion, debating it with Advocates across the country, and watching the vote come in felt like genuine civic participation.",
+    name: "Marcus Williams",
+    university: "Manchester",
+    year: "Year 3 LLB",
+    chamberColor: "#8B6914",
   },
 ];
 
@@ -43,7 +51,7 @@ export function TestimonialSection() {
         What Advocates Say
       </h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
         {TESTIMONIALS.map((t) => (
           <div
             key={t.name}

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ShieldCheck, Users, Mic, FolderOpen } from "lucide-react";
+import { ShieldCheck, Users, Mic, Video, Search, FolderOpen } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 const STEPS: {
@@ -19,17 +19,29 @@ const STEPS: {
   {
     step: "02",
     title: "Join your Chamber",
-    desc: "Select your university, year, modules, and Chamber. Your Chamber is your team for national rankings and inter-university competition.",
+    desc: "Select your university, year, modules, and Chamber. Your Chamber is your team for national rankings, tournaments, and inter-university competition.",
     Icon: Users,
   },
   {
     step: "03",
-    title: "Practice with AI",
-    desc: "Face an AI High Court judge who challenges your submissions with real judicial interventions. Scored across 7 advocacy dimensions.",
-    Icon: Mic,
+    title: "Research and prepare",
+    desc: "Search UK statutes and case law through the Research Engine. Use the Case Brief Generator and Argument Builder to prepare your submissions.",
+    Icon: Search,
   },
   {
     step: "04",
+    title: "Moot live or with AI",
+    desc: "Join a live video session with real participants, or face an AI High Court judge solo. Both modes score your performance across 7 advocacy dimensions.",
+    Icon: Video,
+  },
+  {
+    step: "05",
+    title: "Compete and govern",
+    desc: "Enter tournaments, climb the national league, propose motions in Parliament, and resolve disputes through the Tribunal. This is your society to shape.",
+    Icon: Mic,
+  },
+  {
+    step: "06",
     title: "Build your portfolio",
     desc: "Every session auto-generates scored evidence. Export a branded advocacy portfolio for training contract and pupillage applications.",
     Icon: FolderOpen,

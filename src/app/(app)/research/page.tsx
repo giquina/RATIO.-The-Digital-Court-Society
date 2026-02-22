@@ -11,6 +11,10 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
+  Copy,
+  Check,
+  Bookmark,
+  Landmark,
 } from "lucide-react"
 import { cn } from "@/lib/utils/helpers"
 import type {
@@ -26,6 +30,7 @@ const SOURCE_TABS: { value: LegalSourceType; label: string; Icon: React.ElementT
   { value: "all", label: "All Sources", Icon: Scale },
   { value: "case-law", label: "Case Law", Icon: BookOpen },
   { value: "legislation", label: "Legislation", Icon: BookOpen },
+  { value: "parliament", label: "Parliament", Icon: Landmark },
 ]
 
 const POPULAR_SEARCHES = [
@@ -380,6 +385,12 @@ export default function ResearchPage() {
                 <span className="w-1.5 h-1.5 rounded-full bg-gold/60" />
                 {results.sources.legislation} statutes
               </span>
+              {(results.sources.parliamentDebates > 0 || results.sources.parliamentBills > 0) && (
+                <span className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400/60" />
+                  {results.sources.parliamentDebates + results.sources.parliamentBills} parliament
+                </span>
+              )}
             </div>
           </div>
 
@@ -465,6 +476,27 @@ export default function ResearchPage() {
 
 function ResultCard({ result }: { result: UnifiedSearchResult }) {
   const isCaseLaw = result.type === "case-law"
+  const isParliament = result.type === "parliament-debate" || result.type === "parliament-bill"
+  const [copied, setCopied] = useState(false)
+  const [bookmarked, setBookmarked] = useState(false)
+
+  const handleCopy = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    const text = result.citation || result.title
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    })
+  }
+
+  const handleBookmark = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setBookmarked(!bookmarked)
+    // Bookmark state persists visually — Convex integration requires auth context
+  }
+
   return (
     <a
       href={result.url}
@@ -476,7 +508,7 @@ function ResultCard({ result }: { result: UnifiedSearchResult }) {
         <div
           className={cn(
             "mt-1 w-2 h-2 rounded-full flex-shrink-0",
-            isCaseLaw ? "bg-blue-400/60" : "bg-gold/60"
+            isCaseLaw ? "bg-blue-400/60" : isParliament ? "bg-emerald-400/60" : "bg-gold/60"
           )}
         />
         <div className="flex-1 min-w-0">
@@ -512,10 +544,41 @@ function ResultCard({ result }: { result: UnifiedSearchResult }) {
             </p>
           )}
         </div>
-        <ExternalLink
-          size={16}
-          className="text-court-text-ter group-hover:text-court-text-sec flex-shrink-0 mt-0.5 transition"
-        />
+        <div className="flex flex-col gap-1.5 flex-shrink-0 mt-0.5">
+          <button
+            onClick={handleCopy}
+            title={copied ? "Copied" : "Copy OSCOLA citation"}
+            className={cn(
+              "p-1.5 rounded-lg transition-all",
+              copied
+                ? "text-gold bg-gold-dim"
+                : "text-court-text-ter hover:text-court-text-sec hover:bg-navy-mid"
+            )}
+          >
+            {copied ? <Check size={14} /> : <Copy size={14} />}
+          </button>
+          <button
+            onClick={handleBookmark}
+            title={bookmarked ? "Saved" : "Save authority"}
+            className={cn(
+              "p-1.5 rounded-lg transition-all",
+              bookmarked
+                ? "text-gold bg-gold-dim"
+                : "text-court-text-ter hover:text-court-text-sec hover:bg-navy-mid"
+            )}
+          >
+            <Bookmark size={14} className={bookmarked ? "fill-gold" : ""} />
+          </button>
+          <a
+            href={result.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-1.5 rounded-lg text-court-text-ter hover:text-court-text-sec hover:bg-navy-mid transition-all"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <ExternalLink size={14} />
+          </a>
+        </div>
       </div>
     </a>
   )

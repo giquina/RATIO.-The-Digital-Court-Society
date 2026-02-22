@@ -19,6 +19,7 @@ import type * as governance_legislative from "../governance/legislative.js";
 import type * as governance_tiers from "../governance/tiers.js";
 import type * as notifications from "../notifications.js";
 import type * as profiles from "../profiles.js";
+import type * as research from "../research.js";
 import type * as seed from "../seed.js";
 import type * as sessions from "../sessions.js";
 import type * as social from "../social.js";
@@ -42,6 +43,7 @@ declare const fullApi: ApiFromModules<{
   "governance/tiers": typeof governance_tiers;
   notifications: typeof notifications;
   profiles: typeof profiles;
+  research: typeof research;
   seed: typeof seed;
   sessions: typeof sessions;
   social: typeof social;

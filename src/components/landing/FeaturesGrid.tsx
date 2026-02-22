@@ -1,7 +1,20 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Bot, Scale, Target, BarChart3, Trophy, Users, Search } from "lucide-react";
+import {
+  Bot,
+  Scale,
+  Target,
+  BarChart3,
+  Trophy,
+  Users,
+  Search,
+  Video,
+  Swords,
+  Landmark,
+  Gavel,
+  Wrench,
+} from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 const FEATURES: {
@@ -17,10 +30,34 @@ const FEATURES: {
     tag: "FIRST OF ITS KIND",
   },
   {
+    Icon: Video,
+    title: "Live Video Mooting",
+    desc: "Argue your case face-to-face in virtual courtrooms with timed speaking slots, role allocation, and a formal courtroom entrance.",
+    tag: "LIVE VIDEO",
+  },
+  {
     Icon: Scale,
     title: "Moot Organisation",
     desc: "Create sessions, claim courtroom roles, invite your cohort. Real-time role claiming so no one double-books.",
     tag: "REAL-TIME",
+  },
+  {
+    Icon: Swords,
+    title: "Tournaments",
+    desc: "Single elimination or round-robin brackets for your mooting society. Track results through live brackets and advance through rounds.",
+    tag: "COMPETITIVE",
+  },
+  {
+    Icon: Search,
+    title: "Legal Research Engine",
+    desc: "Search every UK statute and court judgment in one place. OSCOLA citations, filter by court, year, or judge. Direct links to official sources.",
+    tag: "OFFICIAL SOURCES",
+  },
+  {
+    Icon: Wrench,
+    title: "AI Tools Suite",
+    desc: "Case brief generator, argument builder, and personalised learning paths. AI tools purpose-built for legal advocacy preparation.",
+    tag: "AI-POWERED",
   },
   {
     Icon: Target,
@@ -41,16 +78,22 @@ const FEATURES: {
     tag: "130+ UNIVERSITIES",
   },
   {
+    Icon: Landmark,
+    title: "Parliament",
+    desc: "Propose and debate motions that shape platform policy. Every verified Advocate has a vote. Standing orders ensure fair procedure.",
+    tag: "DEMOCRATIC",
+  },
+  {
+    Icon: Gavel,
+    title: "Tribunal",
+    desc: "Resolve disputes through structured judicial procedure. File cases, exchange submissions, and receive binding judgments.",
+    tag: "GOVERNANCE",
+  },
+  {
     Icon: Users,
     title: "Advocate Network",
     desc: "Follow rising stars, commend performances, discover advocates from every UK law school. Your professional network starts here.",
     tag: "SOCIAL",
-  },
-  {
-    Icon: Search,
-    title: "Legal Research",
-    desc: "Search every UK statute and court judgment in one place. OSCOLA citations, direct links to legislation.gov.uk and Find Case Law.",
-    tag: "OFFICIAL SOURCES",
   },
 ];
 
@@ -63,7 +106,17 @@ export function FeaturesGrid() {
       transition={{ duration: 0.5 }}
       className="relative z-10 px-4 md:px-6 lg:px-8 pb-16 max-w-3xl mx-auto"
     >
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
+      {/* Section heading */}
+      <h2 className="font-serif text-2xl md:text-3xl font-bold text-court-text text-center mb-3">
+        Everything You Need
+      </h2>
+      <p className="text-court-base text-court-text-sec text-center max-w-lg mx-auto mb-10">
+        Advocacy training, legal research, moot organisation,
+        competitive tournaments, and democratic governance. All in one
+        platform, built for UK law students.
+      </p>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
         {FEATURES.map((f) => (
           <div
             key={f.title}

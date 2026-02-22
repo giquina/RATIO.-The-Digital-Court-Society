@@ -118,9 +118,184 @@ export interface OSCOLACitation {
   formatted: string
 }
 
+// --- UK Parliament Types ---
+
+export type ParliamentHouse = "Commons" | "Lords"
+
+// -- Hansard (Debates) --
+
+export interface HansardDebateItem {
+  debateSectionExtId: string
+  title: string
+  debateSection: string
+  house: ParliamentHouse
+  sittingDate: string
+  rank?: number
+  url: string
+}
+
+export interface HansardContribution {
+  memberName: string
+  memberId?: number
+  house: ParliamentHouse
+  contributionText: string
+  time?: string
+}
+
+export interface HansardDebateDetail {
+  debateSectionExtId: string
+  title: string
+  house: ParliamentHouse
+  sittingDate: string
+  debateSection: string
+  contributions: HansardContribution[]
+  url: string
+}
+
+export interface HansardSearchParams {
+  searchTerm?: string
+  house?: ParliamentHouse
+  startDate?: string
+  endDate?: string
+  skip?: number
+  take?: number
+  orderBy?: "SittingDateAsc" | "SittingDateDesc"
+}
+
+export interface HansardSearchResult {
+  items: HansardDebateItem[]
+  totalResults: number
+}
+
+// -- Bills --
+
+export type BillSortOrder = "DateUpdatedDesc" | "DateUpdatedAsc" | "TitleAsc" | "TitleDesc"
+
+export interface BillSponsor {
+  memberId: number
+  name: string
+  party: string
+  house: string
+  memberFrom: string
+  memberPhoto?: string
+  memberPage?: string
+}
+
+export interface BillStageSitting {
+  id: number
+  stageId: number
+  billStageId: number
+  billId: number
+  date: string
+}
+
+export interface BillStage {
+  id: number
+  stageId: number
+  sessionId: number
+  description: string
+  abbreviation: string
+  house: string
+  stageSittings: BillStageSitting[]
+  sortOrder: number
+}
+
+export interface BillItem {
+  billId: number
+  shortTitle: string
+  longTitle?: string
+  summary?: string
+  currentHouse: string
+  originatingHouse: string
+  lastUpdate: string
+  isDefeated: boolean
+  isAct: boolean
+  billTypeId: number
+  currentStage?: BillStage
+  sponsors?: BillSponsor[]
+  url: string
+}
+
+export interface BillSearchParams {
+  searchTerm?: string
+  currentHouse?: ParliamentHouse
+  originatingHouse?: ParliamentHouse
+  memberId?: number
+  isDefeated?: boolean
+  isAct?: boolean
+  billStage?: number[]
+  billType?: number[]
+  sortOrder?: BillSortOrder
+  skip?: number
+  take?: number
+}
+
+export interface BillSearchResult {
+  items: BillItem[]
+  totalResults: number
+  itemsPerPage: number
+}
+
+export interface BillStagesResult {
+  stages: BillStage[]
+  totalResults: number
+}
+
+// -- Members --
+
+export interface ParliamentMemberParty {
+  id: number
+  name: string
+  abbreviation: string
+  backgroundColour?: string
+  foregroundColour?: string
+  isLordsMainParty?: boolean
+  isLordsSpiritualParty?: boolean
+  isIndependentParty?: boolean
+}
+
+export interface ParliamentMemberMembership {
+  membershipFrom: string
+  membershipFromId: number
+  house: number
+  membershipStartDate: string
+  membershipEndDate?: string
+  membershipEndReason?: string
+  membershipStatus?: {
+    statusIsActive: boolean
+    statusDescription: string
+  }
+}
+
+export interface ParliamentMember {
+  id: number
+  nameListAs: string
+  nameDisplayAs: string
+  nameFullTitle: string
+  gender: string
+  latestParty: ParliamentMemberParty
+  latestHouseMembership: ParliamentMemberMembership
+  thumbnailUrl?: string
+  url: string
+}
+
+export interface MemberSearchParams {
+  name?: string
+  house?: 1 | 2
+  partyId?: number
+  isCurrentMember?: boolean
+  skip?: number
+  take?: number
+}
+
+export interface MemberSearchResult {
+  items: ParliamentMember[]
+  totalResults: number
+}
+
 // --- Unified Search Types ---
 
-export type LegalSourceType = "legislation" | "case-law" | "all"
+export type LegalSourceType = "legislation" | "case-law" | "parliament" | "all"
 
 export interface UnifiedSearchParams {
   query: string
@@ -132,13 +307,14 @@ export interface UnifiedSearchParams {
     yearTo?: number
     judge?: string
     party?: string
+    house?: ParliamentHouse
   }
   page?: number
   perPage?: number
 }
 
 export interface UnifiedSearchResult {
-  type: "legislation" | "case-law"
+  type: "legislation" | "case-law" | "parliament-debate" | "parliament-bill"
   id: string
   title: string
   subtitle: string
@@ -158,6 +334,8 @@ export interface UnifiedSearchResponse {
   sources: {
     legislation: number
     caseLaw: number
+    parliamentDebates: number
+    parliamentBills: number
   }
 }
 
