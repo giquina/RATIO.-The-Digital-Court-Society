@@ -169,7 +169,7 @@ export interface HansardSearchResult {
 
 // -- Bills --
 
-export type BillSortOrder = "DateUpdatedDesc" | "DateUpdatedAsc" | "TitleAsc" | "TitleDesc"
+export type BillSortOrder = "DateUpdatedDescending" | "DateUpdatedAscending" | "TitleAscending" | "TitleDescending"
 
 export interface BillSponsor {
   memberId: number

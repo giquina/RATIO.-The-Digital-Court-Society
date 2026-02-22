@@ -93,7 +93,7 @@ export async function unifiedSearch(params: UnifiedSearchParams): Promise<Unifie
         currentHouse: params.filters?.house,
         take: params.perPage || 10,
         skip: params.page ? (params.page - 1) * (params.perPage || 10) : 0,
-        sortOrder: "DateUpdatedDesc",
+        sortOrder: "DateUpdatedDescending",
       }).then((res) => {
         parliamentBillsCount = res.totalResults
         for (const item of res.items) {
