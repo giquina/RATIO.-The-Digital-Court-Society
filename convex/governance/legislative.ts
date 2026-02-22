@@ -11,11 +11,9 @@ export const listMotions = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    let q = ctx.db.query("motions");
-    if (args.status) {
-      q = q.withIndex("by_status", (idx) => idx.eq("status", args.status!));
-    }
-    const motions = await q.order("desc").take(args.limit ?? 20);
+    const motions = args.status
+      ? await ctx.db.query("motions").withIndex("by_status", (idx) => idx.eq("status", args.status!)).order("desc").take(args.limit ?? 20)
+      : await ctx.db.query("motions").order("desc").take(args.limit ?? 20);
     // Hydrate with proposer profiles
     return Promise.all(
       motions.map(async (m) => {

@@ -1,11 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { Card, Button, SectionHeader } from "@/components/ui";
+import { useRouter } from "next/navigation";
+import { useQuery } from "convex/react";
+import { useAuthActions } from "@convex-dev/auth/react";
+import { api } from "../../../../convex/_generated/api";
+import { Card, Button, SectionHeader, Skeleton } from "@/components/ui";
 import {
   User, Mail, GraduationCap, Eye, Users, Bell, Mail as MailIcon,
   Smartphone, Clock, Moon, FileText, Shield, Scale, ChevronRight,
-  LogOut, Trash2, AlertTriangle,
+  LogOut, Trash2, AlertTriangle, Loader2,
 } from "lucide-react";
 
 // ── Toggle Switch ──
@@ -82,6 +86,12 @@ function SettingsSection({
 }
 
 export default function SettingsPage() {
+  const router = useRouter();
+  const { signOut } = useAuthActions();
+  const user = useQuery(api.users.currentUser);
+  const profile = useQuery(api.users.myProfile);
+  const [signingOut, setSigningOut] = useState(false);
+
   const [toggles, setToggles] = useState<Record<string, boolean>>({
     profileVisible: true,
     followerCount: true,
@@ -95,6 +105,20 @@ export default function SettingsPage() {
     if (key === "darkMode") return; // always on
     setToggles((prev) => ({ ...prev, [key]: !prev[key] }));
   };
+
+  const handleSignOut = async () => {
+    setSigningOut(true);
+    try {
+      await signOut();
+      router.push("/login");
+    } catch {
+      setSigningOut(false);
+    }
+  };
+
+  const userName = profile?.fullName ?? user?.name ?? "—";
+  const userEmail = user?.email ?? "—";
+  const userUni = profile?.universityShort ?? profile?.university ?? "—";
 
   return (
     <div className="pb-6 md:max-w-content-medium mx-auto">
@@ -111,9 +135,9 @@ export default function SettingsPage() {
           toggles={toggles}
           onToggle={handleToggle}
           rows={[
-            { icon: <User size={16} />, label: "Name", type: "info", value: "Ali Giquina" },
-            { icon: <Mail size={16} />, label: "Email", type: "info", value: "ali.g@ucl.ac.uk" },
-            { icon: <GraduationCap size={16} />, label: "University", type: "info", value: "UCL" },
+            { icon: <User size={16} />, label: "Name", type: "info", value: userName },
+            { icon: <Mail size={16} />, label: "Email", type: "info", value: userEmail },
+            { icon: <GraduationCap size={16} />, label: "University", type: "info", value: userUni },
           ]}
         />
 
@@ -212,9 +236,13 @@ export default function SettingsPage() {
                 </span>
               </div>
               <div className="flex gap-2.5 sm:ml-auto">
-                <button className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-red-500/30 text-red-400 text-xs font-bold hover:bg-red-500/10 transition-colors">
-                  <LogOut size={14} />
-                  Sign Out
+                <button
+                  onClick={handleSignOut}
+                  disabled={signingOut}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-red-500/30 text-red-400 text-xs font-bold hover:bg-red-500/10 transition-colors disabled:opacity-50"
+                >
+                  {signingOut ? <Loader2 size={14} className="animate-spin" /> : <LogOut size={14} />}
+                  {signingOut ? "Signing out..." : "Sign Out"}
                 </button>
                 <button className="text-xs text-red-400/60 hover:text-red-400 transition-colors flex items-center gap-1">
                   <Trash2 size={12} />

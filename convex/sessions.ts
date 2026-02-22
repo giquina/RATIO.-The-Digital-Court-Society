@@ -10,13 +10,9 @@ export const list = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    let q = ctx.db.query("sessions");
-
-    if (args.status) {
-      q = q.withIndex("by_status", (idx) => idx.eq("status", args.status!));
-    }
-
-    const sessions = await q.order("desc").take(args.limit ?? 20);
+    const sessions = args.status
+      ? await ctx.db.query("sessions").withIndex("by_status", (idx) => idx.eq("status", args.status!)).order("desc").take(args.limit ?? 20)
+      : await ctx.db.query("sessions").order("desc").take(args.limit ?? 20);
 
     if (args.university) {
       return sessions.filter((s) => s.university === args.university);

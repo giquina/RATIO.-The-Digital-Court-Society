@@ -1,5 +1,7 @@
 "use client";
 
+import { useState, useRef } from "react";
+import { createPortal } from "react-dom";
 import { cn, getInitials } from "@/lib/utils/helpers";
 import { CHAMBER_COLORS } from "@/lib/constants/app";
 import {
@@ -426,6 +428,78 @@ export function VerifiedBadge({ size = "sm" }: { size?: "xs" | "sm" | "md" }) {
     <span className="inline-flex items-center" title="Verified Advocate">
       <Shield size={sizes[size]} className="text-gold fill-gold/20" />
     </span>
+  );
+}
+
+// ── Tooltip ──
+export function Tooltip({
+  children,
+  content,
+  description,
+  side = "right",
+  delay = 400,
+  disabled = false,
+}: {
+  children: React.ReactNode;
+  content: string;
+  description?: string;
+  side?: "top" | "right" | "bottom" | "left";
+  delay?: number;
+  disabled?: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const [coords, setCoords] = useState({ x: 0, y: 0 });
+  const triggerRef = useRef<HTMLDivElement>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const show = () => {
+    if (disabled) return;
+    timerRef.current = setTimeout(() => {
+      if (!triggerRef.current) return;
+      const rect = triggerRef.current.getBoundingClientRect();
+      const pos = { x: 0, y: 0 };
+      if (side === "right") { pos.x = rect.right + 8; pos.y = rect.top + rect.height / 2; }
+      else if (side === "left") { pos.x = rect.left - 8; pos.y = rect.top + rect.height / 2; }
+      else if (side === "top") { pos.x = rect.left + rect.width / 2; pos.y = rect.top - 8; }
+      else { pos.x = rect.left + rect.width / 2; pos.y = rect.bottom + 8; }
+      setCoords(pos);
+      setOpen(true);
+    }, delay);
+  };
+
+  const hide = () => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    setOpen(false);
+  };
+
+  const translate = side === "right" ? "translate-x-1" : side === "left" ? "-translate-x-1" : side === "top" ? "-translate-y-1" : "translate-y-1";
+  const originStyle = side === "right"
+    ? { left: coords.x, top: coords.y, transform: "translateY(-50%)" }
+    : side === "left"
+    ? { right: `calc(100vw - ${coords.x}px)`, top: coords.y, transform: "translateY(-50%)" }
+    : side === "top"
+    ? { left: coords.x, bottom: `calc(100vh - ${coords.y}px)`, transform: "translateX(-50%)" }
+    : { left: coords.x, top: coords.y, transform: "translateX(-50%)" };
+
+  return (
+    <div ref={triggerRef} onMouseEnter={show} onMouseLeave={hide} onFocus={show} onBlur={hide}>
+      {children}
+      {open && typeof document !== "undefined" && createPortal(
+        <div
+          className={cn(
+            "fixed z-[100] pointer-events-none transition-all duration-150",
+            open ? "opacity-100" : `opacity-0 ${translate}`
+          )}
+          style={originStyle}
+        >
+          <div className="bg-navy-card border border-court-border rounded-lg px-3 py-2 shadow-lg shadow-black/30 max-w-[200px]">
+            <p className="text-court-xs font-semibold text-court-text whitespace-nowrap">{content}</p>
+            {description && <p className="text-court-xs text-court-text-ter mt-0.5">{description}</p>}
+          </div>
+        </div>,
+        document.body
+      )}
+    </div>
   );
 }
 

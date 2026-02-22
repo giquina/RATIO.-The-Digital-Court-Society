@@ -2,7 +2,10 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useMutation } from "convex/react";
+import { api } from "../../../../convex/_generated/api";
 import { UNIVERSITIES, LAW_MODULES, CHAMBERS } from "@/lib/constants/app";
+import { Loader2 } from "lucide-react";
 
 type Step = 1 | 2 | 3 | 4;
 
@@ -18,6 +21,7 @@ function loadSaved() {
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const createProfile = useMutation(api.users.createProfile);
   const saved = loadSaved();
   const [step, setStep] = useState<Step>(saved?.step ?? 1);
   const [university, setUniversity] = useState(saved?.university ?? "");
@@ -25,6 +29,7 @@ export default function OnboardingPage() {
   const [modules, setModules] = useState<string[]>(saved?.modules ?? []);
   const [chamber, setChamber] = useState(saved?.chamber ?? "");
   const [search, setSearch] = useState("");
+  const [saving, setSaving] = useState(false);
 
   // Persist progress to localStorage
   const persist = useCallback(() => {
@@ -186,16 +191,34 @@ export default function OnboardingPage() {
       {/* Navigation */}
       <div className="flex gap-3 mt-6 pt-4 border-t border-court-border-light">
         {step > 1 && (
-          <button onClick={back} className="flex-1 py-3 text-sm font-semibold text-court-text-sec border border-court-border rounded-xl">
+          <button onClick={back} disabled={saving} className="flex-1 py-3 text-sm font-semibold text-court-text-sec border border-court-border rounded-xl disabled:opacity-40">
             Back
           </button>
         )}
         <button
-          onClick={step === 4 ? () => { localStorage.removeItem(STORAGE_KEY); router.push("/home"); } : next}
-          disabled={(step === 1 && !university) || (step === 2 && year === null) || (step === 3 && modules.length === 0) || (step === 4 && !chamber)}
-          className="flex-1 py-3 text-sm font-bold bg-gold text-navy rounded-xl disabled:opacity-40"
+          onClick={step === 4 ? async () => {
+            setSaving(true);
+            try {
+              const uni = UNIVERSITIES.find((u) => u.name === university);
+              await createProfile({
+                university,
+                universityShort: uni?.short ?? university.substring(0, 5),
+                yearOfStudy: year ?? 1,
+                chamber,
+                modules,
+              });
+              localStorage.removeItem(STORAGE_KEY);
+              router.push("/home");
+            } catch (err) {
+              console.error("Failed to create profile:", err);
+              setSaving(false);
+            }
+          } : next}
+          disabled={(step === 1 && !university) || (step === 2 && year === null) || (step === 3 && modules.length === 0) || (step === 4 && !chamber) || saving}
+          className="flex-1 py-3 text-sm font-bold bg-gold text-navy rounded-xl disabled:opacity-40 flex items-center justify-center gap-2"
         >
-          {step === 4 ? "Enter Ratio" : "Continue"}
+          {saving && <Loader2 size={16} className="animate-spin" />}
+          {step === 4 ? (saving ? "Creating profile..." : "Enter Ratio") : "Continue"}
         </button>
       </div>
     </div>

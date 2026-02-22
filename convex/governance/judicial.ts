@@ -11,11 +11,9 @@ export const listCases = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    let q = ctx.db.query("cases");
-    if (args.status) {
-      q = q.withIndex("by_status", (idx) => idx.eq("status", args.status!));
-    }
-    const cases = await q.order("desc").take(args.limit ?? 20);
+    const cases = args.status
+      ? await ctx.db.query("cases").withIndex("by_status", (idx) => idx.eq("status", args.status!)).order("desc").take(args.limit ?? 20)
+      : await ctx.db.query("cases").order("desc").take(args.limit ?? 20);
     return Promise.all(
       cases.map(async (c) => {
         const filer = await ctx.db.get(c.filedById);

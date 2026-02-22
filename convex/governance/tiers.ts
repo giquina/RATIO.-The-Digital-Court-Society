@@ -66,11 +66,9 @@ export const calculateAndUpdateTier = mutation({
 export const getLeaderboardByTier = query({
   args: { tier: v.optional(v.string()) },
   handler: async (ctx, args) => {
-    let q = ctx.db.query("governanceTiers");
-    if (args.tier) {
-      q = q.withIndex("by_tier", (idx) => idx.eq("tier", args.tier!));
-    }
-    const tiers = await q.collect();
+    const tiers = args.tier
+      ? await ctx.db.query("governanceTiers").withIndex("by_tier", (idx) => idx.eq("tier", args.tier!)).collect()
+      : await ctx.db.query("governanceTiers").collect();
     return Promise.all(
       tiers.map(async (t) => {
         const profile = await ctx.db.get(t.profileId);

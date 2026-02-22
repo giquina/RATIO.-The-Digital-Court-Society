@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, Scale, Users, BookOpen, User, Search } from "lucide-react";
 import { cn } from "@/lib/utils/helpers";
+import { useSidebarCounts } from "@/lib/hooks/useSidebarCounts";
 
 const tabs = [
   { href: "/home", label: "Home", Icon: Home },
@@ -11,11 +12,13 @@ const tabs = [
   { href: "/law-book", label: "Law Book", Icon: BookOpen },
   { href: "/research", label: "Research", Icon: Search },
   { href: "/community", label: "Social", Icon: Users },
-  { href: "/profile", label: "Profile", Icon: User },
+  { href: "/profile", label: "Profile", Icon: User, showNotifDot: true },
 ];
 
 export function BottomNav() {
   const pathname = usePathname();
+  const counts = useSidebarCounts();
+  const hasUnread = (counts?.unreadNotifications ?? 0) > 0;
 
   return (
     <nav
@@ -36,14 +39,19 @@ export function BottomNav() {
               {isActive && (
                 <div className="absolute -top-2 w-5 h-0.5 rounded-full bg-gold" />
               )}
-              <tab.Icon
-                size={20}
-                strokeWidth={isActive ? 2.5 : 1.5}
-                className={cn(
-                  "transition-all duration-200 shrink-0",
-                  isActive ? "text-gold" : "text-court-text-ter"
+              <div className="relative">
+                <tab.Icon
+                  size={20}
+                  strokeWidth={isActive ? 2.5 : 1.5}
+                  className={cn(
+                    "transition-all duration-200 shrink-0",
+                    isActive ? "text-gold" : "text-court-text-ter"
+                  )}
+                />
+                {tab.showNotifDot && hasUnread && (
+                  <div className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-gold" />
                 )}
-              />
+              </div>
               <span
                 className={cn(
                   "text-[10px] leading-tight font-bold tracking-wider transition-colors duration-200 truncate max-w-[56px] text-center",

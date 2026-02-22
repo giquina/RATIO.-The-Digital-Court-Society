@@ -28,11 +28,9 @@ export const reportContent = mutation({
 export const listModerationActions = query({
   args: { status: v.optional(v.string()) },
   handler: async (ctx, args) => {
-    let q = ctx.db.query("moderationActions");
-    if (args.status) {
-      q = q.withIndex("by_status", (idx) => idx.eq("status", args.status!));
-    }
-    const actions = await q.order("desc").take(50);
+    const actions = args.status
+      ? await ctx.db.query("moderationActions").withIndex("by_status", (idx) => idx.eq("status", args.status!)).order("desc").take(50)
+      : await ctx.db.query("moderationActions").order("desc").take(50);
     return Promise.all(
       actions.map(async (a) => {
         const reporter = await ctx.db.get(a.reportedById);

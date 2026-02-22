@@ -27,6 +27,20 @@ export const getAll = query({
   },
 });
 
+// Lightweight count-only query for mobile BottomNav badge
+export const getUnreadCount = query({
+  args: { profileId: v.id("profiles") },
+  handler: async (ctx, args) => {
+    const unread = await ctx.db
+      .query("notifications")
+      .withIndex("by_unread", (q) =>
+        q.eq("profileId", args.profileId).eq("read", false)
+      )
+      .collect();
+    return unread.length;
+  },
+});
+
 export const markRead = mutation({
   args: { notificationId: v.id("notifications") },
   handler: async (ctx, args) => {

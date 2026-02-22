@@ -1,7 +1,7 @@
 {
-  "name": "Ratio",
-  "short_name": "Ratio",
-  "description": "Ratio — The digital court society for UK law students",
+  "name": "Ratio. — The Digital Court Society",
+  "short_name": "Ratio.",
+  "description": "The constitutional training ground for UK law students",
   "start_url": "/home",
   "display": "standalone",
   "background_color": "#0C1220",

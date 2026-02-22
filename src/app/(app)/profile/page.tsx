@@ -1,25 +1,74 @@
 "use client";
 
-import { Avatar, Tag, Card, Button, ProgressBar, SectionHeader } from "@/components/ui";
+import { useQuery } from "convex/react";
+import { api } from "../../../../convex/_generated/api";
+import { Avatar, Tag, Card, Button, ProgressBar, SectionHeader, Skeleton } from "@/components/ui";
 import { Flame, Timer, FileText, Star, Trophy, FolderOpen, Link as LinkIcon, Landmark, Settings } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import Link from "next/link";
 
-const ME = {
-  name: "Ali Giquina", initials: "AG", university: "University College London",
-  year: "Year 2 · LLB Law", chamber: "Gray's", followers: 184, following: 96,
-  commendations: 312, streak: 12, moots: 23, hours: 47, rank: "Junior Counsel",
+function getInitials(name: string) {
+  return name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
+}
+
+const YEAR_LABELS: Record<number, string> = {
+  0: "Foundation Year",
+  1: "Year 1 · LLB Law",
+  2: "Year 2 · LLB Law",
+  3: "Year 3 · LLB Law",
+  4: "Year 4 · Masters / LPC / BPC",
 };
 
-const SKILLS = [
-  { skill: "Oral Advocacy", pct: 75 },
-  { skill: "Legal Research", pct: 82 },
-  { skill: "Argument Structure", pct: 60 },
-  { skill: "Judicial Handling", pct: 45 },
-  { skill: "Court Manner", pct: 70 },
-  { skill: "Written Submissions", pct: 55 },
-];
-
 export default function ProfilePage() {
+  const profile = useQuery(api.users.myProfile);
+  const isLoading = profile === undefined;
+
+  if (isLoading) {
+    return (
+      <div className="pb-6 px-4 pt-3 space-y-4">
+        <Skeleton className="h-64 w-full rounded-court" />
+        <div className="grid grid-cols-2 gap-2.5">
+          <Skeleton className="h-28 rounded-court" />
+          <Skeleton className="h-28 rounded-court" />
+        </div>
+        <div className="grid grid-cols-2 gap-2.5">
+          <Skeleton className="h-24 rounded-court" />
+          <Skeleton className="h-24 rounded-court" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="pb-6 px-4 pt-3">
+        <Card className="p-6 text-center">
+          <p className="text-court-text-sec">No profile found. Please complete onboarding.</p>
+        </Card>
+      </div>
+    );
+  }
+
+  const initials = getInitials(profile.fullName);
+  const yearLabel = YEAR_LABELS[profile.yearOfStudy] ?? `Year ${profile.yearOfStudy}`;
+
+  // Calculate moots to next rank
+  const rankThresholds = [
+    { name: "Pupil", min: 0 },
+    { name: "Junior Counsel", min: 5 },
+    { name: "Senior Counsel", min: 20 },
+    { name: "King's Counsel", min: 50 },
+    { name: "Bencher", min: 100 },
+  ];
+  const currentRankIdx = rankThresholds.findIndex((r) => r.name === profile.rank);
+  const nextRank = rankThresholds[currentRankIdx + 1];
+  const currentMin = rankThresholds[currentRankIdx]?.min ?? 0;
+  const nextMin = nextRank?.min ?? 100;
+  const rankProgress = nextRank
+    ? Math.round(((profile.totalMoots - currentMin) / (nextMin - currentMin)) * 100)
+    : 100;
+  const mootsToNext = nextRank ? nextMin - profile.totalMoots : 0;
+
   return (
     <div className="pb-6">
       {/* ── Profile Card ── */}
@@ -27,17 +76,17 @@ export default function ProfilePage() {
         <Card highlight className="p-3 md:p-4 relative overflow-hidden">
           <div className="absolute -top-10 -right-10 w-36 h-36 rounded-full bg-gold/[0.06]" />
           <div className="flex flex-col items-center text-center">
-            <Avatar initials={ME.initials} chamber={ME.chamber} size="xl" border />
-            <h1 className="font-serif text-xl font-bold text-court-text mt-3">{ME.name}</h1>
-            <p className="text-xs text-court-text-sec mt-1">{ME.university}</p>
-            <p className="text-court-sm text-court-text-ter mt-0.5">{ME.year} · {ME.chamber} Chamber</p>
+            <Avatar initials={initials} chamber={profile.chamber} size="xl" border />
+            <h1 className="font-serif text-xl font-bold text-court-text mt-3">{profile.fullName}</h1>
+            <p className="text-xs text-court-text-sec mt-1">{profile.university}</p>
+            <p className="text-court-sm text-court-text-ter mt-0.5">{yearLabel} · {profile.chamber} Chamber</p>
           </div>
 
           <div className="grid grid-cols-3 gap-2 mt-5">
             {[
-              { v: ME.followers, l: "Followers" },
-              { v: ME.following, l: "Following" },
-              { v: ME.commendations, l: "Comms" },
+              { v: profile.followerCount, l: "Followers" },
+              { v: profile.followingCount, l: "Following" },
+              { v: profile.commendationCount, l: "Comms" },
             ].map((s) => (
               <div key={s.l} className="text-center min-w-0">
                 <p className="font-serif text-lg font-bold text-court-text">{s.v}</p>
@@ -57,25 +106,31 @@ export default function ProfilePage() {
       <section className="px-4 mt-4 grid grid-cols-2 gap-2.5">
         <div className="bg-gold-dim border border-gold/25 rounded-court p-3.5">
           <p className="text-court-xs text-court-text-ter uppercase tracking-widest">Current Rank</p>
-          <p className="font-serif text-lg font-bold text-gold mt-1">{ME.rank}</p>
-          <p className="text-court-xs text-court-text-ter mt-1 mb-1.5">12 moots to Senior</p>
-          <ProgressBar pct={65} height={3} />
+          <p className="font-serif text-lg font-bold text-gold mt-1">{profile.rank}</p>
+          <p className="text-court-xs text-court-text-ter mt-1 mb-1.5">
+            {nextRank ? `${mootsToNext} moots to ${nextRank.name}` : "Highest rank achieved"}
+          </p>
+          <ProgressBar pct={rankProgress} height={3} />
         </div>
         <div className="bg-orange-400/[0.08] border border-orange-400/20 rounded-court p-3.5">
           <p className="text-court-xs text-court-text-ter uppercase tracking-widest">Streak</p>
-          <p className="font-serif text-lg font-bold text-orange-400 mt-1 flex items-center gap-1">{ME.streak} days <Flame size={16} className="text-orange-400" /></p>
-          <p className="text-court-xs text-court-text-ter mt-1 mb-1.5">Personal best!</p>
-          <ProgressBar pct={86} color="orange" height={3} />
+          <p className="font-serif text-lg font-bold text-orange-400 mt-1 flex items-center gap-1">
+            {profile.streakDays} days <Flame size={16} className="text-orange-400" />
+          </p>
+          <p className="text-court-xs text-court-text-ter mt-1 mb-1.5">
+            {profile.streakDays === 0 ? "Start your streak today" : "Keep it going"}
+          </p>
+          <ProgressBar pct={Math.min(100, profile.streakDays * 3)} color="orange" height={3} />
         </div>
       </section>
 
       {/* ── Stats Grid ── */}
       <section className="px-4 mt-4 grid grid-cols-2 lg:grid-cols-4 gap-2.5">
         {([
-          { v: `${ME.hours}h`, l: "Advocacy Hours", Icon: Timer },
-          { v: String(ME.moots), l: "Sessions Done", Icon: FileText },
-          { v: "4.2", l: "Avg. Score", Icon: Star },
-          { v: "#14", l: "National Rank", Icon: Trophy },
+          { v: `${profile.totalHours}h`, l: "Advocacy Hours", Icon: Timer },
+          { v: String(profile.totalMoots), l: "Sessions Done", Icon: FileText },
+          { v: profile.readinessScore > 0 ? `${(profile.readinessScore / 10).toFixed(1)}` : "—", l: "Avg. Score", Icon: Star },
+          { v: "—", l: "National Rank", Icon: Trophy },
         ] as { v: string; l: string; Icon: LucideIcon }[]).map((s) => (
           <Card key={s.l} className="p-3.5">
             <s.Icon size={20} className="text-gold" />
@@ -85,41 +140,39 @@ export default function ProfilePage() {
         ))}
       </section>
 
-      {/* ── Skills ── */}
-      <section className="px-4 mt-4">
-        <SectionHeader title="Skills Development" />
-        <Card className="p-4">
-          {SKILLS.map((s) => (
-            <div key={s.skill} className="mb-2.5 last:mb-0">
-              <div className="flex justify-between text-court-sm text-court-text-sec mb-1">
-                <span>{s.skill}</span>
-                <span className="text-gold font-semibold">{s.pct}%</span>
-              </div>
-              <ProgressBar pct={s.pct} />
-            </div>
-          ))}
-        </Card>
-      </section>
+      {/* ── Modules ── */}
+      {profile.modules && profile.modules.length > 0 && (
+        <section className="px-4 mt-4">
+          <SectionHeader title="Modules" />
+          <div className="flex flex-wrap gap-2">
+            {profile.modules.map((m) => (
+              <Tag key={m}>{m}</Tag>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ── Actions ── */}
       <section className="px-4 mt-4">
         {([
           { Icon: FolderOpen, label: "Export Advocacy Portfolio", tag: "PDF" },
           { Icon: LinkIcon, label: "Copy Profile Link" },
-          { Icon: Landmark, label: "Your Chamber · Gray's" },
+          { Icon: Landmark, label: `Your Chamber · ${profile.chamber}` },
           { Icon: FileText, label: "Digital Membership Card", tag: "WALLET" },
-          { Icon: Settings, label: "Settings" },
-        ] as { Icon: LucideIcon; label: string; tag?: string }[]).map((a) => (
-          <div key={a.label} className="flex justify-between items-center py-3.5 border-b border-court-border-light cursor-pointer">
-            <div className="flex gap-3 items-center">
-              <a.Icon size={18} className="text-court-text-sec" />
-              <span className="text-court-base text-court-text font-medium">{a.label}</span>
+          { Icon: Settings, label: "Settings", href: "/settings" },
+        ] as { Icon: LucideIcon; label: string; tag?: string; href?: string }[]).map((a) => (
+          <Link key={a.label} href={a.href ?? "#"}>
+            <div className="flex justify-between items-center py-3.5 border-b border-court-border-light cursor-pointer">
+              <div className="flex gap-3 items-center">
+                <a.Icon size={18} className="text-court-text-sec" />
+                <span className="text-court-base text-court-text font-medium">{a.label}</span>
+              </div>
+              <div className="flex gap-2 items-center">
+                {a.tag && <Tag small>{a.tag}</Tag>}
+                <span className="text-court-text-ter text-sm">&rsaquo;</span>
+              </div>
             </div>
-            <div className="flex gap-2 items-center">
-              {a.tag && <Tag small>{a.tag}</Tag>}
-              <span className="text-court-text-ter text-sm">›</span>
-            </div>
-          </div>
+          </Link>
         ))}
       </section>
     </div>

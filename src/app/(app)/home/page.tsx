@@ -3,26 +3,24 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useQuery } from "convex/react";
+import { api } from "../../../../convex/_generated/api";
 import {
   Avatar,
   Tag,
   Card,
   Button,
-  ProgressBar,
   SectionHeader,
   CommendButton,
   FollowButton,
+  Skeleton,
+  EmptyState,
 } from "@/components/ui";
 import { CHAMBER_COLORS } from "@/lib/constants/app";
 import { Bell, Scale, Calendar, Target, Trophy, Flame, Award, MessageCircle, ExternalLink } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
-// Demo data — replaced by Convex queries in production
-const ME = {
-  name: "Ali Giquina", initials: "AG", university: "UCL", chamber: "Gray's",
-  streak: 12, moots: 23, hours: 47, followers: 184, commendations: 312, readiness: 68, topPercent: 24,
-};
-
+// Demo feed data — will be replaced when social feed is wired
 const FEED = [
   { id: "1", user: "Priya Sharma", initials: "PS", uni: "KCL", chamber: "Lincoln's",
     type: "moot", role: "Leading Counsel", topic: "Contract Law — Anticipatory Breach", time: "2h", comms: 14 },
@@ -30,15 +28,21 @@ const FEED = [
     type: "badge", badge: "Advanced Cross-Examination · Level 2", time: "4h", comms: 28 },
   { id: "3", user: "Sophie Chen", initials: "SC", uni: "UCL", chamber: "Gray's",
     type: "moot", role: "Presiding Judge", topic: "Criminal Law — R v Hughes [2024]", time: "6h", comms: 9 },
-  { id: "4", user: "Marcus Williams", initials: "MW", uni: "Manchester", chamber: "Middle",
-    type: "milestone", milestone: "30-day practice streak", time: "8h", comms: 42 },
 ];
+
+function getInitials(name: string) {
+  return name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
+}
 
 export default function HomePage() {
   const router = useRouter();
+  const profile = useQuery(api.users.myProfile);
   const [commended, setCommended] = useState<Record<string, boolean>>({});
   const [follows, setFollows] = useState<Record<string, boolean>>({});
   const [feedTab, setFeedTab] = useState<"following" | "discover" | "chamber">("following");
+
+  const isLoading = profile === undefined;
+  const initials = profile ? getInitials(profile.fullName) : "??";
 
   return (
     <div className="pb-6">
@@ -48,57 +52,68 @@ export default function HomePage() {
           <h1 className="font-serif text-sm text-gold tracking-[0.14em] uppercase font-bold">
             RATIO<span className="text-gold">.</span>
           </h1>
-          <p className="text-court-sm text-court-text-ter mt-0.5">UCL · Gray&apos;s Chamber</p>
+          {isLoading ? (
+            <Skeleton className="w-32 h-3.5 mt-1" />
+          ) : (
+            <p className="text-court-sm text-court-text-ter mt-0.5">
+              {profile?.universityShort ?? "—"} · {profile?.chamber ?? "—"} Chamber
+            </p>
+          )}
         </div>
         <div className="flex items-center gap-3">
           <Link href="/notifications" className="relative w-9 h-9 rounded-full bg-gold-dim flex items-center justify-center">
             <Bell size={18} className="text-gold" />
-            <span className="absolute top-0.5 right-0.5 w-2 h-2 rounded-full bg-red-500 border-2 border-navy" />
           </Link>
           <Link href="/profile">
-            <Avatar initials="AG" chamber="Gray's" size="sm" border />
+            <Avatar initials={initials} chamber={profile?.chamber ?? "Gray's"} size="sm" border />
           </Link>
         </div>
       </header>
 
       {/* ── Streak + Stats Card ── */}
       <section className="px-4 mb-5">
-        <Card highlight className="p-3 md:p-4 relative overflow-hidden">
-          <div className="absolute -top-8 -right-5 w-32 h-32 rounded-full bg-gold/[0.04]" />
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-court-xs text-court-text-ter uppercase tracking-widest mb-1">Practice Streak</p>
-              <div className="flex items-baseline gap-1.5">
-                <span className="font-serif text-4xl font-bold text-gold">{ME.streak}</span>
-                <span className="text-sm text-court-text-sec">days</span>
-              </div>
-              <p className="text-court-xs text-court-text-ter mt-1 flex items-center gap-1"><Flame size={12} className="text-orange-400" /> Personal best · Top {ME.topPercent}%</p>
-            </div>
-            <div className="text-center">
-              <div className="w-14 h-14 rounded-full flex items-center justify-center"
-                style={{ background: `conic-gradient(#C9A84C 0% ${ME.readiness}%, rgba(255,255,255,0.05) ${ME.readiness}% 100%)` }}>
-                <div className="w-11 h-11 rounded-full bg-navy-card flex items-center justify-center">
-                  <span className="text-sm font-bold text-court-text">{ME.readiness}%</span>
+        {isLoading ? (
+          <Skeleton className="h-44 w-full rounded-court" />
+        ) : (
+          <Card highlight className="p-3 md:p-4 relative overflow-hidden">
+            <div className="absolute -top-8 -right-5 w-32 h-32 rounded-full bg-gold/[0.04]" />
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-court-xs text-court-text-ter uppercase tracking-widest mb-1">Practice Streak</p>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="font-serif text-4xl font-bold text-gold">{profile?.streakDays ?? 0}</span>
+                  <span className="text-sm text-court-text-sec">days</span>
                 </div>
+                <p className="text-court-xs text-court-text-ter mt-1 flex items-center gap-1">
+                  <Flame size={12} className="text-orange-400" /> {profile?.streakDays === 0 ? "Start your streak today" : "Keep it going"}
+                </p>
               </div>
-              <p className="text-court-xs text-court-text-ter uppercase tracking-wider mt-1">SQE2 Ready</p>
+              <div className="text-center">
+                <div className="w-14 h-14 rounded-full flex items-center justify-center"
+                  style={{ background: `conic-gradient(#C9A84C 0% ${profile?.readinessScore ?? 0}%, rgba(255,255,255,0.05) ${profile?.readinessScore ?? 0}% 100%)` }}>
+                  <div className="w-11 h-11 rounded-full bg-navy-card flex items-center justify-center">
+                    <span className="text-sm font-bold text-court-text">{profile?.readinessScore ?? 0}%</span>
+                  </div>
+                </div>
+                <p className="text-court-xs text-court-text-ter uppercase tracking-wider mt-1">SQE2 Ready</p>
+              </div>
             </div>
-          </div>
-          {/* Social stats row */}
-          <div className="grid grid-cols-4 gap-1 mt-4 pt-3.5 border-t border-court-border">
-            {[
-              { v: ME.followers, l: "Followers" },
-              { v: ME.commendations, l: "Comms" },
-              { v: ME.moots, l: "Sessions" },
-              { v: `${ME.hours}h`, l: "Advocacy" },
-            ].map((s) => (
-              <div key={s.l} className="text-center min-w-0">
-                <div className="font-serif text-base font-bold text-court-text">{s.v}</div>
-                <div className="text-[9px] text-court-text-ter uppercase tracking-wider mt-0.5 truncate">{s.l}</div>
-              </div>
-            ))}
-          </div>
-        </Card>
+            {/* Social stats row */}
+            <div className="grid grid-cols-4 gap-1 mt-4 pt-3.5 border-t border-court-border">
+              {[
+                { v: profile?.followerCount ?? 0, l: "Followers" },
+                { v: profile?.commendationCount ?? 0, l: "Comms" },
+                { v: profile?.totalMoots ?? 0, l: "Sessions" },
+                { v: `${profile?.totalHours ?? 0}h`, l: "Advocacy" },
+              ].map((s) => (
+                <div key={s.l} className="text-center min-w-0">
+                  <div className="font-serif text-base font-bold text-court-text">{s.v}</div>
+                  <div className="text-[9px] text-court-text-ter uppercase tracking-wider mt-0.5 truncate">{s.l}</div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
       </section>
 
       {/* ── Quick Actions ── */}
@@ -127,30 +142,12 @@ export default function HomePage() {
       {/* ── Upcoming Session ── */}
       <section className="px-4 lg:px-0 mb-6">
         <SectionHeader title="Your Next Session" action="View all" onAction={() => router.push("/sessions")} />
-        <Card className="overflow-hidden">
-          <div className="bg-burgundy/20 px-4 py-2.5 flex justify-between items-center">
-            <Tag color="burgundy">MOOT · PUBLIC LAW</Tag>
-            <span className="text-court-sm text-court-text-sec">Tue 25 Feb · 14:00</span>
-          </div>
-          <div className="p-4">
-            <h3 className="font-serif text-base font-bold text-court-text mb-2.5 leading-tight">
-              Judicial Review of Executive Power
-            </h3>
-            <div className="bg-gold-dim text-gold text-court-sm font-bold px-2.5 py-1 rounded-md w-fit mb-3">
-              Your role: Leading Counsel (App.)
-            </div>
-            <div className="flex items-center gap-0 mb-4">
-              {["AG", "PS", "DP"].map((i, idx) => (
-                <div key={i} className={idx ? "-ml-2" : ""} style={{ zIndex: 3 - idx }}>
-                  <Avatar initials={i} chamber={["Gray's", "Lincoln's", "Inner"][idx]} size="xs" />
-                </div>
-              ))}
-              <span className="text-court-sm text-court-text-sec ml-2.5">3 of 4 filled</span>
-              <span className="text-court-sm text-gold font-bold ml-auto">1 open →</span>
-            </div>
-            <Button fullWidth>View Preparation Checklist</Button>
-          </div>
-        </Card>
+        <EmptyState
+          icon={<Calendar size={28} />}
+          title="No upcoming sessions"
+          description="Create or join a session to get started"
+          action={<Button onClick={() => router.push("/sessions")}>Browse Sessions</Button>}
+        />
       </section>
 
       {/* ── Activity Feed ── */}
@@ -213,15 +210,6 @@ export default function HomePage() {
                   <div>
                     <p className="text-court-sm text-green-500 font-semibold mb-0.5">Distinction Earned</p>
                     <p className="text-court-base font-bold text-court-text">{item.badge}</p>
-                  </div>
-                </div>
-              )}
-              {item.type === "milestone" && (
-                <div className="bg-orange-400/[0.08] rounded-lg p-3 border border-orange-400/20 flex gap-2.5 items-center mb-2.5">
-                  <Flame size={24} className="text-orange-400 shrink-0" />
-                  <div>
-                    <p className="text-court-sm text-orange-400 font-semibold mb-0.5">Milestone Reached</p>
-                    <p className="text-court-base font-bold text-court-text">{item.milestone}</p>
                   </div>
                 </div>
               )}
