@@ -2,11 +2,11 @@
 
 import { useConvexAuth, useQuery } from "convex/react";
 import { useRouter, usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { BottomNav } from "@/components/shared/BottomNav";
 import { MobileHeader } from "@/components/shared/MobileHeader";
 import { Sidebar } from "@/components/shared/Sidebar";
-import { Loader2 } from "lucide-react";
+import { Loader2, AlertTriangle } from "lucide-react";
 import { anyApi } from "convex/server";
 import { useSidebarStore } from "@/stores/sidebarStore";
 import { cn } from "@/lib/utils/helpers";
@@ -43,6 +43,7 @@ function AppLayoutWithConvex({ children }: { children: React.ReactNode }) {
     anyApi.users.hasProfile,
     isAuthenticated ? {} : "skip"
   );
+  const [loadingTooLong, setLoadingTooLong] = useState(false);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -57,12 +58,39 @@ function AppLayoutWithConvex({ children }: { children: React.ReactNode }) {
     }
   }, [isAuthenticated, hasProfile, router]);
 
+  // Detect stuck loading — if profile query stays undefined for >12s, show error
+  useEffect(() => {
+    if (isAuthenticated && hasProfile === undefined) {
+      const timer = setTimeout(() => setLoadingTooLong(true), 12000);
+      return () => clearTimeout(timer);
+    }
+    setLoadingTooLong(false);
+  }, [isAuthenticated, hasProfile]);
+
   if (isLoading || (isAuthenticated && hasProfile === undefined)) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <Loader2 size={32} className="text-gold animate-spin mx-auto mb-3" />
-          <p className="text-court-text-sec text-court-sm">Loading...</p>
+          {loadingTooLong ? (
+            <>
+              <AlertTriangle size={32} className="text-gold mx-auto mb-3" />
+              <p className="text-court-text text-court-base font-bold mb-1">Connection issue</p>
+              <p className="text-court-text-sec text-court-sm mb-4">
+                Unable to reach the server. Please check your connection.
+              </p>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-4 py-2 bg-gold text-navy text-sm font-bold rounded-xl hover:bg-gold/90 transition-colors"
+              >
+                Retry
+              </button>
+            </>
+          ) : (
+            <>
+              <Loader2 size={32} className="text-gold animate-spin mx-auto mb-3" />
+              <p className="text-court-text-sec text-court-sm">Loading...</p>
+            </>
+          )}
         </div>
       </div>
     );

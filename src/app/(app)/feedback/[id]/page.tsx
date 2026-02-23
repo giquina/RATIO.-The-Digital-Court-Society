@@ -228,7 +228,7 @@ export default function FeedbackDetailPage() {
         </h2>
         <Card className="p-4 space-y-4">
           {FEEDBACK_DIMENSIONS.map((dim) => {
-            const score = feedback.dimensions[dim.key] ?? 0;
+            const score = feedback?.dimensions?.[dim.key] ?? 0;
             return (
               <div key={dim.key}>
                 <div className="flex items-center justify-between mb-1.5">

@@ -222,7 +222,7 @@ export default function RankingsPage() {
       </section>
 
       {/* Your Position — pinned at bottom */}
-      {myIndex >= 0 && (
+      {myIndex >= 0 && myIndex < advocates.length && (
         <section className="px-4 md:px-6 lg:px-8 mt-6">
           <Card highlight className="p-4 border-gold/30">
             <div className="flex items-center gap-3">
@@ -243,7 +243,7 @@ export default function RankingsPage() {
                 <p className="text-court-xs text-court-text-ter uppercase tracking-wider">points</p>
               </div>
             </div>
-            {myIndex > 0 && (
+            {myIndex > 0 && myIndex - 1 < advocates.length && (
               <div className="mt-3 pt-3 border-t border-court-border-light">
                 <p className="text-court-sm text-court-text-sec">
                   <span className="text-green-400 font-semibold">

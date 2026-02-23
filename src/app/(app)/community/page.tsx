@@ -210,10 +210,11 @@ export default function CommunityPage() {
               {/* Top 3 Podium */}
               <div className="flex justify-center gap-1.5 sm:gap-2 mb-5 items-end">
                 {[rankedAll[1], rankedAll[0], rankedAll[2]].map((r, i) => {
+                  if (!r) return null;
                   const isFirst = i === 1;
                   const isMe = r._id === profile?._id;
                   return (
-                    <div key={r._id} className="flex-1 text-center">
+                    <div key={r._id ?? i} className="flex-1 text-center">
                       <Avatar initials={getInitials(r.fullName)} size={isFirst ? "xl" : "lg"} chamber={r.chamber} border={isFirst} />
                       <p className={`${isFirst ? "text-court-base" : "text-court-sm"} font-bold ${isMe ? "text-gold" : "text-court-text"} mt-1.5`}>
                         {r.fullName.split(" ")[0]} {isMe && <span className="text-court-xs font-normal">(You)</span>}
