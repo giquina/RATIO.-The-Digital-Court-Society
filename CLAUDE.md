@@ -33,10 +33,10 @@ npx convex run seed:run # seed badges + starter resources
 ### Route Groups & Auth Flow
 
 Two route groups under `src/app/`:
-- `(auth)/` — login, register, onboarding. `layout-client.tsx` redirects already-authenticated users to `/home` (except `/onboarding` and `/register`).
-- `(app)/` — all authenticated pages (19 routes). `layout-client.tsx` checks `useConvexAuth()` + `api.users.hasProfile`; redirects unauthenticated → `/login`, no profile → `/onboarding`.
+- `(auth)/` — login, register, onboarding, verify, forgot-password, reset-password. `layout-client.tsx` redirects already-authenticated users to `/home` (except `/onboarding` and `/register`).
+- `(app)/` — 19 authenticated routes: home, sessions, community, ai-practice, library, law-book, profile, notifications, settings, rankings, chambers, badges, research, parliament, tribunal, portfolio, tools, about, help. `layout-client.tsx` checks `useConvexAuth()` + `anyApi.users.hasProfile`; redirects unauthenticated → `/login`, no profile → `/onboarding`.
 
-The `(app)` shell renders `<Sidebar>` (desktop), `<BottomNav>` (mobile), and `<TheClerk>` (help overlay). Sidebar width is managed by `useSidebarStore` (Zustand): collapsed = 72px, expanded = 240px. Main content uses `md:ml-[72px]` / `lg:ml-[240px]`.
+The `(app)` shell renders `<Sidebar>` (desktop), `<MobileHeader>` + `<BottomNav>` (mobile, 4 tabs: Home, Sessions, Law Book, Community), and `<TheClerk>` (help overlay). Sidebar width is managed by `useSidebarStore` (Zustand): collapsed = 72px, expanded = 240px. Main content uses `md:ml-[72px]` / `lg:ml-[240px]`.
 
 ### Demo Mode
 
@@ -44,27 +44,34 @@ When `NEXT_PUBLIC_CONVEX_URL` is unset, the app enters demo mode:
 - `ConvexProvider.tsx` wraps children in plain `ConvexProvider` (no auth) with a dummy URL so `useQuery` returns `undefined` instead of crashing.
 - Layout clients skip auth checks and render the app shell directly.
 - Pages should handle `undefined` query results gracefully (show EmptyState or hardcoded data).
+- Demo credentials banner auto-shows on localhost and Vercel preview deployments. Production requires `NEXT_PUBLIC_SHOW_DEMO_CREDENTIALS=true`.
 
 ### Convex Backend
 
-Schema has ~35 tables in `convex/schema.ts`, organized into: Users/Profiles, Social (follows, activities, commendations), Sessions + Roles + Participants, Feedback, AI Sessions, Skills/Badges, Resources, Notifications, Law Book (7 tables), Governance (legislative, executive, judicial — 12 tables), Tournaments, Video Sessions (Daily.co), Subscriptions, Legal Research.
+Schema in `convex/schema.ts` has ~40 tables organized into: Users/Profiles, Social (follows, activities, commendations), Sessions + Roles + Participants, Feedback, AI Sessions, Skills/Badges, Resources, Notifications, Law Book (7 tables), Governance (legislative, executive, judicial — 12 tables), Tournaments, Video Sessions (Daily.co), Subscriptions, Legal Research, Referrals (3 tables).
 
 Auth uses `@convex-dev/auth` with Password provider only (`convex/auth.ts`). No OAuth yet.
 
-Key backend files: `profiles.ts`, `social.ts`, `sessions.ts`, `aiSessions.ts`, `ai.ts` (LLM actions — Claude Sonnet with GPT-4o-mini fallback), `notifications.ts`, `seed.ts`, `users.ts`, `sidebar.ts`, `research.ts`, `videoSessions.ts`, `daily.ts`.
+Key backend files: `profiles.ts`, `social.ts`, `sessions.ts`, `aiSessions.ts`, `ai.ts` (LLM actions — Claude Sonnet with GPT-4o-mini fallback), `notifications.ts`, `seed.ts`, `users.ts`, `sidebar.ts`, `research.ts`, `videoSessions.ts`, `daily.ts`, `referrals.ts`, `subscriptions.ts`, `badges_queries.ts`, `resources_queries.ts`.
 
 ### Frontend Patterns
 
 - All pages are `"use client"` — no server components for app pages (Convex hooks require client)
 - Path alias: `@/*` → `./src/*`
-- Shared UI components barrel-exported from `src/components/ui/index.tsx` — includes EmptyState, Skeleton variants, FollowButton, CommendButton
-- Shared layout components in `src/components/shared/` — Sidebar, BottomNav, TheClerk, ConvexProvider, Analytics, CookieConsent, SplashScreen, FirstVisitSplash, FeatureGate
+- `cn()` utility in `src/lib/utils/helpers.ts` uses clsx + tailwind-merge — always use this for conditional class names
+- `DynamicIcon` in `src/components/ui/index.tsx` maps string icon names (from constants/seed data) to Lucide components. When adding new icons referenced by name, add them to `ICON_MAP`.
+- Shared UI components barrel-exported from `src/components/ui/index.tsx` — includes Avatar, DynamicIcon, EmptyState, Skeleton variants, FollowButton, CommendButton, Tooltip
+- Shared layout components in `src/components/shared/` — Sidebar, BottomNav, MobileHeader, TheClerk, ConvexProvider, Analytics, CookieConsent, SplashScreen, FirstVisitSplash, FeatureGate, DemoCredentialsBanner
 - Zustand stores in `src/stores/` — authStore, sidebarStore, followStore, contributionStore, clerkStore
 - Constants in `src/lib/constants/app.ts` — chambers, ranks, session types, law modules, 142 UK universities, badge definitions, AI personas, feedback dimensions
+- Custom hooks: `useDemoSafe` (safe Convex mutations in demo mode), `useSubscription`, `useSpeechRecognition`, `useNotifications` in `src/hooks/`; `useSidebarCounts` in `src/lib/hooks/`
+- Toast notifications via `sonner` (helper: `src/lib/utils/toast.ts`)
 - AI system prompts in `src/lib/ai/system-prompts.ts`
 - Legal research APIs in `src/lib/legal-api/` — case law, legislation, parliament, OSCOLA formatting, unified search
-- Custom hooks in `src/hooks/` and `src/lib/hooks/`
-- Toast notifications via `sonner` (helper: `src/lib/utils/toast.ts`)
+
+### Cross-Module Queries
+
+The `(app)` layout uses `anyApi` from `convex/server` to call `api.users.hasProfile` without a direct import. This is the pattern for querying Convex functions from layout files where direct `api` imports may cause circular issues.
 
 ### Splash Screens
 
@@ -89,6 +96,7 @@ Sentry wrapping in `next.config.js` is conditional on `SENTRY_AUTH_TOKEN` being 
 - **Font sizes**: `text-court-xs` through `text-court-xl` (10px–18px) — prefer these over arbitrary values
 - **Fonts**: `font-serif` (Cormorant Garamond for headings), `font-sans` (DM Sans for body). Loaded via `next/font/google` CSS variables.
 - **Border radius**: `rounded-court` (14px) for cards, `rounded-xl` for buttons
+- **Max widths**: `max-w-content-narrow` (672px), `max-w-content-medium` (1024px), `max-w-content-wide` (1280px)
 - **Icons**: Lucide React only — never emoji in UI
 - **Tone**: Institutional, serious, calm. No exclamation marks. No hype. Premium = restraint.
 
@@ -98,6 +106,7 @@ Sentry wrapping in `next.config.js` is conditional on `SENTRY_AUTH_TOKEN` being 
 - "Follow" (not subscribe, connect, or add)
 - "Chamber" (not team, group, or house)
 - "Session" (not match, game, or event)
+- "Commend" (not like, upvote, or react)
 - CTA language: "Join as an Advocate", "Start Practice", "Explore the Law Book"
 
 ## Simplification Rules
