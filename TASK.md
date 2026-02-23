@@ -83,8 +83,43 @@ Last updated: 2026-02-22
 - [x] Cookie Policy page created (7 sections, GDPR-compliant) — `src/app/cookies/page.tsx`
 - [x] Cookie Policy link added to footer Legal section — `FooterSection.tsx`
 
+### Completed (Mobile UX Overhaul + Demo Credentials — 2026-02-23)
+- [x] Fix Android system nav bar: `color-scheme: dark` in CSS + viewport — `globals.css`, `layout.tsx`
+- [x] Reduce bottom nav from 6 → 4 tabs (Home, Sessions, Law Book, Community) — `BottomNav.tsx`
+- [x] Create shared MobileHeader (brand + bell + avatar) — `MobileHeader.tsx`
+- [x] Integrate MobileHeader into app shell — `layout-client.tsx`
+- [x] Remove duplicate header from home page — `home/page.tsx`
+- [x] Framer Motion animated tab indicator (spring transition) — `BottomNav.tsx`
+- [x] Glass blur effect on bottom nav (backdrop-blur-xl + shadow) — `BottomNav.tsx`
+- [x] Demo credentials banner with env toggle — `DemoCredentialsBanner.tsx`
+- [x] Integrate demo banner on login (fill action) and register pages
+- [x] Add demo env vars to `.env.example`
+- [x] Share & Reward referral system — schema, ReferralDashboard, /join/[handle], /referral-terms
+- [x] Pricing CTA: burgundy → gold accent — `PricingSection.tsx`
+- [x] PR #3 created: feat/testing-demo-credentials-and-release-sync
+
+### Testing Workflow (3-layer approach)
+
+| Layer | Demo Banner | How |
+|-------|-------------|-----|
+| Local dev (`npm run dev`) | Auto-shown | Detects `localhost` |
+| Preview deployments (PR builds) | Auto-shown | Detects `*.vercel.app` |
+| Production | Hidden by default | Set `NEXT_PUBLIC_SHOW_DEMO_CREDENTIALS=true` in Vercel env to enable |
+
+**To enable on production temporarily:**
+1. Vercel Dashboard → Project → Settings → Environment Variables
+2. Add `NEXT_PUBLIC_SHOW_DEMO_CREDENTIALS=true` (Production only)
+3. Redeploy
+4. Remove the env var when testing window closes
+
+**Demo credentials** (configurable via env):
+- Email: `demo@ratio.law` (override: `NEXT_PUBLIC_DEMO_EMAIL`)
+- Password: `DemoAdvocate2026` (override: `NEXT_PUBLIC_DEMO_PASSWORD`)
+
+**TODO:** Create actual demo user account in Convex with restricted permissions. Track as pending task below.
+
 ### Pending
-- [ ] Create demo account seed function for testers
+- [ ] Create demo account seed function for testers (seed demo@ratio.law user in Convex)
 - [ ] Connect sessions CRUD fully to Convex
 - [ ] Enhance AI Judge with prompt caching + streaming
 - [ ] Wire Rankings page to Convex (replace hardcoded data)
