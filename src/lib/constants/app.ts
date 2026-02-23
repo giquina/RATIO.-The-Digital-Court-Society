@@ -50,25 +50,11 @@ export const MOCK_TRIAL_ROLES = [
   "Clerk",
 ];
 
-// ── Law Modules (common UK LLB) ──
-export const LAW_MODULES = [
-  "Contract Law",
-  "Tort Law",
-  "Public Law",
-  "Criminal Law",
-  "EU Law",
-  "Land Law",
-  "Equity & Trusts",
-  "Human Rights",
-  "Commercial Law",
-  "Company Law",
-  "Family Law",
-  "Employment Law",
-  "International Law",
-  "Evidence",
-  "Jurisprudence",
-  "Dispute Resolution",
-] as const;
+// ── Law Modules ──
+// Single source of truth is now MODULE_REGISTRY in modules.ts.
+// LAW_MODULES re-exported here for backward compatibility.
+export { LAW_MODULE_TITLES as LAW_MODULES, MODULE_REGISTRY, MODULE_CATEGORIES, getModuleBySlug, getModuleByTitle, getModulesByCategory, titleToSlug } from "./modules";
+export type { LawModule } from "./modules";
 
 // ── UK Universities ──
 // Re-exported from the comprehensive regional dataset (142 universities)

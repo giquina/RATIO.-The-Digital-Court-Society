@@ -1,21 +1,29 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery, useMutation } from "convex/react";
 import { anyApi } from "convex/server";
 import { Card, Button, Tag, DynamicIcon } from "@/components/ui";
 import { SESSION_TYPES, LAW_MODULES, MOOT_ROLES, MOCK_TRIAL_ROLES } from "@/lib/constants/app";
 import { courtToast } from "@/lib/utils/toast";
+import { BookOpen, FileText } from "lucide-react";
 
 export default function CreateSessionPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const profile: any = useQuery(anyApi.users.myProfile);
   const createSession = useMutation(anyApi.sessions.create);
-  const [sessionType, setSessionType] = useState("moot");
-  const [module, setModule] = useState("");
-  const [title, setTitle] = useState("");
+
+  // Pre-fill from URL params (e.g., coming from Module Hub "Create Debate" CTA)
+  const prefillType = searchParams.get("type") || "moot";
+  const prefillModule = searchParams.get("module") || "";
+  const prefillMotion = searchParams.get("motion") || "";
+
+  const [sessionType, setSessionType] = useState(prefillType);
+  const [module, setModule] = useState(prefillModule);
+  const [title, setTitle] = useState(prefillMotion);
   const [description, setDescription] = useState("");
   const [date, setDate] = useState("");
   const [startTime, setStartTime] = useState("14:00");
@@ -24,6 +32,15 @@ export default function CreateSessionPage() {
   const [crossUni, setCrossUni] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
+
+  // Debate-specific structured fields
+  const [debateBackground, setDebateBackground] = useState(searchParams.get("background") || "");
+  const [debateLegalIssue, setDebateLegalIssue] = useState("");
+  const [debateArgsFor, setDebateArgsFor] = useState("");
+  const [debateArgsAgainst, setDebateArgsAgainst] = useState("");
+  const [debateClosing, setDebateClosing] = useState("");
+
+  const isDebateMode = sessionType === "debate";
 
   const roles = sessionType === "mock_trial" ? MOCK_TRIAL_ROLES : MOOT_ROLES;
   const isValid = title.trim().length > 0 && module !== "" && date !== "";
@@ -35,6 +52,19 @@ export default function CreateSessionPage() {
     setSubmitted(true);
     if (!isValid || !profile) return;
 
+    // Build rich description for debates
+    const debateDescription = isDebateMode
+      ? [
+          debateBackground && `**Background:** ${debateBackground}`,
+          debateLegalIssue && `**Legal Issue:** ${debateLegalIssue}`,
+          debateArgsFor && `**Arguments For:** ${debateArgsFor}`,
+          debateArgsAgainst && `**Arguments Against:** ${debateArgsAgainst}`,
+          debateClosing && `**Closing Position:** ${debateClosing}`,
+        ].filter(Boolean).join("\n\n")
+      : undefined;
+
+    const finalDescription = isDebateMode ? debateDescription : description;
+
     setIsCreating(true);
     try {
       await createSession({
@@ -43,8 +73,8 @@ export default function CreateSessionPage() {
         module,
         type: sessionType,
         title,
-        description: description || undefined,
-        issueSummary: description || undefined,
+        description: finalDescription || undefined,
+        issueSummary: finalDescription || undefined,
         date,
         startTime,
         endTime,
@@ -64,8 +94,14 @@ export default function CreateSessionPage() {
   return (
     <div className="pb-6">
       <div className="px-4 pt-3 pb-4">
-        <h1 className="font-serif text-2xl font-bold text-court-text mb-1">Create Session</h1>
-        <p className="text-xs text-court-text-sec">Organise a moot, mock trial, or workshop</p>
+        <h1 className="font-serif text-2xl font-bold text-court-text mb-1">
+          {isDebateMode ? "Create Structured Debate" : "Create Session"}
+        </h1>
+        <p className="text-xs text-court-text-sec">
+          {isDebateMode
+            ? "Build a well-reasoned academic debate with structured arguments"
+            : "Organise a moot, mock trial, or debate"}
+        </p>
       </div>
 
       <div className="px-4 flex flex-col gap-3 md:gap-4">
@@ -107,27 +143,87 @@ export default function CreateSessionPage() {
 
         {/* Title */}
         <div>
-          <label className={labelClass}>Session Title</label>
+          <label className={labelClass}>{isDebateMode ? "Motion" : "Session Title"}</label>
           <input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="e.g. Judicial Review of Executive Power"
-            className={inputClass}
+            placeholder={isDebateMode ? "This House believes that..." : "e.g. Judicial Review of Executive Power"}
+            className={`${inputClass} ${isDebateMode ? "font-serif" : ""}`}
           />
         </div>
 
-        {/* Description */}
+        {/* Description / Issue Summary */}
         <div>
-          <label className={labelClass}>Issue Summary (optional)</label>
+          <label className={labelClass}>{isDebateMode ? "Background Context" : "Issue Summary (optional)"}</label>
           <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Brief description of the legal issue..."
+            value={isDebateMode ? debateBackground : description}
+            onChange={(e) => isDebateMode ? setDebateBackground(e.target.value) : setDescription(e.target.value)}
+            placeholder={isDebateMode ? "Set the context for this debate — relevant legal landscape, recent developments..." : "Brief description of the legal issue..."}
             rows={3}
             className={`${inputClass} resize-none`}
           />
         </div>
+
+        {/* Structured Debate Sections (only for debate type) */}
+        {isDebateMode && (
+          <Card className="p-4 space-y-4 border-gold/10">
+            <div className="flex items-center gap-2 mb-1">
+              <FileText size={14} className="text-gold" />
+              <span className="text-court-xs font-bold text-court-text-ter uppercase tracking-widest">Structured Debate Framework</span>
+            </div>
+
+            <div>
+              <label className={labelClass}>Legal Issue</label>
+              <textarea
+                value={debateLegalIssue}
+                onChange={(e) => setDebateLegalIssue(e.target.value)}
+                placeholder="What specific legal question does this debate address?"
+                rows={2}
+                className={`${inputClass} resize-none`}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className={labelClass}>Arguments For</label>
+                <textarea
+                  value={debateArgsFor}
+                  onChange={(e) => setDebateArgsFor(e.target.value)}
+                  placeholder="Key arguments supporting the motion..."
+                  rows={4}
+                  className={`${inputClass} resize-none`}
+                />
+              </div>
+              <div>
+                <label className={labelClass}>Arguments Against</label>
+                <textarea
+                  value={debateArgsAgainst}
+                  onChange={(e) => setDebateArgsAgainst(e.target.value)}
+                  placeholder="Key arguments opposing the motion..."
+                  rows={4}
+                  className={`${inputClass} resize-none`}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className={labelClass}>Closing Position (optional)</label>
+              <textarea
+                value={debateClosing}
+                onChange={(e) => setDebateClosing(e.target.value)}
+                placeholder="Your preliminary view on the matter..."
+                rows={2}
+                className={`${inputClass} resize-none`}
+              />
+            </div>
+
+            <p className="text-court-xs text-court-text-ter">
+              <BookOpen size={11} className="inline mr-1" />
+              This framework helps structure academic debate. All sections are optional but encouraged.
+            </p>
+          </Card>
+        )}
 
         {/* Date & Time */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">

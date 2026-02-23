@@ -1,131 +1,106 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { Card, Tag } from "@/components/ui";
+import { motion } from "framer-motion";
+import { BookOpen, Search, X, FileText, Hash } from "lucide-react";
+import { cn } from "@/lib/utils/helpers";
+import { Card, Tag, DynamicIcon } from "@/components/ui";
 import {
-  BookOpen,
-  Search,
-  Plus,
-  Scale,
-  Shield,
-  AlertTriangle,
-  Globe,
-  Landmark,
-  Building2,
-  Gavel,
-  ScrollText,
-  Users,
-  FileText,
-  X,
-} from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+  MODULE_REGISTRY,
+  MODULE_CATEGORIES,
+  getModulesByCategory,
+  type LawModule,
+} from "@/lib/constants/modules";
 
-// ── Module data ──
-interface LawModule {
-  slug: string;
-  title: string;
-  icon: LucideIcon;
-  topicCount: number;
-  description: string;
-}
+// ── Animation variants ──
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.04 },
+  },
+};
 
-const MODULES: LawModule[] = [
-  {
-    slug: "contract",
-    title: "Contract Law",
-    icon: ScrollText,
-    topicCount: 24,
-    description: "Formation, terms, vitiating factors, discharge, and remedies for breach of contract.",
-  },
-  {
-    slug: "criminal",
-    title: "Criminal Law",
-    icon: Gavel,
-    topicCount: 31,
-    description: "Offences against the person, property offences, inchoate offences, and general defences.",
-  },
-  {
-    slug: "tort",
-    title: "Tort Law",
-    icon: AlertTriangle,
-    topicCount: 18,
-    description: "Negligence, occupiers' liability, nuisance, defamation, and vicarious liability.",
-  },
-  {
-    slug: "public",
-    title: "Public Law",
-    icon: Landmark,
-    topicCount: 22,
-    description: "Constitutional principles, judicial review, human rights, and administrative law.",
-  },
-  {
-    slug: "equity-trusts",
-    title: "Equity & Trusts",
-    icon: Scale,
-    topicCount: 19,
-    description: "Express trusts, resulting and constructive trusts, charitable trusts, and equitable remedies.",
-  },
-  {
-    slug: "eu-international",
-    title: "EU / International",
-    icon: Globe,
-    topicCount: 15,
-    description: "EU institutions, free movement, international treaties, and public international law.",
-  },
-  {
-    slug: "property",
-    title: "Property Law",
-    icon: Building2,
-    topicCount: 20,
-    description: "Land registration, estates and interests, co-ownership, leases, and mortgages.",
-  },
-  {
-    slug: "constitutional",
-    title: "Constitutional Law",
-    icon: Shield,
-    topicCount: 17,
-    description: "Parliamentary sovereignty, separation of powers, rule of law, and devolution.",
-  },
+const itemVariants = {
+  hidden: { opacity: 0, y: 12 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
+};
+
+// ── Category filter type ──
+type CategoryFilter = "all" | LawModule["category"];
+
+const CATEGORY_TABS: { key: CategoryFilter; label: string }[] = [
+  { key: "all", label: "All" },
+  ...MODULE_CATEGORIES.map((c) => ({ key: c.key as CategoryFilter, label: c.label.split(" ")[0] })),
 ];
 
-const TOTAL_TOPICS = MODULES.reduce((sum, m) => sum + m.topicCount, 0);
-const TOTAL_CONTRIBUTORS = 142;
+// ── Computed totals ──
+const TOTAL_MODULES = MODULE_REGISTRY.length;
+const TOTAL_TOPICS = MODULE_REGISTRY.reduce((sum, m) => sum + m.topicCount, 0);
 
 export default function LawBookIndexPage() {
   const router = useRouter();
   const [search, setSearch] = useState("");
+  const [category, setCategory] = useState<CategoryFilter>("all");
 
-  const filtered = MODULES.filter((m) => {
-    if (!search) return true;
-    const q = search.toLowerCase();
-    return (
-      m.title.toLowerCase().includes(q) ||
-      m.description.toLowerCase().includes(q)
-    );
-  });
+  const filtered = useMemo(() => {
+    let modules = category === "all" ? MODULE_REGISTRY : getModulesByCategory(category);
+
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      modules = modules.filter(
+        (m) =>
+          m.title.toLowerCase().includes(q) ||
+          m.description.toLowerCase().includes(q)
+      );
+    }
+
+    return modules;
+  }, [search, category]);
 
   return (
     <div className="pb-6">
       {/* ── Header ── */}
       <header className="px-4 md:px-6 lg:px-8 pt-6 pb-2">
-        <div className="max-w-content-medium mx-auto">
+        <div className="md:max-w-content-medium mx-auto">
           <div className="flex items-center gap-3 mb-2">
             <BookOpen size={28} className="text-gold" />
             <h1 className="font-serif text-2xl md:text-3xl font-bold text-court-text">
-              The Official Law Book
+              Law Book
             </h1>
           </div>
-          <p className="text-sm text-court-text-sec">
-            A student-built, peer-reviewed legal knowledge base
+          <p className="text-court-sm text-court-text-sec">
+            Explore legal modules, cases, and academic resources
           </p>
         </div>
       </header>
 
+      {/* ── Category filter tabs ── */}
+      <div className="px-4 md:px-6 lg:px-8 mt-4 mb-3">
+        <div className="md:max-w-content-medium mx-auto">
+          <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+            {CATEGORY_TABS.map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setCategory(tab.key)}
+                className={cn(
+                  "shrink-0 px-3.5 py-1.5 rounded-xl text-court-xs font-semibold transition-all duration-200 whitespace-nowrap",
+                  category === tab.key
+                    ? "bg-gold text-navy"
+                    : "bg-white/[0.05] text-court-text-sec hover:text-court-text hover:bg-white/[0.08] border border-court-border-light"
+                )}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* ── Search ── */}
-      <div className="px-4 md:px-6 lg:px-8 mt-5 mb-4">
-        <div className="max-w-content-medium mx-auto">
+      <div className="px-4 md:px-6 lg:px-8 mb-5">
+        <div className="md:max-w-content-medium mx-auto">
           <div className="relative">
             <Search
               size={16}
@@ -135,9 +110,9 @@ export default function LawBookIndexPage() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search modules and topics..."
-              className="w-full bg-white/[0.05] border border-court-border rounded-xl px-3.5 py-2.5 pl-10 text-sm text-court-text outline-none focus:border-gold/40 placeholder:text-court-text-ter"
-              aria-label="Search law book"
+              placeholder="Search modules by title..."
+              className="w-full bg-white/[0.05] border border-court-border rounded-xl px-3.5 py-2.5 pl-10 text-court-sm text-court-text outline-none focus:border-gold/40 placeholder:text-court-text-ter transition-colors"
+              aria-label="Search law book modules"
             />
             {search && (
               <button
@@ -152,98 +127,98 @@ export default function LawBookIndexPage() {
         </div>
       </div>
 
-      {/* ── Stats bar ── */}
-      <div className="px-4 md:px-6 lg:px-8 mb-6">
-        <div className="max-w-content-medium mx-auto">
-          <div className="flex items-center gap-2 text-court-text-ter text-xs">
-            <FileText size={14} />
-            <span>
-              {TOTAL_TOPICS} topics across {MODULES.length} modules
-            </span>
-            <span className="mx-1">&middot;</span>
-            <Users size={14} />
-            <span>{TOTAL_CONTRIBUTORS} contributors</span>
-          </div>
-        </div>
-      </div>
-
       {/* ── Module grid ── */}
       <section className="px-4 md:px-6 lg:px-8">
-        <div className="max-w-content-medium mx-auto">
+        <div className="md:max-w-content-medium mx-auto">
           {filtered.length === 0 ? (
-            <div className="text-center py-12">
+            <div className="text-center py-16">
               <Search size={32} className="text-court-text-ter mx-auto mb-3" />
-              <p className="text-court-text-ter text-sm">
-                No modules match &quot;{search}&quot;
+              <p className="text-court-text-ter text-court-sm">
+                No modules match your search
               </p>
               <button
-                onClick={() => setSearch("")}
-                className="text-xs text-gold font-semibold mt-2"
+                onClick={() => {
+                  setSearch("");
+                  setCategory("all");
+                }}
+                className="text-court-xs text-gold font-semibold mt-2"
               >
-                Clear search
+                Clear filters
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              key={`${category}-${search}`}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"
+            >
               {filtered.map((mod) => (
-                <Card
-                  key={mod.slug}
-                  onClick={() => router.push(`/law-book/${mod.slug}`)}
-                  className="p-4 md:p-5 hover:border-gold/20 group cursor-pointer"
-                >
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="w-10 h-10 rounded-xl bg-gold-dim flex items-center justify-center">
-                      <mod.icon size={20} className="text-gold" />
+                <motion.div key={mod.id} variants={itemVariants}>
+                  <Card
+                    onClick={() => router.push(`/law-book/${mod.slug}`)}
+                    className="overflow-hidden hover:border-white/10 group"
+                  >
+                    {/* Gradient header strip */}
+                    <div
+                      className="h-12 flex items-center justify-center"
+                      style={{
+                        background: `linear-gradient(135deg, ${mod.gradient[0]}, ${mod.gradient[1]})`,
+                      }}
+                    >
+                      <DynamicIcon
+                        name={mod.icon}
+                        size={22}
+                        className="text-white/80"
+                      />
                     </div>
-                    <Tag color="gold" small>
-                      {mod.topicCount}
-                    </Tag>
-                  </div>
-                  <h3 className="font-serif text-base font-bold text-court-text mb-1 group-hover:text-gold transition-colors">
-                    {mod.title}
-                  </h3>
-                  <p className="text-court-xs text-court-text-sec leading-relaxed line-clamp-2">
-                    {mod.description}
-                  </p>
-                </Card>
+
+                    {/* Card body */}
+                    <div className="p-4">
+                      <h3 className="font-serif text-court-base font-bold text-court-text mb-1 group-hover:text-gold transition-colors">
+                        {mod.title}
+                      </h3>
+                      <p className="text-court-xs text-court-text-sec leading-relaxed line-clamp-2 mb-3">
+                        {mod.description}
+                      </p>
+
+                      {/* Bottom row: category + topic count */}
+                      <div className="flex items-center justify-between">
+                        <Tag color={mod.color} small>
+                          {mod.category === "core"
+                            ? "Core"
+                            : mod.category === "professional"
+                              ? "Professional"
+                              : mod.category === "specialist"
+                                ? "Specialist"
+                                : "Academic"}
+                        </Tag>
+                        <span className="flex items-center gap-1 text-court-xs text-court-text-ter">
+                          <Hash size={11} />
+                          {mod.topicCount} topics
+                        </span>
+                      </div>
+                    </div>
+                  </Card>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           )}
         </div>
       </section>
 
-      {/* ── Quick links ── */}
-      <section className="px-4 md:px-6 lg:px-8 mt-8">
-        <div className="max-w-content-medium mx-auto flex flex-wrap gap-3">
-          <Link
-            href="/law-book/review-queue"
-            className="flex items-center gap-2 text-xs text-court-text-sec hover:text-gold transition-colors"
-          >
-            <FileText size={14} /> Review Queue
-          </Link>
-          <Link
-            href="/law-book/changelog"
-            className="flex items-center gap-2 text-xs text-court-text-sec hover:text-gold transition-colors"
-          >
-            <ScrollText size={14} /> Recent Changes
-          </Link>
-          <Link
-            href="/law-book/editorial-policy"
-            className="flex items-center gap-2 text-xs text-court-text-sec hover:text-gold transition-colors"
-          >
-            <Shield size={14} /> Editorial Policy
-          </Link>
+      {/* ── Stats bar ── */}
+      <div className="px-4 md:px-6 lg:px-8 mt-6">
+        <div className="md:max-w-content-medium mx-auto">
+          <div className="flex items-center gap-2 text-court-text-ter text-court-xs">
+            <FileText size={13} />
+            <span>
+              {TOTAL_MODULES} modules &middot; {TOTAL_TOPICS} topics
+            </span>
+          </div>
         </div>
-      </section>
-
-      {/* ── Floating Contribute button ── */}
-      <Link
-        href="/law-book/contribute"
-        className="fixed bottom-20 md:bottom-8 right-4 z-40 bg-gold text-navy font-bold rounded-full w-12 h-12 flex items-center justify-center shadow-lg hover:bg-gold/90 transition-all duration-200"
-        aria-label="Contribute to the Law Book"
-      >
-        <Plus size={24} />
-      </Link>
+      </div>
     </div>
   );
 }

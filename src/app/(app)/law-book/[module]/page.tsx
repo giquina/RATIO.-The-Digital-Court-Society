@@ -1,86 +1,35 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import Link from "next/link";
 import { useRouter, useParams } from "next/navigation";
-import { Card, Tag, Button } from "@/components/ui";
+import { motion } from "framer-motion";
 import {
-  BookOpen,
   ArrowLeft,
-  Plus,
-  Eye,
+  BookOpen,
+  Hash,
   Users,
   Quote,
-  ScrollText,
-  Gavel,
-  AlertTriangle,
-  Landmark,
-  Scale,
-  Globe,
-  Building2,
-  Shield,
+  Eye,
+  Plus,
 } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { cn } from "@/lib/utils/helpers";
+import { Card, Tag, Button, DynamicIcon, EmptyState } from "@/components/ui";
+import { getModuleBySlug } from "@/lib/constants/modules";
+import {
+  getSuggestionsForModule,
+  getPromptsForModule,
+  getCaseSpotlight,
+  type TopicSuggestion,
+  type DiscussionPrompt as DiscussionPromptType,
+} from "@/lib/ai/topic-engine";
+import LivePulse from "@/components/modules/LivePulse";
+import AISuggestions from "@/components/modules/AISuggestions";
+import DiscussionPrompts from "@/components/modules/DiscussionPrompts";
+import CaseSpotlight from "@/components/modules/CaseSpotlight";
+import TrendingDebates from "@/components/modules/TrendingDebates";
 
-// ── Module metadata ──
-interface ModuleMeta {
-  title: string;
-  icon: LucideIcon;
-  description: string;
-}
-
-const MODULE_MAP: Record<string, ModuleMeta> = {
-  contract: {
-    title: "Contract Law",
-    icon: ScrollText,
-    description:
-      "Principles governing the formation, performance, and enforcement of legally binding agreements. Covers offer and acceptance, consideration, intention to create legal relations, terms, vitiating factors, discharge, and remedies.",
-  },
-  criminal: {
-    title: "Criminal Law",
-    icon: Gavel,
-    description:
-      "The body of law that relates to crime, prescribing conduct perceived as threatening, harmful, or otherwise endangering to the property, health, safety, and welfare of people. Covers offences against the person, property offences, and defences.",
-  },
-  tort: {
-    title: "Tort Law",
-    icon: AlertTriangle,
-    description:
-      "Civil wrongs that cause a claimant to suffer loss or harm, resulting in legal liability for the person who commits the tortious act. Covers negligence, occupiers' liability, nuisance, and vicarious liability.",
-  },
-  public: {
-    title: "Public Law",
-    icon: Landmark,
-    description:
-      "The branch of law governing the relationship between individuals and the state. Encompasses constitutional law, administrative law, judicial review, and human rights.",
-  },
-  "equity-trusts": {
-    title: "Equity & Trusts",
-    icon: Scale,
-    description:
-      "Equitable principles and the law of trusts, including express trusts, resulting and constructive trusts, charitable trusts, breach of trust, and equitable remedies.",
-  },
-  "eu-international": {
-    title: "EU / International Law",
-    icon: Globe,
-    description:
-      "European Union law, the relationship between EU and domestic law, free movement principles, international treaties, and public international law.",
-  },
-  property: {
-    title: "Property Law",
-    icon: Building2,
-    description:
-      "The area of law governing various forms of ownership and tenancy in real property and personal property. Covers land registration, estates and interests, co-ownership, leases, and mortgages.",
-  },
-  constitutional: {
-    title: "Constitutional Law",
-    icon: Shield,
-    description:
-      "The body of law which defines the relationship of different entities within a state. Covers parliamentary sovereignty, separation of powers, the rule of law, and devolution.",
-  },
-};
-
-// ── Demo topics by module ──
+// ── Types ──
 interface Topic {
   slug: string;
   title: string;
@@ -91,6 +40,7 @@ interface Topic {
   views: number;
 }
 
+// ── Demo topics by module slug ──
 const TOPICS_MAP: Record<string, Topic[]> = {
   contract: [
     {
@@ -114,14 +64,14 @@ const TOPICS_MAP: Record<string, Topic[]> = {
       views: 1523,
     },
     {
-      slug: "intention-to-create-legal-relations",
-      title: "Intention to Create Legal Relations",
+      slug: "terms",
+      title: "Terms of a Contract",
       summary:
-        "The presumptions that apply in domestic/social and commercial agreements regarding the parties' intention to be legally bound.",
+        "Classification of contractual terms as conditions, warranties, and innominate terms, and the distinction between express and implied terms.",
       status: "Published",
-      contributors: 4,
-      citations: 12,
-      views: 987,
+      contributors: 5,
+      citations: 16,
+      views: 1287,
     },
     {
       slug: "misrepresentation",
@@ -134,98 +84,108 @@ const TOPICS_MAP: Record<string, Topic[]> = {
       views: 756,
     },
     {
-      slug: "duress-and-undue-influence",
-      title: "Duress and Undue Influence",
-      summary:
-        "Vitiating factors relating to coercion and improper pressure, including economic duress and presumed/actual undue influence.",
-      status: "Under Review",
-      contributors: 2,
-      citations: 11,
-      views: 634,
-    },
-    {
       slug: "frustration",
       title: "Frustration of Contract",
       summary:
         "When a contract is discharged by frustration due to a supervening event that renders performance impossible, illegal, or radically different.",
-      status: "Draft",
-      contributors: 1,
+      status: "Under Review",
+      contributors: 2,
       citations: 8,
       views: 412,
+    },
+    {
+      slug: "remedies",
+      title: "Remedies for Breach",
+      summary:
+        "Damages, specific performance, injunctions, and restitutionary remedies available for breach of contract under English law.",
+      status: "Draft",
+      contributors: 1,
+      citations: 11,
+      views: 389,
     },
   ],
   criminal: [
     {
-      slug: "murder",
-      title: "Murder",
+      slug: "mens-rea",
+      title: "Mens Rea",
       summary:
-        "The unlawful killing of a reasonable person in being under the King's peace with malice aforethought, express or implied.",
+        "The mental element required for criminal liability: intention, recklessness, negligence, and the distinction between direct and oblique intent.",
       status: "Published",
       contributors: 7,
       citations: 22,
       views: 2103,
     },
     {
-      slug: "voluntary-manslaughter",
-      title: "Voluntary Manslaughter",
+      slug: "actus-reus",
+      title: "Actus Reus",
       summary:
-        "Partial defences to murder: loss of control under s.54 Coroners and Justice Act 2009 and diminished responsibility under s.52.",
-      status: "Published",
-      contributors: 5,
-      citations: 18,
-      views: 1654,
-    },
-    {
-      slug: "non-fatal-offences",
-      title: "Non-Fatal Offences Against the Person",
-      summary:
-        "Assault, battery, ABH (s.47 OAPA 1861), GBH (s.20 and s.18 OAPA 1861), and the hierarchy of non-fatal offences.",
+        "The physical element of a crime including voluntary acts, omissions, causation, and the state of affairs doctrine.",
       status: "Published",
       contributors: 6,
-      citations: 20,
-      views: 1890,
+      citations: 18,
+      views: 1876,
     },
     {
-      slug: "theft",
-      title: "Theft",
+      slug: "homicide",
+      title: "Homicide",
       summary:
-        "The offence under s.1 Theft Act 1968: dishonest appropriation of property belonging to another with intention to permanently deprive.",
+        "Murder, voluntary manslaughter (loss of control, diminished responsibility), involuntary manslaughter (unlawful act, gross negligence).",
       status: "Published",
+      contributors: 8,
+      citations: 26,
+      views: 1954,
+    },
+    {
+      slug: "defences",
+      title: "General Defences",
+      summary:
+        "Self-defence, duress, necessity, automatism, intoxication, and insanity as defences to criminal charges.",
+      status: "Under Review",
       contributors: 4,
       citations: 14,
       views: 1245,
     },
     {
-      slug: "self-defence",
-      title: "Self-Defence",
+      slug: "theft",
+      title: "Theft and Property Offences",
       summary:
-        "The general defence of self-defence under common law and s.76 Criminal Justice and Immigration Act 2008.",
-      status: "Under Review",
-      contributors: 3,
+        "The offence under s.1 Theft Act 1968: dishonest appropriation of property belonging to another with intention to permanently deprive.",
+      status: "Published",
+      contributors: 5,
+      citations: 16,
+      views: 1098,
+    },
+    {
+      slug: "sexual-offences",
+      title: "Sexual Offences",
+      summary:
+        "The Sexual Offences Act 2003, consent, the reasonable belief test, and the statutory framework for sexual offences.",
+      status: "Draft",
+      contributors: 2,
       citations: 10,
-      views: 876,
+      views: 654,
     },
   ],
   tort: [
     {
+      slug: "negligence",
+      title: "Negligence",
+      summary:
+        "The foundational tort requiring proof of duty, breach, causation, and damage, as established in Donoghue v Stevenson.",
+      status: "Published",
+      contributors: 9,
+      citations: 28,
+      views: 2015,
+    },
+    {
       slug: "duty-of-care",
-      title: "Duty of Care in Negligence",
+      title: "Duty of Care",
       summary:
         "Establishing a duty of care through the Caparo three-stage test: foreseeability, proximity, and fair, just and reasonable.",
       status: "Published",
       contributors: 7,
       citations: 21,
-      views: 2015,
-    },
-    {
-      slug: "breach-of-duty",
-      title: "Breach of Duty",
-      summary:
-        "The standard of care expected of the reasonable person and factors considered in determining breach (Blyth v Birmingham Waterworks).",
-      status: "Published",
-      contributors: 5,
-      citations: 16,
-      views: 1432,
+      views: 1876,
     },
     {
       slug: "causation",
@@ -248,14 +208,24 @@ const TOPICS_MAP: Record<string, Topic[]> = {
       views: 945,
     },
     {
-      slug: "private-nuisance",
+      slug: "nuisance",
       title: "Private Nuisance",
       summary:
         "Unreasonable interference with a person's use or enjoyment of land, including locality, duration, and sensitivity factors.",
-      status: "Draft",
+      status: "Under Review",
       contributors: 2,
       citations: 9,
       views: 567,
+    },
+    {
+      slug: "defamation",
+      title: "Defamation",
+      summary:
+        "The Defamation Act 2013, the serious harm threshold, defences of truth, honest opinion, and public interest.",
+      status: "Draft",
+      contributors: 1,
+      citations: 7,
+      views: 432,
     },
   ],
   public: [
@@ -270,14 +240,14 @@ const TOPICS_MAP: Record<string, Topic[]> = {
       views: 2340,
     },
     {
-      slug: "human-rights-act",
-      title: "Human Rights Act 1998",
+      slug: "separation-of-powers",
+      title: "Separation of Powers",
       summary:
-        "The incorporation of the ECHR into domestic law, sections 3, 4, and 6 HRA, and the relationship between courts and Parliament.",
+        "The constitutional doctrine dividing governmental authority into legislative, executive, and judicial branches in the UK.",
       status: "Published",
-      contributors: 6,
-      citations: 22,
-      views: 1876,
+      contributors: 5,
+      citations: 14,
+      views: 1234,
     },
     {
       slug: "rule-of-law",
@@ -285,7 +255,7 @@ const TOPICS_MAP: Record<string, Topic[]> = {
       summary:
         "Dicey's formulation, modern interpretations by Lord Bingham, and the constitutional significance of the rule of law.",
       status: "Published",
-      contributors: 5,
+      contributors: 6,
       citations: 18,
       views: 1543,
     },
@@ -297,39 +267,39 @@ const TOPICS_MAP: Record<string, Topic[]> = {
       status: "Under Review",
       contributors: 4,
       citations: 20,
-      views: 1234,
+      views: 1098,
     },
     {
-      slug: "separation-of-powers",
-      title: "Separation of Powers",
+      slug: "human-rights-act",
+      title: "Human Rights Act 1998",
       summary:
-        "The constitutional doctrine dividing governmental authority into three branches and the practical operation in the UK constitution.",
+        "The incorporation of the ECHR into domestic law, sections 3, 4, and 6 HRA, and the relationship between courts and Parliament.",
+      status: "Published",
+      contributors: 7,
+      citations: 22,
+      views: 1876,
+    },
+    {
+      slug: "prerogative-powers",
+      title: "Prerogative Powers",
+      summary:
+        "The residual powers of the Crown, their exercise by ministers, judicial reviewability, and the GCHQ and Miller decisions.",
       status: "Draft",
       contributors: 2,
-      citations: 14,
-      views: 789,
+      citations: 12,
+      views: 654,
     },
   ],
   "equity-trusts": [
     {
-      slug: "three-certainties",
-      title: "The Three Certainties",
+      slug: "express-trusts",
+      title: "Express Trusts",
       summary:
-        "Certainty of intention, subject matter, and objects as requirements for a valid express trust (Knight v Knight).",
+        "The three certainties (intention, subject matter, objects), constitution of trusts, and the rule in Milroy v Lord.",
       status: "Published",
       contributors: 6,
       citations: 18,
       views: 1456,
-    },
-    {
-      slug: "constitution-of-trusts",
-      title: "Constitution of Trusts",
-      summary:
-        "Methods of constituting a trust: transfer to trustees, self-declaration, and the rule in Milroy v Lord.",
-      status: "Published",
-      contributors: 4,
-      citations: 14,
-      views: 1123,
     },
     {
       slug: "resulting-trusts",
@@ -352,17 +322,27 @@ const TOPICS_MAP: Record<string, Topic[]> = {
       views: 987,
     },
     {
-      slug: "charitable-trusts",
-      title: "Charitable Trusts",
+      slug: "breach-of-trust",
+      title: "Breach of Trust",
       summary:
-        "The requirements for charitable status under the Charities Act 2011, charitable purposes, and the public benefit test.",
+        "Liability of trustees for breach, personal and proprietary remedies, equitable compensation, and the relief under s.61 TA 1925.",
+      status: "Under Review",
+      contributors: 4,
+      citations: 14,
+      views: 876,
+    },
+    {
+      slug: "tracing",
+      title: "Tracing",
+      summary:
+        "Common law and equitable tracing rules, following assets through substitutions, and claims against mixed funds.",
       status: "Draft",
       contributors: 2,
       citations: 10,
       views: 654,
     },
   ],
-  "eu-international": [
+  eu: [
     {
       slug: "direct-effect",
       title: "Direct Effect of EU Law",
@@ -377,53 +357,63 @@ const TOPICS_MAP: Record<string, Topic[]> = {
       slug: "supremacy",
       title: "Supremacy of EU Law",
       summary:
-        "The doctrine established in Costa v ENEL that EU law takes precedence over conflicting national law.",
+        "The doctrine established in Costa v ENEL that EU law takes precedence over conflicting national law, and post-Brexit implications.",
       status: "Published",
       contributors: 4,
       citations: 14,
       views: 1098,
     },
     {
-      slug: "free-movement-goods",
-      title: "Free Movement of Goods",
+      slug: "free-movement",
+      title: "Free Movement",
       summary:
-        "Articles 28-36 TFEU, the Dassonville formula, Cassis de Dijon, and permissible restrictions on trade.",
+        "Articles 28-36 TFEU on goods, free movement of persons and services, the Dassonville formula, and Cassis de Dijon.",
       status: "Under Review",
       contributors: 3,
       citations: 12,
       views: 876,
     },
     {
-      slug: "state-responsibility",
-      title: "State Responsibility",
+      slug: "state-aid",
+      title: "State Aid",
       summary:
-        "The rules of international law governing when and how a state is held responsible for breaches of international obligations.",
+        "The prohibition on state aid under Article 107 TFEU, the de minimis rule, and the role of the European Commission.",
       status: "Under Review",
       contributors: 2,
-      citations: 10,
-      views: 654,
+      citations: 8,
+      views: 543,
     },
     {
-      slug: "sources-international-law",
-      title: "Sources of International Law",
+      slug: "competition",
+      title: "EU Competition Law",
       summary:
-        "Article 38 ICJ Statute: treaties, custom, general principles, and subsidiary sources of international law.",
+        "Articles 101 and 102 TFEU, anti-competitive agreements, abuse of dominant position, and the merger regulation.",
       status: "Draft",
       contributors: 1,
-      citations: 8,
-      views: 432,
+      citations: 6,
+      views: 398,
     },
   ],
-  property: [
+  land: [
     {
-      slug: "land-registration",
-      title: "Land Registration",
+      slug: "estates",
+      title: "Estates in Land",
       summary:
-        "The system of land registration under the Land Registration Act 2002, registered and unregistered land, and overriding interests.",
+        "The freehold and leasehold estates, the fee simple absolute in possession, and the doctrine of estates under the LPA 1925.",
       status: "Published",
       contributors: 6,
       citations: 18,
       views: 1567,
+    },
+    {
+      slug: "registration",
+      title: "Land Registration",
+      summary:
+        "The system of land registration under the Land Registration Act 2002, registered and unregistered land, and overriding interests.",
+      status: "Published",
+      contributors: 7,
+      citations: 20,
+      views: 1432,
     },
     {
       slug: "co-ownership",
@@ -434,16 +424,6 @@ const TOPICS_MAP: Record<string, Topic[]> = {
       contributors: 5,
       citations: 15,
       views: 1345,
-    },
-    {
-      slug: "easements",
-      title: "Easements",
-      summary:
-        "The requirements for an easement (Re Ellenborough Park), methods of creation, and the distinction from licences.",
-      status: "Published",
-      contributors: 4,
-      citations: 14,
-      views: 1123,
     },
     {
       slug: "leases",
@@ -468,7 +448,7 @@ const TOPICS_MAP: Record<string, Topic[]> = {
   ],
   constitutional: [
     {
-      slug: "parliamentary-sovereignty",
+      slug: "sovereignty",
       title: "Parliamentary Sovereignty",
       summary:
         "Dicey's orthodox theory, enrolled act rule, manner and form debate, and challenges from EU law and devolution.",
@@ -488,14 +468,24 @@ const TOPICS_MAP: Record<string, Topic[]> = {
       views: 1543,
     },
     {
-      slug: "royal-prerogative",
-      title: "The Royal Prerogative",
+      slug: "separation-of-powers",
+      title: "Separation of Powers",
       summary:
-        "The residual powers of the Crown, the relationship with statute, and judicial review of prerogative powers (GCHQ, Miller).",
+        "The constitutional doctrine dividing governmental authority into three branches, the Constitutional Reform Act 2005, and practical operation.",
       status: "Published",
       contributors: 4,
-      citations: 16,
-      views: 1234,
+      citations: 14,
+      views: 1123,
+    },
+    {
+      slug: "conventions",
+      title: "Constitutional Conventions",
+      summary:
+        "Non-legal rules of constitutional practice, their binding nature, and relationship with law (AG v Jonathan Cape).",
+      status: "Under Review",
+      contributors: 3,
+      citations: 12,
+      views: 876,
     },
     {
       slug: "devolution",
@@ -504,160 +494,314 @@ const TOPICS_MAP: Record<string, Topic[]> = {
         "The Scotland Act 1998, Government of Wales Act 2006, Northern Ireland Act 1998, and the Sewel Convention.",
       status: "Under Review",
       contributors: 3,
-      citations: 12,
-      views: 876,
+      citations: 10,
+      views: 765,
     },
     {
-      slug: "conventions",
-      title: "Constitutional Conventions",
+      slug: "prerogative",
+      title: "The Royal Prerogative",
       summary:
-        "Non-legal rules of constitutional practice, their binding nature, and relationship with law (AG v Jonathan Cape).",
+        "The residual powers of the Crown, the relationship with statute, and judicial review of prerogative powers (GCHQ, Miller).",
       status: "Draft",
       contributors: 2,
-      citations: 10,
+      citations: 8,
       views: 567,
     },
   ],
 };
 
-const STATUS_STYLES: Record<string, string> = {
-  Published: "text-green-500 bg-green-500/10 border-green-500/20",
-  "Under Review": "text-gold bg-gold-dim border-gold/20",
-  Draft: "text-court-text-ter bg-white/[0.04] border-white/[0.06]",
+// ── Status tag colors ──
+const STATUS_COLOR: Record<string, "green" | "gold" | "blue"> = {
+  Published: "green",
+  "Under Review": "gold",
+  Draft: "blue",
 };
 
-export default function ModuleTopicsPage() {
+// ── Animation variants ──
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.04 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.25 } },
+};
+
+// ── Tab type ──
+type TabKey = "hub" | "topics";
+
+export default function ModuleHubPage() {
   const router = useRouter();
   const params = useParams();
   const moduleSlug = params.module as string;
-  const meta = MODULE_MAP[moduleSlug];
+  const mod = getModuleBySlug(moduleSlug);
 
-  // Fallback for unknown module
-  if (!meta) {
+  const [activeTab, setActiveTab] = useState<TabKey>("hub");
+  const [suggestions, setSuggestions] = useState(() =>
+    getSuggestionsForModule(moduleSlug)
+  );
+
+  const prompts = useMemo(
+    () => getPromptsForModule(moduleSlug),
+    [moduleSlug]
+  );
+  const spotlight = useMemo(
+    () => getCaseSpotlight(moduleSlug),
+    [moduleSlug]
+  );
+  const topics = TOPICS_MAP[moduleSlug] ?? [];
+
+  // ── Handlers ──
+  const handleCreateDebate = useCallback(
+    (suggestion: TopicSuggestion) => {
+      if (!mod) return;
+      router.push(
+        `/sessions/create?type=debate&module=${encodeURIComponent(mod.title)}&motion=${encodeURIComponent(suggestion.title)}`
+      );
+    },
+    [mod, router]
+  );
+
+  const handleRefresh = useCallback(() => {
+    setSuggestions((prev) => [...prev].sort(() => Math.random() - 0.5));
+  }, []);
+
+  const handleEngage = useCallback(
+    (_prompt: DiscussionPromptType) => {
+      if (!mod) return;
+      router.push(
+        `/sessions/create?type=debate&module=${encodeURIComponent(mod.title)}`
+      );
+    },
+    [mod, router]
+  );
+
+  const handleViewBreakdown = useCallback(() => {
+    setActiveTab("topics");
+  }, []);
+
+  // ── Module not found ──
+  if (!mod) {
     return (
       <div className="pb-6 px-4 md:px-6 lg:px-8 pt-6">
-        <div className="max-w-content-narrow mx-auto text-center py-16">
-          <BookOpen size={40} className="text-court-text-ter mx-auto mb-4" />
-          <h1 className="font-serif text-xl font-bold text-court-text mb-2">
-            Module Not Found
-          </h1>
-          <p className="text-sm text-court-text-sec mb-6">
-            The module &quot;{moduleSlug}&quot; does not exist in the Law Book.
-          </p>
-          <Link
-            href="/law-book"
-            className="text-sm text-gold font-semibold hover:underline"
-          >
-            Back to Law Book
-          </Link>
+        <div className="md:max-w-content-medium mx-auto">
+          <EmptyState
+            icon={<BookOpen size={32} />}
+            title="Module Not Found"
+            description={`The module "${moduleSlug}" does not exist in the Law Book.`}
+            action={
+              <Link
+                href="/law-book"
+                className="text-court-sm text-gold font-semibold hover:underline"
+              >
+                Back to Law Book
+              </Link>
+            }
+          />
         </div>
       </div>
     );
   }
 
-  const topics = TOPICS_MAP[moduleSlug] ?? [];
-  const ModuleIcon = meta.icon;
-
   return (
     <div className="pb-6">
       {/* ── Back link ── */}
       <div className="px-4 md:px-6 lg:px-8 pt-3 pb-2">
-        <div className="max-w-content-narrow mx-auto">
+        <div className="md:max-w-content-medium mx-auto">
           <Link
             href="/law-book"
-            className="inline-flex items-center gap-1.5 text-xs text-court-text-ter hover:text-gold transition-colors"
+            className="inline-flex items-center gap-1.5 text-court-xs text-court-text-ter hover:text-gold transition-colors"
           >
             <ArrowLeft size={14} /> Back to Law Book
           </Link>
         </div>
       </div>
 
-      {/* ── Module header ── */}
-      <header className="px-4 md:px-6 lg:px-8 mb-6">
-        <div className="max-w-content-narrow mx-auto">
-          <Card className="p-5 md:p-6">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-xl bg-gold-dim flex items-center justify-center shrink-0">
-                <ModuleIcon size={24} className="text-gold" />
-              </div>
-              <div className="flex-1">
-                <h1 className="font-serif text-xl md:text-2xl font-bold text-court-text mb-2">
-                  {meta.title}
-                </h1>
-                <p className="text-sm text-court-text-sec leading-relaxed">
-                  {meta.description}
-                </p>
-                <div className="flex items-center gap-4 mt-3 text-court-xs text-court-text-ter">
-                  <span className="flex items-center gap-1">
-                    <BookOpen size={12} /> {topics.length} topics
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Users size={12} />{" "}
-                    {topics.reduce((s, t) => s + t.contributors, 0)} contributors
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Quote size={12} />{" "}
-                    {topics.reduce((s, t) => s + t.citations, 0)} citations
-                  </span>
-                </div>
+      {/* ── Module header card ── */}
+      <header className="px-4 md:px-6 lg:px-8 mb-5">
+        <div className="md:max-w-content-medium mx-auto">
+          <Card className="overflow-hidden">
+            {/* Gradient banner */}
+            <div
+              className="h-20 flex items-center justify-center"
+              style={{
+                background: `linear-gradient(135deg, ${mod.gradient[0]}, ${mod.gradient[1]})`,
+              }}
+            >
+              <DynamicIcon
+                name={mod.icon}
+                size={32}
+                className="text-white/80"
+              />
+            </div>
+
+            {/* Content */}
+            <div className="p-4 md:p-5">
+              <h1 className="font-serif text-xl md:text-2xl font-bold text-court-text mb-2">
+                {mod.title}
+              </h1>
+              <p className="text-court-sm text-court-text-sec leading-relaxed mb-3">
+                {mod.description}
+              </p>
+              <div className="flex items-center gap-3 flex-wrap">
+                <Tag color={mod.color} small>
+                  {mod.category === "core"
+                    ? "Core"
+                    : mod.category === "professional"
+                      ? "Professional"
+                      : mod.category === "specialist"
+                        ? "Specialist"
+                        : "Academic"}
+                </Tag>
+                <span className="flex items-center gap-1 text-court-xs text-court-text-ter">
+                  <Hash size={11} />
+                  {mod.topicCount} topics
+                </span>
               </div>
             </div>
           </Card>
         </div>
       </header>
 
-      {/* ── Topics list ── */}
-      <section className="px-4 md:px-6 lg:px-8">
-        <div className="max-w-content-narrow mx-auto">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="font-serif text-lg font-bold text-court-text">
-              Topics
-            </h2>
-            <Link href="/law-book/contribute">
-              <Button size="sm" variant="outline">
-                <span className="flex items-center gap-1.5">
-                  <Plus size={14} /> Add Topic
-                </span>
-              </Button>
-            </Link>
-          </div>
-
-          <div className="flex flex-col gap-2.5">
-            {topics.map((topic) => (
-              <Card
-                key={topic.slug}
-                onClick={() =>
-                  router.push(`/law-book/${moduleSlug}/${topic.slug}`)
-                }
-                className="p-4 hover:border-gold/20 group cursor-pointer"
+      {/* ── Tab navigation ── */}
+      <div className="px-4 md:px-6 lg:px-8 mb-5">
+        <div className="md:max-w-content-medium mx-auto">
+          <div className="flex gap-1 bg-white/[0.04] rounded-xl p-1">
+            {(["hub", "topics"] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={cn(
+                  "flex-1 py-2 px-4 rounded-lg text-court-sm font-semibold transition-all duration-200 capitalize",
+                  activeTab === tab
+                    ? "bg-navy-card text-court-text shadow-sm"
+                    : "text-court-text-ter hover:text-court-text"
+                )}
               >
-                <div className="flex items-start justify-between mb-2">
-                  <h3 className="font-serif text-base font-bold text-court-text group-hover:text-gold transition-colors">
-                    {topic.title}
-                  </h3>
-                  <span
-                    className={`text-court-xs font-bold tracking-wider border rounded px-1.5 py-0.5 whitespace-nowrap ml-3 ${STATUS_STYLES[topic.status]}`}
-                  >
-                    {topic.status.toUpperCase()}
-                  </span>
-                </div>
-                <p className="text-court-sm text-court-text-sec leading-relaxed mb-3 line-clamp-2">
-                  {topic.summary}
-                </p>
-                <div className="flex items-center gap-4 text-court-xs text-court-text-ter">
-                  <span className="flex items-center gap-1">
-                    <Users size={11} /> {topic.contributors}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Quote size={11} /> {topic.citations}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Eye size={11} /> {topic.views.toLocaleString()}
-                  </span>
-                </div>
-              </Card>
+                {tab}
+              </button>
             ))}
           </div>
+        </div>
+      </div>
+
+      {/* ── Tab content ── */}
+      <section className="px-4 md:px-6 lg:px-8">
+        <div className="md:max-w-content-medium mx-auto">
+          {activeTab === "hub" ? (
+            <div className="space-y-6">
+              <LivePulse moduleSlug={mod.slug} moduleTitle={mod.title} />
+
+              {suggestions.length > 0 && (
+                <AISuggestions
+                  suggestions={suggestions}
+                  onCreateDebate={handleCreateDebate}
+                  onRefresh={handleRefresh}
+                />
+              )}
+
+              {prompts.length > 0 && (
+                <DiscussionPrompts
+                  prompts={prompts}
+                  onEngage={handleEngage}
+                />
+              )}
+
+              {spotlight && (
+                <CaseSpotlight
+                  spotlight={spotlight}
+                  onViewBreakdown={handleViewBreakdown}
+                />
+              )}
+
+              <TrendingDebates
+                moduleSlug={mod.slug}
+                moduleTitle={mod.title}
+              />
+            </div>
+          ) : (
+            <div>
+              {/* Topics tab header */}
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="font-serif text-lg font-bold text-court-text">
+                  Topics
+                </h2>
+                <Link href="/law-book/contribute">
+                  <Button size="sm" variant="outline">
+                    <span className="flex items-center gap-1.5">
+                      <Plus size={14} /> Add Topic
+                    </span>
+                  </Button>
+                </Link>
+              </div>
+
+              {topics.length === 0 ? (
+                <EmptyState
+                  icon={<BookOpen size={28} />}
+                  title="No Topics Yet"
+                  description="This module does not have published topics. Contribute to get it started."
+                  action={
+                    <Link href="/law-book/contribute">
+                      <Button size="sm" variant="outline">
+                        Contribute
+                      </Button>
+                    </Link>
+                  }
+                />
+              ) : (
+                <motion.div
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className="space-y-2.5"
+                >
+                  {topics.map((topic) => (
+                    <motion.div key={topic.slug} variants={itemVariants}>
+                      <Card
+                        onClick={() =>
+                          router.push(
+                            `/law-book/${mod.slug}/${topic.slug}`
+                          )
+                        }
+                        className="p-4 group"
+                      >
+                        <div className="flex items-start justify-between gap-3 mb-2">
+                          <h3 className="font-serif text-court-base font-bold text-court-text group-hover:text-gold transition-colors">
+                            {topic.title}
+                          </h3>
+                          <Tag
+                            color={STATUS_COLOR[topic.status] ?? "gold"}
+                            small
+                          >
+                            {topic.status}
+                          </Tag>
+                        </div>
+                        <p className="text-court-sm text-court-text-sec leading-relaxed mb-3 line-clamp-2">
+                          {topic.summary}
+                        </p>
+                        <div className="flex items-center gap-4 text-court-xs text-court-text-ter">
+                          <span className="flex items-center gap-1">
+                            <Users size={11} /> {topic.contributors}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Quote size={11} /> {topic.citations}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Eye size={11} />{" "}
+                            {topic.views.toLocaleString()}
+                          </span>
+                        </div>
+                      </Card>
+                    </motion.div>
+                  ))}
+                </motion.div>
+              )}
+            </div>
+          )}
         </div>
       </section>
     </div>
