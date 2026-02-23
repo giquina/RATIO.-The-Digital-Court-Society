@@ -98,7 +98,7 @@ export function PreSessionLobby({
 
   return (
     <div className="fixed inset-0 z-[100] bg-navy overflow-y-auto">
-      <div className="max-w-lg mx-auto px-4 py-6 pb-12">
+      <div className="max-w-lg mx-auto px-4 pt-[max(env(safe-area-inset-top,0px),24px)] pb-12">
         {/* Header */}
         <motion.div
           className="text-center mb-6"

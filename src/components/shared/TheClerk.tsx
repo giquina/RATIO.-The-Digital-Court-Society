@@ -68,7 +68,7 @@ export function TheClerk() {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 20, opacity: 0 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="fixed bottom-24 left-4 right-4 md:left-auto md:bottom-6 md:right-6 md:w-[340px] z-[70] max-w-[340px] max-h-[70vh] bg-[#131E30]/[0.98] backdrop-blur-xl border border-court-border rounded-court shadow-2xl flex flex-col overflow-hidden"
+            className="fixed bottom-24 inset-x-4 mx-auto md:inset-x-auto md:right-6 md:bottom-6 md:w-[340px] md:mx-0 z-[70] max-w-[340px] max-h-[70vh] bg-[#131E30]/[0.98] backdrop-blur-xl border border-court-border rounded-court shadow-2xl flex flex-col overflow-hidden"
           >
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-court-border shrink-0">

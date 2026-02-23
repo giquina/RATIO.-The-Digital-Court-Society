@@ -28,7 +28,7 @@ export function MobileHeader() {
     : "??";
 
   return (
-    <header className="sticky top-0 z-40 md:hidden bg-navy-mid/95 backdrop-blur-xl border-b border-court-border">
+    <header className="sticky top-0 z-40 md:hidden bg-navy-mid/95 backdrop-blur-xl border-b border-court-border pt-[env(safe-area-inset-top,0px)]">
       <div className="flex items-center justify-between px-4 h-14">
         {/* Left: Brand + university */}
         <div className="flex items-center gap-2 min-w-0">

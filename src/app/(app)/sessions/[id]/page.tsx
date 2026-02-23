@@ -188,7 +188,7 @@ export default function SessionDetailPage() {
   if (session === undefined) {
     return (
       <div className="pb-6">
-        <div className="px-5 pt-3 pb-2">
+        <div className="px-4 pt-3 pb-2">
           <Link href="/sessions" className="text-xs text-court-text-ter">&larr; Sessions</Link>
         </div>
         <section className="px-4 space-y-3">
@@ -220,7 +220,7 @@ export default function SessionDetailPage() {
   if (session === null) {
     return (
       <div className="pb-6">
-        <div className="px-5 pt-3 pb-2">
+        <div className="px-4 pt-3 pb-2">
           <Link href="/sessions" className="text-xs text-court-text-ter">&larr; Sessions</Link>
         </div>
         <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
@@ -312,7 +312,7 @@ export default function SessionDetailPage() {
   if (phase === "done") {
     return (
       <div className="pb-6">
-        <div className="px-5 pt-3 pb-2">
+        <div className="px-4 pt-3 pb-2">
           <Link href="/sessions" className="text-xs text-court-text-ter">&larr; Sessions</Link>
         </div>
         <motion.div
@@ -355,7 +355,7 @@ export default function SessionDetailPage() {
   // ── Phase: Details (default) ──
   return (
     <div className="pb-6">
-      <div className="px-5 pt-3 pb-2 flex justify-between items-center">
+      <div className="px-4 pt-3 pb-2 flex justify-between items-center">
         <Link href="/sessions" className="text-xs text-court-text-ter">&larr; Sessions</Link>
         <div className="flex gap-2">
           <button
@@ -370,12 +370,12 @@ export default function SessionDetailPage() {
       {/* Header card */}
       <section className="px-4 mb-3">
         <Card className="overflow-hidden">
-          <div className="bg-burgundy/20 px-4 py-2.5 flex justify-between items-center">
-            <div className="flex gap-2 items-center">
+          <div className="bg-burgundy/20 px-4 py-2.5 flex justify-between items-start flex-wrap gap-1.5">
+            <div className="flex gap-1.5 items-center flex-wrap">
               <Tag color="burgundy">{displayType.toUpperCase()}</Tag>
               <Tag color="gold">{session.module}</Tag>
             </div>
-            <div className="flex gap-1.5 items-center">
+            <div className="flex gap-1.5 items-center flex-wrap">
               {isVirtual && <Tag color="blue">VIRTUAL</Tag>}
               {rescheduled ? (
                 <Tag color="orange" small>RESCHEDULED</Tag>

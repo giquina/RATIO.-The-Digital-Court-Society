@@ -467,7 +467,7 @@ export function MootRoom({
       </AnimatePresence>
 
       {/* Controls */}
-      <div className="px-3 pb-8 pt-2.5 bg-navy-mid border-t border-court-border">
+      <div className="px-3 pb-[max(env(safe-area-inset-bottom,0px),32px)] pt-2.5 bg-navy-mid border-t border-court-border">
         <div className="flex justify-center items-center gap-3">
           {/* Mic */}
           <button
