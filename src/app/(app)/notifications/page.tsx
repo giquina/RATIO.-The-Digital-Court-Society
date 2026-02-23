@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery, useMutation } from "convex/react";
-import { api } from "../../../../convex/_generated/api";
+import { anyApi } from "convex/server";
 import { Card, DynamicIcon, EmptyState, Skeleton } from "@/components/ui";
 import { courtToast } from "@/lib/utils/toast";
 import { Bell } from "lucide-react";
@@ -37,13 +37,15 @@ function formatTimeAgo(timestamp: number) {
 }
 
 export default function NotificationsPage() {
-  const profile = useQuery(api.users.myProfile);
-  const notifications = useQuery(
-    api.notifications.getAll,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const profile: any = useQuery(anyApi.users.myProfile);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const notifications: any[] | undefined = useQuery(
+    anyApi.notifications.getAll,
     profile ? { profileId: profile._id } : "skip"
   );
-  const markRead = useMutation(api.notifications.markRead);
-  const markAllRead = useMutation(api.notifications.markAllRead);
+  const markRead = useMutation(anyApi.notifications.markRead);
+  const markAllRead = useMutation(anyApi.notifications.markAllRead);
 
   const unread = (notifications ?? []).filter((n) => !n.read);
   const read = (notifications ?? []).filter((n) => n.read);

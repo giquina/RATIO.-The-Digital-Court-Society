@@ -1,5 +1,7 @@
 import { v } from "convex/values";
 import { query, mutation } from "../_generated/server";
+import { auth } from "../auth";
+import { validateStringLength, validateOptionalStringLength, LIMITS } from "../lib/validation";
 
 // ═══════════════════════════════════════════
 // CASES
@@ -67,6 +69,25 @@ export const fileCase = mutation({
     relatedMotionId: v.optional(v.id("motions")),
   },
   handler: async (ctx, args) => {
+    // Auth: verify caller owns the filer profile
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const callerProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!callerProfile || callerProfile._id !== args.filedById) {
+      throw new Error("Not authorized");
+    }
+
+    // Input validation
+    validateStringLength(args.title, "Title", LIMITS.TITLE);
+    validateStringLength(args.issue, "Issue", LIMITS.DESCRIPTION);
+    validateStringLength(args.rule, "Rule", LIMITS.DESCRIPTION);
+    validateStringLength(args.application, "Application", LIMITS.DESCRIPTION);
+    validateStringLength(args.conclusion, "Conclusion", LIMITS.DESCRIPTION);
+    validateStringLength(args.remedySought, "Remedy sought", LIMITS.DESCRIPTION);
+
     // Vexatious filing check: 3+ dismissed cases = cooldown
     const filedCases = await ctx.db
       .query("cases")
@@ -113,6 +134,17 @@ export const addSubmission = mutation({
     content: v.string(),
   },
   handler: async (ctx, args) => {
+    // Auth: verify caller owns the submitter profile
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const callerProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!callerProfile || callerProfile._id !== args.submittedById) {
+      throw new Error("Not authorized");
+    }
+
     return ctx.db.insert("caseSubmissions", {
       ...args,
       submittedAt: new Date().toISOString(),
@@ -134,6 +166,22 @@ export const issueJudgment = mutation({
     remedy: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    // Auth: verify caller owns the judge profile
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const callerProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!callerProfile || callerProfile._id !== args.judgeId) {
+      throw new Error("Not authorized");
+    }
+
+    // Input validation
+    validateStringLength(args.outcome, "Outcome", LIMITS.SHORT_TEXT);
+    validateStringLength(args.reasoning, "Reasoning", LIMITS.CONTENT);
+    validateOptionalStringLength(args.remedy, "Remedy", LIMITS.DESCRIPTION);
+
     const judgmentId = await ctx.db.insert("judgments", {
       ...args,
       isAppealable: true,

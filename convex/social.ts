@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { query, mutation } from "./_generated/server";
+import { auth } from "./auth";
 
 // ═══════════════════════════════════════════
 // FOLLOWS
@@ -53,6 +54,17 @@ export const getFollowing = query({
 export const toggleFollow = mutation({
   args: { followerId: v.id("profiles"), followingId: v.id("profiles") },
   handler: async (ctx, args) => {
+    // Auth: verify caller owns the follower profile
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const callerProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!callerProfile || callerProfile._id !== args.followerId) {
+      throw new Error("Not authorized");
+    }
+
     if (args.followerId === args.followingId) return;
 
     const existing = await ctx.db
@@ -164,6 +176,17 @@ export const createActivity = mutation({
     metadata: v.optional(v.any()),
   },
   handler: async (ctx, args) => {
+    // Auth: verify caller owns the profile
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const callerProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!callerProfile || callerProfile._id !== args.profileId) {
+      throw new Error("Not authorized");
+    }
+
     return ctx.db.insert("activities", {
       ...args,
       commendationCount: 0,
@@ -193,6 +216,17 @@ export const hasCommended = query({
 export const toggleCommend = mutation({
   args: { fromProfileId: v.id("profiles"), activityId: v.id("activities") },
   handler: async (ctx, args) => {
+    // Auth: verify caller owns the commender profile
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const callerProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!callerProfile || callerProfile._id !== args.fromProfileId) {
+      throw new Error("Not authorized");
+    }
+
     const existing = await ctx.db
       .query("commendations")
       .withIndex("by_from_and_activity", (q) =>

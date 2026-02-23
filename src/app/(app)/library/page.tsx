@@ -1,11 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { Tag, Card, Button, SectionHeader, DynamicIcon } from "@/components/ui";
-import { Search, Download, Upload, FileText, Target, Book, PenLine, GraduationCap, BookOpen } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { Tag, Card, Button, SectionHeader, DynamicIcon, Skeleton } from "@/components/ui";
+import { Search, Download, Upload } from "lucide-react";
+import { anyApi } from "convex/server";
+import { useDemoQuery, useDemoMutation } from "@/hooks/useDemoSafe";
 
-const CATEGORIES = [
+const CONVEX_URL = process.env.NEXT_PUBLIC_CONVEX_URL;
+
+// ── Demo data (used when no backend) ──
+const DEMO_CATEGORIES = [
   { key: "moot_template", label: "Moot Templates", icon: "FileText", count: 12, color: "gold" },
   { key: "irac_guide", label: "IRAC / CLEO Guides", icon: "BookOpen", count: 8, color: "blue" },
   { key: "sqe2_prep", label: "SQE2 Preparation", icon: "Target", count: 24, color: "green" },
@@ -14,7 +18,7 @@ const CATEGORIES = [
   { key: "exam_skills", label: "Exam Skills", icon: "GraduationCap", count: 15, color: "red" },
 ];
 
-const ALL_RESOURCES = [
+const DEMO_RESOURCES = [
   { title: "IRAC Structure Template", cat: "IRAC Guide", catKey: "irac_guide", type: "PDF", downloads: 342, isPremium: false },
   { title: "Skeleton Argument \u2014 Standard Format", cat: "Moot Template", catKey: "moot_template", type: "DOCX", downloads: 287, isPremium: false },
   { title: "SQE2 Advocacy Marking Criteria", cat: "SQE2 Prep", catKey: "sqe2_prep", type: "PDF", downloads: 524, isPremium: false },
@@ -25,17 +29,69 @@ const ALL_RESOURCES = [
   { title: "SQE2 Mock Advocacy Scripts", cat: "SQE2 Prep", catKey: "sqe2_prep", type: "PDF", downloads: 312, isPremium: false },
 ];
 
+const CATEGORY_META: Record<string, { label: string; icon: string; color: string }> = {
+  moot_template: { label: "Moot Templates", icon: "FileText", color: "gold" },
+  irac_guide: { label: "IRAC / CLEO Guides", icon: "BookOpen", color: "blue" },
+  sqe2_prep: { label: "SQE2 Preparation", icon: "Target", color: "green" },
+  case_bank: { label: "Case Bank", icon: "Book", color: "burgundy" },
+  judgment_writing: { label: "Judgment Writing", icon: "PenLine", color: "orange" },
+  exam_skills: { label: "Exam Skills", icon: "GraduationCap", color: "red" },
+};
+
 export default function LibraryPage() {
   const [selectedCat, setSelectedCat] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [downloadingIdx, setDownloadingIdx] = useState<number | null>(null);
 
-  const filteredCategories = CATEGORIES.filter((c) => {
+  // Convex queries (skip in demo mode via useDemoQuery)
+  const convexResources = useDemoQuery(anyApi.resources_queries.list, selectedCat ? { category: selectedCat } : {});
+  const convexCounts = useDemoQuery(anyApi.resources_queries.getCategoryCounts);
+  const trackDownload = useDemoMutation(anyApi.resources_queries.trackDownload);
+
+  const isLoading = CONVEX_URL && (convexResources === undefined || convexCounts === undefined);
+
+  // Build categories from Convex or demo
+  const categories = (() => {
+    if (!CONVEX_URL || !convexCounts) return DEMO_CATEGORIES;
+    return Object.entries(convexCounts).map(([key, count]) => ({
+      key,
+      label: CATEGORY_META[key]?.label ?? key,
+      icon: CATEGORY_META[key]?.icon ?? "FileText",
+      count: count as number,
+      color: CATEGORY_META[key]?.color ?? "blue",
+    }));
+  })();
+
+  // Build resources from Convex or demo
+  type ResourceItem = {
+    _id?: string;
+    title: string;
+    cat: string;
+    catKey: string;
+    type: string;
+    downloads: number;
+    isPremium: boolean;
+  };
+
+  const allResources: ResourceItem[] = (() => {
+    if (!CONVEX_URL || !convexResources) return DEMO_RESOURCES;
+    return convexResources.map((r: { _id: string; title: string; category: string; fileType?: string; downloadCount: number; isPremium?: boolean }) => ({
+      _id: r._id,
+      title: r.title,
+      cat: CATEGORY_META[r.category]?.label ?? r.category,
+      catKey: r.category,
+      type: (r.fileType ?? "PDF").toUpperCase(),
+      downloads: r.downloadCount,
+      isPremium: r.isPremium ?? false,
+    }));
+  })();
+
+  const filteredCategories = categories.filter((c) => {
     if (!searchTerm) return true;
     return c.label.toLowerCase().includes(searchTerm.toLowerCase());
   });
 
-  const filteredResources = ALL_RESOURCES.filter((r) => {
+  const filteredResources = allResources.filter((r) => {
     const matchesCat = !selectedCat || r.catKey === selectedCat;
     const matchesSearch =
       !searchTerm ||
@@ -44,9 +100,15 @@ export default function LibraryPage() {
     return matchesCat && matchesSearch;
   });
 
-  const handleDownload = (index: number, title: string) => {
+  const handleDownload = async (index: number, title: string, id?: string) => {
     setDownloadingIdx(index);
-    // Simulate download delay
+    if (trackDownload && id) {
+      try {
+        await trackDownload({ resourceId: id as never });
+      } catch {
+        // Non-critical
+      }
+    }
     setTimeout(() => {
       setDownloadingIdx(null);
       alert(`Downloaded: ${title}`);
@@ -54,8 +116,24 @@ export default function LibraryPage() {
   };
 
   const handleUpload = () => {
-    alert("Upload feature coming soon! This will allow you to contribute templates, notes, or guides.");
+    alert("Upload feature coming soon. This will allow you to contribute templates, notes, or guides.");
   };
+
+  if (isLoading) {
+    return (
+      <div className="pb-6">
+        <div className="px-4 pt-3 pb-4">
+          <h1 className="font-serif text-2xl font-bold text-court-text mb-1">Library</h1>
+          <p className="text-xs text-court-text-sec">Templates, guides, and preparation materials</p>
+        </div>
+        <div className="px-4 grid grid-cols-2 lg:grid-cols-3 gap-2.5">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-24 w-full rounded-court" />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="pb-6">
@@ -120,13 +198,12 @@ export default function LibraryPage() {
       {/* Resources */}
       <section className="px-4">
         <SectionHeader
-          title={selectedCat ? CATEGORIES.find(c => c.key === selectedCat)?.label ?? "Resources" : "Most Downloaded"}
+          title={selectedCat ? (CATEGORY_META[selectedCat]?.label ?? "Resources") : "Most Downloaded"}
           action={selectedCat ? "Clear filter" : filteredResources.length > 4 ? "View all" : undefined}
           onAction={() => {
             if (selectedCat) {
               setSelectedCat(null);
             } else {
-              // View all: clear search to show everything
               setSearchTerm("");
               setSelectedCat(null);
             }
@@ -147,7 +224,7 @@ export default function LibraryPage() {
             </div>
           ) : null}
           {filteredResources.map((r, i) => (
-            <Card key={i} className="px-3.5 py-3 flex items-center gap-3">
+            <Card key={r.title + i} className="px-3.5 py-3 flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-white/[0.04] flex items-center justify-center text-xs font-bold text-court-text-sec shrink-0">
                 {r.type}
               </div>
@@ -160,7 +237,7 @@ export default function LibraryPage() {
                   <Tag color="gold" small>PREMIUM</Tag>
                 ) : (
                   <button
-                    onClick={() => handleDownload(i, r.title)}
+                    onClick={() => handleDownload(i, r.title, r._id)}
                     disabled={downloadingIdx === i}
                     className="text-court-xs text-gold font-bold hover:text-gold/80 transition-colors disabled:opacity-50"
                     title={`Download ${r.title}`}

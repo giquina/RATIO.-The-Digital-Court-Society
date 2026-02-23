@@ -4,14 +4,14 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useMutation } from "convex/react";
-import { api } from "../../../../convex/_generated/api";
+import { anyApi } from "convex/server";
 import Link from "next/link";
 import { Scale, Loader2, ArrowLeft } from "lucide-react";
 
 export default function RegisterPage() {
   const router = useRouter();
   const { signIn } = useAuthActions();
-  const updateName = useMutation(api.users.updateName);
+  const updateName = useMutation(anyApi.users.updateName);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");

@@ -3,11 +3,12 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation } from "convex/react";
-import { api } from "../../../../convex/_generated/api";
+import { anyApi } from "convex/server";
 import { UK_UNIVERSITIES, UK_UNIVERSITIES_BY_REGION, UK_REGIONS } from "@/lib/constants/uk-universities";
 import { LAW_MODULES, CHAMBERS } from "@/lib/constants/app";
 import { useAuthStore } from "@/stores/authStore";
 import { Loader2, SkipForward } from "lucide-react";
+import { courtToast } from "@/lib/utils/toast";
 
 type Step = 1 | 2 | 3 | 4;
 
@@ -25,7 +26,7 @@ function loadSaved() {
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const createProfile = useMutation(api.users.createProfile);
+  const createProfile = useMutation(anyApi.users.createProfile);
   const skipOnboarding = useAuthStore((s) => s.skipOnboarding);
   const saved = loadSaved();
   const [step, setStep] = useState<Step>(saved?.step ?? 1);
@@ -108,7 +109,7 @@ export default function OnboardingPage() {
       localStorage.removeItem("ratio_pending_name");
       router.push("/home");
     } catch (err) {
-      console.error("Failed to create profile:", err);
+      courtToast.error("Failed to create profile. Please try again.");
       setSaving(false);
     }
   };

@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery, useMutation } from "convex/react";
-import { api } from "../../../../../convex/_generated/api";
+import { anyApi } from "convex/server";
 import { Id } from "../../../../../convex/_generated/dataModel";
 import { Avatar, Tag, Card, Button, ProgressBar, Skeleton } from "@/components/ui";
 import {
@@ -60,14 +60,18 @@ export default function SessionDetailPage() {
   const sessionId = params.id as Id<"sessions">;
 
   // ── Convex queries ──
-  const session = useQuery(api.sessions.getById, { sessionId });
-  const roles = useQuery(api.sessions.getRoles, { sessionId });
-  const participants = useQuery(api.sessions.getParticipants, { sessionId });
-  const profile = useQuery(api.users.myProfile);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const session: any = useQuery(anyApi.sessions.getById, { sessionId });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const roles: any[] | undefined = useQuery(anyApi.sessions.getRoles, { sessionId });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const participants: any[] | undefined = useQuery(anyApi.sessions.getParticipants, { sessionId });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const profile: any = useQuery(anyApi.users.myProfile);
 
   // ── Convex mutations ──
-  const claimRoleMutation = useMutation(api.sessions.claimRole);
-  const unclaimRoleMutation = useMutation(api.sessions.unclaimRole);
+  const claimRoleMutation = useMutation(anyApi.sessions.claimRole);
+  const unclaimRoleMutation = useMutation(anyApi.sessions.unclaimRole);
 
   // ── Local UI state ──
   const [phase, setPhase] = useState<Phase>("details");

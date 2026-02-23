@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { query, mutation } from "../_generated/server";
+import { auth } from "../auth";
 
 // ═══════════════════════════════════════════
 // MOTIONS
@@ -57,6 +58,17 @@ export const proposeMotion = mutation({
     category: v.string(),
   },
   handler: async (ctx, args) => {
+    // Auth: verify caller owns the proposer profile
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const callerProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!callerProfile || callerProfile._id !== args.proposerId) {
+      throw new Error("Not authorized");
+    }
+
     const motionId = await ctx.db.insert("motions", {
       ...args,
       secondedById: undefined,
@@ -88,6 +100,17 @@ export const secondMotion = mutation({
     profileId: v.id("profiles"),
   },
   handler: async (ctx, args) => {
+    // Auth: verify caller owns the profile
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const callerProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!callerProfile || callerProfile._id !== args.profileId) {
+      throw new Error("Not authorized");
+    }
+
     const motion = await ctx.db.get(args.motionId);
     if (!motion || motion.status !== "tabled") {
       throw new Error("Motion cannot be seconded");
@@ -113,6 +136,17 @@ export const castVote = mutation({
     vote: v.string(), // "aye", "no", "abstain"
   },
   handler: async (ctx, args) => {
+    // Auth: verify caller owns the profile
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const callerProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!callerProfile || callerProfile._id !== args.profileId) {
+      throw new Error("Not authorized");
+    }
+
     // Check if already voted
     const existing = await ctx.db
       .query("votes")
@@ -171,6 +205,10 @@ export const openVoting = mutation({
     durationHours: v.number(),
   },
   handler: async (ctx, args) => {
+    // Auth: require authentication
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
     const motion = await ctx.db.get(args.motionId);
     if (!motion || motion.status !== "seconded") {
       throw new Error("Motion must be seconded before voting");
@@ -186,6 +224,10 @@ export const openVoting = mutation({
 export const closeVoting = mutation({
   args: { motionId: v.id("motions") },
   handler: async (ctx, args) => {
+    // Auth: require authentication
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
     const motion = await ctx.db.get(args.motionId);
     if (!motion || motion.status !== "voting") return;
 
@@ -211,6 +253,17 @@ export const addDebateEntry = mutation({
     position: v.string(),
   },
   handler: async (ctx, args) => {
+    // Auth: verify caller owns the speaker profile
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const callerProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!callerProfile || callerProfile._id !== args.speakerId) {
+      throw new Error("Not authorized");
+    }
+
     const existing = await ctx.db
       .query("debates")
       .withIndex("by_motion", (q) => q.eq("motionId", args.motionId))

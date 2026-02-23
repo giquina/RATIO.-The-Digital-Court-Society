@@ -2,6 +2,7 @@
 
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import { auth } from "./auth";
 
 // ── Create a new video session ──
 export const create = mutation({
@@ -20,6 +21,17 @@ export const create = mutation({
     opponentRole: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    // Auth: verify caller owns the host profile
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const callerProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!callerProfile || callerProfile._id !== args.hostId) {
+      throw new Error("Not authorized");
+    }
+
     const participants = [];
 
     // Host is always a participant
@@ -79,6 +91,17 @@ export const respondToInvite = mutation({
     response: v.string(), // "accepted" | "declined"
   },
   handler: async (ctx, args) => {
+    // Auth: verify caller owns the profile
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const callerProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!callerProfile || callerProfile._id !== args.profileId) {
+      throw new Error("Not authorized");
+    }
+
     const session = await ctx.db.get(args.videoSessionId);
     if (!session) throw new Error("Session not found");
 
@@ -117,6 +140,17 @@ export const joinSession = mutation({
     profileId: v.id("profiles"),
   },
   handler: async (ctx, args) => {
+    // Auth: verify caller owns the profile
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const callerProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!callerProfile || callerProfile._id !== args.profileId) {
+      throw new Error("Not authorized");
+    }
+
     const session = await ctx.db.get(args.videoSessionId);
     if (!session) throw new Error("Session not found");
 
@@ -149,6 +183,17 @@ export const leaveSession = mutation({
     profileId: v.id("profiles"),
   },
   handler: async (ctx, args) => {
+    // Auth: verify caller owns the profile
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const callerProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!callerProfile || callerProfile._id !== args.profileId) {
+      throw new Error("Not authorized");
+    }
+
     const session = await ctx.db.get(args.videoSessionId);
     if (!session) throw new Error("Session not found");
 
@@ -181,6 +226,10 @@ export const completeSession = mutation({
     videoSessionId: v.id("videoSessions"),
   },
   handler: async (ctx, args) => {
+    // Auth: require authentication
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
     await ctx.db.patch(args.videoSessionId, {
       status: "completed",
       actualEnd: Date.now(),
@@ -202,6 +251,17 @@ export const cancelSession = mutation({
     reason: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    // Auth: verify caller owns the profile
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const callerProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!callerProfile || callerProfile._id !== args.profileId) {
+      throw new Error("Not authorized");
+    }
+
     await ctx.db.patch(args.videoSessionId, {
       status: "cancelled",
       cancelledBy: args.profileId,
@@ -231,6 +291,17 @@ export const rateSession = mutation({
     comments: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    // Auth: verify caller owns the rater profile
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const callerProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!callerProfile || callerProfile._id !== args.raterId) {
+      throw new Error("Not authorized");
+    }
+
     await ctx.db.insert("videoSessionRatings", {
       videoSessionId: args.videoSessionId,
       raterId: args.raterId,

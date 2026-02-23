@@ -1,7 +1,9 @@
 "use client";
 
-import { useQuery } from "convex/react";
-import { api } from "../../../convex/_generated/api";
+import { anyApi } from "convex/server";
+import { useDemoQuery } from "@/hooks/useDemoSafe";
+
+const CONVEX_URL = process.env.NEXT_PUBLIC_CONVEX_URL;
 
 export interface SidebarCounts {
   unreadNotifications: number;
@@ -10,13 +12,19 @@ export interface SidebarCounts {
   aiDrafts: number;
 }
 
+const DEMO_COUNTS: SidebarCounts = {
+  unreadNotifications: 3,
+  upcomingSessions: 2,
+  savedAuthorities: 5,
+  aiDrafts: 1,
+};
+
 /**
  * Hook to fetch sidebar badge counts.
- * Uses ts-expect-error because Convex's generated API types with 40+ tables
- * exceed TypeScript's type instantiation depth limit.
- * The query itself works perfectly at runtime.
+ * Returns demo data when no Convex backend is configured.
  */
 export function useSidebarCounts(): SidebarCounts | null | undefined {
-  // @ts-expect-error — excessive type depth with large Convex schema (40+ tables)
-  return useQuery(api.sidebar.getCounts);
+  const convexCounts = useDemoQuery(anyApi.sidebar.getCounts);
+  if (!CONVEX_URL) return DEMO_COUNTS;
+  return convexCounts as SidebarCounts | null | undefined;
 }

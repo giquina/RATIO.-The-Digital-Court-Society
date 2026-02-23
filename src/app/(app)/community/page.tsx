@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
-import { api } from "../../../../convex/_generated/api";
+import { anyApi } from "convex/server";
 import { Avatar, Tag, Card, FollowButton, SectionHeader, Skeleton, EmptyState, CardSkeleton } from "@/components/ui";
 import { Search, Scale, Medal, Trophy, Users } from "lucide-react";
 import { courtToast } from "@/lib/utils/toast";
@@ -17,10 +17,13 @@ export default function CommunityPage() {
   const [filterTab, setFilterTab] = useState(0);
   const [search, setSearch] = useState("");
 
-  const profile = useQuery(api.users.myProfile);
-  const leaderboard = useQuery(api.profiles.getLeaderboard, { limit: 50 });
-  const following = useQuery(api.social.getFollowing, profile ? { profileId: profile._id } : "skip");
-  const toggleFollow = useMutation(api.social.toggleFollow);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const profile: any = useQuery(anyApi.users.myProfile);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const leaderboard: any[] | undefined = useQuery(anyApi.profiles.getLeaderboard, { limit: 50 });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const following: any[] | undefined = useQuery(anyApi.social.getFollowing, profile ? { profileId: profile._id } : "skip");
+  const toggleFollow = useMutation(anyApi.social.toggleFollow);
 
   // Build a set of profile IDs the current user follows
   // getFollowing returns full profile objects, so we extract _id

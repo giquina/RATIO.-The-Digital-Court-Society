@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { query, mutation } from "./_generated/server";
+import { auth } from "./auth";
 
 // ── Notifications ──
 
@@ -44,6 +45,20 @@ export const getUnreadCount = query({
 export const markRead = mutation({
   args: { notificationId: v.id("notifications") },
   handler: async (ctx, args) => {
+    // Auth: verify caller owns the notification
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const callerProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!callerProfile) throw new Error("Not authorized");
+
+    const notification = await ctx.db.get(args.notificationId);
+    if (!notification || notification.profileId !== callerProfile._id) {
+      throw new Error("Not authorized");
+    }
+
     await ctx.db.patch(args.notificationId, { read: true });
   },
 });
@@ -51,6 +66,17 @@ export const markRead = mutation({
 export const markAllRead = mutation({
   args: { profileId: v.id("profiles") },
   handler: async (ctx, args) => {
+    // Auth: verify caller owns the profile
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const callerProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!callerProfile || callerProfile._id !== args.profileId) {
+      throw new Error("Not authorized");
+    }
+
     const unread = await ctx.db
       .query("notifications")
       .withIndex("by_unread", (q) =>
@@ -96,6 +122,10 @@ export const createResource = mutation({
     uploadedBy: v.optional(v.id("profiles")),
   },
   handler: async (ctx, args) => {
+    // Auth: require authentication
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
     return ctx.db.insert("resources", {
       ...args,
       isPremium: false,

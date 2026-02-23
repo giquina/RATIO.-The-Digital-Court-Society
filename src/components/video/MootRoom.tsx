@@ -100,7 +100,8 @@ export function MootRoom({
           // Opponent left - trigger end flow
         });
       } catch (err) {
-        console.warn("Daily.co init failed, using demo mode:", err);
+        // Daily.co unavailable — fall back to demo mode silently
+        void err;
       }
     }
 
