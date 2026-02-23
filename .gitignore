@@ -7,3 +7,6 @@ out/
 *.tsbuildinfo
 TESTING.md
 ratio-project.zip
+
+# Remotion working files (screenshots served via staticFile)
+public/screenshots/

@@ -16,6 +16,9 @@
     "@daily-co/daily-js": "^0.62.0",
     "@hookform/resolvers": "^3.9.0",
     "@next/third-parties": "^16.1.6",
+    "@remotion/cli": "4.0.428",
+    "@remotion/player": "4.0.428",
+    "@remotion/renderer": "4.0.428",
     "@sentry/nextjs": "^10.39.0",
     "@stripe/stripe-js": "^8.8.0",
     "@vercel/analytics": "^1.6.1",
@@ -28,10 +31,11 @@
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
     "react-hook-form": "^7.54.0",
+    "remotion": "4.0.428",
     "sonner": "^2.0.7",
     "stripe": "^20.3.1",
     "tailwind-merge": "^2.6.0",
-    "zod": "^3.23.0",
+    "zod": "4.3.6",
     "zustand": "^5.0.0"
   },
   "devDependencies": {

@@ -24,6 +24,7 @@ import {
   Bookmark,
   Wrench,
   Flame,
+  Plus,
 } from "lucide-react";
 import { Avatar, Tag, Skeleton, Tooltip } from "@/components/ui";
 import { cn } from "@/lib/utils/helpers";
@@ -237,6 +238,40 @@ export function Sidebar() {
           )}
         </Link>
       </div>
+
+      {/* Create Session CTA */}
+      {(() => {
+        const isCreateActive = pathname === "/sessions/create";
+        const ctaLink = (
+          <Link
+            href="/sessions/create"
+            data-tour="create-session"
+            className={cn(
+              "flex items-center justify-center gap-2 w-full h-10 rounded-xl font-semibold text-court-sm transition-all duration-200",
+              isCreateActive
+                ? "bg-gold text-navy shadow-sm"
+                : "bg-gold/15 text-gold hover:bg-gold hover:text-navy"
+            )}
+          >
+            <Plus size={18} strokeWidth={2.5} className="shrink-0" />
+            {!collapsed && (
+              <span className="hidden lg:inline">Create Session</span>
+            )}
+          </Link>
+        );
+
+        return (
+          <div className="px-2 pt-4 pb-2 shrink-0">
+            {collapsed ? (
+              <Tooltip content="Create Session" side="right">
+                {ctaLink}
+              </Tooltip>
+            ) : (
+              ctaLink
+            )}
+          </div>
+        );
+      })()}
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto no-scrollbar py-4 px-2">
