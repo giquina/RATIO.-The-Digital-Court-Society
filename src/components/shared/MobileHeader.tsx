@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { anyApi } from "convex/server";
-import { Scale, Bell } from "lucide-react";
+import { Scale, Search, Bell } from "lucide-react";
 import { Avatar, Skeleton } from "@/components/ui";
 import { useSidebarCounts } from "@/lib/hooks/useSidebarCounts";
 import { useDemoQuery } from "@/hooks/useDemoSafe";
@@ -47,21 +47,28 @@ export function MobileHeader() {
           </div>
         </div>
 
-        {/* Right: Bell + Avatar */}
-        <div className="flex items-center gap-2.5 shrink-0">
+        {/* Right: Search + Bell + Avatar */}
+        <div className="flex items-center gap-1.5 shrink-0">
+          <Link
+            href="/research"
+            aria-label="Search"
+            className="w-11 h-11 flex items-center justify-center active:scale-95 transition-transform"
+          >
+            <Search size={18} className="text-court-text-sec" />
+          </Link>
           <Link
             href="/notifications"
             aria-label={`Notifications${unreadCount > 0 ? `, ${unreadCount} unread` : ""}`}
-            className="relative w-10 h-10 rounded-full bg-gold-dim flex items-center justify-center active:scale-95 transition-transform"
+            className="relative w-11 h-11 rounded-full bg-gold-dim flex items-center justify-center active:scale-95 transition-transform"
           >
             <Bell size={18} className="text-gold" />
             {unreadCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center px-1">
+              <span className="absolute top-0 right-0 min-w-[16px] h-4 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center px-1">
                 {unreadCount > 99 ? "99+" : unreadCount}
               </span>
             )}
           </Link>
-          <Link href="/profile" aria-label="View profile" className="active:scale-95 transition-transform">
+          <Link href="/profile" aria-label="View profile" className="w-11 h-11 flex items-center justify-center active:scale-95 transition-transform">
             {isLoading ? (
               <Skeleton rounded className="w-8 h-8" />
             ) : (
