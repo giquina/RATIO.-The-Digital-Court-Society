@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { query, mutation } from "./_generated/server";
+import { auth } from "./auth";
 
 // ═══════════════════════════════════════════
 // SAVED AUTHORITIES
@@ -64,6 +65,17 @@ export const saveAuthority = mutation({
     folder: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    // Auth: verify caller owns the profile
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const callerProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!callerProfile || callerProfile._id !== args.profileId) {
+      throw new Error("Not authorized");
+    }
+
     // Prevent duplicates
     const existing = await ctx.db
       .query("savedAuthorities")
@@ -86,6 +98,20 @@ export const removeAuthority = mutation({
     authorityId: v.id("savedAuthorities"),
   },
   handler: async (ctx, args) => {
+    // Auth: verify caller owns the authority
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const callerProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!callerProfile) throw new Error("Not authorized");
+
+    const authority = await ctx.db.get(args.authorityId);
+    if (!authority || authority.profileId !== callerProfile._id) {
+      throw new Error("Not authorized");
+    }
+
     await ctx.db.delete(args.authorityId);
   },
 });
@@ -98,6 +124,20 @@ export const updateAuthorityNotes = mutation({
     folder: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    // Auth: verify caller owns the authority
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const callerProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!callerProfile) throw new Error("Not authorized");
+
+    const authority = await ctx.db.get(args.authorityId);
+    if (!authority || authority.profileId !== callerProfile._id) {
+      throw new Error("Not authorized");
+    }
+
     const { authorityId, ...updates } = args;
     await ctx.db.patch(authorityId, updates);
   },
@@ -133,6 +173,17 @@ export const recordSearch = mutation({
     queryTime: v.number(),
   },
   handler: async (ctx, args) => {
+    // Auth: verify caller owns the profile
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const callerProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!callerProfile || callerProfile._id !== args.profileId) {
+      throw new Error("Not authorized");
+    }
+
     await ctx.db.insert("searchHistory", {
       ...args,
       searchedAt: new Date().toISOString(),
@@ -145,6 +196,17 @@ export const clearSearchHistory = mutation({
     profileId: v.id("profiles"),
   },
   handler: async (ctx, args) => {
+    // Auth: verify caller owns the profile
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const callerProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!callerProfile || callerProfile._id !== args.profileId) {
+      throw new Error("Not authorized");
+    }
+
     const all = await ctx.db
       .query("searchHistory")
       .withIndex("by_profile", (q) => q.eq("profileId", args.profileId))

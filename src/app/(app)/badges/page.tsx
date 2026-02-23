@@ -1,12 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { Card, Tag, ProgressBar, DynamicIcon } from "@/components/ui";
+import { Card, Tag, ProgressBar, DynamicIcon, Skeleton } from "@/components/ui";
 import { BADGE_DEFINITIONS } from "@/lib/constants/app";
 import { Award, Lock, Trophy } from "lucide-react";
+import { anyApi } from "convex/server";
+import { useDemoQuery } from "@/hooks/useDemoSafe";
 
-// ── Demo badge data: augment with earned status & descriptions ──
-const BADGES = [
+const CONVEX_URL = process.env.NEXT_PUBLIC_CONVEX_URL;
+
+// ── Demo badge data (used when no backend) ──
+const DEMO_BADGES = [
   { ...BADGE_DEFINITIONS[0], description: "Complete your first moot session", earned: true },
   { ...BADGE_DEFINITIONS[1], description: "Complete 5 moot sessions", earned: true },
   { ...BADGE_DEFINITIONS[2], description: "Complete 20 moot sessions", earned: false },
@@ -17,13 +21,20 @@ const BADGES = [
   { ...BADGE_DEFINITIONS[7], description: "Receive 50 commendations from peers", earned: false },
   { ...BADGE_DEFINITIONS[8], description: "Complete 5 AI Judge practice sessions", earned: true },
   { ...BADGE_DEFINITIONS[9], description: "Reach 50 followers on Ratio", earned: true },
-  // Extra badges to reach 12
   { name: "First Decade", icon: "Landmark", category: "moots", description: "Complete 10 moot sessions", earned: false, requirement: { type: "moots_completed", threshold: 10 } },
   { name: "Night Owl", icon: "BookOpen", category: "streak", description: "Log practice after midnight 3 times", earned: false, requirement: { type: "special", threshold: 3 } },
 ];
 
-const CATEGORIES = ["All", "Moots", "Streaks", "Community", "Skill"];
+type BadgeItem = {
+  name: string;
+  icon: string;
+  category: string;
+  description: string;
+  earned: boolean;
+  requirement: { type: string; threshold: number };
+};
 
+const CATEGORIES = ["All", "Moots", "Streaks", "Community", "Skill"];
 const CATEGORY_MAP: Record<string, string> = {
   All: "all",
   Moots: "moots",
@@ -35,18 +46,57 @@ const CATEGORY_MAP: Record<string, string> = {
 export default function BadgesPage() {
   const [activeCategory, setActiveCategory] = useState("All");
 
-  const earnedCount = BADGES.filter((b) => b.earned).length;
-  const totalCount = BADGES.length;
+  // Convex queries (skip in demo mode via useDemoQuery)
+  const allBadges = useDemoQuery(anyApi.badges_queries.getAll);
+  const myBadges = useDemoQuery(anyApi.badges_queries.getMyBadges);
+
+  const isLoading = CONVEX_URL && (allBadges === undefined || myBadges === undefined);
+
+  // Build unified badge list with earned status
+  const badges: BadgeItem[] = (() => {
+    if (!CONVEX_URL || !allBadges) return DEMO_BADGES;
+    const earnedSet = new Set((myBadges ?? []).map((b: { badgeId: string }) => b.badgeId));
+    return allBadges.map((b: { _id: string; name: string; icon: string; category: string; description?: string; requirement?: { type: string; threshold: number } }) => ({
+      name: b.name,
+      icon: b.icon,
+      category: b.category,
+      description: b.description ?? "",
+      earned: earnedSet.has(b._id),
+      requirement: b.requirement ?? { type: "unknown", threshold: 0 },
+    }));
+  })();
+
+  const earnedCount = badges.filter((b) => b.earned).length;
+  const totalCount = badges.length;
 
   const filtered =
     activeCategory === "All"
-      ? BADGES
-      : BADGES.filter((b) => b.category === CATEGORY_MAP[activeCategory]);
+      ? badges
+      : badges.filter((b) => b.category === CATEGORY_MAP[activeCategory]);
 
-  // Next badge to earn
-  const nextBadge = BADGES.find(
+  const nextBadge = badges.find(
     (b) => !b.earned && b.category === "moots"
   );
+
+  if (isLoading) {
+    return (
+      <div className="pb-6 md:max-w-content-medium mx-auto">
+        <div className="px-4 md:px-6 lg:px-8 pt-3 pb-4">
+          <div className="flex items-center gap-2 mb-1">
+            <Award size={20} className="text-gold" />
+            <h1 className="font-serif text-2xl font-bold text-court-text">Badges & Achievements</h1>
+          </div>
+        </div>
+        <div className="px-4 md:px-6 lg:px-8">
+          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
+            {Array.from({ length: 12 }).map((_, i) => (
+              <Skeleton key={i} className="h-32 w-full rounded-court" />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="pb-6 md:max-w-content-medium mx-auto">
@@ -77,7 +127,7 @@ export default function BadgesPage() {
           </div>
           <div className="text-right">
             <p className="font-serif text-xl font-bold text-court-text">
-              {Math.round((earnedCount / totalCount) * 100)}%
+              {totalCount > 0 ? Math.round((earnedCount / totalCount) * 100) : 0}%
             </p>
             <p className="text-court-xs text-court-text-ter uppercase tracking-wider">
               Complete
@@ -86,7 +136,7 @@ export default function BadgesPage() {
         </Card>
       </section>
 
-      {/* Category Filter — horizontally scrollable */}
+      {/* Category Filter */}
       <div className="px-4 md:px-6 lg:px-8 mb-4">
         <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
           {CATEGORIES.map((cat) => (
@@ -118,7 +168,6 @@ export default function BadgesPage() {
               }`}
               highlight={badge.earned}
             >
-              {/* Lock overlay for unearned */}
               {!badge.earned && (
                 <div className="absolute inset-0 flex items-center justify-center z-10">
                   <div className="w-7 h-7 rounded-full bg-navy/80 flex items-center justify-center">

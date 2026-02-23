@@ -6,18 +6,37 @@ import { useEffect } from "react";
 import { BottomNav } from "@/components/shared/BottomNav";
 import { Sidebar } from "@/components/shared/Sidebar";
 import { Loader2 } from "lucide-react";
-import { api } from "../../../convex/_generated/api";
+import { anyApi } from "convex/server";
 import { useSidebarStore } from "@/stores/sidebarStore";
 import { cn } from "@/lib/utils/helpers";
 import { TheClerk } from "@/components/shared/TheClerk";
+import { SplashScreen } from "@/components/shared/SplashScreen";
 
-export default function AppLayoutClient({ children }: { children: React.ReactNode }) {
+const CONVEX_URL = process.env.NEXT_PUBLIC_CONVEX_URL;
+
+function AppShell({ children }: { children: React.ReactNode }) {
+  const { collapsed } = useSidebarStore();
+  return (
+    <div className="min-h-screen flex">
+      <Sidebar />
+      <main className={cn(
+        "flex-1 pb-20 md:pb-0 md:ml-[72px]",
+        !collapsed && "lg:ml-[240px]"
+      )}>
+        {children}
+      </main>
+      <BottomNav />
+      <TheClerk />
+    </div>
+  );
+}
+
+function AppLayoutWithConvex({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useConvexAuth();
   const router = useRouter();
   const pathname = usePathname();
-  const { collapsed } = useSidebarStore();
   const hasProfile = useQuery(
-    api.users.hasProfile,
+    anyApi.users.hasProfile,
     isAuthenticated ? {} : "skip"
   );
 
@@ -49,17 +68,21 @@ export default function AppLayoutClient({ children }: { children: React.ReactNod
     return null;
   }
 
+  return <AppShell>{children}</AppShell>;
+}
+
+export default function AppLayoutClient({ children }: { children: React.ReactNode }) {
+  // Demo mode — no Convex backend, render app shell directly
+  if (!CONVEX_URL) {
+    return (
+      <SplashScreen>
+        <AppShell>{children}</AppShell>
+      </SplashScreen>
+    );
+  }
   return (
-    <div className="min-h-screen flex">
-      <Sidebar />
-      <main className={cn(
-        "flex-1 pb-20 md:pb-0 md:ml-[72px]",
-        !collapsed && "lg:ml-[240px]"
-      )}>
-        {children}
-      </main>
-      <BottomNav />
-      <TheClerk />
-    </div>
+    <SplashScreen>
+      <AppLayoutWithConvex>{children}</AppLayoutWithConvex>
+    </SplashScreen>
   );
 }

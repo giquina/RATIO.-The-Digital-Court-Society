@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
-import { api } from "../../../../convex/_generated/api";
+import { anyApi } from "convex/server";
 import { Avatar, Tag, Card, Button, ProgressBar, SectionHeader, Skeleton } from "@/components/ui";
 import { courtToast } from "@/lib/utils/toast";
 import { Flame, Timer, FileText, Star, Trophy, FolderOpen, Link as LinkIcon, Landmark, Settings, X, Loader2 } from "lucide-react";
@@ -22,9 +22,10 @@ const YEAR_LABELS: Record<number, string> = {
 };
 
 export default function ProfilePage() {
-  const profile = useQuery(api.users.myProfile);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const profile: any = useQuery(anyApi.users.myProfile);
   const isLoading = profile === undefined;
-  const updateProfile = useMutation(api.users.updateProfile);
+  const updateProfile = useMutation(anyApi.users.updateProfile);
   const [editing, setEditing] = useState(false);
   const [editName, setEditName] = useState("");
   const [editBio, setEditBio] = useState("");
@@ -216,7 +217,7 @@ export default function ProfilePage() {
         <section className="px-4 mt-4">
           <SectionHeader title="Modules" />
           <div className="flex flex-wrap gap-2">
-            {profile.modules.map((m) => (
+            {profile.modules.map((m: string) => (
               <Tag key={m}>{m}</Tag>
             ))}
           </div>

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation } from "convex/react";
-import { api } from "../../../../convex/_generated/api";
+import { anyApi } from "convex/server";
 import type { Id } from "../../../../convex/_generated/dataModel";
 import { Avatar, Tag, Card, Button, ProgressBar, EmptyState, SessionCardSkeleton } from "@/components/ui";
 import { Calendar, Clock, Check, BookOpen } from "lucide-react";
@@ -48,9 +48,10 @@ function SessionRolesList({
   sessionId: Id<"sessions">;
   profileId: Id<"profiles"> | undefined;
 }) {
-  const roles = useQuery(api.sessions.getRoles, { sessionId });
-  const claimRole = useMutation(api.sessions.claimRole);
-  const unclaimRole = useMutation(api.sessions.unclaimRole);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const roles: any[] | undefined = useQuery(anyApi.sessions.getRoles, { sessionId });
+  const claimRole = useMutation(anyApi.sessions.claimRole);
+  const unclaimRole = useMutation(anyApi.sessions.unclaimRole);
   const [claiming, setClaiming] = useState<string | null>(null);
 
   if (roles === undefined) {
@@ -152,9 +153,12 @@ export default function SessionsPage() {
   const router = useRouter();
 
   // ── Real Convex data ──
-  const profile = useQuery(api.users.myProfile);
-  const upcomingSessions = useQuery(api.sessions.list, { status: "upcoming" });
-  const pastSessions = useQuery(api.sessions.list, { status: "completed" });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const profile: any = useQuery(anyApi.users.myProfile);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const upcomingSessions: any[] | undefined = useQuery(anyApi.sessions.list, { status: "upcoming" });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const pastSessions: any[] | undefined = useQuery(anyApi.sessions.list, { status: "completed" });
 
   const handleTabClick = (index: number) => {
     if (index === 1) {

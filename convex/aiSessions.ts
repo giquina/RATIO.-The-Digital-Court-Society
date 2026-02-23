@@ -1,5 +1,7 @@
 import { v } from "convex/values";
 import { query, mutation, action } from "./_generated/server";
+import { auth } from "./auth";
+import { validateStringLength, LIMITS } from "./lib/validation";
 
 // ── AI Sessions ──
 
@@ -11,6 +13,22 @@ export const create = mutation({
     caseTitle: v.string(),
   },
   handler: async (ctx, args) => {
+    // Auth: verify caller owns the profile
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const callerProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!callerProfile || callerProfile._id !== args.profileId) {
+      throw new Error("Not authorized");
+    }
+
+    // Input validation
+    validateStringLength(args.mode, "Mode", LIMITS.NAME);
+    validateStringLength(args.areaOfLaw, "Area of law", LIMITS.NAME);
+    validateStringLength(args.caseTitle, "Case title", LIMITS.TITLE);
+
     return ctx.db.insert("aiSessions", {
       profileId: args.profileId,
       mode: args.mode,
@@ -36,8 +54,23 @@ export const addMessage = mutation({
     message: v.string(),
   },
   handler: async (ctx, args) => {
+    // Auth: verify caller owns the session
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const callerProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!callerProfile) throw new Error("Not authorized");
+
     const session = await ctx.db.get(args.sessionId);
     if (!session) throw new Error("Session not found");
+    if (session.profileId !== callerProfile._id) {
+      throw new Error("Not authorized");
+    }
+
+    // Input validation
+    validateStringLength(args.message, "Message", LIMITS.CONTENT);
 
     await ctx.db.patch(args.sessionId, {
       transcript: [
@@ -71,19 +104,28 @@ export const complete = mutation({
     sqe2Competencies: v.optional(v.any()),
   },
   handler: async (ctx, args) => {
+    // Auth: verify caller owns the session
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const callerProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!callerProfile) throw new Error("Not authorized");
+
+    const session = await ctx.db.get(args.sessionId);
+    if (!session) throw new Error("Session not found");
+    if (session.profileId !== callerProfile._id) {
+      throw new Error("Not authorized");
+    }
+
     const { sessionId, ...data } = args;
     await ctx.db.patch(sessionId, { ...data, status: "completed" });
 
     // Update profile stats
-    const session = await ctx.db.get(sessionId);
-    if (session) {
-      const profile = await ctx.db.get(session.profileId);
-      if (profile) {
-        await ctx.db.patch(session.profileId, {
-          totalPoints: profile.totalPoints + 25, // 25 points per AI session
-        });
-      }
-    }
+    await ctx.db.patch(session.profileId, {
+      totalPoints: callerProfile.totalPoints + 25, // 25 points per AI session
+    });
   },
 });
 
@@ -108,6 +150,20 @@ export const getById = query({
 export const saveToPortfolio = mutation({
   args: { sessionId: v.id("aiSessions") },
   handler: async (ctx, args) => {
+    // Auth: verify caller owns the session
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const callerProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!callerProfile) throw new Error("Not authorized");
+
+    const session = await ctx.db.get(args.sessionId);
+    if (!session || session.profileId !== callerProfile._id) {
+      throw new Error("Not authorized");
+    }
+
     await ctx.db.patch(args.sessionId, { savedToPortfolio: true });
   },
 });
@@ -134,6 +190,17 @@ export const submitFeedback = mutation({
     strengths: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    // Auth: verify caller owns the fromProfile
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const callerProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!callerProfile || callerProfile._id !== args.fromProfileId) {
+      throw new Error("Not authorized");
+    }
+
     const feedbackId = await ctx.db.insert("feedback", {
       sessionId: args.sessionId,
       fromProfileId: args.fromProfileId,

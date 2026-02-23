@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { query, mutation } from "../_generated/server";
+import { auth } from "../auth";
 
 export const getProfileTier = query({
   args: { profileId: v.id("profiles") },
@@ -14,6 +15,10 @@ export const getProfileTier = query({
 export const calculateAndUpdateTier = mutation({
   args: { profileId: v.id("profiles") },
   handler: async (ctx, args) => {
+    // Auth: require authentication
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
     const profile = await ctx.db.get(args.profileId);
     if (!profile) return;
 

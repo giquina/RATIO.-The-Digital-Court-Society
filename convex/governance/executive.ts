@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { query, mutation } from "../_generated/server";
+import { auth } from "../auth";
 
 // ═══════════════════════════════════════════
 // MODERATION
@@ -14,6 +15,17 @@ export const reportContent = mutation({
     reason: v.string(),
   },
   handler: async (ctx, args) => {
+    // Auth: verify caller owns the reporter profile
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const callerProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!callerProfile || callerProfile._id !== args.reportedById) {
+      throw new Error("Not authorized");
+    }
+
     return ctx.db.insert("moderationActions", {
       ...args,
       status: "reported",
@@ -51,6 +63,17 @@ export const reviewModerationAction = mutation({
     proportionalityAssessment: v.string(),
   },
   handler: async (ctx, args) => {
+    // Auth: verify caller owns the reviewer profile
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const callerProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!callerProfile || callerProfile._id !== args.reviewedById) {
+      throw new Error("Not authorized");
+    }
+
     await ctx.db.patch(args.actionId, {
       status: args.status,
       action: args.action,
@@ -92,6 +115,10 @@ export const assignRole = mutation({
     appointedBy: v.optional(v.id("motions")),
   },
   handler: async (ctx, args) => {
+    // Auth: require authentication
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
     return ctx.db.insert("governanceRoles", {
       ...args,
       appointedAt: new Date().toISOString(),

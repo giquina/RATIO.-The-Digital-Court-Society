@@ -3,15 +3,16 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation } from "convex/react";
-import { api } from "../../../../../convex/_generated/api";
+import { anyApi } from "convex/server";
 import { Card, Button, Tag, DynamicIcon } from "@/components/ui";
 import { SESSION_TYPES, LAW_MODULES, MOOT_ROLES, MOCK_TRIAL_ROLES } from "@/lib/constants/app";
 import { courtToast } from "@/lib/utils/toast";
 
 export default function CreateSessionPage() {
   const router = useRouter();
-  const profile = useQuery(api.users.myProfile);
-  const createSession = useMutation(api.sessions.create);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const profile: any = useQuery(anyApi.users.myProfile);
+  const createSession = useMutation(anyApi.sessions.create);
   const [sessionType, setSessionType] = useState("moot");
   const [module, setModule] = useState("");
   const [title, setTitle] = useState("");

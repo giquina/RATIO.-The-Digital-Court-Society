@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-// Simple auth store — in production, use a proper database + hashing
-// This provides working auth for development and demo purposes
+// DEV/DEMO ONLY — In-memory auth store for local development.
+// Production auth uses Convex Auth (convex/auth.ts).
+// This route is disabled in production via the NODE_ENV check below.
 const users = new Map<string, { name: string; email: string; password: string }>();
 
 // Password reset tokens — token → { email, expiresAt }
@@ -43,7 +44,15 @@ function generateResetToken(): string {
 }
 
 // POST /api/auth — handles login, register, logout, forgot-password, reset-password
+// This route is for dev/demo only. Production uses Convex Auth.
 export async function POST(request: NextRequest) {
+  if (process.env.NODE_ENV === "production") {
+    return NextResponse.json(
+      { error: "This endpoint is disabled in production. Use Convex Auth." },
+      { status: 404 }
+    );
+  }
+
   const body = await request.json();
   const { action } = body;
 
@@ -63,7 +72,7 @@ export async function POST(request: NextRequest) {
     const response = NextResponse.json({ success: true, user: { name, email } });
     response.cookies.set("convex-auth-token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: false, // Dev-only route, never runs in production
       sameSite: "lax",
       path: "/",
       maxAge: 60 * 60 * 24 * 30, // 30 days
@@ -84,7 +93,7 @@ export async function POST(request: NextRequest) {
     const response = NextResponse.json({ success: true, user: { name: user.name, email } });
     response.cookies.set("convex-auth-token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: false, // Dev-only route, never runs in production
       sameSite: "lax",
       path: "/",
       maxAge: 60 * 60 * 24 * 30,
@@ -133,9 +142,11 @@ export async function POST(request: NextRequest) {
         expiresAt: Date.now() + TOKEN_EXPIRY_MS,
       });
       // In production: send email with reset link via SendGrid/Resend/etc.
-      // For dev: log the token so it can be tested
-      console.log(`[DEV] Password reset token for ${email}: ${resetToken}`);
-      console.log(`[DEV] Reset URL: /reset-password?token=${resetToken}`);
+      // In dev: log the token so it can be tested
+      if (process.env.NODE_ENV === "development") {
+        console.log(`[DEV] Password reset token for ${email}: ${resetToken}`);
+        console.log(`[DEV] Reset URL: /reset-password?token=${resetToken}`);
+      }
     }
 
     return NextResponse.json({ success: true });

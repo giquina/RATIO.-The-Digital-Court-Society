@@ -3,9 +3,9 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation } from "convex/react";
+import { anyApi } from "convex/server";
 import { courtToast } from "@/lib/utils/toast";
 import { useAuthActions } from "@convex-dev/auth/react";
-import { api } from "../../../../convex/_generated/api";
 import { Card, Button, SectionHeader, Skeleton } from "@/components/ui";
 import {
   User, Mail, GraduationCap, Eye, Users, Bell, Mail as MailIcon,
@@ -50,6 +50,8 @@ function SettingsSection({
   toggles: Record<string, boolean>;
   onToggle: (key: string) => void;
 }) {
+  const router = useRouter();
+
   return (
     <div>
       <h3 className="text-court-xs font-bold text-court-text-ter uppercase tracking-widest mb-2 px-1">
@@ -60,6 +62,7 @@ function SettingsSection({
           <div
             key={i}
             className="flex items-center gap-3 px-4 py-3.5 cursor-pointer hover:bg-white/[0.02] transition-colors"
+            onClick={row.type === "link" && row.href ? () => router.push(row.href!) : undefined}
           >
             <div className="w-8 h-8 rounded-lg bg-white/[0.05] flex items-center justify-center text-court-text-sec shrink-0">
               {row.icon}
@@ -89,9 +92,11 @@ function SettingsSection({
 export default function SettingsPage() {
   const router = useRouter();
   const { signOut } = useAuthActions();
-  const user = useQuery(api.users.currentUser);
-  const profile = useQuery(api.users.myProfile);
-  const updateSettings = useMutation(api.users.updateSettings);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const user: any = useQuery(anyApi.users.currentUser);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const profile: any = useQuery(anyApi.users.myProfile);
+  const updateSettings = useMutation(anyApi.users.updateSettings);
   const [signingOut, setSigningOut] = useState(false);
 
   const [toggles, setToggles] = useState<Record<string, boolean>>({
@@ -238,9 +243,9 @@ export default function SettingsPage() {
           toggles={toggles}
           onToggle={handleToggle}
           rows={[
-            { icon: <FileText size={16} />, label: "Terms of Service", type: "link" },
-            { icon: <Shield size={16} />, label: "Privacy Policy", type: "link" },
-            { icon: <Scale size={16} />, label: "Code of Conduct", type: "link" },
+            { icon: <FileText size={16} />, label: "Terms of Service", type: "link", href: "/terms" },
+            { icon: <Shield size={16} />, label: "Privacy Policy", type: "link", href: "/privacy" },
+            { icon: <Scale size={16} />, label: "Code of Conduct", type: "link", href: "/code-of-conduct" },
           ]}
         />
 

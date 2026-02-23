@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
-import { useQuery } from "convex/react";
-import { api } from "../../../convex/_generated/api";
+import { anyApi } from "convex/server";
+import { useDemoQuery } from "@/hooks/useDemoSafe";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Home,
@@ -29,6 +29,17 @@ import { Avatar, Tag, Skeleton, Tooltip } from "@/components/ui";
 import { cn } from "@/lib/utils/helpers";
 import { useSidebarStore } from "@/stores/sidebarStore";
 import { useSidebarCounts, type SidebarCounts } from "@/lib/hooks/useSidebarCounts";
+
+const CONVEX_URL = process.env.NEXT_PUBLIC_CONVEX_URL;
+
+const DEMO_PROFILE = {
+  fullName: "Demo Advocate",
+  chamber: "Gray's",
+  rank: "Pupil",
+  streakDays: 3,
+  totalMoots: 0,
+  totalPoints: 0,
+};
 
 interface NavItem {
   href: string;
@@ -124,8 +135,9 @@ function SidebarBadge({ count, collapsed }: { count: number; collapsed: boolean 
 // ── Mini Profile ──
 
 function SidebarProfile({ collapsed }: { collapsed: boolean }) {
-  const profile = useQuery(api.users.myProfile);
-  const isLoading = profile === undefined;
+  const convexProfile = useDemoQuery(anyApi.users.myProfile);
+  const profile = CONVEX_URL ? convexProfile : DEMO_PROFILE;
+  const isLoading = CONVEX_URL && profile === undefined;
 
   if (isLoading) {
     return (
@@ -192,7 +204,8 @@ function SidebarProfile({ collapsed }: { collapsed: boolean }) {
 export function Sidebar() {
   const pathname = usePathname();
   const { collapsed, beginnerMode, toggleCollapsed, markRouteVisited, hasVisited } = useSidebarStore();
-  const profile = useQuery(api.users.myProfile);
+  const convexProfile = useDemoQuery(anyApi.users.myProfile);
+  const profile = CONVEX_URL ? convexProfile : DEMO_PROFILE;
   const counts = useSidebarCounts();
 
   // Detect beginner: no moots + no points

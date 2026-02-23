@@ -2,6 +2,8 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 
+const MAX_TRANSCRIPT_LENGTH = 50000;
+
 interface UseSpeechRecognitionReturn {
   transcript: string;
   isListening: boolean;
@@ -15,11 +17,13 @@ export function useSpeechRecognition(): UseSpeechRecognitionReturn {
   const [transcript, setTranscript] = useState("");
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<ISpeechRecognition | null>(null);
+  const isListeningRef = useRef(false);
 
   const isSupported =
     typeof window !== "undefined" &&
     ("SpeechRecognition" in window || "webkitSpeechRecognition" in window);
 
+  // Initialize recognition instance once
   useEffect(() => {
     if (!isSupported) return;
 
@@ -39,33 +43,70 @@ export function useSpeechRecognition(): UseSpeechRecognitionReturn {
         }
       }
       if (finalTranscript) {
-        setTranscript((prev) => prev + " " + finalTranscript);
+        setTranscript((prev) => {
+          const next = prev + " " + finalTranscript;
+          if (next.length > MAX_TRANSCRIPT_LENGTH) {
+            return next.slice(-MAX_TRANSCRIPT_LENGTH);
+          }
+          return next;
+        });
       }
     };
 
     recognition.onerror = (event: ISpeechRecognitionErrorEvent) => {
-      console.error("Speech recognition error:", event.error);
+      if (event.error !== "aborted") {
+        // eslint-disable-next-line no-console
+        console.error("Speech recognition error:", event.error);
+      }
       setIsListening(false);
+      isListeningRef.current = false;
     };
 
     recognition.onend = () => {
-      if (isListening) {
-        recognition.start(); // Auto-restart for continuous listening
+      // Use ref to avoid stale closure — auto-restart if still listening
+      if (isListeningRef.current) {
+        try {
+          recognition.start();
+        } catch {
+          // Already started or destroyed
+          setIsListening(false);
+          isListeningRef.current = false;
+        }
       }
     };
 
     recognitionRef.current = recognition;
-  }, [isSupported, isListening]);
+
+    // Cleanup: abort recognition on unmount
+    return () => {
+      isListeningRef.current = false;
+      try {
+        recognition.abort();
+      } catch {
+        // Already stopped
+      }
+      recognition.onresult = null;
+      recognition.onerror = null;
+      recognition.onend = null;
+      recognitionRef.current = null;
+    };
+  }, [isSupported]);
 
   const startListening = useCallback(() => {
-    if (recognitionRef.current && !isListening) {
-      recognitionRef.current.start();
-      setIsListening(true);
+    if (recognitionRef.current && !isListeningRef.current) {
+      try {
+        recognitionRef.current.start();
+        setIsListening(true);
+        isListeningRef.current = true;
+      } catch {
+        // Already started
+      }
     }
-  }, [isListening]);
+  }, []);
 
   const stopListening = useCallback(() => {
     if (recognitionRef.current) {
+      isListeningRef.current = false;
       recognitionRef.current.stop();
       setIsListening(false);
     }

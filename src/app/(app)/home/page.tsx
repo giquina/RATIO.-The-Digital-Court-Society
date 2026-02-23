@@ -4,8 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation } from "convex/react";
+import { anyApi } from "convex/server";
 import { courtToast } from "@/lib/utils/toast";
-import { api } from "../../../../convex/_generated/api";
 import {
   Avatar,
   Tag,
@@ -46,19 +46,21 @@ function getInitials(name: string) {
 
 export default function HomePage() {
   const router = useRouter();
-  const profile = useQuery(api.users.myProfile);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const profile: any = useQuery(anyApi.users.myProfile);
   const [feedTab, setFeedTab] = useState<"following" | "discover" | "chamber">("following");
 
   // Real Convex feed + notifications
-  const feed = useQuery(
-    api.social.getFeed,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const feed: any[] | undefined = useQuery(
+    anyApi.social.getFeed,
     profile ? { profileId: profile._id, feedType: feedTab, limit: 30 } : "skip"
   );
   const unreadCount = useQuery(
-    api.notifications.getUnreadCount,
+    anyApi.notifications.getUnreadCount,
     profile ? { profileId: profile._id } : "skip"
   );
-  const toggleCommend = useMutation(api.social.toggleCommend);
+  const toggleCommend = useMutation(anyApi.social.toggleCommend);
   const [optimisticCommends, setOptimisticCommends] = useState<Record<string, boolean>>({});
 
   const handleCommend = async (activityId: string) => {

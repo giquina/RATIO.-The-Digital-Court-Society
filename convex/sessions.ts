@@ -1,5 +1,7 @@
 import { v } from "convex/values";
 import { query, mutation } from "./_generated/server";
+import { auth } from "./auth";
+import { validateStringLength, validateOptionalStringLength, validateArrayLength, LIMITS } from "./lib/validation";
 
 // ── Queries ──
 
@@ -95,6 +97,26 @@ export const create = mutation({
     roles: v.array(v.string()), // role names to create
   },
   handler: async (ctx, args) => {
+    // Auth: verify caller owns the profile
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const callerProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!callerProfile || callerProfile._id !== args.createdBy) {
+      throw new Error("Not authorized");
+    }
+
+    // Input validation
+    validateStringLength(args.title, "Title", LIMITS.TITLE);
+    validateOptionalStringLength(args.description, "Description", LIMITS.DESCRIPTION);
+    validateOptionalStringLength(args.issueSummary, "Issue summary", LIMITS.DESCRIPTION);
+    validateStringLength(args.module, "Module", LIMITS.NAME);
+    validateStringLength(args.type, "Type", LIMITS.NAME);
+    validateOptionalStringLength(args.location, "Location", LIMITS.SHORT_TEXT);
+    validateArrayLength(args.roles, "Roles", 10);
+
     const { roles, ...sessionData } = args;
 
     const sessionId = await ctx.db.insert("sessions", {
@@ -142,6 +164,17 @@ export const claimRole = mutation({
     sessionId: v.id("sessions"),
   },
   handler: async (ctx, args) => {
+    // Auth: verify caller owns the profile
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const callerProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!callerProfile || callerProfile._id !== args.profileId) {
+      throw new Error("Not authorized");
+    }
+
     const role = await ctx.db.get(args.roleId);
     if (!role || role.isClaimed) {
       throw new Error("Role is already claimed");
@@ -178,6 +211,17 @@ export const unclaimRole = mutation({
     sessionId: v.id("sessions"),
   },
   handler: async (ctx, args) => {
+    // Auth: verify caller owns the profile
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const callerProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!callerProfile || callerProfile._id !== args.profileId) {
+      throw new Error("Not authorized");
+    }
+
     await ctx.db.patch(args.roleId, {
       claimedBy: undefined,
       isClaimed: false,
@@ -204,6 +248,10 @@ export const unclaimRole = mutation({
 export const updateStatus = mutation({
   args: { sessionId: v.id("sessions"), status: v.string() },
   handler: async (ctx, args) => {
+    // Auth: require authentication
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
     await ctx.db.patch(args.sessionId, { status: args.status });
   },
 });
