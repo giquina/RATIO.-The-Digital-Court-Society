@@ -40,12 +40,16 @@ export default defineSchema({
     commendationCount: v.number(),
     isPublic: v.boolean(),
     modules: v.array(v.string()), // ["Contract Law", "Public Law", ...]
+    handle: v.optional(v.string()), // URL-safe slug for referral links: /join/[handle]
+    referredByProfileId: v.optional(v.id("profiles")), // who referred this advocate
+    referralCount: v.optional(v.number()), // cached count of successful referrals
   })
     .index("by_user", ["userId"])
     .index("by_university", ["university"])
     .index("by_chamber", ["chamber"])
     .index("by_points", ["totalPoints"])
-    .index("by_rank", ["rank"]),
+    .index("by_rank", ["rank"])
+    .index("by_handle", ["handle"]),
 
   // ═══════════════════════════════════════════
   // SOCIAL LAYER
@@ -676,4 +680,51 @@ export default defineSchema({
   })
     .index("by_profile", ["profileId"])
     .index("by_profile_recent", ["profileId", "searchedAt"]),
+
+  // ═══════════════════════════════════════════
+  // REFERRALS — SHARE & REWARD
+  // ═══════════════════════════════════════════
+  referrals: defineTable({
+    referrerId: v.id("profiles"), // advocate who sent the invite
+    inviteeUserId: v.optional(v.id("users")), // set after signup
+    inviteeProfileId: v.optional(v.id("profiles")), // set after onboarding
+    status: v.string(), // "pending" | "signed_up" | "activated" | "expired" | "flagged"
+    createdAt: v.string(), // ISO timestamp
+    signedUpAt: v.optional(v.string()),
+    activatedAt: v.optional(v.string()), // set after first session completion
+    expiresAt: v.string(), // end of academic year or 30-day dormancy
+    universityDomainMatch: v.optional(v.boolean()), // true if same .ac.uk domain
+    fraudFlags: v.optional(v.array(v.string())), // ["same_ip", "velocity_cap", "self_referral"]
+  })
+    .index("by_referrer", ["referrerId"])
+    .index("by_status", ["status"])
+    .index("by_invitee_user", ["inviteeUserId"])
+    .index("by_invitee_profile", ["inviteeProfileId"]),
+
+  referralRewards: defineTable({
+    profileId: v.id("profiles"), // advocate who earned the reward
+    referralId: v.id("referrals"), // which referral triggered it
+    rewardType: v.string(), // "ai_session" | "advanced_feedback" | "archive_unlock"
+    earnedAt: v.string(), // ISO timestamp
+    expiresAt: v.string(), // end of academic term
+    redeemed: v.boolean(),
+    redeemedAt: v.optional(v.string()),
+    revoked: v.boolean(),
+    revokedReason: v.optional(v.string()),
+  })
+    .index("by_profile", ["profileId"])
+    .index("by_referral", ["referralId"])
+    .index("by_type", ["profileId", "rewardType"]),
+
+  referralAnalytics: defineTable({
+    period: v.string(), // "2026-02" (monthly) or "2026-W08" (weekly)
+    invitesSent: v.number(),
+    clicks: v.number(), // landing page visits
+    signups: v.number(),
+    activations: v.number(), // completed first session
+    rewardsIssued: v.number(),
+    fraudFlagsTriggered: v.number(),
+    topUniversities: v.optional(v.array(v.string())), // top 5 universities by referral
+  })
+    .index("by_period", ["period"]),
 });

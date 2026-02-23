@@ -5,6 +5,10 @@
 /* Fonts loaded via next/font/google in layout.tsx — no render-blocking @import */
 
 @layer base {
+  html {
+    color-scheme: dark;
+  }
+
   body {
     @apply bg-navy text-court-text font-sans antialiased;
   }

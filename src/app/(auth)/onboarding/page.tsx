@@ -27,6 +27,8 @@ function loadSaved() {
 export default function OnboardingPage() {
   const router = useRouter();
   const createProfile = useMutation(anyApi.users.createProfile);
+  const claimMyReferral = useMutation(anyApi.referrals.claimMyReferral);
+  const linkProfileToReferral = useMutation(anyApi.referrals.linkProfileToReferral);
   const skipOnboarding = useAuthStore((s) => s.skipOnboarding);
   const saved = loadSaved();
   const [step, setStep] = useState<Step>(saved?.step ?? 1);
@@ -97,7 +99,7 @@ export default function OnboardingPage() {
     try {
       const uni = UK_UNIVERSITIES.find((u) => u.name === university);
       const pendingName = typeof window !== "undefined" ? localStorage.getItem("ratio_pending_name") ?? undefined : undefined;
-      await createProfile({
+      const profileId = await createProfile({
         university,
         universityShort: uni?.short ?? university.substring(0, 5),
         yearOfStudy: year ?? 1,
@@ -105,6 +107,21 @@ export default function OnboardingPage() {
         modules,
         fullName: pendingName,
       });
+
+      // Claim referral if user arrived via a referral link
+      const referrerHandle = typeof window !== "undefined"
+        ? localStorage.getItem("ratio_referral_handle")
+        : null;
+      if (referrerHandle && profileId) {
+        try {
+          await claimMyReferral({ referrerHandle });
+          await linkProfileToReferral({ profileId, referrerHandle });
+        } catch {
+          // Referral claim is best-effort — do not block onboarding
+        }
+        localStorage.removeItem("ratio_referral_handle");
+      }
+
       localStorage.removeItem(STORAGE_KEY);
       localStorage.removeItem("ratio_pending_name");
       router.push("/home");

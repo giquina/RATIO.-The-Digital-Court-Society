@@ -4,6 +4,7 @@ import { useConvexAuth, useQuery } from "convex/react";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { BottomNav } from "@/components/shared/BottomNav";
+import { MobileHeader } from "@/components/shared/MobileHeader";
 import { Sidebar } from "@/components/shared/Sidebar";
 import { Loader2 } from "lucide-react";
 import { anyApi } from "convex/server";
@@ -19,12 +20,15 @@ function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex">
       <Sidebar />
-      <main className={cn(
-        "flex-1 pb-20 md:pb-0 md:ml-[72px]",
+      <div className={cn(
+        "flex-1 min-w-0 flex flex-col md:ml-[72px]",
         !collapsed && "lg:ml-[240px]"
       )}>
-        {children}
-      </main>
+        <MobileHeader />
+        <main className="flex-1 min-w-0 pb-24 md:pb-0">
+          {children}
+        </main>
+      </div>
       <BottomNav />
       <TheClerk />
     </div>

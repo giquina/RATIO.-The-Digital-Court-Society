@@ -117,7 +117,7 @@ export default function RankingsPage() {
             <button
               key={tab}
               onClick={() => setActiveTab(i)}
-              className={`px-4 py-1.5 rounded-full text-court-sm font-bold whitespace-nowrap border transition-all ${
+              className={`px-4 py-2 min-h-[44px] rounded-full text-court-sm font-bold whitespace-nowrap border transition-all ${
                 activeTab === i
                   ? "border-gold/40 bg-gold-dim text-gold"
                   : "border-court-border text-court-text-ter hover:text-court-text-sec"
@@ -132,14 +132,14 @@ export default function RankingsPage() {
       {/* Podium — Top 3 */}
       {top3.length >= 3 && (
         <section className="px-4 md:px-6 lg:px-8 mb-6">
-          <div className="flex justify-center items-end gap-1.5 sm:gap-2.5">
+          <div className="flex justify-center items-end gap-1 sm:gap-2.5">
             {/* Silver — 2nd */}
-            <div className="flex-1 min-w-0 max-w-[110px] sm:max-w-[130px] text-center">
+            <div className="flex-1 min-w-0 max-w-[95px] sm:max-w-[130px] text-center">
               <Avatar initials={getInitials(top3[1].fullName)} chamber={top3[1].chamber} size="lg" />
-              <p className="text-court-sm font-bold text-court-text mt-1.5">
+              <p className="text-court-sm font-bold text-court-text mt-1.5 truncate">
                 {top3[1].fullName.split(" ")[0]}
               </p>
-              <p className="text-court-xs text-court-text-ter">{top3[1].universityShort}</p>
+              <p className="text-court-xs text-court-text-ter truncate">{top3[1].universityShort}</p>
               <div className={`mt-2 py-2.5 rounded-lg border ${MEDAL_BG[1]} flex flex-col items-center`}>
                 <div className="flex justify-center">{MEDAL_ICONS[1]}</div>
                 <p className="text-court-xs font-bold text-court-text mt-0.5">{top3[1].totalPoints.toLocaleString()}</p>
@@ -151,15 +151,15 @@ export default function RankingsPage() {
             </div>
 
             {/* Gold — 1st */}
-            <div className="flex-1 min-w-0 max-w-[110px] sm:max-w-[130px] text-center -mt-4">
+            <div className="flex-1 min-w-0 max-w-[105px] sm:max-w-[130px] text-center -mt-4">
               <div className="flex justify-center mb-1">
                 <Crown size={18} className="text-gold" />
               </div>
               <Avatar initials={getInitials(top3[0].fullName)} chamber={top3[0].chamber} size="xl" border />
-              <p className="text-court-base font-bold text-court-text mt-1.5">
+              <p className="text-court-base font-bold text-court-text mt-1.5 truncate">
                 {top3[0].fullName.split(" ")[0]}
               </p>
-              <p className="text-court-xs text-court-text-ter">{top3[0].universityShort}</p>
+              <p className="text-court-xs text-court-text-ter truncate">{top3[0].universityShort}</p>
               <div className={`mt-2 py-3 rounded-lg border ${MEDAL_BG[0]} flex flex-col items-center`}>
                 <div className="flex justify-center">{MEDAL_ICONS[0]}</div>
                 <p className="text-court-sm font-bold text-gold mt-0.5">{top3[0].totalPoints.toLocaleString()}</p>
@@ -171,12 +171,12 @@ export default function RankingsPage() {
             </div>
 
             {/* Bronze — 3rd */}
-            <div className="flex-1 min-w-0 max-w-[110px] sm:max-w-[130px] text-center">
+            <div className="flex-1 min-w-0 max-w-[95px] sm:max-w-[130px] text-center">
               <Avatar initials={getInitials(top3[2].fullName)} chamber={top3[2].chamber} size="lg" />
-              <p className="text-court-sm font-bold text-court-text mt-1.5">
+              <p className="text-court-sm font-bold text-court-text mt-1.5 truncate">
                 {top3[2].fullName.split(" ")[0]}
               </p>
-              <p className="text-court-xs text-court-text-ter">{top3[2].universityShort}</p>
+              <p className="text-court-xs text-court-text-ter truncate">{top3[2].universityShort}</p>
               <div className={`mt-2 py-2.5 rounded-lg border ${MEDAL_BG[2]} flex flex-col items-center`}>
                 <div className="flex justify-center">{MEDAL_ICONS[2]}</div>
                 <p className="text-court-xs font-bold text-court-text mt-0.5">{top3[2].totalPoints.toLocaleString()}</p>
@@ -202,10 +202,10 @@ export default function RankingsPage() {
               </span>
               <Avatar initials={getInitials(person.fullName)} chamber={person.chamber} size="sm" />
               <div className="flex-1 min-w-0">
-                <p className={`text-court-base font-bold ${isMe ? "text-gold" : "text-court-text"}`}>
+                <p className={`text-court-base font-bold truncate ${isMe ? "text-gold" : "text-court-text"}`}>
                   {person.fullName} {isMe && <span className="text-court-xs font-normal">(You)</span>}
                 </p>
-                <p className="text-court-xs text-court-text-ter">
+                <p className="text-court-xs text-court-text-ter truncate">
                   {person.universityShort} · {person.totalMoots} moots
                 </p>
               </div>

@@ -8,6 +8,7 @@ import { courtToast } from "@/lib/utils/toast";
 import { Flame, Timer, FileText, Star, Trophy, FolderOpen, Link as LinkIcon, Landmark, Settings, X, Loader2 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
+import { ReferralDashboard } from "@/components/shared/ReferralDashboard";
 
 function getInitials(name: string) {
   return name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
@@ -223,6 +224,13 @@ export default function ProfilePage() {
           </div>
         </section>
       )}
+
+      {/* ── Invite to the Bar ── */}
+      <section className="px-4 mt-4">
+        <Card className="p-4">
+          <ReferralDashboard />
+        </Card>
+      </section>
 
       {/* ── Actions ── */}
       <section className="px-4 mt-4">

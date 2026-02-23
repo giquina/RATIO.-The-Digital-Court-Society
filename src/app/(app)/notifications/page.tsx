@@ -18,6 +18,7 @@ const TYPE_ICON: Record<string, string> = {
   session_invite: "Calendar",
   chamber_update: "Shield",
   achievement: "Trophy",
+  referral_activated: "UserPlus",
 };
 
 function getIconForType(type: string) {

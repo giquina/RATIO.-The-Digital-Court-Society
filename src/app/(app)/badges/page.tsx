@@ -143,7 +143,7 @@ export default function BadgesPage() {
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
-              className={`px-3.5 py-1.5 rounded-full text-court-sm font-bold whitespace-nowrap border transition-all ${
+              className={`px-3.5 py-2 min-h-[44px] rounded-full text-court-sm font-bold whitespace-nowrap border transition-all ${
                 activeCategory === cat
                   ? "border-gold/40 bg-gold-dim text-gold"
                   : "border-court-border text-court-text-ter hover:text-court-text-sec"

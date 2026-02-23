@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthActions } from "@convex-dev/auth/react";
 import Link from "next/link";
 import { Scale, Loader2, ArrowLeft } from "lucide-react";
+import { DemoCredentialsBanner } from "@/components/shared/DemoCredentialsBanner";
 
 function LoginForm() {
   const router = useRouter();
@@ -39,6 +40,14 @@ function LoginForm() {
         <h1 className="font-serif text-2xl font-bold text-court-text">Return to the Bench</h1>
         <p className="text-xs text-court-text-sec mt-1.5">Sign in to continue your advocacy</p>
       </div>
+
+      <DemoCredentialsBanner
+        variant="login"
+        onUseDemo={(demoEmail, demoPassword) => {
+          setEmail(demoEmail);
+          setPassword(demoPassword);
+        }}
+      />
 
       <form
         onSubmit={(e) => { e.preventDefault(); handleSignIn(); }}

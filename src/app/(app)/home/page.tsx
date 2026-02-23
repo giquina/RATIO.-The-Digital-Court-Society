@@ -16,7 +16,7 @@ import {
   Skeleton,
   EmptyState,
 } from "@/components/ui";
-import { Bell, Scale, Calendar, Target, Trophy, Flame, Award, MessageCircle, ExternalLink } from "lucide-react";
+import { Scale, Calendar, Target, Trophy, Flame, Award, MessageCircle, ExternalLink } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 // ── Activity type → icon & colour mapping ──
@@ -56,10 +56,6 @@ export default function HomePage() {
     anyApi.social.getFeed,
     profile ? { profileId: profile._id, feedType: feedTab, limit: 30 } : "skip"
   );
-  const unreadCount = useQuery(
-    anyApi.notifications.getUnreadCount,
-    profile ? { profileId: profile._id } : "skip"
-  );
   const toggleCommend = useMutation(anyApi.social.toggleCommend);
   const [optimisticCommends, setOptimisticCommends] = useState<Record<string, boolean>>({});
 
@@ -78,39 +74,9 @@ export default function HomePage() {
   };
 
   const isLoading = profile === undefined;
-  const initials = profile ? getInitials(profile.fullName) : "??";
 
   return (
     <div className="pb-6">
-      {/* ── Header ── */}
-      <header className="flex justify-between items-center px-4 pt-3 pb-4">
-        <div>
-          <h1 className="font-serif text-sm text-gold tracking-[0.14em] uppercase font-bold">
-            RATIO<span className="text-gold">.</span>
-          </h1>
-          {isLoading ? (
-            <Skeleton className="w-32 h-3.5 mt-1" />
-          ) : (
-            <p className="text-court-sm text-court-text-ter mt-0.5">
-              {profile?.universityShort ?? "—"}{profile?.chamber ? ` · ${profile.chamber} Chamber` : ""}
-            </p>
-          )}
-        </div>
-        <div className="flex items-center gap-3">
-          <Link href="/notifications" aria-label="Notifications" className="relative w-9 h-9 rounded-full bg-gold-dim flex items-center justify-center">
-            <Bell size={18} className="text-gold" />
-            {!!unreadCount && unreadCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 rounded-full bg-red-500 text-white text-court-xs font-bold flex items-center justify-center px-1">
-                {unreadCount > 99 ? "99+" : unreadCount}
-              </span>
-            )}
-          </Link>
-          <Link href="/profile" aria-label="View profile">
-            <Avatar initials={initials} chamber={profile?.chamber} size="sm" border />
-          </Link>
-        </div>
-      </header>
-
       {/* ── Streak + Stats Card ── */}
       <section className="px-4 mb-5">
         {isLoading ? (
@@ -258,7 +224,7 @@ export default function HomePage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between items-center">
                       <div>
-                        <span className="text-court-base font-bold text-court-text">{authorName}</span>
+                        <span className="text-court-base font-bold text-court-text truncate">{authorName}</span>
                         <span className="text-court-xs text-court-text-ter ml-1.5">{timeAgo(item._creationTime)}</span>
                       </div>
                     </div>
