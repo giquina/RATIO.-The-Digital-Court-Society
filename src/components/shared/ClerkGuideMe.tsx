@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { usePathname } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -19,7 +20,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
 
 export function ClerkGuideMe() {
   const pathname = usePathname();
-  const guide = getGuideForRoute(pathname);
+  const guide = useMemo(() => getGuideForRoute(pathname), [pathname]);
 
   return (
     <div className="flex flex-col">

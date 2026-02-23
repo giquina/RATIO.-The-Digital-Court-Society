@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
 import { Search, ChevronDown, ChevronUp, HelpCircle, BookOpen, Mic, Brain, BarChart3, Landmark, Library, Shield } from "lucide-react";
@@ -34,15 +34,18 @@ export function ClerkQuickHelp() {
     });
   };
 
-  const filtered = HELP_SECTIONS.map((section) => ({
-    ...section,
-    items: section.items.filter(
-      (item) =>
-        !searchQuery ||
-        item.q.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.a.toLowerCase().includes(searchQuery.toLowerCase())
-    ),
-  })).filter((s) => s.items.length > 0);
+  const filtered = useMemo(() => {
+    const query = searchQuery.toLowerCase();
+    return HELP_SECTIONS.map((section) => ({
+      ...section,
+      items: section.items.filter(
+        (item) =>
+          !searchQuery ||
+          item.q.toLowerCase().includes(query) ||
+          item.a.toLowerCase().includes(query)
+      ),
+    })).filter((s) => s.items.length > 0);
+  }, [searchQuery]);
 
   return (
     <div className="flex flex-col">
@@ -70,20 +73,29 @@ export function ClerkQuickHelp() {
           const isOpen = openSections.has(section.id);
           return (
             <div key={section.id}>
-              <button onClick={() => toggleSection(section.id)} className="w-full flex items-center gap-2.5 px-4 py-2.5 hover:bg-white/[0.02] transition-colors">
+              <button
+                onClick={() => toggleSection(section.id)}
+                aria-expanded={isOpen}
+                aria-controls={`clerk-section-${section.id}`}
+                className="w-full flex items-center gap-2.5 px-4 min-h-[44px] py-2.5 hover:bg-white/[0.02] transition-colors"
+              >
                 {Icon && <Icon size={14} className="text-gold shrink-0" />}
                 <span className="flex-1 text-left text-court-sm font-semibold text-court-text">{section.title}</span>
                 <span className="text-[10px] text-court-text-ter mr-1">{section.items.length}</span>
                 {isOpen ? <ChevronUp size={12} className="text-court-text-ter" /> : <ChevronDown size={12} className="text-court-text-ter" />}
               </button>
               {isOpen && (
-                <div className="border-t border-white/[0.04]">
+                <div id={`clerk-section-${section.id}`} className="border-t border-white/[0.04]">
                   {section.items.map((item, idx) => {
                     const key = `${section.id}-${idx}`;
                     const isItemOpen = openItems.has(key);
                     return (
                       <div key={key} className="border-b border-white/[0.04] last:border-b-0">
-                        <button onClick={() => toggleItem(key)} className="w-full flex items-start gap-2 px-4 py-2 hover:bg-white/[0.02] transition-colors text-left">
+                        <button
+                          onClick={() => toggleItem(key)}
+                          aria-expanded={isItemOpen}
+                          className="w-full flex items-start gap-2 px-4 min-h-[44px] py-2.5 hover:bg-white/[0.02] transition-colors text-left"
+                        >
                           <span className="text-gold font-bold text-court-xs mt-0.5 shrink-0">Q</span>
                           <span className="flex-1 text-court-xs text-court-text leading-relaxed">{item.q}</span>
                           {isItemOpen ? <ChevronUp size={10} className="text-court-text-ter shrink-0 mt-1" /> : <ChevronDown size={10} className="text-court-text-ter shrink-0 mt-1" />}

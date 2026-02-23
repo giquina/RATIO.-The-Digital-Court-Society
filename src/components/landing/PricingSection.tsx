@@ -80,7 +80,7 @@ const TIERS = [
     priceColor: "text-court-text",
     bgAccent: "bg-burgundy/10",
     checkColor: "text-[#C9A84C]/60",
-    ctaVariant: "outline" as const,
+    ctaVariant: "accent" as const,
     ctaLabel: "Start Free Trial",
   },
 ];
@@ -183,8 +183,8 @@ export function PricingSection() {
               className={`w-full mt-5 py-2.5 rounded-xl text-sm font-bold tracking-wide transition-all duration-200 text-center block ${
                 tier.ctaVariant === "primary"
                   ? "bg-gold text-navy hover:bg-gold/90"
-                  : tier.ctaVariant === "outline"
-                  ? "border border-burgundy/40 text-court-text hover:bg-burgundy/10"
+                  : tier.ctaVariant === "accent"
+                  ? "border border-gold/30 text-gold hover:bg-gold/10 hover:border-gold/50"
                   : "bg-white/5 text-court-text-sec border border-court-border hover:bg-white/10"
               }`}
             >

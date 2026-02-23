@@ -49,8 +49,9 @@ export function TheClerk() {
             exit={{ scale: 0.8, opacity: 0 }}
             transition={{ duration: 0.2 }}
             onClick={() => open()}
-            className="fixed bottom-24 right-4 md:bottom-6 md:right-6 z-[70] h-10 px-3.5 rounded-full bg-navy-card border border-court-border hover:border-gold/30 flex items-center gap-1.5 transition-colors duration-200 shadow-lg"
+            className="fixed bottom-24 right-4 md:bottom-6 md:right-6 z-[70] h-11 px-3.5 rounded-full bg-navy-card border border-court-border hover:border-gold/30 flex items-center gap-1.5 transition-colors duration-200 shadow-lg"
             aria-label="Open The Clerk help panel"
+            aria-expanded={false}
           >
             <Scale size={16} className="text-gold" />
             <span className="text-court-xs font-semibold text-court-text-sec">Clerk</span>
@@ -75,18 +76,20 @@ export function TheClerk() {
                 <Scale size={18} className="text-gold" />
                 <h2 className="font-serif text-base font-bold text-court-text">The Clerk</h2>
               </div>
-              <button onClick={close} className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-white/[0.06] transition-colors" aria-label="Close help panel">
-                <X size={16} className="text-court-text-ter" />
+              <button onClick={close} className="w-10 h-10 rounded-lg flex items-center justify-center hover:bg-white/[0.06] transition-colors" aria-label="Close help panel">
+                <X size={18} className="text-court-text-ter" />
               </button>
             </div>
 
             {/* Tabs */}
-            <div className="flex border-b border-court-border shrink-0">
+            <div className="flex border-b border-court-border shrink-0" role="tablist" aria-label="Clerk help sections">
               {TABS.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setTab(tab.id)}
-                  className={`flex-1 py-2.5 text-court-xs font-semibold tracking-wide transition-colors relative ${
+                  aria-selected={activeTab === tab.id}
+                  role="tab"
+                  className={`flex-1 min-h-[44px] py-2.5 text-court-xs font-semibold tracking-wide transition-colors relative ${
                     activeTab === tab.id ? "text-gold" : "text-court-text-ter hover:text-court-text-sec"
                   }`}
                 >
@@ -99,7 +102,7 @@ export function TheClerk() {
             </div>
 
             {/* Content */}
-            <div className="flex-1 overflow-y-auto min-h-0 scrollbar-hide">
+            <div className="flex-1 overflow-y-auto min-h-0 scrollbar-hide" role="tabpanel" aria-label={`${activeTab} content`}>
               {activeTab === "help" && <ClerkQuickHelp />}
               {activeTab === "glossary" && <ClerkGlossary />}
               {activeTab === "guide" && <ClerkGuideMe />}

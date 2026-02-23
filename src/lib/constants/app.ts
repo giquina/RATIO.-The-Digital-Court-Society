@@ -130,3 +130,25 @@ export const AI_PERSONAS = {
     gradient: ["#1A3D2A", "#3D6B45"],
   },
 } as const;
+
+// ── Referral System ──
+export const REFERRAL = {
+  VELOCITY_CAP_WEEKLY: 10,
+  REWARD_CAP_MONTHLY: 5,
+  REWARD_CAP_TERM: 15,
+  DORMANT_EXPIRY_DAYS: 30,
+  SITE_URL: "https://ratiothedigitalcourtsociety.com",
+  REWARD_TYPES: {
+    ai_session: { label: "AI Judge Session", icon: "Brain", description: "One additional AI Judge practice session" },
+    advanced_feedback: { label: "Advanced Feedback", icon: "BarChart3", description: "Enhanced feedback analysis on your next session" },
+    archive_unlock: { label: "Archive Access", icon: "FolderOpen", description: "Term-based access to the session archive" },
+  },
+  WHATSAPP_MESSAGE: (handle: string) =>
+    `I invite you to join Ratio — The Digital Court Society. A constitutional training ground for UK law students. Join as an Advocate: https://ratiothedigitalcourtsociety.com/join/${handle}`,
+} as const;
+
+export const REFERRAL_BADGE_DEFINITIONS = [
+  { name: "First Referral", icon: "UserPlus", category: "community", requirement: { type: "referrals_completed", threshold: 1 } },
+  { name: "Advocate Recruiter", icon: "Users", category: "community", requirement: { type: "referrals_completed", threshold: 5 } },
+  { name: "Chamber Builder", icon: "Shield", category: "community", requirement: { type: "referrals_completed", threshold: 15 } },
+] as const;

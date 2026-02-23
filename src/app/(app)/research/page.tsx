@@ -151,27 +151,27 @@ export default function ResearchPage() {
     selectedCourts.length > 0 || yearFrom || yearTo || judgeFilter || partyFilter
 
   return (
-    <div className="min-h-screen px-4 sm:px-6 lg:px-8 py-6 max-w-4xl mx-auto">
+    <div className="min-h-screen px-4 sm:px-6 lg:px-8 py-6 pb-24 sm:pb-6 max-w-4xl mx-auto">
       {/* Page Header */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-1">
-          <h1 className="font-serif text-2xl sm:text-3xl font-bold text-court-text tracking-tight">
+      <div className="mb-6">
+        <div className="flex items-start justify-between gap-3 mb-2">
+          <h1 className="font-serif text-2xl sm:text-3xl font-bold text-court-text tracking-tight leading-tight">
             Legal Research
           </h1>
-          <div className="flex items-center gap-3">
-            <span className="text-court-xs font-bold tracking-[0.15em] text-gold bg-gold-dim border border-gold/20 rounded px-2 py-0.5">
-              OFFICIAL SOURCES
-            </span>
-            <Link
-              href="/research/saved"
-              className="flex items-center gap-1.5 text-court-xs font-bold tracking-wider text-court-text-ter hover:text-gold transition-colors"
-            >
-              <Bookmark size={14} />
-              Saved
-            </Link>
-          </div>
+          <Link
+            href="/research/saved"
+            className="flex-shrink-0 flex items-center gap-1.5 text-court-xs font-bold tracking-wider text-court-text-ter hover:text-gold transition-colors min-h-[44px]"
+          >
+            <Bookmark size={14} />
+            Saved
+          </Link>
         </div>
-        <p className="text-court-base text-court-text-sec">
+        <div className="flex items-center gap-3 mb-2">
+          <span className="text-court-xs font-bold tracking-[0.15em] text-gold bg-gold-dim border border-gold/20 rounded px-2 py-1">
+            OFFICIAL SOURCES
+          </span>
+        </div>
+        <p className="text-court-sm sm:text-court-base text-court-text-sec leading-relaxed">
           Search every UK statute and court judgment. Powered by legislation.gov.uk & Find Case Law.
         </p>
       </div>
@@ -196,7 +196,7 @@ export default function ResearchPage() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search cases, statutes, or paste a citation..."
-              className="w-full bg-transparent text-court-text placeholder:text-court-text-ter pl-12 pr-4 py-4 text-base focus:outline-none"
+              className="w-full bg-transparent text-court-text placeholder:text-court-text-ter/60 pl-12 pr-4 py-3.5 sm:py-4 text-court-sm sm:text-base focus:outline-none"
               autoComplete="off"
               spellCheck="false"
             />
@@ -204,14 +204,14 @@ export default function ResearchPage() {
         </div>
 
         {/* Source Tabs + Filter Toggle */}
-        <div className="flex flex-wrap items-center gap-2 mt-3">
+        <div className="flex items-center gap-2 mt-3 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 no-scrollbar">
           {SOURCE_TABS.map((tab) => (
             <button
               key={tab.value}
               type="button"
               onClick={() => setSource(tab.value)}
               className={cn(
-                "px-4 py-2.5 rounded-xl text-court-xs font-bold tracking-wider transition-all flex items-center gap-1.5 active:scale-95",
+                "flex-shrink-0 px-3.5 sm:px-4 py-2.5 min-h-[44px] rounded-xl text-court-xs font-bold tracking-wider transition-all flex items-center gap-1.5 active:scale-95",
                 source === tab.value
                   ? "bg-gold-dim text-gold border border-gold/20"
                   : "text-court-text-ter hover:text-court-text-sec border border-transparent"
@@ -221,12 +221,11 @@ export default function ResearchPage() {
               {tab.label}
             </button>
           ))}
-          <div className="flex-1" />
           <button
             type="button"
             onClick={() => setShowFilters(!showFilters)}
             className={cn(
-              "px-4 py-2.5 rounded-xl text-court-xs font-bold tracking-wider transition-all flex items-center gap-1.5 active:scale-95",
+              "flex-shrink-0 px-3.5 sm:px-4 py-2.5 min-h-[44px] rounded-xl text-court-xs font-bold tracking-wider transition-all flex items-center gap-1.5 active:scale-95",
               showFilters || hasActiveFilters
                 ? "bg-gold-dim text-gold border border-gold/20"
                 : "text-court-text-ter hover:text-court-text-sec border border-transparent"
@@ -356,16 +355,16 @@ export default function ResearchPage() {
 
       {/* Popular Searches */}
       {!results && !isLoading && (
-        <div className="mb-8">
+        <div className="mb-6">
           <p className="text-court-xs font-bold tracking-[0.15em] text-court-text-ter mb-3">
             POPULAR SEARCHES
           </p>
-          <div className="flex flex-wrap gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {POPULAR_SEARCHES.map((term) => (
               <button
                 key={term}
                 onClick={() => handleQuickSearch(term)}
-                className="px-4 py-2.5 bg-navy-card border border-court-border-light rounded-xl text-court-sm text-court-text-sec hover:text-court-text hover:bg-navy-mid hover:border-court-border transition-all active:scale-95"
+                className="px-3 sm:px-4 py-2.5 min-h-[44px] bg-navy-card border border-court-border-light rounded-xl text-court-sm text-court-text-sec hover:text-court-text hover:bg-navy-mid hover:border-court-border transition-all active:scale-95 text-left truncate"
               >
                 {term}
               </button>
@@ -374,22 +373,24 @@ export default function ResearchPage() {
         </div>
       )}
 
-      {/* Recent Searches — TODO: replace RECENT_SEARCHES_DEMO with useQuery(api.research.getRecentSearches) when Convex auth is wired */}
+      {/* Recent Searches */}
       {!results && !isLoading && (
-        <div className="mb-8">
+        <div className="mb-6">
           <p className="text-court-xs font-bold tracking-[0.15em] text-court-text-ter mb-3 flex items-center gap-2">
             <Clock size={12} />
             RECENT SEARCHES
           </p>
-          <div className="flex flex-wrap gap-2">
+          <div className="space-y-2">
             {RECENT_SEARCHES_DEMO.map((item) => (
               <button
                 key={item.query}
                 onClick={() => handleQuickSearch(item.query)}
-                className="group/recent flex items-center gap-2 px-4 py-2.5 bg-navy-card border border-court-border-light rounded-xl text-court-sm text-court-text-sec hover:text-court-text hover:bg-navy-mid hover:border-court-border transition-all active:scale-95"
+                className="group/recent w-full flex items-center justify-between gap-3 px-4 py-3 min-h-[44px] bg-navy-card border border-court-border-light rounded-xl hover:bg-navy-mid hover:border-court-border transition-all active:scale-95"
               >
-                <span>{item.query}</span>
-                <span className="text-court-xs text-court-text-ter group-hover/recent:text-court-text-sec transition-colors">
+                <span className="text-court-sm text-court-text-sec group-hover/recent:text-court-text transition-colors truncate text-left">
+                  {item.query}
+                </span>
+                <span className="flex-shrink-0 text-court-xs text-court-text-ter group-hover/recent:text-court-text-sec transition-colors whitespace-nowrap">
                   {item.resultCount} results · {item.searchedAt}
                 </span>
               </button>
@@ -409,7 +410,7 @@ export default function ResearchPage() {
       {results && (
         <div ref={resultsRef}>
           {/* Results Header */}
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
             <div className="flex items-center gap-3">
               <span className="text-court-sm text-court-text-sec">
                 {results.totalResults.toLocaleString()} result

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Search, ChevronDown, ChevronUp } from "lucide-react";
 import { useClerkStore } from "@/stores/clerkStore";
 import { GLOSSARY_TERMS } from "@/lib/constants/clerk-glossary";
@@ -23,13 +23,16 @@ export function ClerkGlossary() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [expandedTerm, setExpandedTerm] = useState<string | null>(null);
 
-  const filtered = GLOSSARY_TERMS.filter((term) => {
-    const matchesCategory = selectedCategory === "all" || term.category === selectedCategory;
-    const matchesSearch = !searchQuery ||
-      term.term.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      term.definition.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+  const filtered = useMemo(() => {
+    const query = searchQuery.toLowerCase();
+    return GLOSSARY_TERMS.filter((term) => {
+      const matchesCategory = selectedCategory === "all" || term.category === selectedCategory;
+      const matchesSearch = !searchQuery ||
+        term.term.toLowerCase().includes(query) ||
+        term.definition.toLowerCase().includes(query);
+      return matchesCategory && matchesSearch;
+    });
+  }, [searchQuery, selectedCategory]);
 
   return (
     <div className="flex flex-col">
@@ -55,7 +58,8 @@ export function ClerkGlossary() {
             <button
               key={cat.id}
               onClick={() => setSelectedCategory(cat.id)}
-              className={`text-[10px] px-2.5 py-1 rounded-full border transition-colors ${
+              aria-pressed={selectedCategory === cat.id}
+              className={`text-[10px] px-2.5 min-h-[34px] py-1.5 rounded-full border transition-colors ${
                 selectedCategory === cat.id
                   ? "bg-gold/10 text-gold border-gold/20"
                   : "bg-white/[0.04] text-court-text-ter border-white/[0.06] hover:text-court-text-sec"
@@ -75,7 +79,8 @@ export function ClerkGlossary() {
             <div key={term.term}>
               <button
                 onClick={() => setExpandedTerm(isExpanded ? null : term.term)}
-                className="w-full flex items-center gap-2 px-4 py-2.5 hover:bg-white/[0.02] transition-colors text-left"
+                aria-expanded={isExpanded}
+                className="w-full flex items-center gap-2 px-4 min-h-[44px] py-2.5 hover:bg-white/[0.02] transition-colors text-left"
               >
                 <span className="flex-1 text-court-sm font-semibold text-court-text">{term.term}</span>
                 {isExpanded ? <ChevronUp size={12} className="text-court-text-ter" /> : <ChevronDown size={12} className="text-court-text-ter" />}

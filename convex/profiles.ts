@@ -266,5 +266,71 @@ export const incrementMoots = mutation({
       totalPoints: newPoints,
       rank,
     });
+
+    // Activate referral on first session completion (activation gate)
+    if (profile.totalMoots === 0 && profile.referredByProfileId) {
+      const referral = await ctx.db
+        .query("referrals")
+        .withIndex("by_invitee_profile", (q) =>
+          q.eq("inviteeProfileId", args.profileId)
+        )
+        .first();
+      if (referral && referral.status === "signed_up") {
+        const now = new Date().toISOString();
+        await ctx.db.patch(referral._id, {
+          status: "activated",
+          activatedAt: now,
+        });
+
+        // Check monthly reward cap before issuing reward
+        const monthStart = new Date();
+        monthStart.setDate(1);
+        monthStart.setHours(0, 0, 0, 0);
+        const existingRewards = await ctx.db
+          .query("referralRewards")
+          .withIndex("by_profile", (q) => q.eq("profileId", referral.referrerId))
+          .collect();
+        const monthlyRewards = existingRewards.filter(
+          (r) => r.earnedAt > monthStart.toISOString() && !r.revoked
+        ).length;
+
+        if (monthlyRewards < 5) {
+          // Issue AI session reward to referrer
+          const academicYearEnd = new Date();
+          const yearForExpiry = academicYearEnd.getMonth() >= 7
+            ? academicYearEnd.getFullYear() + 1
+            : academicYearEnd.getFullYear();
+          const expiresAt = `${yearForExpiry}-07-31T23:59:59.000Z`;
+
+          await ctx.db.insert("referralRewards", {
+            profileId: referral.referrerId,
+            referralId: referral._id,
+            rewardType: "ai_session",
+            earnedAt: now,
+            expiresAt,
+            redeemed: false,
+            revoked: false,
+          });
+
+          // Increment referrer's cached count
+          const referrer = await ctx.db.get(referral.referrerId);
+          if (referrer) {
+            await ctx.db.patch(referral.referrerId, {
+              referralCount: (referrer.referralCount ?? 0) + 1,
+            });
+          }
+
+          // Notify the referrer
+          await ctx.db.insert("notifications", {
+            profileId: referral.referrerId,
+            type: "referral_activated",
+            title: "Your referral has joined the Bar",
+            body: "An advocate you invited has completed their first session. You have earned a reward.",
+            metadata: { referralId: referral._id },
+            read: false,
+          });
+        }
+      }
+    }
   },
 });

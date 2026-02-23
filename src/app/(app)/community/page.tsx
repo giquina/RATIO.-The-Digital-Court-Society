@@ -239,11 +239,11 @@ export default function CommunityPage() {
                     <Card key={r._id} highlight={isMe} className="px-3.5 py-3 flex items-center gap-3">
                       <span className="text-sm font-bold text-court-text-ter w-6 text-center font-serif">{r.pos}</span>
                       <Avatar initials={getInitials(r.fullName)} chamber={r.chamber} size="sm" />
-                      <div className="flex-1">
-                        <p className={`text-court-base font-bold ${isMe ? "text-gold" : "text-court-text"}`}>
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-court-base font-bold truncate ${isMe ? "text-gold" : "text-court-text"}`}>
                           {r.fullName} {isMe && <span className="text-court-xs font-normal">(You)</span>}
                         </p>
-                        <p className="text-court-xs text-court-text-ter">{r.universityShort} · {r.totalMoots} moots</p>
+                        <p className="text-court-xs text-court-text-ter truncate">{r.universityShort} · {r.totalMoots} moots</p>
                       </div>
                       <div className="text-right">
                         <p className="text-sm font-bold text-court-text font-serif">{r.totalPoints}</p>
@@ -306,11 +306,11 @@ export default function CommunityPage() {
                     <Card key={p._id} className="px-3.5 py-3 flex items-center gap-3 mb-2">
                       <span className="text-court-base font-bold text-gold w-5 font-serif">{i + 1}</span>
                       <Avatar initials={getInitials(p.fullName)} chamber={p.chamber} size="sm" />
-                      <div className="flex-1">
-                        <p className={`text-court-base font-bold ${isMe ? "text-gold" : "text-court-text"}`}>
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-court-base font-bold truncate ${isMe ? "text-gold" : "text-court-text"}`}>
                           {p.fullName} {isMe && <span className="text-court-xs font-normal">(You)</span>}
                         </p>
-                        <p className="text-court-xs text-court-text-ter">{p.universityShort} · {p.totalMoots} moots</p>
+                        <p className="text-court-xs text-court-text-ter truncate">{p.universityShort} · {p.totalMoots} moots</p>
                       </div>
                       <Tag>{p.rank}</Tag>
                     </Card>

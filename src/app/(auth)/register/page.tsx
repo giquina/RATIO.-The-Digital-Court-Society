@@ -1,12 +1,25 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useMutation } from "convex/react";
 import { anyApi } from "convex/server";
 import Link from "next/link";
 import { Scale, Loader2, ArrowLeft } from "lucide-react";
+import { DemoCredentialsBanner } from "@/components/shared/DemoCredentialsBanner";
+
+/** Captures ?ref= param from referral links and stores in localStorage */
+function ReferralCapture() {
+  const searchParams = useSearchParams();
+  useEffect(() => {
+    const ref = searchParams.get("ref");
+    if (ref && typeof window !== "undefined") {
+      localStorage.setItem("ratio_referral_handle", ref);
+    }
+  }, [searchParams]);
+  return null;
+}
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -54,11 +67,14 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen flex flex-col justify-center px-4 md:px-6 lg:px-8">
+      <Suspense><ReferralCapture /></Suspense>
       <div className="text-center mb-12">
         <div className="flex justify-center mb-4"><Scale size={44} className="text-gold" /></div>
         <h1 className="font-serif text-2xl font-bold text-court-text">Join the Bar</h1>
         <p className="text-xs text-court-text-sec mt-1.5">Begin your advocacy journey</p>
       </div>
+
+      <DemoCredentialsBanner variant="register" />
 
       <form
         onSubmit={(e) => { e.preventDefault(); handleRegister(); }}
