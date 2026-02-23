@@ -1,7 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, DM_Sans } from "next/font/google";
 import { ConvexClientProvider } from "@/components/shared/ConvexProvider";
-import { Analytics } from "@/components/shared/Analytics";
+import { Analytics as GAAnalytics } from "@/components/shared/Analytics";
+import { Analytics as VercelAnalytics } from "@vercel/analytics/react";
 import { CookieConsent } from "@/components/shared/CookieConsent";
 import { Toaster } from "sonner";
 import "./globals.css";
@@ -126,7 +127,8 @@ export default function RootLayout({
             }}
           />
         </ConvexClientProvider>
-        <Analytics />
+        <VercelAnalytics />
+        <GAAnalytics />
         <CookieConsent />
       </body>
     </html>
