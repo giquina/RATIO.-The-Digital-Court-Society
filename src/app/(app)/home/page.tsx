@@ -76,7 +76,7 @@ export default function HomePage() {
   const isLoading = profile === undefined;
 
   return (
-    <div className="pb-6">
+    <div className="pt-2 pb-6">
       {/* ── Streak + Stats Card ── */}
       <section className="px-4 mb-5">
         {isLoading ? (
@@ -88,7 +88,7 @@ export default function HomePage() {
               <div>
                 <p className="text-court-xs text-court-text-ter uppercase tracking-widest mb-1">Practice Streak</p>
                 <div className="flex items-baseline gap-1.5">
-                  <span className="font-serif text-4xl font-bold text-gold">{profile?.streakDays ?? 0}</span>
+                  <span className="font-serif text-3xl sm:text-4xl font-bold text-gold">{profile?.streakDays ?? 0}</span>
                   <span className="text-sm text-court-text-sec">days</span>
                 </div>
                 <p className="text-court-xs text-court-text-ter mt-1 flex items-center gap-1">
@@ -96,9 +96,9 @@ export default function HomePage() {
                 </p>
               </div>
               <div className="text-center">
-                <div className="w-14 h-14 rounded-full flex items-center justify-center"
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center"
                   style={{ background: `conic-gradient(#C9A84C 0% ${profile?.readinessScore ?? 0}%, rgba(255,255,255,0.05) ${profile?.readinessScore ?? 0}% 100%)` }}>
-                  <div className="w-11 h-11 rounded-full bg-navy-card flex items-center justify-center">
+                  <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-navy-card flex items-center justify-center">
                     <span className="text-sm font-bold text-court-text">{profile?.readinessScore ?? 0}%</span>
                   </div>
                 </div>

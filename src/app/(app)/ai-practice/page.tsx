@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Tag, Card, Button, ProgressBar, DynamicIcon } from "@/components/ui";
 import { AI_PERSONAS, FEEDBACK_DIMENSIONS } from "@/lib/constants/app";
-import { Lightbulb, Book, Mic, Pause, ArrowUp } from "lucide-react";
+import { Lightbulb, Book, Mic, Pause, ArrowUp, Scale, AlertCircle } from "lucide-react";
+import { cn } from "@/lib/utils/helpers";
 
-type Screen = "select" | "briefing" | "session" | "feedback";
+type Screen = "select" | "briefing" | "session" | "loading-feedback" | "feedback";
 type Mode = "judge" | "mentor" | "examiner" | "opponent";
 
 interface Message {
@@ -13,6 +14,9 @@ interface Message {
   text: string;
   time: string;
 }
+
+const MAX_MESSAGE_LENGTH = 2000;
+const MAX_EXCHANGES = 30;
 
 const CASE_BRIEFS: Record<Mode, { area: string; matter: string; yourRole: string; instructions: string; authorities: string[] }> = {
   judge: {
@@ -52,6 +56,17 @@ const AI_RESPONSES = [
   "Very well. You have five minutes remaining. I suggest you move to your strongest authority and conclude your submissions.",
 ];
 
+const FALLBACK_SCORES = {
+  argumentStructure: 3.5, useOfAuthorities: 4.0, oralDelivery: 3.8,
+  judicialHandling: 3.2, courtManner: 4.5, persuasiveness: 3.6, timeManagement: 4.0,
+};
+
+const FALLBACK_JUDGMENT = "Counsel demonstrated a solid understanding of the constitutional principles at play. The opening submissions were well-structured, following IRAC methodology competently. However, when pressed on the distinction between reviewability and unlawfulness of prerogative power, Counsel\u2019s response lacked the precision this court would expect. Court manner was exemplary throughout.";
+
+const FALLBACK_KEY_STRENGTH = "Well-structured opening submissions following IRAC methodology with exemplary court manner throughout.";
+
+const FALLBACK_KEY_IMPROVEMENT = "When facing a judicial intervention, take a moment before responding. Your instinct to answer immediately led to imprecise language when discussing the GCHQ distinction. Pause, consider the exact question, then respond with specificity.";
+
 export default function AIPracticePage() {
   const [screen, setScreen] = useState<Screen>("select");
   const [mode, setMode] = useState<Mode>("judge");
@@ -64,8 +79,29 @@ export default function AIPracticePage() {
   const chatEndRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // API integration state
+  const [apiMessages, setApiMessages] = useState<Array<{role: 'user' | 'assistant'; content: string}>>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [exchangeCount, setExchangeCount] = useState(0);
+  const [sessionLimitReached, setSessionLimitReached] = useState(false);
+  const [feedbackData, setFeedbackData] = useState<{
+    scores: Record<string, number>;
+    overall: number;
+    judgment: string;
+    keyStrength: string;
+    keyImprovement: string;
+  } | null>(null);
+  const [rateLimited, setRateLimited] = useState(false);
+  const [inputError, setInputError] = useState<string | null>(null);
+  const [feedbackFallback, setFeedbackFallback] = useState(false);
+
   const persona = AI_PERSONAS[mode];
   const brief = CASE_BRIEFS[mode];
+
+  const buildCaseContext = useCallback(() => {
+    return `${brief.area}: ${brief.matter}. Role: ${brief.yourRole}. Authorities: ${brief.authorities.join(', ')}`;
+  }, [brief]);
 
   useEffect(() => {
     if (timerActive && timer > 0) {
@@ -78,28 +114,99 @@ export default function AIPracticePage() {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Auto-dismiss rate limit banner after 10 seconds
+  useEffect(() => {
+    if (rateLimited) {
+      const timeout = setTimeout(() => setRateLimited(false), 10000);
+      return () => clearTimeout(timeout);
+    }
+  }, [rateLimited]);
+
   const formatTime = (s: number) => `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, "0")}`;
 
-  const startSession = () => {
+  const startSession = async () => {
     setScreen("session");
     setTimerActive(true);
+    setExchangeCount(0);
+    setError(null);
+    setFeedbackData(null);
+    setFeedbackFallback(false);
+
     const openings: Record<Mode, string> = {
       judge: "This court is now in session. I have read the papers before me. Counsel for the Appellant, you may begin your submissions. Please state the central issue you invite this court to determine.",
-      mentor: "Good afternoon. I've reviewed the skeleton argument you submitted. Let's work through it together. Tell me — what's the central question the court needs to decide in this matter?",
+      mentor: "Good afternoon. I've reviewed the skeleton argument you submitted. Let's work through it together. Tell me \u2014 what's the central question the court needs to decide in this matter?",
       examiner: "This is your SQE2 advocacy assessment. You are Counsel for the Applicant in a summary judgment application under CPR Part 24. You have 15 minutes. Please begin your submissions.",
       opponent: "Counsel, I appear for the Defence. I will be making submissions that the confession evidence was obtained in breach of PACE. You may begin for the Prosecution.",
     };
+
+    // Try to get AI opening from the API
+    let openingText = openings[mode];
+    try {
+      const initialApiMessages: Array<{role: 'user' | 'assistant'; content: string}> = [
+        { role: 'user', content: 'Begin the session. Provide your opening statement in character.' }
+      ];
+
+      const res = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mode,
+          messages: initialApiMessages,
+          caseContext: buildCaseContext(),
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.content) {
+          openingText = data.content;
+          setApiMessages([
+            { role: 'user', content: 'Begin the session. Provide your opening statement in character.' },
+            { role: 'assistant', content: openingText },
+          ]);
+        }
+      }
+      // On non-ok responses, fall through to use hardcoded opening
+    } catch {
+      // API unavailable — use fallback opening (already set)
+    }
+
+    // If apiMessages weren't set by the API call, initialize with the fallback
+    setApiMessages((prev) => {
+      if (prev.length === 0) {
+        return [
+          { role: 'user', content: 'Begin the session. Provide your opening statement in character.' },
+          { role: 'assistant', content: openingText },
+        ];
+      }
+      return prev;
+    });
+
     setMessages([{
       role: "ai",
-      text: openings[mode],
+      text: openingText,
       time: new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }),
     }]);
     setAiSpeaking(true);
     setTimeout(() => setAiSpeaking(false), 3000);
   };
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (!inputText.trim()) return;
+
+    // Validate message length
+    if (inputText.length > MAX_MESSAGE_LENGTH) {
+      setInputError(`Submissions must not exceed ${MAX_MESSAGE_LENGTH} characters. Current: ${inputText.length}`);
+      return;
+    }
+    setInputError(null);
+
+    // Check exchange limit
+    if (exchangeCount >= MAX_EXCHANGES) {
+      setError("This session has reached its conclusion. Please end the session to receive your assessment.");
+      return;
+    }
+
     const userMsg: Message = {
       role: "user",
       text: inputText,
@@ -108,23 +215,154 @@ export default function AIPracticePage() {
     setMessages((prev) => [...prev, userMsg]);
     setInputText("");
     setAiSpeaking(true);
+    setIsLoading(true);
+    setError(null);
 
-    const responseIdx = Math.min(
-      Math.floor(messages.filter((m) => m.role === "user").length),
-      AI_RESPONSES.length - 1
-    );
-    setTimeout(() => {
+    const updatedApiMessages: Array<{role: 'user' | 'assistant'; content: string}> = [
+      ...apiMessages,
+      { role: 'user', content: inputText },
+    ];
+
+    try {
+      const res = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mode,
+          messages: updatedApiMessages,
+          caseContext: buildCaseContext(),
+        }),
+      });
+
+      if (res.status === 429) {
+        setRateLimited(true);
+        setAiSpeaking(false);
+        setIsLoading(false);
+        // Revert the user message from apiMessages since we didn't get a response
+        return;
+      }
+
+      if (res.status === 402 || res.status === 403) {
+        setSessionLimitReached(true);
+        setAiSpeaking(false);
+        setIsLoading(false);
+        setScreen("select");
+        return;
+      }
+
+      if (!res.ok) {
+        throw new Error(`Server error: ${res.status}`);
+      }
+
+      const data = await res.json();
+      const aiText = data.content || AI_RESPONSES[Math.min(exchangeCount, AI_RESPONSES.length - 1)];
+
+      setApiMessages([...updatedApiMessages, { role: 'assistant', content: aiText }]);
+      setExchangeCount((c) => c + 1);
       setMessages((prev) => [
         ...prev,
         {
           role: "ai",
-          text: AI_RESPONSES[responseIdx],
+          text: aiText,
           time: new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }),
         },
       ]);
       setAiSpeaking(false);
-    }, 2500);
+      setIsLoading(false);
+    } catch {
+      // Fallback to hardcoded responses
+      const responseIdx = Math.min(exchangeCount, AI_RESPONSES.length - 1);
+      const fallbackText = AI_RESPONSES[responseIdx];
+
+      setApiMessages([...updatedApiMessages, { role: 'assistant', content: fallbackText }]);
+      setExchangeCount((c) => c + 1);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "ai",
+          text: fallbackText,
+          time: new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }),
+        },
+      ]);
+      setError("The court is experiencing difficulties. Your submissions have been noted.");
+      setAiSpeaking(false);
+      setIsLoading(false);
+    }
   };
+
+  const endSession = async () => {
+    setTimerActive(false);
+    setScreen("loading-feedback");
+
+    const sessionDuration = 900 - timer;
+
+    try {
+      const res = await fetch('/api/ai/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mode,
+          messages: apiMessages,
+          caseContext: buildCaseContext(),
+          sessionDuration,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setFeedbackData({
+          scores: data.scores || FALLBACK_SCORES,
+          overall: data.overall || parseFloat(((Object.values(data.scores || FALLBACK_SCORES) as number[]).reduce((a, b) => a + b, 0) / 7).toFixed(1)),
+          judgment: data.judgment || FALLBACK_JUDGMENT,
+          keyStrength: data.keyStrength || FALLBACK_KEY_STRENGTH,
+          keyImprovement: data.keyImprovement || FALLBACK_KEY_IMPROVEMENT,
+        });
+        setFeedbackFallback(false);
+      } else {
+        throw new Error('Feedback API error');
+      }
+    } catch {
+      // Fall back to hardcoded scores
+      setFeedbackData({
+        scores: FALLBACK_SCORES,
+        overall: parseFloat((Object.values(FALLBACK_SCORES).reduce((a, b) => a + b, 0) / 7).toFixed(1)),
+        judgment: FALLBACK_JUDGMENT,
+        keyStrength: FALLBACK_KEY_STRENGTH,
+        keyImprovement: FALLBACK_KEY_IMPROVEMENT,
+      });
+      setFeedbackFallback(true);
+    }
+
+    // Brief interstitial delay before showing feedback
+    setTimeout(() => {
+      setScreen("feedback");
+    }, 4000);
+  };
+
+  // ── LOADING FEEDBACK INTERSTITIAL ──
+  if (screen === "loading-feedback") {
+    return (
+      <div className="flex flex-col items-center justify-center h-[calc(100dvh-80px)]">
+        <div className="flex flex-col items-center gap-6">
+          <div className="relative">
+            <div className="w-20 h-20 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center animate-pulse">
+              <Scale size={32} className="text-gold" />
+            </div>
+          </div>
+          <div className="text-center">
+            <p className="font-serif text-lg font-bold text-court-text mb-2">
+              The court is retiring to consider its judgment...
+            </p>
+            <div className="flex items-center justify-center gap-1.5 mt-3">
+              <span className="w-1.5 h-1.5 rounded-full bg-gold/60 animate-bounce" style={{ animationDelay: '0ms' }} />
+              <span className="w-1.5 h-1.5 rounded-full bg-gold/60 animate-bounce" style={{ animationDelay: '200ms' }} />
+              <span className="w-1.5 h-1.5 rounded-full bg-gold/60 animate-bounce" style={{ animationDelay: '400ms' }} />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // ── MODE SELECTION ──
   if (screen === "select") {
@@ -134,6 +372,27 @@ export default function AIPracticePage() {
           <h1 className="font-serif text-2xl font-bold text-court-text mb-1">AI Practice</h1>
           <p className="text-xs text-court-text-sec">Train with AI-powered legal personas. No judgement, just improvement.</p>
         </div>
+
+        {/* Session limit reached state */}
+        {sessionLimitReached && (
+          <div className="px-4 mb-4">
+            <Card className="p-5 border-gold/30">
+              <div className="flex flex-col items-center text-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center">
+                  <Scale size={24} className="text-gold" />
+                </div>
+                <div>
+                  <h3 className="font-serif text-base font-bold text-court-text mb-1">Monthly Practice Allocation Exhausted</h3>
+                  <p className="text-court-sm text-court-text-sec leading-relaxed">
+                    You have used your 3 complimentary hearings this month. Upgrade to Premium for unlimited practice.
+                  </p>
+                </div>
+                <Button variant="outline" onClick={() => setSessionLimitReached(false)}>View Premium</Button>
+              </div>
+            </Card>
+          </div>
+        )}
+
         <div className="px-4 flex flex-col gap-3">
           {(Object.entries(AI_PERSONAS) as [Mode, (typeof AI_PERSONAS)[Mode]][]).map(([key, p]) => {
             const descriptions: Record<Mode, string> = {
@@ -145,8 +404,8 @@ export default function AIPracticePage() {
             return (
               <Card
                 key={key}
-                onClick={key !== "opponent" ? () => { setMode(key); setScreen("briefing"); } : undefined}
-                className={`p-4 transition-all ${key === "opponent" ? "opacity-50" : "cursor-pointer hover:border-white/10"}`}
+                onClick={key !== "opponent" && !sessionLimitReached ? () => { setMode(key); setScreen("briefing"); } : undefined}
+                className={`p-4 transition-all ${key === "opponent" || sessionLimitReached ? "opacity-50" : "cursor-pointer hover:border-white/10"}`}
               >
                 <div className="flex gap-3.5 items-center">
                   <div
@@ -190,7 +449,7 @@ export default function AIPracticePage() {
     return (
       <div className="pb-6">
         <div className="px-4 pt-3 pb-4">
-          <button onClick={() => setScreen("select")} className="text-xs text-court-text-ter mb-3">← Back to modes</button>
+          <button onClick={() => setScreen("select")} className="text-xs text-court-text-ter mb-3">&larr; Back to modes</button>
           <div className="flex items-center gap-3 mb-4">
             <div className="w-12 h-12 rounded-court flex items-center justify-center"
               style={{ background: `linear-gradient(135deg, ${persona.gradient[0]}, ${persona.gradient[1]})` }}>
@@ -242,25 +501,48 @@ export default function AIPracticePage() {
   if (screen === "session") {
     return (
       <div className="flex flex-col h-[calc(100dvh-80px)]">
+        {/* Rate limit banner */}
+        {rateLimited && (
+          <div className="px-4 py-2.5 bg-amber-500/10 border-b border-amber-500/20 shrink-0">
+            <p className="text-court-xs text-amber-400 text-center">
+              The court requires a brief recess. Please wait a moment before continuing.
+            </p>
+          </div>
+        )}
+
         <div className="px-4 pt-3 pb-2 flex justify-between items-center border-b border-court-border-light shrink-0">
           <div className="flex items-center gap-2">
             <DynamicIcon name={persona.icon} size={16} className="text-court-text" />
             <span className="text-xs font-bold text-court-text">{persona.name}</span>
           </div>
           <div className="flex items-center gap-3">
+            {/* Exchange count indicator */}
+            <div className="bg-navy-card border border-court-border rounded-full px-2.5 py-0.5 text-court-xs text-court-text-ter font-mono">
+              {exchangeCount}/{MAX_EXCHANGES}
+            </div>
             <div className="bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-1 text-xs font-bold text-red-400 font-mono">
               {formatTime(timer)}
             </div>
-            <button onClick={() => { setTimerActive(false); setScreen("feedback"); }} className="text-court-xs text-red-400 font-bold">
+            <button onClick={endSession} className="text-court-xs text-red-400 font-bold">
               End
             </button>
           </div>
         </div>
 
+        {/* Error banner */}
+        {error && (
+          <div className="px-4 py-2 bg-red-500/10 border-b border-red-500/20 shrink-0">
+            <div className="flex items-center gap-2">
+              <AlertCircle size={12} className="text-red-400 shrink-0" />
+              <p className="text-court-xs text-red-400">{error}</p>
+            </div>
+          </div>
+        )}
+
         {/* Avatar */}
         <div className="flex justify-center py-5 relative shrink-0">
           <div className="relative">
-            {aiSpeaking && (
+            {(aiSpeaking || isLoading) && (
               <>
                 <div className="absolute inset-0 rounded-full animate-pulse-ring" style={{ border: `2px solid ${persona.color}33` }} />
                 <div className="absolute inset-0 rounded-full animate-pulse-ring" style={{ border: `2px solid ${persona.color}22`, animationDelay: "0.8s" }} />
@@ -270,14 +552,14 @@ export default function AIPracticePage() {
               className="w-20 h-20 rounded-full flex items-center justify-center relative z-10 transition-all duration-500"
               style={{
                 background: `linear-gradient(135deg, ${persona.gradient[0]}, ${persona.gradient[1]})`,
-                boxShadow: aiSpeaking ? `0 0 30px ${persona.color}40` : `0 0 15px ${persona.color}15`,
+                boxShadow: (aiSpeaking || isLoading) ? `0 0 30px ${persona.color}40` : `0 0 15px ${persona.color}15`,
               }}
             >
               <DynamicIcon name={persona.icon} size={32} className="text-court-text" />
             </div>
           </div>
           <p className="absolute bottom-2 text-court-xs text-court-text-ter">
-            {aiSpeaking ? "Judge is speaking..." : "Awaiting your submissions..."}
+            {isLoading ? "Considering your submissions..." : aiSpeaking ? "Judge is speaking..." : exchangeCount >= MAX_EXCHANGES ? "Session concluding. Please end the session." : "Awaiting your submissions..."}
           </p>
         </div>
 
@@ -297,11 +579,29 @@ export default function AIPracticePage() {
               </div>
             </div>
           ))}
+          {isLoading && (
+            <div className="mb-3 flex justify-start">
+              <div className="max-w-[85%] rounded-2xl px-4 py-2.5 bg-navy-card border border-court-border-light rounded-bl-md">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-court-text-ter animate-bounce" style={{ animationDelay: '0ms' }} />
+                  <span className="w-1.5 h-1.5 rounded-full bg-court-text-ter animate-bounce" style={{ animationDelay: '200ms' }} />
+                  <span className="w-1.5 h-1.5 rounded-full bg-court-text-ter animate-bounce" style={{ animationDelay: '400ms' }} />
+                </div>
+              </div>
+            </div>
+          )}
           <div ref={chatEndRef} />
         </div>
 
         {/* Input */}
         <div className="px-4 py-3 border-t border-court-border-light bg-navy shrink-0">
+          {/* Input validation error */}
+          {inputError && (
+            <div className="flex items-center gap-1.5 mb-2 px-1">
+              <AlertCircle size={11} className="text-red-400 shrink-0" />
+              <p className="text-court-xs text-red-400">{inputError}</p>
+            </div>
+          )}
           <div className="flex gap-2 items-end pb-4">
             <button
               onClick={() => setIsListening(!isListening)}
@@ -311,17 +611,44 @@ export default function AIPracticePage() {
             >
               {isListening ? <Pause size={16} className="text-white" /> : <Mic size={16} className="text-gold" />}
             </button>
-            <div className="flex-1 bg-navy-card border border-court-border rounded-xl flex items-end">
+            <div className={cn(
+              "flex-1 bg-navy-card border rounded-xl flex items-end",
+              inputError ? "border-red-500/40" : "border-court-border"
+            )}>
               <textarea
                 value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                placeholder="Make your submissions..."
+                onChange={(e) => {
+                  setInputText(e.target.value);
+                  if (inputError && e.target.value.length <= MAX_MESSAGE_LENGTH) {
+                    setInputError(null);
+                  }
+                }}
+                placeholder={exchangeCount >= MAX_EXCHANGES ? "Session limit reached. Please end the session." : "Make your submissions..."}
                 rows={1}
-                className="flex-1 bg-transparent text-court-base text-court-text px-3 py-2.5 resize-none outline-none placeholder:text-court-text-ter"
+                disabled={isLoading || exchangeCount >= MAX_EXCHANGES}
+                className="flex-1 bg-transparent text-court-base text-court-text px-3 py-2.5 resize-none outline-none placeholder:text-court-text-ter disabled:opacity-50"
                 onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
               />
+              {/* Character count when approaching limit */}
+              {inputText.length > MAX_MESSAGE_LENGTH * 0.8 && (
+                <span className={cn(
+                  "text-court-xs px-2 py-2.5 tabular-nums shrink-0",
+                  inputText.length > MAX_MESSAGE_LENGTH ? "text-red-400" : "text-court-text-ter"
+                )}>
+                  {inputText.length}/{MAX_MESSAGE_LENGTH}
+                </span>
+              )}
             </div>
-            <button onClick={sendMessage} className="w-10 h-10 rounded-full bg-gold flex items-center justify-center shrink-0">
+            <button
+              onClick={sendMessage}
+              disabled={isLoading || exchangeCount >= MAX_EXCHANGES || !inputText.trim()}
+              className={cn(
+                "w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-all",
+                isLoading || exchangeCount >= MAX_EXCHANGES || !inputText.trim()
+                  ? "bg-gold/30 cursor-not-allowed"
+                  : "bg-gold"
+              )}
+            >
               <ArrowUp size={16} className="text-navy" />
             </button>
           </div>
@@ -331,11 +658,10 @@ export default function AIPracticePage() {
   }
 
   // ── FEEDBACK ──
-  const scores = {
-    argumentStructure: 3.5, useOfAuthorities: 4.0, oralDelivery: 3.8,
-    judicialHandling: 3.2, courtManner: 4.5, persuasiveness: 3.6, timeManagement: 4.0,
-  };
-  const overall = (Object.values(scores).reduce((a, b) => a + b, 0) / 7).toFixed(1);
+  const scores = feedbackData?.scores || FALLBACK_SCORES;
+  const overall = feedbackData?.overall?.toFixed(1) || ((Object.values(scores) as number[]).reduce((a, b) => a + b, 0) / 7).toFixed(1);
+  const judgment = feedbackData?.judgment || FALLBACK_JUDGMENT;
+  const keyImprovement = feedbackData?.keyImprovement || FALLBACK_KEY_IMPROVEMENT;
 
   return (
     <div className="pb-6">
@@ -343,6 +669,16 @@ export default function AIPracticePage() {
         <h1 className="font-serif text-2xl font-bold text-court-text mb-1">Session Feedback</h1>
         <p className="text-xs text-court-text-sec">{persona.name} · {brief.area}</p>
       </div>
+
+      {/* Fallback notice */}
+      {feedbackFallback && (
+        <div className="px-4 mb-3">
+          <div className="px-3 py-2 rounded-lg bg-navy-card border border-court-border-light">
+            <p className="text-court-xs text-court-text-ter text-center">Assessment generated from standard benchmarks.</p>
+          </div>
+        </div>
+      )}
+
       <section className="px-4 mb-4">
         <Card highlight className="p-6 text-center">
           <p className="text-court-xs text-court-text-ter uppercase tracking-widest mb-2">Overall Score</p>
@@ -363,14 +699,15 @@ export default function AIPracticePage() {
         <Card className="p-4">
           <h3 className="font-serif text-sm font-bold text-court-text mb-3">Assessment Breakdown</h3>
           {FEEDBACK_DIMENSIONS.map((dim) => {
-            const score = scores[dim.key as keyof typeof scores];
+            const score = scores[dim.key as keyof typeof scores] as number | undefined;
+            const safeScore = score ?? 0;
             return (
               <div key={dim.key} className="mb-3 last:mb-0">
                 <div className="flex justify-between items-center mb-1">
                   <span className="text-court-sm text-court-text-sec flex items-center gap-1"><DynamicIcon name={dim.icon} size={12} className="text-court-text-sec" /> {dim.label}</span>
-                  <span className="text-court-sm font-bold text-court-text">{score.toFixed(1)}</span>
+                  <span className="text-court-sm font-bold text-court-text">{safeScore.toFixed(1)}</span>
                 </div>
-                <ProgressBar pct={(score / 5) * 100} color={score >= 4 ? "green" : score >= 3 ? "gold" : "red"} />
+                <ProgressBar pct={(safeScore / 5) * 100} color={safeScore >= 4 ? "green" : safeScore >= 3 ? "gold" : "red"} />
               </div>
             );
           })}
@@ -380,7 +717,7 @@ export default function AIPracticePage() {
         <Card className="p-4">
           <h3 className="font-serif text-sm font-bold text-court-text mb-2">Judgment</h3>
           <p className="text-court-base text-court-text-sec leading-relaxed">
-            Counsel demonstrated a solid understanding of the constitutional principles at play. The opening submissions were well-structured, following IRAC methodology competently. However, when pressed on the distinction between reviewability and unlawfulness of prerogative power, Counsel&apos;s response lacked the precision this court would expect. Court manner was exemplary throughout.
+            {judgment}
           </p>
         </Card>
       </section>
@@ -388,12 +725,21 @@ export default function AIPracticePage() {
         <Card className="p-4 bg-gold-dim border-gold/25">
           <h3 className="text-court-xs text-gold uppercase tracking-widest font-bold mb-2">Key Improvement</h3>
           <p className="text-court-base text-court-text leading-relaxed">
-            When facing a judicial intervention, take a moment before responding. Your instinct to answer immediately led to imprecise language when discussing the GCHQ distinction. Pause, consider the exact question, then respond with specificity.
+            {keyImprovement}
           </p>
         </Card>
       </section>
       <section className="px-4 flex flex-col gap-2.5">
-        <Button fullWidth onClick={() => { setScreen("select"); setMessages([]); setTimer(900); }}>Practice Again</Button>
+        <Button fullWidth onClick={() => {
+          setScreen("select");
+          setMessages([]);
+          setTimer(900);
+          setApiMessages([]);
+          setExchangeCount(0);
+          setError(null);
+          setFeedbackData(null);
+          setFeedbackFallback(false);
+        }}>Practice Again</Button>
         <Button fullWidth variant="outline">Save to Portfolio</Button>
         <Button fullWidth variant="secondary">Share Result</Button>
       </section>

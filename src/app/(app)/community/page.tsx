@@ -219,7 +219,7 @@ export default function CommunityPage() {
                       <p className={`${isFirst ? "text-court-base" : "text-court-sm"} font-bold ${isMe ? "text-gold" : "text-court-text"} mt-1.5`}>
                         {r.fullName.split(" ")[0]} {isMe && <span className="text-court-xs font-normal">(You)</span>}
                       </p>
-                      <p className="text-court-xs text-court-text-ter">{r.universityShort}</p>
+                      <p className="text-court-xs text-court-text-ter truncate">{r.universityShort}</p>
                       <div className={`mt-1.5 py-1 rounded-lg ${isFirst ? "bg-gold-dim border border-gold/25" : "bg-white/[0.04] border border-court-border-light"}`}>
                         <div className="flex justify-center">{[
                           <Medal key="silver" size={16} className="text-gray-300" />,
