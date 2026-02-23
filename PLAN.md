@@ -1,7 +1,7 @@
 # RATIO — High-Level Plan
-Last updated: 2026-02-22
+Last updated: 2026-02-23
 
-## Status: Days 1-6 complete. Production live.
+## Status: Days 1-6 complete. Production live. Auth + Demo login working.
 
 ### Phase Summary
 | Day | Focus | Status |
@@ -24,7 +24,7 @@ Last updated: 2026-02-22
 
 ### Production Details
 - Domain: ratiothedigitalcourtsociety.com (GoDaddy → Vercel)
-- Analytics: Google Analytics 4 (G-NG49LD1FXR) with GDPR consent gating
+- Analytics: Google Analytics 4 (G-D2EJDX48MD) with GDPR consent gating
 - Error tracking: Sentry (org: armora, project: ratio)
 - Deployment: Vercel, auto-deploy from main branch
 - SEO: Full OG/Twitter metadata, dynamic sitemap (14 routes), robots.txt
@@ -40,5 +40,5 @@ Ratio is ONE thing: A constitutional training ground for UK law students.
 4. Mobile-first ruthlessness (44px tap targets, breathing room)
 5. Ship focused, add later (Phase 1 Core → Phase 2 Institutional → Phase 3 Governance → Phase 4 Ecosystem)
 
-### Full Plan
-See `C:\Users\MuhammadGIQUINA(Stud\.claude\plans\majestic-hugging-mango.md` for the complete 13-section plan with all technical details.
+### Documentation
+See [docs/DOCS_INDEX.md](docs/DOCS_INDEX.md) for the full documentation map.

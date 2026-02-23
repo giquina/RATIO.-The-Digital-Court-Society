@@ -1,4 +1,5 @@
-import { mutation } from "./_generated/server";
+import { mutation, internalMutation, internalQuery } from "./_generated/server";
+import { v } from "convex/values";
 
 // Run this once to seed badge definitions and starter resources.
 // Execute via: npx convex run seed:run
@@ -51,5 +52,115 @@ export const run = mutation({
     }
 
     console.log(`Seeded ${badges.length} badges and ${resources.length} resources.`);
+  },
+});
+
+// ═══════════════════════════════════════════════════════════════
+// DEMO ACCOUNT HELPERS
+// ═══════════════════════════════════════════════════════════════
+// Used by convex/seedDemo.ts to manage the demo@ratio.law account.
+
+/** Check if demo auth account exists. */
+export const checkDemoExists = internalQuery({
+  args: {},
+  handler: async (ctx) => {
+    const authAccount = await ctx.db
+      .query("authAccounts")
+      .withIndex("providerAndAccountId", (q) =>
+        q.eq("provider", "password").eq("providerAccountId", "demo@ratio.law")
+      )
+      .first();
+    return authAccount ? { secret: authAccount.secret } : null;
+  },
+});
+
+/** Delete all records for the demo account (user, authAccount, profile). */
+export const deleteDemoAccount = internalMutation({
+  args: { email: v.string() },
+  handler: async (ctx, { email }) => {
+    // Delete authAccount
+    const authAccount = await ctx.db
+      .query("authAccounts")
+      .withIndex("providerAndAccountId", (q) =>
+        q.eq("provider", "password").eq("providerAccountId", email)
+      )
+      .first();
+    if (authAccount) {
+      await ctx.db.delete(authAccount._id);
+    }
+
+    // Delete profile (by handle)
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_handle", (q) => q.eq("handle", "demo-advocate"))
+      .first();
+    if (profile) {
+      await ctx.db.delete(profile._id);
+    }
+
+    // Delete user
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_email", (q) => q.eq("email", email))
+      .first();
+    if (user) {
+      await ctx.db.delete(user._id);
+    }
+  },
+});
+
+/** Update the demo user's name after account creation. */
+export const updateDemoUser = internalMutation({
+  args: { userId: v.id("users"), name: v.string() },
+  handler: async (ctx, { userId, name }) => {
+    await ctx.db.patch(userId, { name });
+  },
+});
+
+/** Create a full profile for the demo account. */
+export const createDemoProfile = internalMutation({
+  args: { email: v.string(), name: v.string() },
+  handler: async (ctx, { email, name }) => {
+    // Look up user by email
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_email", (q) => q.eq("email", email))
+      .first();
+    if (!user) {
+      console.error("Cannot create profile: user not found for", email);
+      return;
+    }
+
+    // Check if profile already exists
+    const existingProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .first();
+    if (existingProfile) {
+      return; // Already has a profile
+    }
+
+    await ctx.db.insert("profiles", {
+      userId: user._id,
+      fullName: name,
+      university: "Birkbeck, University of London",
+      universityShort: "BBK",
+      yearOfStudy: 2,
+      chamber: "Gray's",
+      bio: "Demo account for exploring Ratio. This account is shared and may be reset periodically.",
+      rank: "Junior Counsel",
+      streakDays: 5,
+      streakLastDate: new Date().toISOString().split("T")[0],
+      totalMoots: 12,
+      totalHours: 8,
+      totalPoints: 340,
+      readinessScore: 42,
+      followerCount: 7,
+      followingCount: 3,
+      commendationCount: 4,
+      isPublic: true,
+      modules: ["Contract Law", "Public Law", "Criminal Law", "Tort Law"],
+      handle: "demo-advocate",
+    });
   },
 });

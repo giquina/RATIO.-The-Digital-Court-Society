@@ -17,6 +17,8 @@ import { PricingSection } from "@/components/landing/PricingSection";
 import { FAQSection } from "@/components/landing/FAQSection";
 import { CTASection } from "@/components/landing/CTASection";
 import { FooterSection } from "@/components/landing/FooterSection";
+import { DisclaimerBanner } from "@/components/landing/DisclaimerBanner";
+import { StudyUseCases } from "@/components/landing/StudyUseCases";
 import { FirstVisitSplash } from "@/components/shared/FirstVisitSplash";
 
 export default function LandingPage() {
@@ -46,7 +48,9 @@ export default function LandingPage() {
       {/* Sections */}
       <HeroSection />
       <TrustBar />
+      <DisclaimerBanner />
       <FeaturesGrid id="features" />
+      <StudyUseCases />
       <HowItWorks />
       <AIShowcase id="ai-showcase" />
       <VideoMootingShowcase id="video-mooting" />

@@ -75,8 +75,8 @@ Production secrets are managed through Vercel environment variables and Convex d
 
 If you discover a security vulnerability in Ratio, please report it responsibly.
 
-- **Email**: security@ratiothedigitalcourtsociety.com
-- **Expected response time**: 48 hours
+- **Email**: mgiqui01@student.bbk.ac.uk (subject line: "Ratio Security Report")
+- **Expected response time**: 72 hours
 
 Please include the following in your report:
 
@@ -85,6 +85,10 @@ Please include the following in your report:
 3. Any relevant screenshots or proof-of-concept code.
 
 Do not disclose the vulnerability publicly until it has been addressed.
+
+### Safe Harbour
+
+We will not pursue legal action against security researchers who report vulnerabilities in good faith, follow responsible disclosure practices, and do not access or modify other users' data. We ask that you allow a reasonable period (90 days) for remediation before any public disclosure.
 
 ## Known Limitations
 

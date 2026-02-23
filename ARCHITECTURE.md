@@ -257,7 +257,7 @@ See `.env.example` for the full list.
 |----------|----------|---------|
 | `NEXT_PUBLIC_CONVEX_URL` | Yes (demo mode without) | Convex deployment URL |
 | AI API keys | No | Claude/OpenAI -- falls back to hardcoded responses |
-| `NEXT_PUBLIC_GA4_ID` | No | Google Analytics 4 |
+| `NEXT_PUBLIC_GA_MEASUREMENT_ID` | No | Google Analytics 4 |
 | `SENTRY_AUTH_TOKEN` | No | Sentry error tracking (build wrapping is conditional) |
 | Stripe keys | No | Subscription billing |
 | Daily.co key | No | Video session rooms |

@@ -32,7 +32,7 @@ Open [http://localhost:3000](http://localhost:3000).
 |-------|-----------|------|
 | Frontend | Next.js 14 (App Router) + Tailwind CSS | Free |
 | Backend | Convex (real-time database + serverless) | Free tier |
-| Auth | Convex Auth (Google + email) | Free |
+| Auth | Convex Auth (Password only) | Free |
 | AI Judge | Claude / GPT-4o-mini via API | ~£0.05/session |
 | Voice | Web Speech API (browser-native) | Free |
 | Hosting | Vercel | Free tier |
@@ -57,7 +57,7 @@ src/
 ├── hooks/               # Custom React hooks
 └── stores/              # Zustand state management
 convex/
-├── schema.ts            # Database schema (15 tables)
+├── schema.ts            # Database schema (~40 tables)
 ├── profiles.ts          # User profile queries/mutations
 ├── sessions.ts          # Session CRUD + role claiming
 ├── social.ts            # Follows, activities, commendations
@@ -84,6 +84,14 @@ Works with or without API keys — falls back to hardcoded responses for demos.
 - **AI sessions**: ~100 sessions/month for £8 in API costs
 - **Voice**: Unlimited (browser Web Speech API)
 
+## Documentation
+
+- [Documentation Index](docs/DOCS_INDEX.md) — Map of all project documentation
+- [Architecture](ARCHITECTURE.md) — System overview and design decisions
+- [Security](SECURITY.md) — Security architecture and vulnerability reporting
+- [Product Overview](docs/PRODUCT.md) — What Ratio is and who it's for
+- [FAQ](docs/FAQ.md) — Student-focused frequently asked questions
+
 ## Deploy
 
 ```bash
@@ -93,3 +101,7 @@ vercel
 # Deploy Convex to production
 npx convex deploy
 ```
+
+---
+
+> **Disclaimer**: Ratio is an educational training tool for UK law students. It does not provide legal advice. AI-generated content should always be verified against primary sources.

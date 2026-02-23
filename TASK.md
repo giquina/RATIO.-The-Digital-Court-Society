@@ -1,5 +1,5 @@
 # RATIO — Task Tracker
-Last updated: 2026-02-22
+Last updated: 2026-02-23
 
 ## Current Phase: Day 5+ — Backend Wiring & Feature Build
 
@@ -42,7 +42,7 @@ Last updated: 2026-02-22
 - [x] Full SEO metadata in root layout (OG, Twitter, robots, viewport)
 - [x] Dynamic sitemap (14 routes) — `src/app/sitemap.ts`
 - [x] robots.txt generation — `src/app/robots.ts`
-- [x] Google Analytics 4 (G-NG49LD1FXR) with GDPR cookie consent gating
+- [x] Google Analytics 4 (G-D2EJDX48MD) with GDPR cookie consent gating
 - [x] Sentry error tracking (client/server/edge configs)
 - [x] Security headers (HSTS, X-Frame-Options, CSP, Permissions-Policy)
 - [x] 404 page with institutional copy — `src/app/not-found.tsx`
@@ -116,10 +116,14 @@ Last updated: 2026-02-22
 - Email: `demo@ratio.law` (override: `NEXT_PUBLIC_DEMO_EMAIL`)
 - Password: `DemoAdvocate2026` (override: `NEXT_PUBLIC_DEMO_PASSWORD`)
 
-**TODO:** Create actual demo user account in Convex with restricted permissions. Track as pending task below.
+### Completed (Auth Infrastructure + Demo Account — 2026-02-23)
+- [x] Set Convex production env vars: JWT_PRIVATE_KEY, JWKS, SITE_URL — 2026-02-23
+- [x] Demo account seed via official auth:store flow — `convex/seedDemo.ts` — 2026-02-23
+- [x] Demo login verified working: `demo@ratio.law` / `DemoAdvocate2026` — 2026-02-23
+- [x] Fresh GA4 property created: G-D2EJDX48MD — 2026-02-23
+- [x] Cleanup debug files (convex/debug.ts, convex/debugAuth.ts removed) — 2026-02-23
 
 ### Pending
-- [ ] Create demo account seed function for testers (seed demo@ratio.law user in Convex)
 - [ ] Connect sessions CRUD fully to Convex
 - [ ] Enhance AI Judge with prompt caching + streaming
 - [ ] Wire Rankings page to Convex (replace hardcoded data)
