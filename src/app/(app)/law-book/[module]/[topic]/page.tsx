@@ -251,7 +251,7 @@ export default function TopicReadingPage() {
   const handleCite = () => {
     const citation = isDemo
       ? `'Offer and Acceptance' in RATIO Law Book (Contract Law, v7, 14 February 2026)`
-      : `'${fallback?.title}' in RATIO Law Book (${moduleName}, v${fallback?.version}, ${fallback?.lastUpdated})`;
+      : `'${fallback?.title ?? "Unknown"}' in RATIO Law Book (${moduleName}, v${fallback?.version ?? 1}, ${fallback?.lastUpdated ?? "Unknown"})`;
     navigator.clipboard.writeText(citation).then(() => {
       setCiteCopied(true);
       setTimeout(() => setCiteCopied(false), 2000);

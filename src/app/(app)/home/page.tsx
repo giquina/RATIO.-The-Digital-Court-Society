@@ -106,7 +106,7 @@ export default function HomePage() {
               </div>
             </div>
             {/* Social stats row */}
-            <div className="grid grid-cols-4 gap-1 mt-4 pt-3.5 border-t border-court-border">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 mt-4 pt-3.5 border-t border-court-border">
               {[
                 { v: profile?.followerCount ?? 0, l: "Followers" },
                 { v: profile?.commendationCount ?? 0, l: "Comms" },
