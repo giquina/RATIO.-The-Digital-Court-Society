@@ -157,10 +157,10 @@ export function ReferralDashboard() {
             <button
               onClick={handleWhatsApp}
               disabled={!info.canInvite}
-              className="flex-1 flex items-center justify-center gap-1.5 bg-[#25D366]/10 border border-[#25D366]/20 text-[#25D366] font-semibold text-court-xs py-2.5 rounded-xl hover:bg-[#25D366]/15 transition-colors disabled:opacity-40"
+              className="flex-1 flex items-center justify-center gap-1.5 bg-gold/10 border border-gold/20 text-gold font-semibold text-court-xs py-2.5 rounded-xl hover:bg-gold/15 transition-colors disabled:opacity-40"
             >
               <Share2 size={13} />
-              WhatsApp
+              Share
             </button>
           </div>
 

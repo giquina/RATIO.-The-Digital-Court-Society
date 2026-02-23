@@ -7,11 +7,17 @@ import Link from "next/link";
 import { Scale, Loader2, ArrowLeft } from "lucide-react";
 import { DemoCredentialsBanner } from "@/components/shared/DemoCredentialsBanner";
 
+const CONVEX_URL = process.env.NEXT_PUBLIC_CONVEX_URL;
+
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect") || "/home";
-  const { signIn } = useAuthActions();
+
+  // useAuthActions() returns undefined when no ConvexAuthProvider is present
+  // (demo mode). Don't destructure directly to avoid TypeError.
+  const authActions = useAuthActions();
+  const signIn = authActions?.signIn;
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -21,6 +27,13 @@ function LoginForm() {
   const handleSignIn = async () => {
     setError("");
     setLoading(true);
+
+    // Demo mode — skip real auth, just redirect
+    if (!CONVEX_URL || !signIn) {
+      router.push(redirect);
+      return;
+    }
+
     try {
       await signIn("password", { email: email.toLowerCase().trim(), password, flow: "signIn" });
       router.push(redirect);

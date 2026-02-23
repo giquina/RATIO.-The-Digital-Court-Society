@@ -23,7 +23,9 @@ function ReferralCapture() {
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { signIn } = useAuthActions();
+  // useAuthActions() returns undefined when no ConvexAuthProvider is present (demo mode)
+  const authActions = useAuthActions();
+  const signIn = authActions?.signIn;
   const updateName = useMutation(anyApi.users.updateName);
 
   const [name, setName] = useState("");

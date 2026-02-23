@@ -91,7 +91,9 @@ function SettingsSection({
 
 export default function SettingsPage() {
   const router = useRouter();
-  const { signOut } = useAuthActions();
+  // useAuthActions() returns undefined when no ConvexAuthProvider is present (demo mode)
+  const authActions = useAuthActions();
+  const signOut = authActions?.signOut;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const user: any = useQuery(anyApi.users.currentUser);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
