@@ -503,6 +503,9 @@ export function Tooltip({
   );
 }
 
+// ── PremiumEmptyState (re-export from separate file) ──
+export { PremiumEmptyState } from "./PremiumEmptyState";
+
 // ── ErrorState ──
 export function ErrorState({
   title = "Something went wrong",

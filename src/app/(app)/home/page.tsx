@@ -18,6 +18,7 @@ import {
 } from "@/components/ui";
 import { Scale, Calendar, Target, Trophy, Flame, Award, MessageCircle, ExternalLink } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { StarterKit } from "@/components/shared/StarterKit";
 
 // ── Activity type → icon & colour mapping ──
 const ACTIVITY_ICON_MAP: Record<string, { Icon: LucideIcon; color: string }> = {
@@ -77,8 +78,13 @@ export default function HomePage() {
 
   return (
     <div className="pt-2 pb-6">
-      {/* ── Streak + Stats Card ── */}
+      {/* ── Starter Kit (new advocates) ── */}
       <section className="px-4 mb-5">
+        <StarterKit profile={profile} onDismiss={() => {}} />
+      </section>
+
+      {/* ── Streak + Stats Card ── */}
+      <section className="px-4 mb-5" data-tour="dashboard">
         {isLoading ? (
           <Skeleton className="h-44 w-full rounded-court" />
         ) : (
@@ -125,7 +131,7 @@ export default function HomePage() {
 
       {/* ── Quick Actions ── */}
       <section className="px-4 mb-6">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5" data-tour="quick-actions">
           {([
             { Icon: Scale, label: "Create Session", sub: "Host a moot or trial", href: "/sessions/create" },
             { Icon: Calendar, label: "View Timetable", sub: "This week's sessions", href: "/sessions" },

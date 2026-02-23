@@ -51,6 +51,8 @@ interface NavItem {
   tooltip?: string;
   /** Beginner-mode subtitle */
   subtitle?: string;
+  /** data-tour attribute for onboarding tour targeting */
+  tourId?: string;
 }
 
 interface NavSection {
@@ -65,15 +67,15 @@ const sections: NavSection[] = [
     title: "MAIN",
     items: [
       { href: "/home", label: "Home", icon: Home, tooltip: "Dashboard" },
-      { href: "/sessions", label: "Sessions", icon: Scale, countKey: "upcomingSessions", tooltip: "Moot court sessions", subtitle: "Join a moot court hearing" },
-      { href: "/ai-practice", label: "AI Practice", icon: Mic, countKey: "aiDrafts", tooltip: "Practice with AI", subtitle: "Practice with an AI judge" },
+      { href: "/sessions", label: "Sessions", icon: Scale, countKey: "upcomingSessions", tooltip: "Moot court sessions", subtitle: "Join a moot court hearing", tourId: "nav-sessions" },
+      { href: "/ai-practice", label: "AI Practice", icon: Mic, countKey: "aiDrafts", tooltip: "Practice with AI", subtitle: "Practice with an AI judge", tourId: "nav-ai-practice" },
       { href: "/notifications", label: "Notifications", icon: Bell, countKey: "unreadNotifications", tooltip: "Notifications" },
     ],
   },
   {
     title: "LEARN",
     items: [
-      { href: "/law-book", label: "Law Book", icon: BookOpen, tooltip: "Legal encyclopedia", subtitle: "Collaborative legal encyclopedia" },
+      { href: "/law-book", label: "Law Book", icon: BookOpen, tooltip: "Legal encyclopedia", subtitle: "Collaborative legal encyclopedia", tourId: "nav-law-book" },
       { href: "/research", label: "Research", icon: Search, tooltip: "Legal research" },
       { href: "/research/saved", label: "Saved", icon: Bookmark, countKey: "savedAuthorities", tooltip: "Saved authorities" },
       { href: "/tools", label: "Tools", icon: Wrench, tooltip: "Legal tools" },
@@ -84,13 +86,13 @@ const sections: NavSection[] = [
     items: [
       { href: "/rankings", label: "Rankings", icon: Trophy, tooltip: "Advocate leaderboard", subtitle: "Advocate leaderboard" },
       { href: "/chambers", label: "Chambers", icon: Landmark, tooltip: "Your Inn of Court group", subtitle: "Your Inn of Court group" },
-      { href: "/community", label: "Community", icon: Users, tooltip: "Fellow advocates" },
+      { href: "/community", label: "Community", icon: Users, tooltip: "Fellow advocates", tourId: "nav-community" },
     ],
   },
   {
     title: "ACCOUNT",
     items: [
-      { href: "/profile", label: "Profile", icon: User, tooltip: "Your profile" },
+      { href: "/profile", label: "Profile", icon: User, tooltip: "Your profile", tourId: "nav-profile" },
       { href: "/portfolio", label: "Portfolio", icon: FolderOpen, tooltip: "Your advocacy record", subtitle: "Your advocacy record" },
       { href: "/settings", label: "Settings", icon: Settings, tooltip: "Settings" },
     ],
@@ -255,6 +257,7 @@ export function Sidebar() {
                 <Link
                   key={item.href}
                   href={item.href}
+                  data-tour={item.tourId}
                   className={cn(
                     "flex items-center gap-3 px-3 rounded-xl mb-0.5 transition-all duration-200 group relative",
                     showSubtitles && item.subtitle ? "py-2" : "py-2.5",

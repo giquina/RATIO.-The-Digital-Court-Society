@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { Tag, Card, Button, ProgressBar, DynamicIcon } from "@/components/ui";
 import { AI_PERSONAS, FEEDBACK_DIMENSIONS } from "@/lib/constants/app";
 import { Lightbulb, Book, Mic, Pause, ArrowUp, Scale, AlertCircle } from "lucide-react";
+import ModeSelector from "@/components/ai-practice/ModeSelector";
 import { cn } from "@/lib/utils/helpers";
 
 type Screen = "select" | "briefing" | "session" | "loading-feedback" | "feedback";
@@ -367,80 +368,11 @@ export default function AIPracticePage() {
   // ── MODE SELECTION ──
   if (screen === "select") {
     return (
-      <div className="pb-6">
-        <div className="px-4 pt-3 pb-4">
-          <h1 className="font-serif text-2xl font-bold text-court-text mb-1">AI Practice</h1>
-          <p className="text-xs text-court-text-sec">Train with AI-powered legal personas. No judgement, just improvement.</p>
-        </div>
-
-        {/* Session limit reached state */}
-        {sessionLimitReached && (
-          <div className="px-4 mb-4">
-            <Card className="p-5 border-gold/30">
-              <div className="flex flex-col items-center text-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center">
-                  <Scale size={24} className="text-gold" />
-                </div>
-                <div>
-                  <h3 className="font-serif text-base font-bold text-court-text mb-1">Monthly Practice Allocation Exhausted</h3>
-                  <p className="text-court-sm text-court-text-sec leading-relaxed">
-                    You have used your 3 complimentary hearings this month. Upgrade to Premium for unlimited practice.
-                  </p>
-                </div>
-                <Button variant="outline" onClick={() => setSessionLimitReached(false)}>View Premium</Button>
-              </div>
-            </Card>
-          </div>
-        )}
-
-        <div className="px-4 flex flex-col gap-3">
-          {(Object.entries(AI_PERSONAS) as [Mode, (typeof AI_PERSONAS)[Mode]][]).map(([key, p]) => {
-            const descriptions: Record<Mode, string> = {
-              judge: "Face a virtual High Court judge who will challenge your submissions and score your advocacy.",
-              mentor: "Get constructive coaching on your technique from a supportive senior counsel.",
-              examiner: "Timed SQE2-format assessment with marking against SRA competency standards.",
-              opponent: "AI argues against you in real time. Train rebuttal and thinking on your feet.",
-            };
-            return (
-              <Card
-                key={key}
-                onClick={key !== "opponent" && !sessionLimitReached ? () => { setMode(key); setScreen("briefing"); } : undefined}
-                className={`p-4 transition-all ${key === "opponent" || sessionLimitReached ? "opacity-50" : "cursor-pointer hover:border-white/10"}`}
-              >
-                <div className="flex gap-3.5 items-center">
-                  <div
-                    className="w-14 h-14 rounded-court flex items-center justify-center shrink-0"
-                    style={{ background: `linear-gradient(135deg, ${p.gradient[0]}, ${p.gradient[1]})` }}
-                  >
-                    <DynamicIcon name={p.icon} size={24} className="text-court-text" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="font-serif text-base font-bold text-court-text">{p.name}</h3>
-                        <p className="text-court-sm text-court-text-ter mt-0.5">{p.subtitle}</p>
-                      </div>
-                      {key === "opponent" && <Tag color="orange" small>COMING SOON</Tag>}
-                    </div>
-                    <p className="text-court-base text-court-text-sec mt-1.5 leading-relaxed">{descriptions[key]}</p>
-                  </div>
-                </div>
-              </Card>
-            );
-          })}
-        </div>
-        <div className="px-4 mt-5">
-          <Card className="p-4 bg-green-500/[0.06] border-green-500/15">
-            <div className="flex gap-2.5 items-center">
-              <Lightbulb size={24} className="text-green-500 shrink-0" />
-              <div>
-                <p className="text-court-base font-semibold text-court-text">Free tier: 3 sessions / month</p>
-                <p className="text-court-sm text-court-text-ter">Upgrade to Premium for unlimited AI practice</p>
-              </div>
-            </div>
-          </Card>
-        </div>
-      </div>
+      <ModeSelector
+        onSelectMode={(key) => { setMode(key); setScreen("briefing"); }}
+        sessionLimitReached={sessionLimitReached}
+        onDismissLimit={() => setSessionLimitReached(false)}
+      />
     );
   }
 
