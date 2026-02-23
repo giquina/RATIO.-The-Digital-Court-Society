@@ -729,6 +729,9 @@ export default function AIPracticePage() {
           </p>
         </Card>
       </section>
+      <p className="text-court-xs text-court-text-ter text-center px-4 mb-4">
+        AI-generated for educational purposes. Verify against primary sources.
+      </p>
       <section className="px-4 flex flex-col gap-2.5">
         <Button fullWidth onClick={() => {
           setScreen("select");
