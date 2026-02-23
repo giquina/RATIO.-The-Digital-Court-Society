@@ -58,7 +58,7 @@ export const metadata: Metadata = {
       "The constitutional training ground for UK law students. Organise moots, practise with an AI Judge, and build your portfolio.",
     images: [
       {
-        url: "/og-image.png",
+        url: "/api/og",
         width: 1200,
         height: 630,
         alt: "Ratio. — The Digital Court Society",
@@ -70,7 +70,7 @@ export const metadata: Metadata = {
     title: "Ratio. — The Digital Court Society",
     description:
       "The constitutional training ground for UK law students. Organise moots, practise with an AI Judge, and build your portfolio.",
-    images: ["/og-image.png"],
+    images: ["/api/og"],
   },
   robots: {
     index: true,
@@ -93,7 +93,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
+  viewportFit: "cover",
   themeColor: "#0C1220",
 };
 

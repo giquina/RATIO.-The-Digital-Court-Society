@@ -81,7 +81,7 @@ export default function HomePage() {
   const initials = profile ? getInitials(profile.fullName) : "??";
 
   return (
-    <div className="pb-24 md:pb-6">
+    <div className="pb-6">
       {/* ── Header ── */}
       <header className="flex justify-between items-center px-4 pt-3 pb-4">
         <div>
@@ -195,12 +195,12 @@ export default function HomePage() {
       <section className="px-4 lg:px-0">
         <div className="flex justify-between items-center mb-3.5">
           <h2 className="font-serif text-lg font-bold text-court-text">Activity</h2>
-          <div className="flex gap-3">
+          <div className="flex gap-2 sm:gap-3 shrink-0">
             {(["following", "discover", "chamber"] as const).map((t) => (
               <button
                 key={t}
                 onClick={() => setFeedTab(t)}
-                className={`text-court-sm font-semibold pb-0.5 capitalize focus:outline-none focus:ring-1 focus:ring-gold/30 rounded-sm ${
+                className={`text-court-xs sm:text-court-sm font-semibold pb-0.5 capitalize focus:outline-none focus:ring-1 focus:ring-gold/30 rounded-sm ${
                   feedTab === t ? "text-gold border-b-[1.5px] border-gold" : "text-court-text-ter"
                 }`}
               >

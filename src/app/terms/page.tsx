@@ -308,10 +308,10 @@ export default function TermsPage() {
             <p className="text-court-base text-court-text-sec leading-relaxed mb-4">
               You may terminate your account at any time by contacting us at{" "}
               <a
-                href="mailto:support@ratio.law"
+                href="mailto:mgiqui01@student.bbk.ac.uk"
                 className="text-gold hover:underline"
               >
-                support@ratio.law
+                mgiqui01@student.bbk.ac.uk
               </a>{" "}
               or through the account settings page. Upon termination, your right to
               access the platform will cease immediately.
@@ -377,10 +377,10 @@ export default function TermsPage() {
             </p>
             <p className="text-court-base text-court-text-sec leading-relaxed mb-4">
               <a
-                href="mailto:support@ratio.law"
+                href="mailto:mgiqui01@student.bbk.ac.uk"
                 className="text-gold hover:underline"
               >
-                support@ratio.law
+                mgiqui01@student.bbk.ac.uk
               </a>
             </p>
           </section>

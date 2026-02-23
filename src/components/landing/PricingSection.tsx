@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 
@@ -177,8 +178,9 @@ export function PricingSection() {
             </ul>
 
             {/* CTA Button */}
-            <button
-              className={`w-full mt-5 py-2.5 rounded-xl text-sm font-bold tracking-wide transition-all duration-200 ${
+            <Link
+              href={tier.name === "Free" ? "/register" : `/register?plan=${tier.name.toLowerCase().replace("+", "_plus")}`}
+              className={`w-full mt-5 py-2.5 rounded-xl text-sm font-bold tracking-wide transition-all duration-200 text-center block ${
                 tier.ctaVariant === "primary"
                   ? "bg-gold text-navy hover:bg-gold/90"
                   : tier.ctaVariant === "outline"
@@ -187,7 +189,7 @@ export function PricingSection() {
               }`}
             >
               {tier.ctaLabel}
-            </button>
+            </Link>
           </div>
         ))}
       </div>

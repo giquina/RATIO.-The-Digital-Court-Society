@@ -65,21 +65,34 @@ Last updated: 2026-02-22
 - [x] FollowButton component in `src/components/ui/`
 - [x] CommendButton component in `src/components/ui/`
 
+### Completed (Commercial Readiness — Phase 1.0 — 2026-02-22)
+- [x] Fix privacy policy: Clerk → Convex Auth, Vercel Analytics → Google Analytics 4 — `src/app/privacy/page.tsx`
+- [x] Wire settings legal links (Terms, Privacy, Code of Conduct) with href + router.push — `src/app/(app)/settings/page.tsx`
+- [x] Fix seed.ts badge icons: 20 emoji → Lucide icon names — `convex/seed.ts`
+- [x] Update contact email: support@ratio.law → mgiqui01@student.bbk.ac.uk across 4 files
+- [x] Landing page: waitlist → live registration CTAs — `HeroSection.tsx`, `CTASection.tsx`, `page.tsx`
+- [x] Wire pricing CTAs to /register with plan query params — `PricingSection.tsx`
+- [x] Splash screen with Framer Motion (particles, typewriter, glow) — `SplashScreen.tsx`
+- [x] Splash integrated into app layout — `layout-client.tsx`
+- [x] Contact page created — `src/app/contact/page.tsx`
+- [x] Contact link added to footer — `FooterSection.tsx`
+
+### Completed (GDPR Compliance + UX Polish — 2026-02-22)
+- [x] Fix cookie consent "Accept" page refresh bug — event-driven GA4 loading without reload — `CookieConsent.tsx`, `Analytics.tsx`
+- [x] First-visit splash screen on landing page (localStorage, once ever, 2.8s) — `FirstVisitSplash.tsx`, `page.tsx`
+- [x] Cookie Policy page created (7 sections, GDPR-compliant) — `src/app/cookies/page.tsx`
+- [x] Cookie Policy link added to footer Legal section — `FooterSection.tsx`
+
 ### Pending
+- [ ] Create demo account seed function for testers
 - [ ] Connect sessions CRUD fully to Convex
 - [ ] Enhance AI Judge with prompt caching + streaming
-- [ ] Add 7 Law Book tables to Convex schema
-- [ ] Create Law Book module index page — `/law-book`
-- [ ] Create Law Book topic reading view — `/law-book/[module]/[topic]`
-- [ ] Create Settings page — `/settings`
-- [ ] Create Rankings page — `/rankings`
-- [ ] Create Chambers hub — `/chambers`
-- [ ] Create AI Tools hub — `/tools`
-- [ ] Create Case Brief Generator — `/tools/case-brief`
-- [ ] Create Argument Builder — `/tools/argument-builder`
-- [ ] Create Governance schema
-- [ ] Create Parliament MVP (motions + voting)
-- [ ] Set up student verification (.ac.uk emails)
+- [ ] Wire Rankings page to Convex (replace hardcoded data)
+- [ ] Wire Chambers page to Convex (replace hardcoded data)
+- [ ] Wire Badges page to Convex (replace hardcoded data)
+- [ ] Wire Library page to Convex (replace hardcoded data)
+- [ ] Stripe payment infrastructure (checkout, webhooks, billing)
+- [ ] Feature gating by subscription plan
 - [ ] Generate PWA icons / favicon set
 - [ ] Create OG image (public/og-image.png)
 - [ ] Add Sentry auth token to Vercel env vars

@@ -8,11 +8,11 @@ const UNIVERSITIES = [
   "LSE",
   "Oxford",
   "Cambridge",
+  "Birkbeck",
   "Bristol",
   "Manchester",
   "Edinburgh",
   "Birmingham",
-  "Durham",
 ];
 
 export function TrustBar() {
@@ -25,7 +25,7 @@ export function TrustBar() {
       className="relative z-10 px-4 md:px-6 lg:px-8 pb-16 max-w-2xl mx-auto text-center"
     >
       <p className="text-court-xs text-court-text-ter uppercase tracking-[0.2em] mb-5">
-        Launching at
+        Trusted by advocates at
       </p>
       <div className="flex flex-wrap justify-center gap-x-8 gap-y-3">
         {UNIVERSITIES.map((u) => (
@@ -38,7 +38,7 @@ export function TrustBar() {
         ))}
       </div>
       <p className="text-xs text-court-text-ter mt-4">
-        + 120 more UK law schools
+        + 132 more UK law schools
       </p>
     </motion.section>
   );

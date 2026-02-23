@@ -628,6 +628,24 @@ export default defineSchema({
     .index("by_session", ["videoSessionId"]),
 
   // ═══════════════════════════════════════════
+  // SUBSCRIPTIONS & BILLING
+  // ═══════════════════════════════════════════
+  subscriptions: defineTable({
+    userId: v.id("users"),
+    plan: v.string(), // "free", "premium", "premium_plus"
+    stripeCustomerId: v.optional(v.string()),
+    stripeSubscriptionId: v.optional(v.string()),
+    stripePriceId: v.optional(v.string()),
+    status: v.string(), // "active", "canceled", "past_due", "trialing", "incomplete"
+    currentPeriodStart: v.optional(v.number()),
+    currentPeriodEnd: v.optional(v.number()),
+    cancelAtPeriodEnd: v.optional(v.boolean()),
+  })
+    .index("by_user", ["userId"])
+    .index("by_stripe_customer", ["stripeCustomerId"])
+    .index("by_stripe_subscription", ["stripeSubscriptionId"]),
+
+  // ═══════════════════════════════════════════
   // LEGAL RESEARCH
   // ═══════════════════════════════════════════
   savedAuthorities: defineTable({

@@ -1,0 +1,12 @@
+<svg width="192" height="192" viewBox="0 0 192 192" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="192" height="192" rx="24" fill="#0C1220"/>
+  <g transform="translate(96, 60)" stroke="#C9A84C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M0 -24v38"/>
+    <path d="M-14 -16l14-4 14 4"/>
+    <path d="M-14 -16l-4 14a10 10 0 0 0 8 0l-4-14"/>
+    <path d="M14 -16l-4 14a10 10 0 0 0 8 0l-4-14"/>
+    <path d="M-6 14h12"/>
+  </g>
+  <text x="96" y="140" text-anchor="middle" font-family="Georgia, serif" font-size="28" font-weight="700" fill="#F2EDE6" letter-spacing="4">RATIO</text>
+  <text x="143" y="140" font-family="Georgia, serif" font-size="28" font-weight="700" fill="#C9A84C">.</text>
+</svg>

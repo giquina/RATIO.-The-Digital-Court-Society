@@ -42,14 +42,17 @@ const FOOTER_SECTIONS = [
     title: "Legal",
     links: [
       { name: "Privacy Policy", href: "/privacy" },
+      { name: "Cookie Policy", href: "/cookies" },
       { name: "Terms of Service", href: "/terms" },
       { name: "Code of Conduct", href: "/code-of-conduct" },
+      { name: "FAQ", href: "/#faq" },
+      { name: "Contact", href: "/contact" },
     ],
   },
 ];
 
 const UNIVERSITIES = [
-  "UCL", "KCL", "LSE", "Oxford", "Cambridge", "Bristol", "Edinburgh", "Manchester",
+  "UCL", "KCL", "LSE", "Oxford", "Cambridge", "Birkbeck", "Bristol", "Manchester", "Edinburgh", "Birmingham",
 ];
 
 export function FooterSection() {
@@ -118,7 +121,7 @@ export function FooterSection() {
         {/* Universities bar */}
         <div className="border-t border-court-border pt-6 mb-6">
           <p className="text-court-xs font-bold tracking-[0.15em] text-court-text-ter uppercase mb-3">
-            Universities
+            Supported at 142 UK universities including
           </p>
           <div className="flex flex-wrap gap-x-4 gap-y-1.5">
             {UNIVERSITIES.map((uni) => (
@@ -135,7 +138,7 @@ export function FooterSection() {
             &copy; 2026 Ratio. Built for the Bar.
           </p>
           <p className="text-court-xs text-court-text-ter">
-            Built by law students, for law students.
+            mgiqui01@student.bbk.ac.uk
           </p>
         </div>
       </div>

@@ -144,7 +144,7 @@ export default function CommunityPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-center">
                         <div>
-                          <p className="text-sm font-bold text-court-text">{p.fullName}</p>
+                          <p className="text-sm font-bold text-court-text truncate">{p.fullName}</p>
                           <p className="text-court-xs text-court-text-ter mt-0.5">
                             {p.universityShort} · Year {p.yearOfStudy}{p.chamber ? ` \u00B7 ${p.chamber} Chamber` : ""}
                           </p>
@@ -208,7 +208,7 @@ export default function CommunityPage() {
           ) : (
             <>
               {/* Top 3 Podium */}
-              <div className="flex justify-center gap-2 mb-5 items-end">
+              <div className="flex justify-center gap-1.5 sm:gap-2 mb-5 items-end">
                 {[rankedAll[1], rankedAll[0], rankedAll[2]].map((r, i) => {
                   const isFirst = i === 1;
                   const isMe = r._id === profile?._id;
@@ -275,7 +275,7 @@ export default function CommunityPage() {
             />
           ) : (
             <>
-              <Card highlight className="p-5 text-center mb-4">
+              <Card highlight className="p-3.5 sm:p-5 text-center mb-4">
                 <Scale size={36} className="text-gold mx-auto" />
                 <h2 className="font-serif text-xl font-bold text-court-text mt-2">{profile.chamber} Chamber</h2>
                 <p className="text-court-sm text-court-text-sec mt-1">{chamberProfiles.length} members</p>

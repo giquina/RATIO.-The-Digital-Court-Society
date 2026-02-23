@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { TrustBar } from "@/components/landing/TrustBar";
@@ -18,21 +17,11 @@ import { PricingSection } from "@/components/landing/PricingSection";
 import { FAQSection } from "@/components/landing/FAQSection";
 import { CTASection } from "@/components/landing/CTASection";
 import { FooterSection } from "@/components/landing/FooterSection";
+import { FirstVisitSplash } from "@/components/shared/FirstVisitSplash";
 
 export default function LandingPage() {
-  const [email, setEmail] = useState("");
-  const [submitted, setSubmitted] = useState(false);
-  const [count, setCount] = useState(247);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email.includes("@")) return;
-    // In production: call Convex mutation to store email
-    setSubmitted(true);
-    setCount((c) => c + 1);
-  };
-
   return (
+    <FirstVisitSplash>
     <div className="min-h-screen overflow-hidden relative">
       {/* Background effects */}
       <div className="absolute inset-0 pointer-events-none">
@@ -55,13 +44,7 @@ export default function LandingPage() {
       </nav>
 
       {/* Sections */}
-      <HeroSection
-        email={email}
-        setEmail={setEmail}
-        submitted={submitted}
-        count={count}
-        onSubmit={handleSubmit}
-      />
+      <HeroSection />
       <TrustBar />
       <FeaturesGrid id="features" />
       <HowItWorks />
@@ -75,14 +58,9 @@ export default function LandingPage() {
       <TestimonialSection />
       <PricingSection />
       <FAQSection />
-      <CTASection
-        email={email}
-        setEmail={setEmail}
-        submitted={submitted}
-        count={count}
-        onSubmit={handleSubmit}
-      />
+      <CTASection />
       <FooterSection />
     </div>
+    </FirstVisitSplash>
   );
 }

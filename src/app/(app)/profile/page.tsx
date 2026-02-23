@@ -150,7 +150,7 @@ export default function ProfilePage() {
             <p className="text-xs text-court-text-sec mt-1">{profile.university}</p>
             <p className="text-court-sm text-court-text-ter mt-0.5">{yearLabel}{profile.chamber ? ` · ${profile.chamber} Chamber` : ""}</p>
             {profile.bio && (
-              <p className="text-court-sm text-court-text-sec mt-2 max-w-xs leading-relaxed">{profile.bio}</p>
+              <p className="text-court-sm text-court-text-sec mt-2 max-w-[280px] sm:max-w-xs leading-relaxed">{profile.bio}</p>
             )}
           </div>
 

@@ -23,7 +23,7 @@ const FAQ_SECTIONS = [
       },
       {
         q: "Which universities are supported?",
-        a: "Ratio currently supports 20 UK universities including UCL, KCL, LSE, Oxford, Cambridge, Bristol, Manchester, Birmingham, Edinburgh, Leeds, Exeter, Warwick, Nottingham, Durham, QMUL, SOAS, City, Sheffield, Glasgow, and Cardiff. More universities are being added each term.",
+        a: "Ratio supports 142 UK universities across all regions, including UCL, KCL, LSE, Oxford, Cambridge, Birkbeck, Bristol, Manchester, Edinburgh, Birmingham, Leeds, Exeter, Warwick, Nottingham, Durham, QMUL, SOAS, City, Sheffield, Glasgow, Cardiff, and many more. If your university is not listed during registration, contact us and we will add it.",
       },
     ],
   },
@@ -210,7 +210,7 @@ export default function HelpPage() {
                           )}
                         </button>
                         {isItemOpen && (
-                          <div className="px-4 pb-3.5 pl-9">
+                          <div className="px-4 pb-3.5 pl-4 sm:pl-9">
                             <p className="text-court-base text-court-text-sec leading-relaxed">
                               {item.a}
                             </p>
@@ -249,11 +249,11 @@ export default function HelpPage() {
               We aim to respond within 24 hours.
             </p>
             <a
-              href="mailto:support@ratio.law"
+              href="mailto:mgiqui01@student.bbk.ac.uk"
               className="inline-flex items-center gap-2 bg-gold text-navy font-bold text-xs px-5 py-2.5 rounded-xl hover:bg-gold/90 transition-colors"
             >
               <Mail size={14} />
-              support@ratio.law
+              mgiqui01@student.bbk.ac.uk
             </a>
           </div>
         </Card>

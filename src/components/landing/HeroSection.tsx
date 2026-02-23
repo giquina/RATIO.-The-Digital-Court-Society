@@ -1,24 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
-import { Scale } from "lucide-react";
+import { Scale, ArrowRight } from "lucide-react";
 
-interface HeroSectionProps {
-  email: string;
-  setEmail: (email: string) => void;
-  submitted: boolean;
-  count: number;
-  onSubmit: (e: React.FormEvent) => void;
-}
-
-export function HeroSection({
-  email,
-  setEmail,
-  submitted,
-  count,
-  onSubmit,
-}: HeroSectionProps) {
+export function HeroSection() {
   return (
     <motion.section
       initial={{ opacity: 0, y: 20 }}
@@ -41,7 +27,7 @@ export function HeroSection({
           ))}
         </div>
         <span className="text-court-sm text-gold font-semibold">
-          {count} Advocates on the waitlist
+          142 UK universities supported
         </span>
       </div>
 
@@ -54,42 +40,25 @@ export function HeroSection({
         Tournaments. Democratic governance. One platform, built for the Bar.
       </p>
 
-      {/* Email Capture */}
-      {!submitted ? (
-        <form onSubmit={onSubmit} className="max-w-sm mx-auto">
-          <div className="flex gap-2">
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Your university email"
-              required
-              className="flex-1 bg-navy-card border border-court-border rounded-xl px-4 py-3.5 text-sm text-court-text outline-none focus:border-gold/40 transition-colors placeholder:text-court-text-ter"
-            />
-            <button
-              type="submit"
-              className="bg-gold text-navy font-bold rounded-xl px-6 py-3.5 text-sm tracking-wide shrink-0 hover:bg-gold/90 transition-colors"
-            >
-              Join
-            </button>
-          </div>
-          <p className="text-court-xs text-court-text-ter mt-3">
-            Free forever. Built for UK law students. Launching March 2026.
-          </p>
-        </form>
-      ) : (
-        <div className="max-w-sm mx-auto animate-slide-up">
-          <div className="bg-green-500/10 border border-green-500/20 rounded-xl px-6 py-5 text-center">
-            <Scale size={28} className="text-green-500 mx-auto" />
-            <p className="text-sm font-bold text-green-500 mt-2">
-              You&apos;re on the list.
-            </p>
-            <p className="text-xs text-court-text-sec mt-1">
-              Advocate #{count}. We&apos;ll notify you at launch.
-            </p>
-          </div>
-        </div>
-      )}
+      {/* Registration CTAs */}
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-sm mx-auto">
+        <Link
+          href="/register"
+          className="w-full sm:w-auto bg-gold text-navy font-bold rounded-xl px-8 py-3.5 text-sm tracking-wide hover:bg-gold/90 transition-colors inline-flex items-center justify-center gap-2"
+        >
+          Join as an Advocate
+          <ArrowRight size={16} />
+        </Link>
+        <Link
+          href="/login"
+          className="w-full sm:w-auto border border-court-border text-court-text-sec font-semibold rounded-xl px-8 py-3.5 text-sm hover:border-white/10 transition-colors inline-flex items-center justify-center"
+        >
+          Sign In
+        </Link>
+      </div>
+      <p className="text-court-xs text-court-text-ter mt-4">
+        Free forever. Built for UK law students.
+      </p>
     </motion.section>
   );
 }

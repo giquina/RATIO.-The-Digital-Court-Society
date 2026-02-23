@@ -153,7 +153,7 @@ export default function PrivacyPage() {
               We implement appropriate technical and organisational measures to
               protect your personal data against unauthorised access, alteration,
               disclosure, or destruction. These measures include encryption of data
-              in transit via TLS, secure authentication through Clerk, and regular
+              in transit via TLS, secure authentication through Convex Auth, and regular
               security reviews of our infrastructure.
             </p>
             <p className="text-court-base text-court-text-sec leading-relaxed mb-4">
@@ -181,7 +181,7 @@ export default function PrivacyPage() {
                 real-time data synchronisation
               </li>
               <li>
-                <span className="font-medium">Clerk</span> — Authentication and
+                <span className="font-medium">Convex Auth</span> — Authentication and
                 user identity management
               </li>
               <li>
@@ -193,8 +193,8 @@ export default function PrivacyPage() {
                 providers for the AI Judge and analytical tools
               </li>
               <li>
-                <span className="font-medium">Vercel Analytics</span> — Anonymous
-                usage analytics
+                <span className="font-medium">Google Analytics 4</span> — Anonymous
+                usage analytics (subject to cookie consent)
               </li>
             </ul>
             <p className="text-court-base text-court-text-sec leading-relaxed mb-4">
@@ -246,10 +246,10 @@ export default function PrivacyPage() {
             <p className="text-court-base text-court-text-sec leading-relaxed mb-4">
               To exercise any of these rights, please contact us at{" "}
               <a
-                href="mailto:support@ratio.law"
+                href="mailto:mgiqui01@student.bbk.ac.uk"
                 className="text-gold hover:underline"
               >
-                support@ratio.law
+                mgiqui01@student.bbk.ac.uk
               </a>
               . We will respond to your request within one month, as required by
               law. If you are unsatisfied with our response, you have the right to
@@ -337,10 +337,10 @@ export default function PrivacyPage() {
             </p>
             <p className="text-court-base text-court-text-sec leading-relaxed mb-4">
               <a
-                href="mailto:support@ratio.law"
+                href="mailto:mgiqui01@student.bbk.ac.uk"
                 className="text-gold hover:underline"
               >
-                support@ratio.law
+                mgiqui01@student.bbk.ac.uk
               </a>
             </p>
             <p className="text-court-base text-court-text-sec leading-relaxed mb-4">

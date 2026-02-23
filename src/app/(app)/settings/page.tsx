@@ -255,23 +255,23 @@ export default function SettingsPage() {
             Danger Zone
           </h3>
           <Card className="p-4 border-red-500/10">
-            <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+            <div className="flex flex-col gap-3">
               <div className="flex items-center gap-2 text-red-400">
-                <AlertTriangle size={16} />
+                <AlertTriangle size={16} className="shrink-0" />
                 <span className="text-court-base text-court-text-ter">
                   These actions are irreversible
                 </span>
               </div>
-              <div className="flex gap-2.5 sm:ml-auto">
+              <div className="flex flex-wrap gap-2.5">
                 <button
                   onClick={handleSignOut}
                   disabled={signingOut}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-red-500/30 text-red-400 text-xs font-bold hover:bg-red-500/10 transition-colors disabled:opacity-50"
+                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-red-500/30 text-red-400 text-xs font-bold hover:bg-red-500/10 transition-colors disabled:opacity-50"
                 >
                   {signingOut ? <Loader2 size={14} className="animate-spin" /> : <LogOut size={14} />}
                   {signingOut ? "Signing out..." : "Sign Out"}
                 </button>
-                <button className="text-xs text-red-400/60 hover:text-red-400 transition-colors flex items-center gap-1">
+                <button className="text-xs text-red-400/60 hover:text-red-400 transition-colors flex items-center gap-1 px-3 py-2.5">
                   <Trash2 size={12} />
                   Delete Account
                 </button>

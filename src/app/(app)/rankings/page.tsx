@@ -132,9 +132,9 @@ export default function RankingsPage() {
       {/* Podium — Top 3 */}
       {top3.length >= 3 && (
         <section className="px-4 md:px-6 lg:px-8 mb-6">
-          <div className="flex justify-center items-end gap-2.5">
+          <div className="flex justify-center items-end gap-1.5 sm:gap-2.5">
             {/* Silver — 2nd */}
-            <div className="flex-1 max-w-[130px] text-center">
+            <div className="flex-1 min-w-0 max-w-[110px] sm:max-w-[130px] text-center">
               <Avatar initials={getInitials(top3[1].fullName)} chamber={top3[1].chamber} size="lg" />
               <p className="text-court-sm font-bold text-court-text mt-1.5">
                 {top3[1].fullName.split(" ")[0]}
@@ -151,7 +151,7 @@ export default function RankingsPage() {
             </div>
 
             {/* Gold — 1st */}
-            <div className="flex-1 max-w-[130px] text-center -mt-4">
+            <div className="flex-1 min-w-0 max-w-[110px] sm:max-w-[130px] text-center -mt-4">
               <div className="flex justify-center mb-1">
                 <Crown size={18} className="text-gold" />
               </div>
@@ -171,7 +171,7 @@ export default function RankingsPage() {
             </div>
 
             {/* Bronze — 3rd */}
-            <div className="flex-1 max-w-[130px] text-center">
+            <div className="flex-1 min-w-0 max-w-[110px] sm:max-w-[130px] text-center">
               <Avatar initials={getInitials(top3[2].fullName)} chamber={top3[2].chamber} size="lg" />
               <p className="text-court-sm font-bold text-court-text mt-1.5">
                 {top3[2].fullName.split(" ")[0]}

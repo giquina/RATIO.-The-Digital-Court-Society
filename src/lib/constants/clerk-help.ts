@@ -29,7 +29,7 @@ export const HELP_SECTIONS: HelpSection[] = [
       },
       {
         q: "Which universities are supported?",
-        a: "Ratio currently supports 20 UK universities including UCL, KCL, LSE, Oxford, Cambridge, Bristol, Manchester, Birmingham, Edinburgh, Leeds, Exeter, Warwick, Nottingham, Durham, QMUL, SOAS, City, Sheffield, Glasgow, and Cardiff. More universities are being added each term.",
+        a: "Ratio supports 142 UK universities across all regions, including UCL, KCL, LSE, Oxford, Cambridge, Birkbeck, Bristol, Manchester, Edinburgh, Birmingham, Leeds, Exeter, Warwick, Nottingham, Durham, QMUL, SOAS, City, Sheffield, Glasgow, Cardiff, and many more. If your university is not listed during registration, contact us and we will add it.",
       },
       {
         q: "What are chambers?",

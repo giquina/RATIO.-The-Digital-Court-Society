@@ -2,7 +2,7 @@
 
 import { usePathname, useSearchParams } from "next/navigation";
 import Script from "next/script";
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
@@ -22,13 +22,21 @@ function AnalyticsPageView() {
 }
 
 export function Analytics() {
-  if (!GA_ID) return null;
+  const [consentGranted, setConsentGranted] = useState(false);
 
-  // Only load if user has consented
-  if (typeof window !== "undefined") {
-    const consent = localStorage.getItem("ratio-cookie-consent");
-    if (consent !== "accepted") return null;
-  }
+  useEffect(() => {
+    // Check existing consent on mount
+    if (localStorage.getItem("ratio-cookie-consent") === "accepted") {
+      setConsentGranted(true);
+    }
+
+    // Listen for real-time consent granted (no page reload needed)
+    const handler = () => setConsentGranted(true);
+    window.addEventListener("ratio-consent-granted", handler);
+    return () => window.removeEventListener("ratio-consent-granted", handler);
+  }, []);
+
+  if (!GA_ID || !consentGranted) return null;
 
   return (
     <>

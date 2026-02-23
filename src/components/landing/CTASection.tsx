@@ -1,23 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
-import { Scale } from "lucide-react";
+import { Scale, ArrowRight } from "lucide-react";
 
-interface CTASectionProps {
-  email: string;
-  setEmail: (email: string) => void;
-  submitted: boolean;
-  count: number;
-  onSubmit: (e: React.FormEvent) => void;
-}
-
-export function CTASection({
-  email,
-  setEmail,
-  submitted,
-  count,
-  onSubmit,
-}: CTASectionProps) {
+export function CTASection() {
   return (
     <motion.section
       initial={{ opacity: 0, y: 20 }}
@@ -31,31 +18,15 @@ export function CTASection({
         Ready to prove it?
       </h2>
       <p className="text-court-base text-court-text-sec mb-6">
-        Join {count} law students already on the waitlist.
+        Join advocates from 142 UK universities already practising.
       </p>
-      {!submitted ? (
-        <form onSubmit={onSubmit} className="flex gap-2">
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Your email"
-            required
-            className="flex-1 bg-navy-card border border-court-border rounded-xl px-4 py-3 text-sm text-court-text outline-none focus:border-gold/40 placeholder:text-court-text-ter"
-          />
-          <button
-            type="submit"
-            className="bg-gold text-navy font-bold rounded-xl px-6 py-3 text-sm shrink-0 hover:bg-gold/90 transition-colors"
-          >
-            Join
-          </button>
-        </form>
-      ) : (
-        <p className="text-sm text-green-500 font-semibold flex items-center justify-center gap-2">
-          <Scale size={16} className="text-green-500" />
-          You&apos;re already on the list.
-        </p>
-      )}
+      <Link
+        href="/register"
+        className="bg-gold text-navy font-bold rounded-xl px-8 py-3.5 text-sm tracking-wide hover:bg-gold/90 transition-colors inline-flex items-center justify-center gap-2"
+      >
+        Join as an Advocate
+        <ArrowRight size={16} />
+      </Link>
     </motion.section>
   );
 }

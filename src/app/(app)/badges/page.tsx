@@ -88,7 +88,7 @@ export default function BadgesPage() {
           </div>
         </div>
         <div className="px-4 md:px-6 lg:px-8">
-          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
             {Array.from({ length: 12 }).map((_, i) => (
               <Skeleton key={i} className="h-32 w-full rounded-court" />
             ))}
@@ -157,11 +157,11 @@ export default function BadgesPage() {
 
       {/* Badge Grid */}
       <section className="px-4 md:px-6 lg:px-8">
-        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
           {filtered.map((badge) => (
             <Card
               key={badge.name}
-              className={`p-3.5 text-center relative overflow-hidden transition-all ${
+              className={`p-3 sm:p-3.5 text-center relative overflow-hidden transition-all ${
                 badge.earned
                   ? "hover:border-white/10"
                   : "opacity-50 grayscale"

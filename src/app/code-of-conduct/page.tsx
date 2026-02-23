@@ -252,10 +252,10 @@ export default function CodeOfConductPage() {
               <li>
                 Direct email to{" "}
                 <a
-                  href="mailto:support@ratio.law"
+                  href="mailto:mgiqui01@student.bbk.ac.uk"
                   className="text-gold hover:underline"
                 >
-                  support@ratio.law
+                  mgiqui01@student.bbk.ac.uk
                 </a>
               </li>
             </ul>

@@ -75,7 +75,7 @@ const FEATURES: {
     Icon: Trophy,
     title: "National League",
     desc: "Join a Chamber. Compete in national rankings. Rise from Pupil to King's Counsel. Your university vs everyone.",
-    tag: "130+ UNIVERSITIES",
+    tag: "142 UNIVERSITIES",
   },
   {
     Icon: Landmark,

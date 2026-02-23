@@ -4,7 +4,9 @@ import { useConvexAuth } from "convex/react";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
 
-export default function AuthLayoutClient({ children }: { children: React.ReactNode }) {
+const CONVEX_URL = process.env.NEXT_PUBLIC_CONVEX_URL;
+
+function AuthLayoutWithConvex({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useConvexAuth();
   const router = useRouter();
   const pathname = usePathname();
@@ -19,4 +21,12 @@ export default function AuthLayoutClient({ children }: { children: React.ReactNo
   }, [isAuthenticated, isLoading, router, pathname]);
 
   return <>{children}</>;
+}
+
+export default function AuthLayoutClient({ children }: { children: React.ReactNode }) {
+  // Demo mode — no Convex backend, skip auth checks
+  if (!CONVEX_URL) {
+    return <>{children}</>;
+  }
+  return <AuthLayoutWithConvex>{children}</AuthLayoutWithConvex>;
 }

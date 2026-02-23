@@ -108,7 +108,7 @@ export default function ChambersPage() {
                   <p className="text-court-base text-court-text-sec italic mt-1">
                     &ldquo;{myChamber.motto}&rdquo;
                   </p>
-                  <div className="flex gap-5 mt-3">
+                  <div className="flex flex-wrap gap-x-4 gap-y-1.5 mt-3">
                     <div className="flex items-center gap-1.5">
                       <Users size={13} className="text-court-text-ter" />
                       <span className="text-court-sm text-court-text-sec">{myChamber.members} members</span>

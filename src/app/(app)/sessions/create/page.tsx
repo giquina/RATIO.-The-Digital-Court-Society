@@ -130,8 +130,8 @@ export default function CreateSessionPage() {
         </div>
 
         {/* Date & Time */}
-        <div className="grid grid-cols-3 gap-2.5">
-          <div className="col-span-1">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+          <div>
             <label className={labelClass}>Date</label>
             <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={inputClass} />
           </div>

@@ -3,6 +3,8 @@ import Stripe from "stripe";
 import { ConvexHttpClient } from "convex/browser";
 import { anyApi } from "convex/server";
 
+export const runtime = 'nodejs';
+
 function getStripe() {
   return new Stripe(process.env.STRIPE_SECRET_KEY!, {
     apiVersion: "2026-01-28.clover",

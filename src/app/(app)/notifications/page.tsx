@@ -139,9 +139,9 @@ export default function NotificationsPage() {
                   <DynamicIcon name={getIconForType(n.type)} size={16} className="text-gold" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex justify-between items-start">
-                    <p className="text-court-base font-bold text-court-text">{n.title}</p>
-                    <span className="text-court-xs text-court-text-ter shrink-0 ml-2">
+                  <div className="flex justify-between items-start gap-2">
+                    <p className="text-court-base font-bold text-court-text min-w-0 break-words">{n.title}</p>
+                    <span className="text-court-xs text-court-text-ter shrink-0">
                       {formatTimeAgo(n._creationTime)}
                     </span>
                   </div>
@@ -171,9 +171,9 @@ export default function NotificationsPage() {
                   <DynamicIcon name={getIconForType(n.type)} size={16} className="text-court-text-sec" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex justify-between items-start">
-                    <p className="text-court-base font-medium text-court-text-sec">{n.title}</p>
-                    <span className="text-court-xs text-court-text-ter shrink-0 ml-2">
+                  <div className="flex justify-between items-start gap-2">
+                    <p className="text-court-base font-medium text-court-text-sec min-w-0 break-words">{n.title}</p>
+                    <span className="text-court-xs text-court-text-ter shrink-0">
                       {formatTimeAgo(n._creationTime)}
                     </span>
                   </div>

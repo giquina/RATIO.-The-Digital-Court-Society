@@ -20,8 +20,8 @@ export function CookieConsent() {
   const handleAccept = () => {
     localStorage.setItem(CONSENT_KEY, "accepted");
     setVisible(false);
-    // Reload to initialise GA4 now that consent is granted
-    window.location.reload();
+    // Signal Analytics component to load GA4 without page reload
+    window.dispatchEvent(new Event("ratio-consent-granted"));
   };
 
   const handleDecline = () => {
@@ -33,7 +33,7 @@ export function CookieConsent() {
 
   return (
     <div className="fixed bottom-0 inset-x-0 z-50 p-4 md:p-6">
-      <div className="max-w-lg mx-auto bg-navy-card border border-court-border rounded-court p-5 shadow-xl">
+      <div className="max-w-sm sm:max-w-lg mx-auto bg-navy-card border border-court-border rounded-court p-4 sm:p-5 shadow-xl">
         <div className="flex items-start gap-3">
           <div className="w-9 h-9 rounded-full bg-gold-dim flex items-center justify-center flex-shrink-0 mt-0.5">
             <Shield size={18} className="text-gold" />
