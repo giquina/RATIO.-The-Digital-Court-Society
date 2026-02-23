@@ -217,7 +217,7 @@ export async function POST(request: Request): Promise<Response> {
         "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: "claude-haiku-4-5-20241022",
+        model: "claude-haiku-4-5-20251001",
         max_tokens: MAX_TOKENS_FEEDBACK,
         system: systemPrompt,
         messages: [
