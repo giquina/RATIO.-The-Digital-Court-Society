@@ -135,7 +135,7 @@ export function FooterSection() {
         {/* Bottom bar */}
         <div className="border-t border-court-border pt-6 flex flex-col md:flex-row justify-between items-center gap-2">
           <p className="text-court-xs text-court-text-ter">
-            &copy; 2026 Ratio. Built for the Bar.
+            &copy; 2026 Ratio. Built for the Bar. &middot; England &amp; Wales &middot; Educational tool
           </p>
           <p className="text-court-xs text-court-text-ter">
             mgiqui01@student.bbk.ac.uk

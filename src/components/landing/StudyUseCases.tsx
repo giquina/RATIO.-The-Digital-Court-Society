@@ -7,7 +7,6 @@ import {
   Scale,
   Target,
   FolderOpen,
-  CheckCircle,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -41,13 +40,6 @@ const USE_CASES: {
     title: "Portfolio Building",
     desc: "Every practice session generates scored evidence. Export a branded PDF for training contract applications.",
   },
-];
-
-const VERIFICATION_POINTS = [
-  "Cross-reference AI analysis with primary legislation on legislation.gov.uk",
-  "Verify case citations against official law reports (ICLR, BAILII)",
-  "Check statutory provisions are current and not repealed",
-  "Use OSCOLA citation format for all academic and professional work",
 ];
 
 const containerVariants = {
@@ -85,7 +77,7 @@ export function StudyUseCases() {
       </motion.div>
 
       {/* Use-case cards grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
         {USE_CASES.map((uc) => (
           <motion.div
             key={uc.title}
@@ -104,29 +96,6 @@ export function StudyUseCases() {
           </motion.div>
         ))}
       </div>
-
-      {/* Verification Guidance box */}
-      <motion.div
-        variants={itemVariants}
-        className="bg-navy-card border border-court-border-light rounded-court border-l-4 border-l-gold p-5 md:p-6"
-      >
-        <h3 className="font-serif text-lg font-bold text-court-text mb-4">
-          Always Verify
-        </h3>
-        <ul className="space-y-3">
-          {VERIFICATION_POINTS.map((point) => (
-            <li key={point} className="flex gap-3 items-start">
-              <CheckCircle
-                size={16}
-                className="text-gold shrink-0 mt-0.5"
-              />
-              <span className="text-court-base text-court-text-sec leading-relaxed">
-                {point}
-              </span>
-            </li>
-          ))}
-        </ul>
-      </motion.div>
     </motion.section>
   );
 }
