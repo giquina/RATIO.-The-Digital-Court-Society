@@ -49,6 +49,7 @@ export function TheClerk() {
             exit={{ scale: 0.8, opacity: 0 }}
             transition={{ duration: 0.2 }}
             onClick={() => open()}
+            data-tour="clerk-button"
             className="fixed bottom-24 right-4 md:bottom-6 md:right-6 z-[70] h-11 px-3.5 rounded-full bg-navy-card border border-court-border hover:border-gold/30 flex items-center gap-1.5 transition-colors duration-200 shadow-lg"
             aria-label="Open The Clerk help panel"
             aria-expanded={false}

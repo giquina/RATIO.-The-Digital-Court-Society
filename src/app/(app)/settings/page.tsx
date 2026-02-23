@@ -10,8 +10,9 @@ import { Card, Button, SectionHeader, Skeleton } from "@/components/ui";
 import {
   User, Mail, GraduationCap, Eye, Users, Bell, Mail as MailIcon,
   Smartphone, Clock, Moon, FileText, Shield, Scale, ChevronRight,
-  LogOut, Trash2, AlertTriangle, Loader2,
+  LogOut, Trash2, AlertTriangle, Loader2, RotateCcw,
 } from "lucide-react";
+import { useTourStore } from "@/stores/tourStore";
 
 // ── Toggle Switch ──
 function Toggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
@@ -145,6 +146,7 @@ export default function SettingsPage() {
     }
   };
 
+  const resetTour = useTourStore((s) => s.resetTour);
   const userName = profile?.fullName ?? user?.name ?? "—";
   const userEmail = user?.email ?? "—";
   const userUni = profile?.universityShort ?? profile?.university ?? "—";
@@ -238,6 +240,28 @@ export default function SettingsPage() {
             },
           ]}
         />
+
+        {/* Onboarding */}
+        <div>
+          <h3 className="text-court-xs font-bold text-court-text-ter uppercase tracking-widest mb-2 px-1">
+            Onboarding
+          </h3>
+          <Card className="divide-y divide-court-border-light">
+            <div
+              className="flex items-center gap-3 px-4 py-3.5 cursor-pointer hover:bg-white/[0.02] transition-colors"
+              onClick={() => { resetTour(); router.push("/home"); }}
+            >
+              <div className="w-8 h-8 rounded-lg bg-white/[0.05] flex items-center justify-center text-court-text-sec shrink-0">
+                <RotateCcw size={16} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-court-base font-medium text-court-text">Replay Onboarding Tour</p>
+                <p className="text-court-sm text-court-text-ter mt-0.5">Revisit the guided introduction to Ratio</p>
+              </div>
+              <ChevronRight size={16} className="text-court-text-ter" />
+            </div>
+          </Card>
+        </div>
 
         {/* Legal */}
         <SettingsSection

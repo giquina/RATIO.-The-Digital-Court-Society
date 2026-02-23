@@ -11,6 +11,7 @@ import { anyApi } from "convex/server";
 import { useSidebarStore } from "@/stores/sidebarStore";
 import { cn } from "@/lib/utils/helpers";
 import { TheClerk } from "@/components/shared/TheClerk";
+import { OnboardingTour } from "@/components/shared/OnboardingTour";
 import { SplashScreen } from "@/components/shared/SplashScreen";
 
 const CONVEX_URL = process.env.NEXT_PUBLIC_CONVEX_URL;
@@ -31,6 +32,7 @@ function AppShell({ children }: { children: React.ReactNode }) {
       </div>
       <BottomNav />
       <TheClerk />
+      <OnboardingTour />
     </div>
   );
 }
