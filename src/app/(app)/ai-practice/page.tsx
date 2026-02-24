@@ -652,7 +652,7 @@ export default function AIPracticePage() {
   // ── LIVE SESSION ──
   if (screen === "session") {
     return (
-      <div className="flex flex-col h-[calc(100dvh-64px)]">
+      <div className="flex flex-col h-dvh pb-[60px]">
         {/* Minimal session header — just context, no controls */}
         <div className="bg-gradient-to-b from-[#1A0E08] to-navy border-b border-gold/10 shrink-0">
           {rateLimited && (
@@ -778,7 +778,7 @@ export default function AIPracticePage() {
         {/* Quick phrases — hidden when typing, collapsed after first exchange */}
         {!isTyping && (
           <div className={cn(
-            "px-3 py-1.5 border-t border-court-border-light/20 shrink-0 transition-all",
+            "px-3 py-1 border-t border-court-border-light/20 shrink-0 transition-all",
             messages.length > 2 && "max-h-[44px] overflow-hidden"
           )}>
             <ObjectionButtons
@@ -789,7 +789,7 @@ export default function AIPracticePage() {
         )}
 
         {/* Input area — larger and more comfortable */}
-        <div className="px-3 py-2 border-t border-court-border-light bg-gradient-to-t from-[#0A0A1A] to-navy shrink-0">
+        <div className="px-3 pt-1.5 pb-1 border-t border-court-border-light bg-gradient-to-t from-[#0A0A1A] to-navy shrink-0">
           {/* Voice/input errors */}
           {(inputError || (voiceInput.error && voiceInput.error !== "WHISPER_UNAVAILABLE")) && (
             <div className="flex items-center gap-1.5 mb-1.5 px-1">
@@ -805,7 +805,7 @@ export default function AIPracticePage() {
             </div>
           )}
 
-          <div className="flex gap-2 items-end pb-[max(env(safe-area-inset-bottom,0px),4px)]">
+          <div className="flex gap-2 items-end pb-1">
             {/* Text input — full width now that buttons are stacked on the right */}
             <div className={cn(
               "flex-1 bg-navy-card border rounded-2xl flex items-end",
