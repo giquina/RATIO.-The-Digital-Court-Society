@@ -8,6 +8,8 @@ import ModeSelector from "@/components/ai-practice/ModeSelector";
 import JudgeAvatar from "@/components/ai-practice/JudgeAvatar";
 import ObjectionButtons from "@/components/ai-practice/ObjectionButtons";
 import TranscriptPanel from "@/components/ai-practice/TranscriptPanel";
+import CaseNotePanel from "@/components/ai-practice/CaseNotePanel";
+import SpectatorShare from "@/components/ai-practice/SpectatorShare";
 import { useVoiceInput } from "@/hooks/useVoiceInput";
 import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
 import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
@@ -129,6 +131,16 @@ export default function AIPracticePage() {
   const [useWhisper, setUseWhisper] = useState(true);
   // Text-to-speech
   const tts = useSpeechSynthesis();
+
+  // Case Note Generator
+  const [caseNote, setCaseNote] = useState<Record<string, unknown> | null>(null);
+  const [caseNoteGenerating, setCaseNoteGenerating] = useState(false);
+  const [caseNoteError, setCaseNoteError] = useState<string | null>(null);
+
+  // Spectator Mode
+  const [spectatorEnabled, setSpectatorEnabled] = useState(false);
+  const [spectatorCode, setSpectatorCode] = useState<string | null>(null);
+  const [spectatorCount, setSpectatorCount] = useState(0);
 
   const persona = AI_PERSONAS[mode];
   const brief = CASE_BRIEFS[mode];
@@ -449,6 +461,61 @@ export default function AIPracticePage() {
     setTimeout(() => setScreen("feedback"), 4000);
   };
 
+  // ── Generate Case Note ──
+  const generateCaseNote = async () => {
+    setCaseNoteGenerating(true);
+    setCaseNoteError(null);
+
+    try {
+      const res = await fetch("/api/ai/case-note", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mode,
+          areaOfLaw: brief.area,
+          caseTitle: brief.matter,
+          messages: apiMessages,
+          scores: feedbackData?.scores,
+          overallScore: feedbackData?.overall,
+          judgment: feedbackData?.judgment,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setCaseNote(data.caseNote);
+      } else {
+        throw new Error("Case note API error");
+      }
+    } catch {
+      setCaseNoteError("Unable to generate case note. Please try again.");
+    }
+
+    setCaseNoteGenerating(false);
+  };
+
+  // ── Spectator Mode toggles ──
+  const enableSpectatorMode = async (): Promise<string> => {
+    // For now, spectator mode uses local state.
+    // When connected to Convex session persistence, this will call
+    // the aiSessions.enableSpectator mutation instead.
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    let code = "";
+    for (let i = 0; i < 8; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    setSpectatorEnabled(true);
+    setSpectatorCode(code);
+    setSpectatorCount(0);
+    return code;
+  };
+
+  const disableSpectatorMode = async (): Promise<void> => {
+    setSpectatorEnabled(false);
+    setSpectatorCode(null);
+    setSpectatorCount(0);
+  };
+
   // ── LOADING FEEDBACK INTERSTITIAL ──
   if (screen === "loading-feedback") {
     return (
@@ -595,6 +662,14 @@ export default function AIPracticePage() {
                 caseTitle={brief.matter}
                 personaName={displayPersonaName}
                 areaOfLaw={brief.area}
+              />
+              {/* Spectator mode share */}
+              <SpectatorShare
+                spectatorCode={spectatorCode}
+                spectatorCount={spectatorCount}
+                isEnabled={spectatorEnabled}
+                onEnable={enableSpectatorMode}
+                onDisable={disableSpectatorMode}
               />
               {/* TTS toggle */}
               <button
@@ -858,6 +933,15 @@ export default function AIPracticePage() {
       <p className="text-court-xs text-court-text-ter text-center px-4 mb-4">
         AI-generated for educational purposes. Verify against primary sources.
       </p>
+      {/* Case Note Generator */}
+      <section className="px-4 mb-4">
+        <CaseNotePanel
+          caseNote={caseNote as any}
+          isGenerating={caseNoteGenerating}
+          onGenerate={generateCaseNote}
+          error={caseNoteError}
+        />
+      </section>
       <section className="px-4 flex flex-col gap-2.5">
         <Button fullWidth onClick={() => {
           setScreen("select");
@@ -870,6 +954,11 @@ export default function AIPracticePage() {
           setFeedbackFallback(false);
           setLastAiResponse("");
           setTemperament("standard");
+          setCaseNote(null);
+          setCaseNoteError(null);
+          setSpectatorEnabled(false);
+          setSpectatorCode(null);
+          setSpectatorCount(0);
         }}>Practice Again</Button>
         <Button fullWidth variant="outline">Save to Portfolio</Button>
         <Button fullWidth variant="secondary">Share Result</Button>

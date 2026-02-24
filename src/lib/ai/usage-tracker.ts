@@ -16,7 +16,7 @@
 // ---------------------------------------------------------------------------
 
 interface AiRequestParams {
-  endpoint: 'chat' | 'feedback';
+  endpoint: 'chat' | 'feedback' | 'case-note';
   mode: string;
   inputTokens: number;
   outputTokens: number;

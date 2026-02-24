@@ -186,9 +186,14 @@ export default defineSchema({
     sqe2Competencies: v.optional(v.any()),
     savedToPortfolio: v.boolean(),
     status: v.string(), // "in_progress", "completed"
+    // Spectator Mode
+    spectatorEnabled: v.optional(v.boolean()),
+    spectatorCode: v.optional(v.string()), // 8-char shareable code
+    spectatorCount: v.optional(v.number()), // live viewer count
   })
     .index("by_profile", ["profileId"])
-    .index("by_mode", ["mode"]),
+    .index("by_mode", ["mode"])
+    .index("by_spectator_code", ["spectatorCode"]),
 
   // ═══════════════════════════════════════════
   // SKILLS & BADGES

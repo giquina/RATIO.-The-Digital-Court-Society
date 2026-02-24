@@ -237,3 +237,136 @@ export const getFeedbackForProfile = query({
       .collect();
   },
 });
+
+// ═══════════════════════════════════════════
+// SPECTATOR MODE
+// ═══════════════════════════════════════════
+
+/**
+ * Enable spectator mode on a session — generates a unique shareable code.
+ * Only the session owner can enable this.
+ */
+export const enableSpectator = mutation({
+  args: { sessionId: v.id("aiSessions") },
+  handler: async (ctx, args) => {
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const callerProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!callerProfile) throw new Error("Not authorized");
+
+    const session = await ctx.db.get(args.sessionId);
+    if (!session || session.profileId !== callerProfile._id) {
+      throw new Error("Not authorized");
+    }
+
+    // Generate an 8-character alphanumeric code
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no ambiguous chars (0/O, 1/I)
+    let code = "";
+    for (let i = 0; i < 8; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+
+    await ctx.db.patch(args.sessionId, {
+      spectatorEnabled: true,
+      spectatorCode: code,
+      spectatorCount: 0,
+    });
+
+    return code;
+  },
+});
+
+/**
+ * Disable spectator mode on a session.
+ */
+export const disableSpectator = mutation({
+  args: { sessionId: v.id("aiSessions") },
+  handler: async (ctx, args) => {
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const callerProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!callerProfile) throw new Error("Not authorized");
+
+    const session = await ctx.db.get(args.sessionId);
+    if (!session || session.profileId !== callerProfile._id) {
+      throw new Error("Not authorized");
+    }
+
+    await ctx.db.patch(args.sessionId, {
+      spectatorEnabled: false,
+      spectatorCode: undefined,
+      spectatorCount: 0,
+    });
+  },
+});
+
+/**
+ * Lookup a session by spectator code — public query (no auth required).
+ * Returns session data for spectators to watch.
+ */
+export const getBySpectatorCode = query({
+  args: { code: v.string() },
+  handler: async (ctx, args) => {
+    const session = await ctx.db
+      .query("aiSessions")
+      .withIndex("by_spectator_code", (q) => q.eq("spectatorCode", args.code))
+      .first();
+
+    if (!session || !session.spectatorEnabled) {
+      return null;
+    }
+
+    // Get the advocate's display name (first name + university)
+    const profile = await ctx.db.get(session.profileId);
+    const advocateName = profile
+      ? `${profile.fullName.split(" ")[0]} (${profile.universityShort})`
+      : "Anonymous Advocate";
+
+    return {
+      _id: session._id,
+      mode: session.mode,
+      areaOfLaw: session.areaOfLaw,
+      caseTitle: session.caseTitle,
+      transcript: session.transcript,
+      status: session.status,
+      spectatorCount: session.spectatorCount ?? 0,
+      advocateName,
+    };
+  },
+});
+
+/**
+ * Increment spectator count when someone joins.
+ */
+export const joinAsSpectator = mutation({
+  args: { sessionId: v.id("aiSessions") },
+  handler: async (ctx, args) => {
+    const session = await ctx.db.get(args.sessionId);
+    if (!session || !session.spectatorEnabled) {
+      throw new Error("Session not available for spectating");
+    }
+    await ctx.db.patch(args.sessionId, {
+      spectatorCount: (session.spectatorCount ?? 0) + 1,
+    });
+  },
+});
+
+/**
+ * Decrement spectator count when someone leaves.
+ */
+export const leaveAsSpectator = mutation({
+  args: { sessionId: v.id("aiSessions") },
+  handler: async (ctx, args) => {
+    const session = await ctx.db.get(args.sessionId);
+    if (!session) return;
+    await ctx.db.patch(args.sessionId, {
+      spectatorCount: Math.max(0, (session.spectatorCount ?? 1) - 1),
+    });
+  },
+});
