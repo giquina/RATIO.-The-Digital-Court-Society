@@ -28,13 +28,14 @@ interface Scene {
 }
 
 const SCENES: Scene[] = [
-  { id: "intro", startFrame: 0, durationFrames: 90 }, // 0-3s
-  { id: "dashboard", startFrame: 75, durationFrames: 100 }, // 2.5-5.8s
-  { id: "ai-practice", startFrame: 165, durationFrames: 100 }, // 5.5-8.8s
-  { id: "sessions", startFrame: 255, durationFrames: 100 }, // 8.5-11.8s
-  { id: "law-book", startFrame: 345, durationFrames: 100 }, // 11.5-14.8s
-  { id: "community", startFrame: 435, durationFrames: 90 }, // 14.5-17.5s
-  { id: "cta", startFrame: 510, durationFrames: 150 }, // 17-22s
+  { id: "intro", startFrame: 0, durationFrames: 80 },        // 0–2.7s
+  { id: "dashboard", startFrame: 70, durationFrames: 80 },    // 2.3–5s
+  { id: "ai-practice", startFrame: 140, durationFrames: 80 }, // 4.7–7.3s
+  { id: "ai-session", startFrame: 210, durationFrames: 80 },  // 7–9.7s
+  { id: "sessions", startFrame: 280, durationFrames: 80 },    // 9.3–12s
+  { id: "law-book", startFrame: 350, durationFrames: 80 },    // 11.7–14.3s
+  { id: "community", startFrame: 420, durationFrames: 70 },   // 14–16.3s
+  { id: "cta", startFrame: 480, durationFrames: 120 },        // 16–20s
 ];
 
 // ── Helper: scene-local progress 0→1 ──
@@ -162,7 +163,7 @@ function IntroScene({ frame }: { frame: number }) {
   const { local, active } = useSceneProgress(scene, frame);
   if (!active && local > scene.durationFrames + 30) return null;
 
-  const fadeOut = interpolate(local, [70, 90], [1, 0], {
+  const fadeOut = interpolate(local, [60, 80], [1, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
@@ -323,7 +324,7 @@ function FeatureScene({
 // ── Scene: CTA ──
 
 function CTAScene({ frame }: { frame: number }) {
-  const scene = SCENES[6];
+  const scene = SCENES[7];
   const { local, active } = useSceneProgress(scene, frame);
   if (!active && local < -15) return null;
 
@@ -460,38 +461,47 @@ export const RatioShowcase: React.FC = () => {
         screenshotSrc={staticFile("screenshots/mobile/dashboard-mobile.png")}
       />
 
-      {/* AI Practice */}
+      {/* AI Practice — Mode Selection */}
       <FeatureScene
         frame={frame}
         scene={SCENES[2]}
         title="AI Advocacy Training"
-        description="Practice against an AI Judge. Real-time feedback on argumentation, legal reasoning, and case strategy."
+        description="Choose your AI persona. Adversarial judge, supportive mentor, or SQE2 examiner."
         screenshotSrc={staticFile("screenshots/mobile/ai-practice-mobile.png")}
+      />
+
+      {/* AI Session — Live Courtroom */}
+      <FeatureScene
+        frame={frame}
+        scene={SCENES[3]}
+        title="The Court is in Session"
+        description="Argue your case before the AI Judge. Real-time exchanges, quick phrases, and voice input."
+        screenshotSrc={staticFile("screenshots/mobile/ai-session-live.png")}
       />
 
       {/* Sessions */}
       <FeatureScene
         frame={frame}
-        scene={SCENES[3]}
-        title="Live Video Mooting"
-        description="Schedule and join live moot court sessions with peers. Video, roles, and structured format."
+        scene={SCENES[4]}
+        title="Live Moot Court"
+        description="Schedule and join live moot court sessions. Claim roles, argue cases, and get scored."
         screenshotSrc={staticFile("screenshots/mobile/sessions-mobile.png")}
       />
 
       {/* Law Book */}
       <FeatureScene
         frame={frame}
-        scene={SCENES[4]}
+        scene={SCENES[5]}
         title="The Law Book"
-        description="17 modules. 300+ topics. Core qualifying subjects, professional practice, specialist areas, and jurisprudence."
+        description="17 modules. 300+ topics. Core qualifying subjects, professional practice, and jurisprudence."
         screenshotSrc={staticFile("screenshots/mobile/law-book-mobile.png")}
       />
 
       {/* Community */}
       <FeatureScene
         frame={frame}
-        scene={SCENES[5]}
-        title="The Community"
+        scene={SCENES[6]}
+        title="The Society"
         description="Connect with advocates from 142 UK universities. Follow, commend, and rise through the ranks."
         screenshotSrc={staticFile("screenshots/mobile/community-mobile.png")}
       />

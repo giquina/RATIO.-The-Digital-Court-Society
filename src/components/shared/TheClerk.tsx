@@ -80,11 +80,14 @@ export function TheClerk() {
           >
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-court-border shrink-0">
-              <div className="flex items-center gap-2">
-                <Scale size={18} className="text-gold" />
-                <h2 className="font-serif text-base font-bold text-court-text">The Clerk</h2>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <Scale size={18} className="text-gold shrink-0" />
+                  <h2 className="font-serif text-base font-bold text-court-text">The Clerk</h2>
+                </div>
+                <p className="text-court-xs text-court-text-ter mt-0.5 ml-[26px]">Your guide to navigating the Court</p>
               </div>
-              <button onClick={close} className="w-10 h-10 rounded-lg flex items-center justify-center hover:bg-white/[0.06] transition-colors" aria-label="Close help panel">
+              <button onClick={close} className="w-10 h-10 rounded-lg flex items-center justify-center hover:bg-white/[0.06] transition-colors shrink-0" aria-label="Close help panel">
                 <X size={18} className="text-court-text-ter" />
               </button>
             </div>
@@ -97,7 +100,7 @@ export function TheClerk() {
                   onClick={() => setTab(tab.id)}
                   aria-selected={activeTab === tab.id}
                   role="tab"
-                  className={`flex-1 min-h-[44px] py-2.5 text-court-xs font-semibold tracking-wide transition-colors relative ${
+                  className={`flex-1 min-h-[44px] py-2.5 text-court-sm font-semibold tracking-wide transition-colors relative ${
                     activeTab === tab.id ? "text-gold" : "text-court-text-ter hover:text-court-text-sec"
                   }`}
                 >
@@ -119,7 +122,7 @@ export function TheClerk() {
             {/* Footer */}
             <div className="px-4 py-2.5 border-t border-court-border shrink-0 flex items-start gap-1.5">
               <Info size={11} className="text-court-text-ter shrink-0 mt-0.5" />
-              <p className="text-[10px] leading-tight text-court-text-ter">Educational platform guidance only. Not legal advice.</p>
+              <p className="text-court-xs leading-tight text-court-text-ter">Educational platform guidance only. Not legal advice.</p>
             </div>
           </motion.div>
         )}

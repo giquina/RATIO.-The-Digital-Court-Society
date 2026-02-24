@@ -31,17 +31,17 @@ export default function ObjectionButtons({ onInsert, disabled }: ObjectionButton
 
   return (
     <div className="px-1">
-      <div className="flex items-center justify-between mb-1.5">
-        <p className="text-court-xs md:text-xs text-court-text-ter">Quick phrases</p>
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-court-sm md:text-sm text-court-text-ter">Quick phrases</p>
         <button
           onClick={() => setExpanded(!expanded)}
-          className="flex items-center gap-0.5 text-court-xs md:text-xs text-court-text-ter hover:text-court-text transition-colors"
+          className="flex items-center gap-1 text-court-sm md:text-sm text-court-text-ter hover:text-court-text transition-colors"
         >
           {expanded ? "Less" : "More"}
-          {expanded ? <ChevronUp size={10} /> : <ChevronDown size={10} />}
+          {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
         </button>
       </div>
-      <motion.div className="flex flex-wrap gap-1.5 md:gap-2" layout>
+      <motion.div className="flex flex-wrap gap-2 md:gap-2.5" layout>
         <AnimatePresence>
           {visiblePhrases.map((phrase) => (
             <motion.button
@@ -52,7 +52,7 @@ export default function ObjectionButtons({ onInsert, disabled }: ObjectionButton
               transition={{ duration: 0.15 }}
               onClick={() => onInsert(phrase.text)}
               disabled={disabled}
-              className="px-2.5 md:px-3.5 py-1 md:py-1.5 rounded-full text-court-xs md:text-sm bg-gold/8 border border-gold/15 text-gold/80 hover:bg-gold/15 hover:text-gold transition-all disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap"
+              className="px-3 md:px-4 py-1.5 md:py-2 rounded-full text-court-sm md:text-base bg-gold/8 border border-gold/15 text-gold/80 hover:bg-gold/15 hover:text-gold transition-all disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap"
             >
               {phrase.label}
             </motion.button>

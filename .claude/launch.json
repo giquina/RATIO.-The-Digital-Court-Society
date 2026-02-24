@@ -10,8 +10,14 @@
     {
       "name": "convex-dev",
       "runtimeExecutable": "node",
-      "runtimeArgs": ["node_modules/convex/dist/esm/cli/index.js", "dev"],
+      "runtimeArgs": ["node_modules/convex/bin/main.js", "dev"],
       "port": 3210
+    },
+    {
+      "name": "remotion-preview",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["node_modules/@remotion/cli/remotion-cli.js", "preview", "remotion/index.ts"],
+      "port": 3100
     }
   ]
 }

@@ -79,9 +79,9 @@ export function ClerkQuickHelp() {
                 aria-controls={`clerk-section-${section.id}`}
                 className="w-full flex items-center gap-2.5 px-4 min-h-[44px] py-2.5 hover:bg-white/[0.02] transition-colors"
               >
-                {Icon && <Icon size={14} className="text-gold shrink-0" />}
-                <span className="flex-1 text-left text-court-sm font-semibold text-court-text">{section.title}</span>
-                <span className="text-[10px] text-court-text-ter mr-1">{section.items.length}</span>
+                {Icon && <Icon size={16} className="text-gold shrink-0" />}
+                <span className="flex-1 text-left text-court-base font-semibold text-court-text">{section.title}</span>
+                <span className="text-court-xs text-court-text-ter mr-1">{section.items.length}</span>
                 {isOpen ? <ChevronUp size={12} className="text-court-text-ter" /> : <ChevronDown size={12} className="text-court-text-ter" />}
               </button>
               {isOpen && (
@@ -96,13 +96,13 @@ export function ClerkQuickHelp() {
                           aria-expanded={isItemOpen}
                           className="w-full flex items-start gap-2 px-4 min-h-[44px] py-2.5 hover:bg-white/[0.02] transition-colors text-left"
                         >
-                          <span className="text-gold font-bold text-court-xs mt-0.5 shrink-0">Q</span>
-                          <span className="flex-1 text-court-xs text-court-text leading-relaxed">{item.q}</span>
-                          {isItemOpen ? <ChevronUp size={10} className="text-court-text-ter shrink-0 mt-1" /> : <ChevronDown size={10} className="text-court-text-ter shrink-0 mt-1" />}
+                          <span className="text-gold font-bold text-court-sm mt-0.5 shrink-0">Q</span>
+                          <span className="flex-1 text-court-sm text-court-text leading-relaxed">{item.q}</span>
+                          {isItemOpen ? <ChevronUp size={12} className="text-court-text-ter shrink-0 mt-1" /> : <ChevronDown size={12} className="text-court-text-ter shrink-0 mt-1" />}
                         </button>
                         {isItemOpen && (
                           <div className="px-4 pb-2.5 pl-9">
-                            <p className="text-court-xs text-court-text-sec leading-relaxed">{item.a}</p>
+                            <p className="text-court-sm text-court-text-sec leading-relaxed">{item.a}</p>
                           </div>
                         )}
                       </div>
@@ -118,13 +118,13 @@ export function ClerkQuickHelp() {
       {filtered.length === 0 && (
         <div className="text-center py-8">
           <HelpCircle size={24} className="text-court-text-ter mx-auto mb-2" />
-          <p className="text-court-xs text-court-text-ter">No results for &ldquo;{searchQuery}&rdquo;</p>
+          <p className="text-court-sm text-court-text-ter">No results for &ldquo;{searchQuery}&rdquo;</p>
         </div>
       )}
 
       {/* Footer link */}
       <div className="p-3 border-t border-white/[0.04]">
-        <Link href="/help" className="block text-center text-court-xs text-gold hover:text-gold/80 transition-colors">
+        <Link href="/help" className="block text-center text-court-sm text-gold hover:text-gold/80 transition-colors">
           View full Help Centre
         </Link>
       </div>

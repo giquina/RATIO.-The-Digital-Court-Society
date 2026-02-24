@@ -59,7 +59,7 @@ export function ClerkGlossary() {
               key={cat.id}
               onClick={() => setSelectedCategory(cat.id)}
               aria-pressed={selectedCategory === cat.id}
-              className={`text-[10px] px-2.5 min-h-[34px] py-1.5 rounded-full border transition-colors ${
+              className={`text-court-xs px-2.5 min-h-[34px] py-1.5 rounded-full border transition-colors ${
                 selectedCategory === cat.id
                   ? "bg-gold/10 text-gold border-gold/20"
                   : "bg-white/[0.04] text-court-text-ter border-white/[0.06] hover:text-court-text-sec"
@@ -82,21 +82,21 @@ export function ClerkGlossary() {
                 aria-expanded={isExpanded}
                 className="w-full flex items-center gap-2 px-4 min-h-[44px] py-2.5 hover:bg-white/[0.02] transition-colors text-left"
               >
-                <span className="flex-1 text-court-sm font-semibold text-court-text">{term.term}</span>
+                <span className="flex-1 text-court-base font-semibold text-court-text">{term.term}</span>
                 {isExpanded ? <ChevronUp size={12} className="text-court-text-ter" /> : <ChevronDown size={12} className="text-court-text-ter" />}
               </button>
               {isExpanded && (
                 <div className="px-4 pb-3">
-                  <p className="text-court-xs text-court-text-sec leading-relaxed mb-2">{term.definition}</p>
+                  <p className="text-court-sm text-court-text-sec leading-relaxed mb-2">{term.definition}</p>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full ${CATEGORY_COLORS[term.category] || ""}`}>
+                    <span className={`text-court-xs px-2 py-0.5 rounded-full ${CATEGORY_COLORS[term.category] || ""}`}>
                       {term.category}
                     </span>
                     {term.relatedTerms?.map((rt) => (
                       <button
                         key={rt}
                         onClick={() => { setSearch(rt); setExpandedTerm(null); }}
-                        className="text-[10px] text-gold/70 hover:text-gold transition-colors"
+                        className="text-court-xs text-gold/70 hover:text-gold transition-colors"
                       >
                         {rt}
                       </button>
@@ -112,7 +112,7 @@ export function ClerkGlossary() {
       {filtered.length === 0 && (
         <div className="text-center py-8">
           <Search size={24} className="text-court-text-ter mx-auto mb-2" />
-          <p className="text-court-xs text-court-text-ter">No terms found</p>
+          <p className="text-court-sm text-court-text-ter">No terms found</p>
         </div>
       )}
     </div>

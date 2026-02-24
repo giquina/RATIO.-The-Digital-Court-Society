@@ -16,6 +16,7 @@ import {
   ScrollText,
   ChevronDown,
   LogOut,
+  LayoutGrid,
 } from "lucide-react";
 import { cn } from "@/lib/utils/helpers";
 
@@ -223,21 +224,33 @@ function generateHints(
 export default function SessionDock(props: SessionDockProps) {
   const [activeTab, setActiveTab] = useState<DockTab>(null);
 
-  // Default to Session tab on desktop
+  // Default to Brief tab on desktop — shows case details immediately
   useEffect(() => {
     if (window.matchMedia("(min-width: 768px)").matches && !activeTab) {
-      setActiveTab("session");
+      setActiveTab("brief");
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const [notes, setNotes] = useState("");
+  const [expanded, setExpanded] = useState(false);
   const sheetRef = useRef<HTMLDivElement>(null);
 
-  // Close sheet when tapping outside
-  const handleBackdropClick = useCallback(() => setActiveTab(null), []);
+  // Close sheet and collapse bubbles when tapping outside
+  const handleBackdropClick = useCallback(() => {
+    setActiveTab(null);
+    setExpanded(false);
+  }, []);
 
-  // Toggle tab — tap same tab to close
+  const isDesktop = typeof window !== "undefined" && window.matchMedia("(min-width: 768px)").matches;
+
+  // Toggle tab — tap same tab to close on mobile, keep open on desktop
   const toggleTab = (tab: DockTab & string) => {
-    setActiveTab((prev) => (prev === tab ? null : tab));
+    setActiveTab((prev) => {
+      if (prev === tab) {
+        // On desktop, don't close — switch to brief instead of empty
+        return isDesktop ? "brief" : null;
+      }
+      return tab;
+    });
   };
 
   const hints = generateHints(props.mode, props.messages);
@@ -385,13 +398,13 @@ export default function SessionDock(props: SessionDockProps) {
 
   return (
     <>
-      {/* ═══ MOBILE: Backdrop + Bottom Sheet + Bottom Bar ═══ */}
+      {/* ═══ MOBILE: Floating 3D Bubbles + Right Slide Panel ═══ */}
 
       {/* Backdrop overlay (mobile only) */}
       <AnimatePresence>
         {activeTab && (
           <motion.div
-            className="fixed inset-0 bg-black/40 z-40 md:hidden"
+            className="fixed top-0 left-0 right-0 bottom-[68px] bg-black/50 z-[55] md:hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -400,100 +413,141 @@ export default function SessionDock(props: SessionDockProps) {
         )}
       </AnimatePresence>
 
-      {/* Bottom sheet panel (mobile only) */}
+      {/* Right slide panel (mobile only) */}
       <AnimatePresence>
         {activeTab && (
           <motion.div
             ref={sheetRef}
-            className="fixed bottom-[60px] left-0 right-0 z-50 bg-navy border-t border-gold/15 rounded-t-2xl shadow-2xl max-h-[55vh] flex flex-col md:hidden"
-            initial={{ y: "100%" }}
-            animate={{ y: 0 }}
-            exit={{ y: "100%" }}
-            transition={{ type: "spring", damping: 30, stiffness: 400 }}
+            className="fixed right-0 top-0 bottom-[68px] z-[60] w-[85vw] max-w-[320px] bg-[#0C1220]/[0.97] backdrop-blur-2xl border-l border-gold/15 flex flex-col md:hidden shadow-[-8px_0_40px_rgba(0,0,0,0.5)]"
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ type: "spring", damping: 28, stiffness: 300 }}
           >
-            {/* Sheet header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-court-border-light/20 shrink-0">
-              <h3 className="text-sm font-bold text-gold">
-                {TABS.find((t) => t.id === activeTab)?.label}
-              </h3>
+            {/* Panel header */}
+            <div className="flex items-center justify-between px-4 py-3 border-b border-gold/10 shrink-0">
+              <div className="flex items-center gap-2">
+                {(() => {
+                  const tab = TABS.find((t) => t.id === activeTab);
+                  if (!tab) return null;
+                  return <tab.Icon size={16} className="text-gold" />;
+                })()}
+                <h3 className="text-court-base font-bold text-gold">
+                  {TABS.find((t) => t.id === activeTab)?.label}
+                </h3>
+              </div>
               <button
                 onClick={() => setActiveTab(null)}
-                className="p-1.5 rounded-full bg-navy-card text-court-text-ter hover:text-court-text"
+                className="w-8 h-8 rounded-full bg-white/[0.06] flex items-center justify-center text-court-text-ter hover:text-court-text transition-colors"
               >
-                <ChevronDown size={16} />
+                <X size={14} />
               </button>
             </div>
 
-            {/* Sheet content */}
-            <div className="flex-1 overflow-y-auto px-4 py-3">
+            {/* Panel content */}
+            <div className="flex-1 overflow-y-auto px-4 py-3 scrollbar-hide">
               {renderPanelContent()}
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Bottom tab bar (mobile only) */}
-      <nav
-        className="fixed bottom-0 left-0 right-0 z-50 bg-navy-mid/95 backdrop-blur-xl border-t border-gold/15 md:hidden"
-        role="navigation"
-        aria-label="Session tools"
-      >
-        <div className="mx-auto flex px-1 pt-1.5 pb-[max(env(safe-area-inset-bottom,0px),4px)]">
-          {TABS.map((tab) => {
+      {/* Collapsible tool bubbles (mobile only) — End + Bench centered-right */}
+      <div className="fixed right-3 bottom-[45%] z-[60] flex flex-col-reverse gap-1.5 md:hidden">
+        {/* Bench toggle — always visible (bottom of pair) */}
+        <motion.button
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 400, damping: 20 }}
+          onClick={() => setExpanded((prev) => !prev)}
+          className={cn(
+            "w-[52px] h-[52px] rounded-full flex flex-col items-center justify-center",
+            "backdrop-blur-xl transition-all duration-200",
+            expanded
+              ? "bg-gold/15 border border-gold/30 shadow-[0_0_20px_rgba(201,168,76,0.25),0_4px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)]"
+              : "bg-white/[0.08] border border-white/[0.12] shadow-[0_4px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] active:scale-95"
+          )}
+          aria-label={expanded ? "Close bench" : "Open bench"}
+        >
+          <motion.div animate={{ rotate: expanded ? 45 : 0 }} transition={{ duration: 0.2 }}>
+            {expanded ? <X size={20} className="text-gold" /> : <LayoutGrid size={20} className="text-court-text-sec" />}
+          </motion.div>
+          <span className={cn(
+            "text-[9px] leading-none mt-1 font-semibold",
+            expanded ? "text-gold" : "text-court-text-sec"
+          )}>
+            {expanded ? "Close" : "Bench"}
+          </span>
+        </motion.button>
+
+        {/* End Session — always visible, sits above Bench */}
+        <motion.button
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 400, damping: 20, delay: 0.06 }}
+          onClick={() => {
+            if (confirm("End this session? You will receive your assessment.")) {
+              props.onEndSession();
+            }
+          }}
+          className={cn(
+            "w-[52px] h-[52px] rounded-full flex flex-col items-center justify-center",
+            "backdrop-blur-xl",
+            "bg-red-500/15 border border-red-500/25",
+            "shadow-[0_0_16px_rgba(239,68,68,0.2),0_4px_24px_rgba(0,0,0,0.4)]",
+            "active:scale-95 transition-transform"
+          )}
+          aria-label="End Session"
+        >
+          <LogOut size={20} strokeWidth={2} className="text-red-400" />
+          <span className="text-[9px] leading-none mt-1 font-bold text-red-400">End</span>
+        </motion.button>
+
+        {/* Expandable tool bubbles — shown only when Bench is tapped */}
+        <AnimatePresence>
+          {expanded && TABS.map((tab, index) => {
             const isActive = activeTab === tab.id;
             return (
-              <button
+              <motion.button
                 key={tab.id}
-                onClick={() => toggleTab(tab.id)}
-                className="flex-1 flex flex-col items-center gap-0.5 relative min-h-[48px] py-1.5 justify-center active:scale-[0.97] transition-transform"
-              >
-                {isActive && (
-                  <motion.div
-                    layoutId="sessionDockIndicator"
-                    className="absolute -top-1.5 w-6 h-0.5 rounded-full bg-gold"
-                    transition={{ type: "spring", stiffness: 500, damping: 35 }}
-                  />
+                initial={{ scale: 0, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0, opacity: 0, y: 20 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 400,
+                  damping: 22,
+                  delay: index * 0.04,
+                }}
+                onClick={() => {
+                  toggleTab(tab.id);
+                  setExpanded(false);
+                }}
+                className={cn(
+                  "w-[52px] h-[52px] rounded-full flex flex-col items-center justify-center",
+                  "backdrop-blur-xl transition-all duration-200",
+                  isActive
+                    ? "bg-gold/15 border border-gold/30 shadow-[0_0_20px_rgba(201,168,76,0.25),0_4px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)]"
+                    : "bg-white/[0.08] border border-white/[0.12] shadow-[0_4px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] active:scale-95"
                 )}
+                aria-label={tab.label}
+              >
                 <tab.Icon
                   size={20}
                   strokeWidth={isActive ? 2.5 : 1.5}
-                  className={cn(
-                    "transition-all duration-200 shrink-0",
-                    isActive ? "text-gold" : "text-court-text-sec"
-                  )}
+                  className={isActive ? "text-gold" : "text-court-text-sec"}
                 />
-                <span
-                  className={cn(
-                    "text-[10px] leading-tight font-semibold tracking-wide transition-colors duration-200",
-                    isActive ? "text-gold" : "text-court-text-sec"
-                  )}
-                >
+                <span className={cn(
+                  "text-[9px] leading-none mt-1 font-semibold",
+                  isActive ? "text-gold" : "text-court-text-sec"
+                )}>
                   {tab.label}
                 </span>
-              </button>
+              </motion.button>
             );
           })}
-
-          {/* End Session — always visible, red, unmissable */}
-          <button
-            onClick={() => {
-              if (confirm("End this session? You will receive your assessment.")) {
-                props.onEndSession();
-              }
-            }}
-            className="flex-1 flex flex-col items-center gap-0.5 min-h-[48px] py-1.5 justify-center active:scale-[0.97] transition-transform"
-          >
-            <LogOut
-              size={20}
-              strokeWidth={2}
-              className="text-red-400 shrink-0"
-            />
-            <span className="text-[10px] leading-tight font-bold tracking-wide text-red-400">
-              End
-            </span>
-          </button>
-        </div>
-      </nav>
+        </AnimatePresence>
+      </div>
 
       {/* ═══ DESKTOP: Right Sidebar ═══ */}
       <aside className="hidden md:flex flex-col w-[320px] shrink-0 border-l border-gold/10 bg-navy/50 h-full">

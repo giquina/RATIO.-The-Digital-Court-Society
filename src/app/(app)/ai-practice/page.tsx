@@ -650,7 +650,7 @@ export default function AIPracticePage() {
         </div>
 
         {/* Sticky CTA buttons — always visible */}
-        <div className="shrink-0 px-4 py-3 border-t border-court-border-light/20 bg-navy">
+        <div className="shrink-0 px-4 pt-3 pb-1 border-t border-court-border-light/20 bg-navy">
           <div className="flex gap-2.5">
             <Button variant="secondary" fullWidth onClick={() => setScreen("select")}>Cancel</Button>
             <Button fullWidth onClick={startSession}>Begin Session</Button>
@@ -664,7 +664,7 @@ export default function AIPracticePage() {
   if (screen === "session") {
     return (
       <div className="flex h-dvh">
-      <div className="flex flex-col flex-1 min-w-0 pb-[60px] md:pb-0">
+      <div className="flex flex-col flex-1 min-w-0 pb-[68px] md:pb-0">
         {/* ── Courtroom Header ── */}
         <div className="bg-gradient-to-b from-[#1A0E08] via-[#130D06] to-navy border-b border-gold/10 shrink-0">
           {rateLimited && (
@@ -774,7 +774,7 @@ export default function AIPracticePage() {
                   <div className="w-[3px] rounded-full bg-gold/30 shrink-0 my-1" />
                   <div className="pl-3 py-1">
                     <p className="text-[10px] md:text-xs font-medium text-gold/50 mb-1">
-                      {displayPersonaName} · {msg.time} · Exchange {Math.ceil((i + 1) / 2)} of {MAX_EXCHANGES}
+                      {msg.time} · Exchange {Math.ceil((i + 1) / 2)} of {MAX_EXCHANGES}
                     </p>
                     <p className="text-[15px] md:text-base text-court-text leading-[1.65] font-[410]">{msg.text}</p>
                   </div>
@@ -854,10 +854,10 @@ export default function AIPracticePage() {
                 }}
                 onBlur={() => { if (!inputText.trim()) setIsTyping(false); }}
                 placeholder={exchangeCount >= MAX_EXCHANGES ? "Session limit reached." : isRecordingActive ? "Listening..." : "Make your submissions..."}
-                rows={2}
+                rows={3}
                 disabled={isLoading || exchangeCount >= MAX_EXCHANGES}
-                className="flex-1 bg-transparent text-sm text-court-text px-3 py-2.5 resize-none outline-none placeholder:text-court-text-ter disabled:opacity-50 max-h-[120px]"
-                style={{ minHeight: "52px" }}
+                className="flex-1 bg-transparent text-sm text-court-text px-3 py-2.5 resize-none outline-none placeholder:text-court-text-ter disabled:opacity-50 max-h-[140px]"
+                style={{ minHeight: "72px" }}
                 onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
               />
               {inputText.length > MAX_MESSAGE_LENGTH * 0.8 && (
