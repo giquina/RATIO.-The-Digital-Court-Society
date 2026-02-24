@@ -653,7 +653,8 @@ export default function AIPracticePage() {
   // ── LIVE SESSION ──
   if (screen === "session") {
     return (
-      <div className="flex flex-col h-dvh pb-[60px] md:pb-0">
+      <div className="flex h-dvh">
+      <div className="flex flex-col flex-1 min-w-0 pb-[60px] md:pb-0">
         {/* ── Courtroom Header ── */}
         <div className="bg-gradient-to-b from-[#1A0E08] via-[#130D06] to-navy border-b border-gold/10 shrink-0">
           {rateLimited && (
@@ -902,7 +903,9 @@ export default function AIPracticePage() {
           </div>
         </div>
 
-        {/* Session Dock — replaces bottom nav with contextual tools */}
+        </div>{/* end inner flex-col */}
+
+        {/* Session Dock — bottom bar on mobile, right sidebar on desktop */}
         <SessionDock
           mode={mode}
           brief={brief}

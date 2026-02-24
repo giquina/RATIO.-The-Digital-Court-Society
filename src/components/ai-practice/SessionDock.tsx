@@ -234,13 +234,156 @@ export default function SessionDock(props: SessionDockProps) {
 
   const hints = generateHints(props.mode, props.messages);
 
+  // ── Shared panel content — used by both mobile sheet and desktop sidebar ──
+  const renderPanelContent = () => {
+    if (!activeTab) return null;
+    return (
+      <div className="space-y-3">
+        {/* BRIEF */}
+        {activeTab === "brief" && (
+          <>
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-court-text-ter mb-0.5">Area of Law</p>
+              <p className="text-sm text-court-text font-medium">{props.brief.area}</p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-court-text-ter mb-0.5">Matter</p>
+              <p className="text-sm text-court-text leading-relaxed">{props.brief.matter}</p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-court-text-ter mb-0.5">Your Role</p>
+              <p className="text-sm text-gold font-semibold">{props.brief.yourRole}</p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-court-text-ter mb-0.5">Instructions</p>
+              <p className="text-sm text-court-text-sec leading-relaxed">{props.brief.instructions}</p>
+            </div>
+          </>
+        )}
+
+        {/* AUTHORITIES */}
+        {activeTab === "authorities" && (
+          <>
+            <p className="text-xs text-court-text-ter">
+              Tap an authority to copy it for your submissions.
+            </p>
+            {props.brief.authorities.map((auth, i) => (
+              <button
+                key={i}
+                onClick={() => { navigator.clipboard?.writeText(auth); }}
+                className="w-full text-left bg-navy-card border border-court-border rounded-xl px-3 py-2.5 hover:border-gold/30 transition-colors group"
+              >
+                <div className="flex items-start gap-2">
+                  <span className="text-gold font-bold text-xs mt-0.5">{i + 1}</span>
+                  <p className="text-sm text-court-text leading-relaxed group-hover:text-gold transition-colors">
+                    {auth}
+                  </p>
+                </div>
+              </button>
+            ))}
+            <p className="text-[10px] text-court-text-ter text-center pt-1">
+              These are your key authorities for this case
+            </p>
+          </>
+        )}
+
+        {/* HINTS */}
+        {activeTab === "hints" && (
+          <>
+            <p className="text-xs text-court-text-ter">
+              {props.mode === "judge" && "Advocacy coaching based on the judge's responses:"}
+              {props.mode === "mentor" && "Tips for getting the most from your mentoring session:"}
+              {props.mode === "examiner" && "SQE2 competency reminders and exam technique:"}
+              {props.mode === "opponent" && "Rebuttal tactics and debating strategy:"}
+            </p>
+            {hints.map((hint, i) => (
+              <div
+                key={i}
+                className="bg-gold/5 border border-gold/15 rounded-xl px-3 py-2.5 flex items-start gap-2"
+              >
+                <Lightbulb size={14} className="text-gold shrink-0 mt-0.5" />
+                <p className="text-sm text-court-text leading-relaxed">{hint}</p>
+              </div>
+            ))}
+          </>
+        )}
+
+        {/* NOTES */}
+        {activeTab === "notes" && (
+          <>
+            <p className="text-xs text-court-text-ter">
+              Jot down points to address or arguments to remember:
+            </p>
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder={"e.g. Judge asked about CCSU distinction — address in closing\n\nRemember to cite para 43 of Miller..."}
+              className="w-full h-40 bg-navy-card border border-court-border rounded-xl px-3 py-2.5 text-sm text-court-text resize-none outline-none focus:border-gold/30 placeholder:text-court-text-ter"
+            />
+            <p className="text-[10px] text-court-text-ter text-right">
+              {notes.length > 0 ? `${notes.length} chars` : "Notes are saved for this session"}
+            </p>
+          </>
+        )}
+
+        {/* SESSION */}
+        {activeTab === "session" && (
+          <>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="bg-navy-card border border-court-border rounded-xl px-3 py-2.5 text-center">
+                <p className="text-[10px] uppercase tracking-wider text-court-text-ter mb-0.5">Exchanges</p>
+                <p className="text-lg font-bold text-court-text font-mono">
+                  {props.exchangeCount}<span className="text-court-text-ter text-sm">/{props.maxExchanges}</span>
+                </p>
+              </div>
+              <div className="bg-navy-card border border-court-border rounded-xl px-3 py-2.5 text-center">
+                <p className="text-[10px] uppercase tracking-wider text-court-text-ter mb-0.5">Time</p>
+                <p className="text-lg font-bold text-red-400 font-mono">{props.timerDisplay}</p>
+              </div>
+            </div>
+            <div className="bg-navy-card border border-court-border rounded-xl px-3 py-2.5">
+              <p className="text-[10px] uppercase tracking-wider text-court-text-ter mb-0.5">Presiding</p>
+              <p className="text-sm font-bold text-gold">{props.personaName}</p>
+            </div>
+            <div className="space-y-2">
+              <button
+                onClick={props.onToggleTts}
+                className={cn(
+                  "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border transition-colors",
+                  props.ttsEnabled
+                    ? "bg-gold/10 border-gold/20 text-gold"
+                    : "bg-navy-card border-court-border text-court-text-sec"
+                )}
+              >
+                {props.ttsEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
+                <span className="text-sm font-medium">
+                  Judge voice {props.ttsEnabled ? "on" : "off"}
+                </span>
+              </button>
+              {props.transcriptSlot}
+              {props.spectatorSlot}
+            </div>
+            <button
+              onClick={props.onEndSession}
+              className="w-full py-3 rounded-xl bg-red-500/10 border border-red-500/25 text-red-400 font-bold text-sm hover:bg-red-500/20 transition-colors"
+            >
+              End Session
+            </button>
+          </>
+        )}
+      </div>
+    );
+  };
+
   return (
     <>
-      {/* Backdrop overlay when a panel is open */}
+      {/* ═══ MOBILE: Backdrop + Bottom Sheet + Bottom Bar ═══ */}
+
+      {/* Backdrop overlay (mobile only) */}
       <AnimatePresence>
         {activeTab && (
           <motion.div
-            className="fixed inset-0 bg-black/40 z-40"
+            className="fixed inset-0 bg-black/40 z-40 md:hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -249,12 +392,12 @@ export default function SessionDock(props: SessionDockProps) {
         )}
       </AnimatePresence>
 
-      {/* Bottom sheet panel */}
+      {/* Bottom sheet panel (mobile only) */}
       <AnimatePresence>
         {activeTab && (
           <motion.div
             ref={sheetRef}
-            className="fixed bottom-[60px] left-0 right-0 z-50 bg-navy border-t border-gold/15 rounded-t-2xl shadow-2xl max-h-[55vh] flex flex-col"
+            className="fixed bottom-[60px] left-0 right-0 z-50 bg-navy border-t border-gold/15 rounded-t-2xl shadow-2xl max-h-[55vh] flex flex-col md:hidden"
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
@@ -274,156 +417,14 @@ export default function SessionDock(props: SessionDockProps) {
             </div>
 
             {/* Sheet content */}
-            <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
-              {/* ── BRIEF PANEL ── */}
-              {activeTab === "brief" && (
-                <>
-                  <div>
-                    <p className="text-[10px] uppercase tracking-wider text-court-text-ter mb-0.5">Area of Law</p>
-                    <p className="text-sm text-court-text font-medium">{props.brief.area}</p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] uppercase tracking-wider text-court-text-ter mb-0.5">Matter</p>
-                    <p className="text-sm text-court-text leading-relaxed">{props.brief.matter}</p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] uppercase tracking-wider text-court-text-ter mb-0.5">Your Role</p>
-                    <p className="text-sm text-gold font-semibold">{props.brief.yourRole}</p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] uppercase tracking-wider text-court-text-ter mb-0.5">Instructions</p>
-                    <p className="text-sm text-court-text-sec leading-relaxed">{props.brief.instructions}</p>
-                  </div>
-                </>
-              )}
-
-              {/* ── AUTHORITIES PANEL ── */}
-              {activeTab === "authorities" && (
-                <>
-                  <p className="text-xs text-court-text-ter">
-                    Tap an authority to copy it for your submissions.
-                  </p>
-                  {props.brief.authorities.map((auth, i) => (
-                    <button
-                      key={i}
-                      onClick={() => {
-                        navigator.clipboard?.writeText(auth);
-                      }}
-                      className="w-full text-left bg-navy-card border border-court-border rounded-xl px-3 py-2.5 hover:border-gold/30 transition-colors group"
-                    >
-                      <div className="flex items-start gap-2">
-                        <span className="text-gold font-bold text-xs mt-0.5">{i + 1}</span>
-                        <p className="text-sm text-court-text leading-relaxed group-hover:text-gold transition-colors">
-                          {auth}
-                        </p>
-                      </div>
-                    </button>
-                  ))}
-                  <p className="text-[10px] text-court-text-ter text-center pt-1">
-                    These are your key authorities for this case
-                  </p>
-                </>
-              )}
-
-              {/* ── HINTS PANEL ── */}
-              {activeTab === "hints" && (
-                <>
-                  <p className="text-xs text-court-text-ter">
-                    {props.mode === "judge" && "Advocacy coaching based on the judge's responses:"}
-                    {props.mode === "mentor" && "Tips for getting the most from your mentoring session:"}
-                    {props.mode === "examiner" && "SQE2 competency reminders and exam technique:"}
-                    {props.mode === "opponent" && "Rebuttal tactics and debating strategy:"}
-                  </p>
-                  {hints.map((hint, i) => (
-                    <div
-                      key={i}
-                      className="bg-gold/5 border border-gold/15 rounded-xl px-3 py-2.5 flex items-start gap-2"
-                    >
-                      <Lightbulb size={14} className="text-gold shrink-0 mt-0.5" />
-                      <p className="text-sm text-court-text leading-relaxed">{hint}</p>
-                    </div>
-                  ))}
-                </>
-              )}
-
-              {/* ── NOTES PANEL ── */}
-              {activeTab === "notes" && (
-                <>
-                  <p className="text-xs text-court-text-ter">
-                    Jot down points to address or arguments to remember:
-                  </p>
-                  <textarea
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    placeholder="e.g. Judge asked about CCSU distinction — address in closing&#10;&#10;Remember to cite para 43 of Miller..."
-                    className="w-full h-40 bg-navy-card border border-court-border rounded-xl px-3 py-2.5 text-sm text-court-text resize-none outline-none focus:border-gold/30 placeholder:text-court-text-ter"
-                  />
-                  <p className="text-[10px] text-court-text-ter text-right">
-                    {notes.length > 0 ? `${notes.length} chars` : "Notes are saved for this session"}
-                  </p>
-                </>
-              )}
-
-              {/* ── SESSION PANEL ── */}
-              {activeTab === "session" && (
-                <>
-                  {/* Status cards */}
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="bg-navy-card border border-court-border rounded-xl px-3 py-2.5 text-center">
-                      <p className="text-[10px] uppercase tracking-wider text-court-text-ter mb-0.5">Exchanges</p>
-                      <p className="text-lg font-bold text-court-text font-mono">
-                        {props.exchangeCount}<span className="text-court-text-ter text-sm">/{props.maxExchanges}</span>
-                      </p>
-                    </div>
-                    <div className="bg-navy-card border border-court-border rounded-xl px-3 py-2.5 text-center">
-                      <p className="text-[10px] uppercase tracking-wider text-court-text-ter mb-0.5">Time</p>
-                      <p className="text-lg font-bold text-red-400 font-mono">{props.timerDisplay}</p>
-                    </div>
-                  </div>
-
-                  {/* Persona */}
-                  <div className="bg-navy-card border border-court-border rounded-xl px-3 py-2.5">
-                    <p className="text-[10px] uppercase tracking-wider text-court-text-ter mb-0.5">Presiding</p>
-                    <p className="text-sm font-bold text-gold">{props.personaName}</p>
-                  </div>
-
-                  {/* Controls */}
-                  <div className="space-y-2">
-                    <button
-                      onClick={props.onToggleTts}
-                      className={cn(
-                        "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border transition-colors",
-                        props.ttsEnabled
-                          ? "bg-gold/10 border-gold/20 text-gold"
-                          : "bg-navy-card border-court-border text-court-text-sec"
-                      )}
-                    >
-                      {props.ttsEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
-                      <span className="text-sm font-medium">
-                        Judge voice {props.ttsEnabled ? "on" : "off"}
-                      </span>
-                    </button>
-
-                    {/* Transcript and Spectator slots (existing components) */}
-                    {props.transcriptSlot}
-                    {props.spectatorSlot}
-                  </div>
-
-                  {/* End session */}
-                  <button
-                    onClick={props.onEndSession}
-                    className="w-full py-3 rounded-xl bg-red-500/10 border border-red-500/25 text-red-400 font-bold text-sm hover:bg-red-500/20 transition-colors"
-                  >
-                    End Session
-                  </button>
-                </>
-              )}
+            <div className="flex-1 overflow-y-auto px-4 py-3">
+              {renderPanelContent()}
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* ── The dock bar itself ── */}
+      {/* Bottom tab bar (mobile only) */}
       <nav
         className="fixed bottom-0 left-0 right-0 z-50 bg-navy-mid/95 backdrop-blur-xl border-t border-gold/15 md:hidden"
         role="navigation"
@@ -466,6 +467,50 @@ export default function SessionDock(props: SessionDockProps) {
           })}
         </div>
       </nav>
+
+      {/* ═══ DESKTOP: Right Sidebar ═══ */}
+      <aside className="hidden md:flex flex-col w-[320px] shrink-0 border-l border-gold/10 bg-navy/50 h-full">
+        {/* Vertical tab buttons */}
+        <div className="flex border-b border-court-border-light/20 shrink-0">
+          {TABS.map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => toggleTab(tab.id)}
+                className={cn(
+                  "flex-1 flex flex-col items-center gap-1 py-3 transition-colors relative",
+                  isActive
+                    ? "text-gold"
+                    : "text-court-text-sec hover:text-court-text"
+                )}
+              >
+                <tab.Icon size={16} strokeWidth={isActive ? 2.5 : 1.5} />
+                <span className="text-[10px] font-semibold tracking-wide">{tab.label}</span>
+                {isActive && (
+                  <motion.div
+                    layoutId="desktopDockIndicator"
+                    className="absolute bottom-0 left-2 right-2 h-0.5 rounded-full bg-gold"
+                    transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                  />
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Panel content */}
+        <div className="flex-1 overflow-y-auto px-4 py-4">
+          {activeTab ? (
+            renderPanelContent()
+          ) : (
+            <div className="flex flex-col items-center justify-center h-full text-center opacity-40">
+              <FileText size={24} className="text-court-text-ter mb-2" />
+              <p className="text-xs text-court-text-ter">Select a tool above</p>
+            </div>
+          )}
+        </div>
+      </aside>
     </>
   );
 }
