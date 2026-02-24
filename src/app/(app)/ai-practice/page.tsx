@@ -14,6 +14,7 @@ import { useVoiceInput } from "@/hooks/useVoiceInput";
 import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
 import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
 import { cn } from "@/lib/utils/helpers";
+import { useSessionStore } from "@/stores/sessionStore";
 import {
   playCourtInSession,
   playJudgeResponse,
@@ -96,6 +97,14 @@ function stripEmotes(text: string): string {
 
 export default function AIPracticePage() {
   const [screen, setScreen] = useState<Screen>("select");
+  const { enterSession, exitSession } = useSessionStore();
+
+  // Tell the layout to hide header/nav when in active session
+  useEffect(() => {
+    if (screen === "session") enterSession();
+    else exitSession();
+    return () => exitSession(); // cleanup on unmount
+  }, [screen, enterSession, exitSession]);
   const [mode, setMode] = useState<Mode>("judge");
   const [temperament, setTemperament] = useState<JudgeTemperament>("standard");
   const [messages, setMessages] = useState<Message[]>([]);
@@ -640,7 +649,7 @@ export default function AIPracticePage() {
   // ── LIVE SESSION ──
   if (screen === "session") {
     return (
-      <div className="flex flex-col h-[calc(100dvh-80px)]">
+      <div className="flex flex-col h-[100dvh] md:h-[calc(100dvh-80px)]">
         {/* Courtroom header bar — dark wood panelling effect */}
         <div className="bg-gradient-to-b from-[#1A0E08] to-navy border-b border-gold/10 shrink-0">
           {/* Rate limit banner */}

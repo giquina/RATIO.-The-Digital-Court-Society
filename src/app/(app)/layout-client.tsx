@@ -9,6 +9,7 @@ import { Sidebar } from "@/components/shared/Sidebar";
 import { Loader2, AlertTriangle } from "lucide-react";
 import { anyApi } from "convex/server";
 import { useSidebarStore } from "@/stores/sidebarStore";
+import { useSessionStore } from "@/stores/sessionStore";
 import { cn } from "@/lib/utils/helpers";
 import { TheClerk } from "@/components/shared/TheClerk";
 import { OnboardingTour } from "@/components/shared/OnboardingTour";
@@ -18,6 +19,7 @@ const CONVEX_URL = process.env.NEXT_PUBLIC_CONVEX_URL;
 
 function AppShell({ children }: { children: React.ReactNode }) {
   const { collapsed } = useSidebarStore();
+  const { isSessionActive } = useSessionStore();
   return (
     <div className="min-h-screen flex">
       <Sidebar />
@@ -25,12 +27,12 @@ function AppShell({ children }: { children: React.ReactNode }) {
         "flex-1 min-w-0 flex flex-col md:ml-[72px]",
         !collapsed && "lg:ml-[240px]"
       )}>
-        <MobileHeader />
-        <main className="flex-1 min-w-0 pb-24 md:pb-0">
+        {!isSessionActive && <MobileHeader />}
+        <main className={cn("flex-1 min-w-0", isSessionActive ? "pb-0" : "pb-24 md:pb-0")}>
           {children}
         </main>
       </div>
-      <BottomNav />
+      {!isSessionActive && <BottomNav />}
       <TheClerk />
       <OnboardingTour />
     </div>
