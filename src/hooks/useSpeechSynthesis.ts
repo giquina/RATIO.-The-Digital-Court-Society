@@ -15,12 +15,22 @@ interface UseSpeechSynthesisReturn {
  * Text-to-speech hook using browser's built-in SpeechSynthesis API.
  * Selects a deep, formal British English voice when available.
  * Free — no API calls needed.
+ *
+ * Mobile fix: iOS/Android require the first speak() call to happen
+ * inside a user gesture (tap). We "unlock" the API by speaking a
+ * silent utterance when the user toggles TTS on. After that,
+ * programmatic speak() calls work fine.
+ *
+ * Also works around the iOS bug where speech pauses after ~15s
+ * by running a resume interval while speaking.
  */
 export function useSpeechSynthesis(): UseSpeechSynthesisReturn {
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [enabled, setEnabled] = useState(false);
+  const [enabled, setEnabledState] = useState(false);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const voiceRef = useRef<SpeechSynthesisVoice | null>(null);
+  const resumeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const unlockedRef = useRef(false);
 
   const isSupported =
     typeof window !== "undefined" && "speechSynthesis" in window;
@@ -62,12 +72,50 @@ export function useSpeechSynthesis(): UseSpeechSynthesisReturn {
     };
   }, [isSupported]);
 
+  // iOS resume workaround — speech pauses after ~15s
+  // Keep poking it so it doesn't stop
+  const startResumeInterval = useCallback(() => {
+    if (resumeIntervalRef.current) return;
+    resumeIntervalRef.current = setInterval(() => {
+      if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+        window.speechSynthesis.pause();
+        window.speechSynthesis.resume();
+      }
+    }, 10000); // every 10s
+  }, []);
+
+  const clearResumeInterval = useCallback(() => {
+    if (resumeIntervalRef.current) {
+      clearInterval(resumeIntervalRef.current);
+      resumeIntervalRef.current = null;
+    }
+  }, []);
+
+  // Unlock speech API — called from user gesture (tap) context
+  const unlockAudio = useCallback(() => {
+    if (!isSupported || unlockedRef.current) return;
+    // Speak a silent/empty utterance to "warm up" the API on mobile
+    const silent = new SpeechSynthesisUtterance("");
+    silent.volume = 0;
+    window.speechSynthesis.speak(silent);
+    unlockedRef.current = true;
+  }, [isSupported]);
+
+  // setEnabled wrapper — unlocks audio on user gesture when enabling
+  const setEnabled = useCallback((value: boolean) => {
+    if (value && isSupported) {
+      unlockAudio();
+    }
+    setEnabledState(value);
+  }, [isSupported, unlockAudio]);
+
   const speak = useCallback(
     (text: string) => {
       if (!isSupported || !enabled) return;
 
       // Stop any ongoing speech
       window.speechSynthesis.cancel();
+      clearResumeInterval();
 
       // Strip any remaining emotes/asterisks just in case
       const cleanText = text.replace(/\*[^*]+\*/g, "").trim();
@@ -84,21 +132,39 @@ export function useSpeechSynthesis(): UseSpeechSynthesisReturn {
       utterance.pitch = 0.85; // Slightly deeper
       utterance.volume = 0.8;
 
-      utterance.onstart = () => setIsSpeaking(true);
-      utterance.onend = () => setIsSpeaking(false);
-      utterance.onerror = () => setIsSpeaking(false);
+      utterance.onstart = () => {
+        setIsSpeaking(true);
+        startResumeInterval(); // iOS fix
+      };
+      utterance.onend = () => {
+        setIsSpeaking(false);
+        clearResumeInterval();
+      };
+      utterance.onerror = () => {
+        setIsSpeaking(false);
+        clearResumeInterval();
+      };
 
       window.speechSynthesis.speak(utterance);
     },
-    [isSupported, enabled],
+    [isSupported, enabled, startResumeInterval, clearResumeInterval],
   );
 
   const stop = useCallback(() => {
     if (isSupported) {
       window.speechSynthesis.cancel();
+      clearResumeInterval();
       setIsSpeaking(false);
     }
-  }, [isSupported]);
+  }, [isSupported, clearResumeInterval]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (isSupported) window.speechSynthesis.cancel();
+      clearResumeInterval();
+    };
+  }, [isSupported, clearResumeInterval]);
 
   return {
     speak,

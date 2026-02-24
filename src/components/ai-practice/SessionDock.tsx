@@ -15,6 +15,7 @@ import {
   Eye,
   ScrollText,
   ChevronDown,
+  LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils/helpers";
 
@@ -472,6 +473,25 @@ export default function SessionDock(props: SessionDockProps) {
               </button>
             );
           })}
+
+          {/* End Session — always visible, red, unmissable */}
+          <button
+            onClick={() => {
+              if (confirm("End this session? You will receive your assessment.")) {
+                props.onEndSession();
+              }
+            }}
+            className="flex-1 flex flex-col items-center gap-0.5 min-h-[48px] py-1.5 justify-center active:scale-[0.97] transition-transform"
+          >
+            <LogOut
+              size={20}
+              strokeWidth={2}
+              className="text-red-400 shrink-0"
+            />
+            <span className="text-[10px] leading-tight font-bold tracking-wide text-red-400">
+              End
+            </span>
+          </button>
         </div>
       </nav>
 
@@ -504,6 +524,19 @@ export default function SessionDock(props: SessionDockProps) {
               </button>
             );
           })}
+
+          {/* End Session — desktop sidebar */}
+          <button
+            onClick={() => {
+              if (confirm("End this session? You will receive your assessment.")) {
+                props.onEndSession();
+              }
+            }}
+            className="flex-1 flex flex-col items-center gap-1 py-3 transition-colors text-red-400 hover:text-red-300"
+          >
+            <LogOut size={16} strokeWidth={2} />
+            <span className="text-[10px] font-bold tracking-wide">End</span>
+          </button>
         </div>
 
         {/* Panel content */}
