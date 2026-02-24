@@ -570,7 +570,9 @@ export default function AIPracticePage() {
   // ── BRIEFING ──
   if (screen === "briefing") {
     return (
-      <div className="pb-6">
+      <div className="flex flex-col h-[calc(100dvh-140px)] md:h-[calc(100dvh-80px)]">
+        {/* Scrollable content */}
+        <div className="flex-1 overflow-y-auto pb-4">
         <div className="px-4 pt-3 pb-4">
           <button onClick={() => setScreen("select")} className="text-xs text-court-text-ter mb-3">&larr; Back to modes</button>
           <div className="flex items-center gap-3 mb-4">
@@ -632,7 +634,7 @@ export default function AIPracticePage() {
             <p className="text-court-xs text-court-text-ter uppercase tracking-widest mb-2">Instructions</p>
             <p className="text-court-base text-court-text-sec leading-relaxed">{brief.instructions}</p>
           </Card>
-          <Card className="p-4 mb-5">
+          <Card className="p-4">
             <p className="text-court-xs text-court-text-ter uppercase tracking-widest mb-2">Key Authorities</p>
             {brief.authorities.map((a) => (
               <div key={a} className="flex items-start gap-2 mb-1.5 last:mb-0">
@@ -641,6 +643,11 @@ export default function AIPracticePage() {
               </div>
             ))}
           </Card>
+        </div>
+        </div>
+
+        {/* Sticky CTA buttons — always visible */}
+        <div className="shrink-0 px-4 py-3 border-t border-court-border-light/20 bg-navy">
           <div className="flex gap-2.5">
             <Button variant="secondary" fullWidth onClick={() => setScreen("select")}>Cancel</Button>
             <Button fullWidth onClick={startSession}>Begin Session</Button>

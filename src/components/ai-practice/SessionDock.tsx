@@ -221,6 +221,13 @@ function generateHints(
 
 export default function SessionDock(props: SessionDockProps) {
   const [activeTab, setActiveTab] = useState<DockTab>(null);
+
+  // Default to Session tab on desktop
+  useEffect(() => {
+    if (window.matchMedia("(min-width: 768px)").matches && !activeTab) {
+      setActiveTab("session");
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const [notes, setNotes] = useState("");
   const sheetRef = useRef<HTMLDivElement>(null);
 

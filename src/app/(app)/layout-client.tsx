@@ -22,6 +22,12 @@ const CONVEX_URL = process.env.NEXT_PUBLIC_CONVEX_URL;
 function AppShell({ children }: { children: React.ReactNode }) {
   const { collapsed } = useSidebarStore();
   const { isSessionActive } = useSessionStore();
+
+  // Ensure page starts at top after auth redirect
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <div className="min-h-screen flex">
       <Sidebar />
