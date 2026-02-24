@@ -9,6 +9,8 @@ interface UseSpeechSynthesisReturn {
   isSupported: boolean;
   setEnabled: (enabled: boolean) => void;
   enabled: boolean;
+  /** Call inside a user gesture (tap/click) to unlock audio on mobile */
+  unlockAudio: () => void;
 }
 
 /**
@@ -26,7 +28,7 @@ interface UseSpeechSynthesisReturn {
  */
 export function useSpeechSynthesis(): UseSpeechSynthesisReturn {
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [enabled, setEnabledState] = useState(false);
+  const [enabled, setEnabledState] = useState(true); // On by default — judge should speak
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const voiceRef = useRef<SpeechSynthesisVoice | null>(null);
   const resumeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -173,5 +175,6 @@ export function useSpeechSynthesis(): UseSpeechSynthesisReturn {
     isSupported,
     setEnabled,
     enabled,
+    unlockAudio,
   };
 }

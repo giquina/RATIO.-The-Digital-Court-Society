@@ -248,6 +248,9 @@ export default function AIPracticePage() {
     setFeedbackFallback(false);
     setLastAiResponse("");
 
+    // Unlock speech API inside user gesture — required by iOS/Safari/Android
+    tts.unlockAudio();
+
     resumeAudio();
     playCourtInSession();
 
