@@ -11,7 +11,7 @@ const tabs = [
   { href: "/sessions", label: "Sessions", Icon: Scale },
   { href: "/ai-practice", label: "AI Practice", Icon: Target, center: true },
   { href: "/law-book", label: "Law Book", Icon: BookOpen },
-  { href: "/community", label: "Community", Icon: Users },
+  { href: "/community", label: "Society", Icon: Users },
 ];
 
 export function BottomNav() {

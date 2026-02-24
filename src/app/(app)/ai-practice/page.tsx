@@ -708,13 +708,13 @@ export default function AIPracticePage() {
         )}
 
         {/* Judge Avatar */}
-        <div className="flex justify-center py-4 relative shrink-0">
-          <div className="flex flex-col items-center gap-2">
+        <div className="flex justify-center py-2 relative shrink-0">
+          <div className="flex flex-col items-center gap-1">
             <JudgeAvatar
               isActive={aiSpeaking || isLoading}
               isListening={isRecordingActive}
               responseText={lastAiResponse}
-              size={80}
+              size={56}
             />
             <p className="text-court-xs text-court-text-ter italic">
               {isLoading

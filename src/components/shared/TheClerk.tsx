@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Scale, X, Info } from "lucide-react";
 import { useClerkStore } from "@/stores/clerkStore";
@@ -17,6 +18,10 @@ const TABS = [
 export function TheClerk() {
   const { isOpen, activeTab, open, close, setTab } = useClerkStore();
   const panelRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+
+  // Hide on AI practice page — the session UI needs the full screen
+  const isAiPractice = pathname?.startsWith("/ai-practice");
 
   // Close on Escape
   useEffect(() => {
@@ -37,6 +42,8 @@ export function TheClerk() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen, close]);
+
+  if (isAiPractice) return null;
 
   return (
     <>
