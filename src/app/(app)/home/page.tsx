@@ -21,6 +21,7 @@ import type { LucideIcon } from "lucide-react";
 import { StarterKit } from "@/components/shared/StarterKit";
 import { PostComposer } from "@/components/shared/PostComposer";
 import { PostCard } from "@/components/shared/PostCard";
+import { QuerySafeBoundary } from "@/components/shared/QuerySafeBoundary";
 import { useIsDemoAccount } from "@/hooks/useIsDemoAccount";
 import { DEMO_ACTIVITY_FEED, DEMO_PROFILE_STATS, DEMO_POSTS } from "@/lib/constants/demo-data";
 
@@ -49,16 +50,77 @@ function getInitials(name: string) {
   return name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
 }
 
+// ── PostsFeedContent: isolated component for posts query ──
+// Lives inside QuerySafeBoundary so if Convex posts functions
+// aren't deployed yet, the boundary catches the error gracefully.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function PostsFeedContent({ profile, isDemo }: { profile: any; isDemo: boolean }) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const posts: any[] | undefined = useQuery(anyApi.posts.list, { limit: 30 });
+
+  return (
+    <>
+      <PostComposer />
+
+      {/* Posts loading */}
+      {posts === undefined && (
+        <>
+          {[1, 2].map((i) => (
+            <Card key={i} className="p-3.5">
+              <div className="flex gap-2.5 items-center mb-2.5">
+                <Skeleton className="w-8 h-8 rounded-full" />
+                <div className="flex-1">
+                  <Skeleton className="w-32 h-3.5 mb-1.5" />
+                  <Skeleton className="w-20 h-2.5" />
+                </div>
+              </div>
+              <Skeleton className="w-full h-16 rounded-lg mb-2.5" />
+              <Skeleton className="w-48 h-3" />
+            </Card>
+          ))}
+        </>
+      )}
+
+      {/* Posts empty state */}
+      {posts !== undefined && posts.length === 0 && !isDemo && (
+        <EmptyState
+          icon={<MessageCircle size={28} />}
+          title="No posts yet"
+          description="Be the first to share a legal insight with your fellow advocates"
+        />
+      )}
+
+      {/* Demo posts */}
+      {posts !== undefined && posts.length === 0 && isDemo && (
+        DEMO_POSTS.map((post) => (
+          <PostCard
+            key={post._id}
+            post={post as any}
+            currentProfileId={profile?._id}
+            isDemo={true}
+          />
+        ))
+      )}
+
+      {/* Real post cards */}
+      {(posts ?? []).length > 0 && (posts ?? []).map((post) => (
+        <PostCard
+          key={post._id}
+          post={post}
+          currentProfileId={profile?._id}
+          isDemo={isDemo}
+        />
+      ))}
+    </>
+  );
+}
+
 export default function HomePage() {
   const router = useRouter();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const profile: any = useQuery(anyApi.users.myProfile);
   const isDemo = useIsDemoAccount();
   const [feedTab, setFeedTab] = useState<"posts" | "following" | "discover" | "chamber">("posts");
-
-  // Posts feed (user-authored content)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const posts: any[] | undefined = useQuery(anyApi.posts.list, { limit: 30 });
 
   // Real Convex feed + notifications
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -227,59 +289,35 @@ export default function HomePage() {
         <div className="flex flex-col gap-2.5">
           {/* ── Posts tab ── */}
           {feedTab === "posts" && (
-            <>
-              <PostComposer />
-
-              {/* Posts loading */}
-              {posts === undefined && (
-                <>
-                  {[1, 2].map((i) => (
-                    <Card key={i} className="p-3.5">
-                      <div className="flex gap-2.5 items-center mb-2.5">
-                        <Skeleton className="w-8 h-8 rounded-full" />
-                        <div className="flex-1">
-                          <Skeleton className="w-32 h-3.5 mb-1.5" />
-                          <Skeleton className="w-20 h-2.5" />
-                        </div>
-                      </div>
-                      <Skeleton className="w-full h-16 rounded-lg mb-2.5" />
-                      <Skeleton className="w-48 h-3" />
-                    </Card>
-                  ))}
-                </>
-              )}
-
-              {/* Posts empty state */}
-              {posts !== undefined && posts.length === 0 && !isDemo && (
-                <EmptyState
-                  icon={<MessageCircle size={28} />}
-                  title="No posts yet"
-                  description="Be the first to share a legal insight with your fellow advocates"
-                />
-              )}
-
-              {/* Demo posts */}
-              {posts !== undefined && posts.length === 0 && isDemo && (
-                DEMO_POSTS.map((post) => (
-                  <PostCard
-                    key={post._id}
-                    post={post as any}
-                    currentProfileId={profile?._id}
-                    isDemo={true}
-                  />
-                ))
-              )}
-
-              {/* Real post cards */}
-              {(posts ?? []).length > 0 && (posts ?? []).map((post) => (
-                <PostCard
-                  key={post._id}
-                  post={post}
-                  currentProfileId={profile?._id}
-                  isDemo={isDemo}
-                />
-              ))}
-            </>
+            <QuerySafeBoundary
+              fallback={
+                // Convex posts functions not deployed yet — show demo posts or empty
+                isDemo ? (
+                  <>
+                    <PostComposer />
+                    {DEMO_POSTS.map((post) => (
+                      <PostCard
+                        key={post._id}
+                        post={post as any}
+                        currentProfileId={profile?._id}
+                        isDemo={true}
+                      />
+                    ))}
+                  </>
+                ) : (
+                  <>
+                    <PostComposer />
+                    <EmptyState
+                      icon={<MessageCircle size={28} />}
+                      title="Posts coming soon"
+                      description="This feature is being set up. Check back shortly!"
+                    />
+                  </>
+                )
+              }
+            >
+              <PostsFeedContent profile={profile} isDemo={isDemo} />
+            </QuerySafeBoundary>
           )}
 
           {/* ── Activity tabs (following / discover / chamber) ── */}
