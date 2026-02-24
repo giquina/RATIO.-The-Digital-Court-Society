@@ -875,6 +875,7 @@ export default function AIPracticePage() {
 
         {/* Session Dock — replaces bottom nav with contextual tools */}
         <SessionDock
+          mode={mode}
           brief={brief}
           exchangeCount={exchangeCount}
           maxExchanges={MAX_EXCHANGES}

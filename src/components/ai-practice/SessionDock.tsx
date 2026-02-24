@@ -21,6 +21,8 @@ import { cn } from "@/lib/utils/helpers";
 // ── Types ──
 
 interface SessionDockProps {
+  /** Session mode — determines hint content */
+  mode: "judge" | "mentor" | "examiner" | "opponent";
   /** Case brief data */
   brief: {
     area: string;
@@ -63,47 +65,153 @@ const TABS: { id: DockTab & string; label: string; Icon: typeof FileText }[] = [
 ];
 
 // ── Hint Generator ──
-// Analyses the last AI message to give contextual coaching tips
+// Produces contextual coaching tips based on mode + conversation state
 
-function generateHints(messages: Array<{ role: "ai" | "user"; text: string }>): string[] {
+type Mode = "judge" | "mentor" | "examiner" | "opponent";
+
+function generateHints(
+  mode: Mode,
+  messages: Array<{ role: "ai" | "user"; text: string }>
+): string[] {
   const lastAi = [...messages].reverse().find((m) => m.role === "ai")?.text.toLowerCase() || "";
+  const lastUser = [...messages].reverse().find((m) => m.role === "user")?.text.toLowerCase() || "";
+  const exchangeCount = messages.filter((m) => m.role === "user").length;
   const hints: string[] = [];
 
-  // Always-relevant tips
-  if (messages.length <= 2) {
-    hints.push("Start strong: 'May it please the court, my name is [name], counsel for the [party].'");
-    hints.push("State the relief you seek clearly in your opening 30 seconds.");
-    hints.push("Provide a roadmap: outline your 2-3 strongest points upfront.");
-  }
+  // ── SHARED: Contextual triggers that apply to any mode ──
 
-  // Contextual tips based on judge's last response
   if (lastAi.includes("distinguish") || lastAi.includes("how does this differ")) {
-    hints.push("The judge wants you to distinguish a case. Focus on factual differences, then explain why those differences matter to the legal principle.");
+    hints.push("You're being asked to distinguish a case. Focus on factual differences first, then explain why those differences change the legal principle.");
   }
   if (lastAi.includes("authority") || lastAi.includes("cite") || lastAi.includes("which case")) {
-    hints.push("Cite your authority precisely: case name, year, and the specific principle or paragraph number.");
-  }
-  if (lastAi.includes("not satisfied") || lastAi.includes("unconvinced") || lastAi.includes("troubled")) {
-    hints.push("The judge is sceptical. Don't retreat — reframe your argument using different reasoning or a stronger authority.");
+    hints.push("Cite precisely: case name, year, court, and the specific principle or paragraph. Use the Cases tab below to check your authorities.");
   }
   if (lastAi.includes("time") || lastAi.includes("remaining") || lastAi.includes("conclude")) {
-    hints.push("Time is running short. Move to your strongest point and deliver a clear, memorable conclusion.");
-  }
-  if (lastAi.includes("policy") || lastAi.includes("practical")) {
-    hints.push("This is a policy question. Ground your answer in principle first, then explain practical implications.");
-  }
-  if (lastAi.includes("yes or no") || lastAi.includes("simple question")) {
-    hints.push("Answer directly — 'Yes, My Lord' or 'No, My Lord' — then explain. Don't dodge.");
-  }
-  if (lastAi.includes("stop you") || lastAi.includes("interrupt")) {
-    hints.push("The judge interrupted you. Answer their concern fully before returning to your planned argument. Don't rush.");
+    hints.push("Time is running short. Move to your strongest remaining point and deliver a clear conclusion.");
   }
 
-  // General coaching if nothing specific triggered
-  if (hints.length === 0) {
-    hints.push("Remember IRAC: Issue → Rule → Application → Conclusion.");
-    hints.push("Use signposting: 'Turning to my second submission, My Lord...'");
-    hints.push("If unsure of an answer, say: 'I will take instructions on that point' rather than guessing.");
+  // ── MODE-SPECIFIC HINTS ──
+
+  if (mode === "judge") {
+    // Opening tips
+    if (exchangeCount === 0) {
+      hints.push("Start with: 'May it please the court, my name is [name], counsel for the [party].'");
+      hints.push("State the relief you seek in your first 30 seconds, then give a roadmap of your 2-3 strongest points.");
+      hints.push("Lead with your strongest argument — don't build up to it.");
+    }
+    // Sceptical judge
+    if (lastAi.includes("not satisfied") || lastAi.includes("unconvinced") || lastAi.includes("troubled") || lastAi.includes("bold proposition")) {
+      hints.push("The judge is sceptical. Don't retreat — reframe using different reasoning or a stronger authority.");
+    }
+    // Interrupted
+    if (lastAi.includes("stop you") || lastAi.includes("interrupt") || lastAi.includes("i'll stop")) {
+      hints.push("You've been interrupted. Answer the judge's concern fully before returning to your planned argument.");
+    }
+    // Direct question
+    if (lastAi.includes("yes or no") || lastAi.includes("simple question") || lastAi.includes("directly")) {
+      hints.push("Answer directly: 'Yes, My Lord' or 'No, My Lord' — then explain. Judges hate evasion.");
+    }
+    // Policy question
+    if (lastAi.includes("policy") || lastAi.includes("practical") || lastAi.includes("consequences")) {
+      hints.push("This is a policy question. Ground your answer in legal principle first, then address practical implications.");
+    }
+    // Approving
+    if (lastAi.includes("helpful") || lastAi.includes("well put") || lastAi.includes("that is helpful")) {
+      hints.push("The judge found that point persuasive. Build on it — connect it to your next argument while you have momentum.");
+    }
+    // General judge fallbacks
+    if (hints.length === 0) {
+      hints.push("Use IRAC structure: Issue → Rule → Application → Conclusion.");
+      hints.push("Signpost transitions: 'Turning to my second submission, My Lord...'");
+      hints.push("If unsure: 'I will take instructions on that point, My Lord' is better than guessing.");
+    }
+  }
+
+  if (mode === "mentor") {
+    if (exchangeCount === 0) {
+      hints.push("Start by telling your mentor what you're working on or what specific area you'd like feedback on.");
+      hints.push("Be open about what you find difficult — that's how mentoring works best.");
+      hints.push("Have your skeleton argument or case analysis ready to discuss.");
+    }
+    // Mentor asking probing questions
+    if (lastAi.includes("why") || lastAi.includes("what do you think") || lastAi.includes("how would you")) {
+      hints.push("Your mentor is using the Socratic method. Think it through before answering — they want to see your reasoning process, not just the answer.");
+    }
+    // Structural feedback
+    if (lastAi.includes("structure") || lastAi.includes("reorganise") || lastAi.includes("restructure") || lastAi.includes("opening paragraph")) {
+      hints.push("They've flagged a structural issue. Try using the funnel structure: broad legal principle → narrow application → specific relief sought.");
+    }
+    // Praise
+    if (lastAi.includes("good") || lastAi.includes("effective") || lastAi.includes("precise") || lastAi.includes("well")) {
+      hints.push("Your mentor praised something specific — note it in your Notes tab so you can replicate that technique.");
+    }
+    // Writing advice
+    if (lastAi.includes("skeleton") || lastAi.includes("writing") || lastAi.includes("draft")) {
+      hints.push("For skeleton arguments: each paragraph should make ONE point, supported by ONE authority, applied to YOUR facts.");
+    }
+    if (hints.length === 0) {
+      hints.push("Ask your mentor about specific techniques: 'How should I structure a rebuttal?' or 'How do I handle hostile questions?'");
+      hints.push("Common frameworks to ask about: IRAC, CLEO, funnel structure, or the rule-of-three for persuasion.");
+      hints.push("Don't just accept advice — ask follow-up questions to understand the reasoning behind it.");
+    }
+  }
+
+  if (mode === "examiner") {
+    if (exchangeCount === 0) {
+      hints.push("This is a formal SQE2 assessment. Begin with: 'May it please the court...' and state your application clearly.");
+      hints.push("You'll be assessed on 5 competencies: Advocacy, Case Analysis, Legal Research, Oral Communication, Professional Conduct.");
+      hints.push("Time management is critical — prioritise your strongest points. Don't try to cover everything.");
+    }
+    // SQE2 competency reminders
+    if (exchangeCount > 0 && exchangeCount <= 3) {
+      hints.push("SQE2 tip: Structure matters. Examiners want to see a clear introduction → core submissions → conclusion.");
+    }
+    // Examiner asking for clarification
+    if (lastAi.includes("clarify") || lastAi.includes("explain further") || lastAi.includes("what do you mean")) {
+      hints.push("The examiner needs more precision. Restate your point with the specific legal test or statutory provision.");
+    }
+    // Procedure
+    if (lastAi.includes("procedure") || lastAi.includes("CPR") || lastAi.includes("rule")) {
+      hints.push("Know your procedural rules. For Part 24 summary judgment: 'no real prospect of success' and 'no other compelling reason for trial'.");
+    }
+    // Mid-session reminders
+    if (exchangeCount >= 5) {
+      hints.push("Check you've covered all competencies: Have you cited authority? Applied law to facts? Maintained court manner?");
+    }
+    if (hints.length === 0) {
+      hints.push("The examiner won't coach you. If you're stuck, take a breath, state the legal test, and apply it to the facts.");
+      hints.push("Professional conduct: always address the court correctly, don't interrupt, maintain composure.");
+      hints.push("Pass requires ALL five competencies met. If you've missed one area, pivot to address it now.");
+    }
+  }
+
+  if (mode === "opponent") {
+    if (exchangeCount === 0) {
+      hints.push("Listen carefully to opposing counsel's opening. Note their key authorities and the weaknesses in their argument.");
+      hints.push("Prepare to distinguish their cases: same name, different facts, different outcome.");
+      hints.push("Don't attack everything — pick the 2-3 weakest points and focus your fire there.");
+    }
+    // Opponent made a strong point
+    if (lastAi.includes("concede") || lastAi.includes("accept") || lastAi.includes("strong point")) {
+      hints.push("They've made a concession or acknowledged your point. Press the advantage — build on it immediately.");
+    }
+    // Opponent challenging your authority
+    if (lastAi.includes("distinguish") || lastAi.includes("does not apply") || lastAi.includes("different facts")) {
+      hints.push("They're trying to distinguish your authority. Defend it: explain why the principle still applies despite factual differences.");
+    }
+    // Opponent raising counterargument
+    if (lastAi.includes("however") || lastAi.includes("on the contrary") || lastAi.includes("with respect")) {
+      hints.push("They're pivoting to a counterargument. Don't get drawn into their framework — restate YOUR principle and show why it prevails.");
+    }
+    // Opponent citing new authority
+    if (lastAi.includes("[") && lastAi.includes("]")) {
+      hints.push("Opposing counsel cited a case. If you don't know it, don't bluff — say 'That authority is not before me, but the principle in [your case] is directly on point.'");
+    }
+    if (hints.length === 0) {
+      hints.push("Rebuttal tip: acknowledge the opponent's point briefly, then pivot: 'While my learned friend raises [X], this overlooks [Y].'");
+      hints.push("Concede small points gracefully to maintain credibility: 'I accept that, but the critical issue remains...'");
+      hints.push("Use the opponent's own logic against them: 'If my learned friend's argument is correct, then it follows that...' and show the absurd conclusion.");
+    }
   }
 
   return hints;
@@ -124,7 +232,7 @@ export default function SessionDock(props: SessionDockProps) {
     setActiveTab((prev) => (prev === tab ? null : tab));
   };
 
-  const hints = generateHints(props.messages);
+  const hints = generateHints(props.mode, props.messages);
 
   return (
     <>
@@ -221,7 +329,10 @@ export default function SessionDock(props: SessionDockProps) {
               {activeTab === "hints" && (
                 <>
                   <p className="text-xs text-court-text-ter">
-                    Coaching tips based on where you are in the session:
+                    {props.mode === "judge" && "Advocacy coaching based on the judge's responses:"}
+                    {props.mode === "mentor" && "Tips for getting the most from your mentoring session:"}
+                    {props.mode === "examiner" && "SQE2 competency reminders and exam technique:"}
+                    {props.mode === "opponent" && "Rebuttal tactics and debating strategy:"}
                   </p>
                   {hints.map((hint, i) => (
                     <div
