@@ -173,9 +173,11 @@ export default function AIPracticePage() {
     }
   }, [timerActive, timer]);
 
-  // Auto-scroll chat
+  // Auto-scroll chat — scroll to bottom only after user sends (not on judge's opening)
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (messages.length > 1) {
+      chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
   }, [messages]);
 
   // Auto-dismiss rate limit banner
@@ -738,8 +740,6 @@ export default function AIPracticePage() {
 
         {/* Chat messages — flex-end so messages start from bottom */}
         <div className="flex-1 overflow-y-auto px-3 no-scrollbar flex flex-col">
-          {/* Spacer pushes messages to bottom when few, collapses when content overflows */}
-          <div className="flex-1" />
           <div>
           {messages.map((msg, i) => (
             <div key={i} className={`mb-3 flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
@@ -806,30 +806,7 @@ export default function AIPracticePage() {
           )}
 
           <div className="flex gap-2 items-end pb-[max(env(safe-area-inset-bottom,0px),4px)]">
-            {/* Voice input button — 44px for comfortable tapping */}
-            <button
-              onClick={handleVoiceToggle}
-              disabled={isLoading || exchangeCount >= MAX_EXCHANGES || voiceInput.isTranscribing}
-              className={cn(
-                "w-11 h-11 rounded-full flex items-center justify-center shrink-0 transition-all",
-                isRecordingActive
-                  ? "bg-red-500 animate-pulse shadow-lg shadow-red-500/30"
-                  : voiceInput.isTranscribing
-                    ? "bg-blue-500/20 border border-blue-500/30"
-                    : "bg-gold-dim border border-gold/25 hover:bg-gold/20",
-                (isLoading || exchangeCount >= MAX_EXCHANGES) && "opacity-40 cursor-not-allowed"
-              )}
-            >
-              {isRecordingActive ? (
-                <Pause size={16} className="text-white" />
-              ) : voiceInput.isTranscribing ? (
-                <div className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
-              ) : (
-                <Mic size={16} className="text-gold" />
-              )}
-            </button>
-
-            {/* Text input — taller, auto-grows */}
+            {/* Text input — full width now that buttons are stacked on the right */}
             <div className={cn(
               "flex-1 bg-navy-card border rounded-2xl flex items-end",
               inputError ? "border-red-500/40" : "border-court-border"
@@ -859,19 +836,45 @@ export default function AIPracticePage() {
               )}
             </div>
 
-            {/* Send button — 44px for comfortable tapping */}
-            <button
-              onClick={sendMessage}
-              disabled={isLoading || exchangeCount >= MAX_EXCHANGES || !inputText.trim()}
-              className={cn(
-                "w-11 h-11 rounded-full flex items-center justify-center shrink-0 transition-all",
-                isLoading || exchangeCount >= MAX_EXCHANGES || !inputText.trim()
-                  ? "bg-gold/30 cursor-not-allowed"
-                  : "bg-gold hover:bg-gold/90"
-              )}
-            >
-              <ArrowUp size={18} className="text-navy" />
-            </button>
+            {/* Mic + Send stacked vertically on the right */}
+            <div className="flex flex-col gap-1.5 shrink-0">
+              {/* Voice input button */}
+              <button
+                onClick={handleVoiceToggle}
+                disabled={isLoading || exchangeCount >= MAX_EXCHANGES || voiceInput.isTranscribing}
+                className={cn(
+                  "w-11 h-11 rounded-full flex items-center justify-center transition-all",
+                  isRecordingActive
+                    ? "bg-red-500 animate-pulse shadow-lg shadow-red-500/30"
+                    : voiceInput.isTranscribing
+                      ? "bg-blue-500/20 border border-blue-500/30"
+                      : "bg-gold-dim border border-gold/25 hover:bg-gold/20",
+                  (isLoading || exchangeCount >= MAX_EXCHANGES) && "opacity-40 cursor-not-allowed"
+                )}
+              >
+                {isRecordingActive ? (
+                  <Pause size={16} className="text-white" />
+                ) : voiceInput.isTranscribing ? (
+                  <div className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Mic size={16} className="text-gold" />
+                )}
+              </button>
+
+              {/* Send button */}
+              <button
+                onClick={sendMessage}
+                disabled={isLoading || exchangeCount >= MAX_EXCHANGES || !inputText.trim()}
+                className={cn(
+                  "w-11 h-11 rounded-full flex items-center justify-center transition-all",
+                  isLoading || exchangeCount >= MAX_EXCHANGES || !inputText.trim()
+                    ? "bg-gold/30 cursor-not-allowed"
+                    : "bg-gold hover:bg-gold/90"
+                )}
+              >
+                <ArrowUp size={18} className="text-navy" />
+              </button>
+            </div>
           </div>
         </div>
 
