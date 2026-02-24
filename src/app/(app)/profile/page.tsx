@@ -5,9 +5,10 @@ import { useQuery, useMutation } from "convex/react";
 import { anyApi } from "convex/server";
 import { Avatar, Tag, Card, Button, ProgressBar, SectionHeader, Skeleton } from "@/components/ui";
 import { courtToast } from "@/lib/utils/toast";
-import { Flame, Timer, FileText, Star, Trophy, FolderOpen, Link as LinkIcon, Landmark, Settings, X, Loader2 } from "lucide-react";
+import { Flame, Timer, FileText, Star, Trophy, FolderOpen, Link as LinkIcon, Landmark, Settings, X, Loader2, LogOut } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
+import { useAuthActions } from "@convex-dev/auth/react";
 import { ReferralDashboard } from "@/components/shared/ReferralDashboard";
 
 function getInitials(name: string) {
@@ -31,6 +32,19 @@ export default function ProfilePage() {
   const [editName, setEditName] = useState("");
   const [editBio, setEditBio] = useState("");
   const [saving, setSaving] = useState(false);
+  const authActions = useAuthActions();
+  const signOut = authActions?.signOut;
+  const [signingOut, setSigningOut] = useState(false);
+
+  const handleSignOut = async () => {
+    setSigningOut(true);
+    try {
+      await signOut();
+    } catch {
+      setSigningOut(false);
+      courtToast.error("Failed to sign out");
+    }
+  };
 
   if (isLoading) {
     return (
@@ -254,6 +268,20 @@ export default function ProfilePage() {
             </div>
           </Link>
         ))}
+
+        {/* Sign Out — right here, no digging into Settings */}
+        <button
+          onClick={handleSignOut}
+          disabled={signingOut}
+          className="flex justify-between items-center w-full py-3.5 cursor-pointer"
+        >
+          <div className="flex gap-3 items-center">
+            {signingOut ? <Loader2 size={18} className="text-red-400 animate-spin" /> : <LogOut size={18} className="text-red-400" />}
+            <span className="text-court-base text-red-400 font-medium">
+              {signingOut ? "Signing out..." : "Sign Out"}
+            </span>
+          </div>
+        </button>
       </section>
     </div>
   );
