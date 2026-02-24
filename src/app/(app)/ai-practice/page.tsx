@@ -122,6 +122,7 @@ export default function AIPracticePage() {
   } | null>(null);
   const [rateLimited, setRateLimited] = useState(false);
   const [inputError, setInputError] = useState<string | null>(null);
+  const [isTyping, setIsTyping] = useState(false);
   const [feedbackFallback, setFeedbackFallback] = useState(false);
 
   // Voice input (Whisper)
@@ -329,6 +330,7 @@ export default function AIPracticePage() {
     };
     setMessages((prev) => [...prev, userMsg]);
     setInputText("");
+    setIsTyping(false);
     setAiSpeaking(true);
     setIsLoading(true);
     setError(null);
@@ -650,20 +652,18 @@ export default function AIPracticePage() {
             </div>
           )}
 
-          <div className="px-4 pt-3 pb-2 flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <DynamicIcon name={persona.icon} size={16} className="text-gold/70" />
-              <span className="text-xs font-bold text-court-text">{displayPersonaName}</span>
+          <div className="px-3 pt-2 pb-1.5 flex justify-between items-center">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <DynamicIcon name={persona.icon} size={14} className="text-gold/70 shrink-0" />
+              <span className="text-xs font-bold text-court-text truncate">{displayPersonaName}</span>
             </div>
-            <div className="flex items-center gap-2">
-              {/* Transcript panel toggle */}
+            <div className="flex items-center gap-1.5 shrink-0">
               <TranscriptPanel
                 messages={messages}
                 caseTitle={brief.matter}
                 personaName={displayPersonaName}
                 areaOfLaw={brief.area}
               />
-              {/* Spectator mode share */}
               <SpectatorShare
                 spectatorCode={spectatorCode}
                 spectatorCount={spectatorCount}
@@ -671,7 +671,6 @@ export default function AIPracticePage() {
                 onEnable={enableSpectatorMode}
                 onDisable={disableSpectatorMode}
               />
-              {/* TTS toggle */}
               <button
                 onClick={() => { tts.setEnabled(!tts.enabled); if (tts.isSpeaking) tts.stop(); }}
                 className={cn(
@@ -682,15 +681,13 @@ export default function AIPracticePage() {
               >
                 {tts.enabled ? <Volume2 size={14} /> : <VolumeX size={14} />}
               </button>
-              {/* Exchange counter */}
-              <div className="bg-navy-card border border-court-border rounded-full px-2.5 py-0.5 text-court-xs text-court-text-ter font-mono">
-                {exchangeCount}/{MAX_EXCHANGES}
+              {/* Merged counter + timer */}
+              <div className="bg-navy-card border border-court-border rounded-full px-2 py-0.5 text-[10px] text-court-text-ter font-mono flex items-center gap-1">
+                <span>{exchangeCount}/{MAX_EXCHANGES}</span>
+                <span className="text-court-border">·</span>
+                <span className="text-red-400 font-bold">{formatTime(timer)}</span>
               </div>
-              {/* Timer */}
-              <div className="bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-1 text-xs font-bold text-red-400 font-mono">
-                {formatTime(timer)}
-              </div>
-              <button onClick={endSession} className="text-court-xs text-red-400 font-bold">
+              <button onClick={endSession} className="text-[10px] bg-red-500/10 text-red-400 font-bold px-2 py-1 rounded-lg">
                 End
               </button>
             </div>
@@ -707,33 +704,55 @@ export default function AIPracticePage() {
           </div>
         )}
 
-        {/* Judge Avatar */}
-        <div className="flex justify-center py-2 relative shrink-0">
-          <div className="flex flex-col items-center gap-1">
+        {/* Judge Avatar — full when no messages, collapsed inline after */}
+        {messages.length === 0 ? (
+          <div className="flex justify-center py-3 relative shrink-0">
+            <div className="flex flex-col items-center gap-1">
+              <JudgeAvatar
+                isActive={aiSpeaking || isLoading}
+                isListening={isRecordingActive}
+                responseText={lastAiResponse}
+                size={56}
+              />
+              <p className="text-court-xs text-court-text-ter italic">
+                {isLoading
+                  ? `${displayPersonaName} is considering your submission...`
+                  : voiceInput.isTranscribing
+                    ? "Transcribing your speech..."
+                    : isRecordingActive
+                      ? "Listening... tap mic to stop"
+                      : tts.isSpeaking
+                        ? "Judge is speaking..."
+                        : exchangeCount >= MAX_EXCHANGES
+                          ? "Session concluding. Please end the session."
+                          : "Awaiting your submissions..."}
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 px-3 py-1.5 border-b border-court-border-light/20 shrink-0">
             <JudgeAvatar
               isActive={aiSpeaking || isLoading}
               isListening={isRecordingActive}
               responseText={lastAiResponse}
               size={56}
+              collapsed
             />
-            <p className="text-court-xs text-court-text-ter italic">
+            <p className="text-[11px] text-court-text-ter italic flex-1 min-w-0 truncate">
               {isLoading
-                ? `${displayPersonaName} is considering your submission...`
-                : voiceInput.isTranscribing
-                  ? "Transcribing your speech..."
-                  : isRecordingActive
-                    ? "Listening... tap mic to stop"
-                    : tts.isSpeaking
-                      ? "Judge is speaking..."
-                      : exchangeCount >= MAX_EXCHANGES
-                        ? "Session concluding. Please end the session."
-                        : "Awaiting your submissions..."}
+                ? "Considering..."
+                : tts.isSpeaking
+                  ? "Speaking..."
+                  : exchangeCount >= MAX_EXCHANGES
+                    ? "Session concluding"
+                    : "In session"}
             </p>
           </div>
-        </div>
+        )}
 
-        {/* Chat messages */}
-        <div className="flex-1 overflow-y-auto px-4 no-scrollbar">
+        {/* Chat messages — flex-end so messages start from bottom */}
+        <div className="flex-1 overflow-y-auto px-3 no-scrollbar flex flex-col justify-end">
+          <div>
           {messages.map((msg, i) => (
             <div key={i} className={`mb-3 flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
               <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 ${
@@ -765,41 +784,46 @@ export default function AIPracticePage() {
             </div>
           )}
           <div ref={chatEndRef} />
+          </div>
         </div>
 
-        {/* Quick phrases */}
-        <div className="px-3 py-2 border-t border-court-border-light/30 shrink-0">
-          <ObjectionButtons
-            onInsert={(text) => setInputText((prev) => prev + text)}
-            disabled={isLoading || exchangeCount >= MAX_EXCHANGES}
-          />
-        </div>
+        {/* Quick phrases — hidden when typing, collapsed after first exchange */}
+        {!isTyping && (
+          <div className={cn(
+            "px-3 py-1.5 border-t border-court-border-light/20 shrink-0 transition-all",
+            messages.length > 2 && "max-h-[44px] overflow-hidden"
+          )}>
+            <ObjectionButtons
+              onInsert={(text) => setInputText((prev) => prev + text)}
+              disabled={isLoading || exchangeCount >= MAX_EXCHANGES}
+            />
+          </div>
+        )}
 
-        {/* Input area */}
-        <div className="px-4 py-3 border-t border-court-border-light bg-gradient-to-t from-[#0A0A1A] to-navy shrink-0">
+        {/* Input area — larger and more comfortable */}
+        <div className="px-3 py-2 border-t border-court-border-light bg-gradient-to-t from-[#0A0A1A] to-navy shrink-0">
           {/* Voice/input errors */}
           {(inputError || (voiceInput.error && voiceInput.error !== "WHISPER_UNAVAILABLE")) && (
-            <div className="flex items-center gap-1.5 mb-2 px-1">
+            <div className="flex items-center gap-1.5 mb-1.5 px-1">
               <AlertCircle size={11} className="text-red-400 shrink-0" />
               <p className="text-court-xs text-red-400">{inputError || voiceInput.error}</p>
             </div>
           )}
 
-          {/* Whisper transcribing indicator */}
           {voiceInput.isTranscribing && (
-            <div className="flex items-center gap-2 mb-2 px-1">
+            <div className="flex items-center gap-2 mb-1.5 px-1">
               <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
               <p className="text-court-xs text-blue-400">Transcribing your speech...</p>
             </div>
           )}
 
-          <div className="flex gap-2 items-end pb-4">
-            {/* Voice input button */}
+          <div className="flex gap-2 items-end pb-[max(env(safe-area-inset-bottom,0px),4px)]">
+            {/* Voice input button — 44px for comfortable tapping */}
             <button
               onClick={handleVoiceToggle}
               disabled={isLoading || exchangeCount >= MAX_EXCHANGES || voiceInput.isTranscribing}
               className={cn(
-                "w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-all",
+                "w-11 h-11 rounded-full flex items-center justify-center shrink-0 transition-all",
                 isRecordingActive
                   ? "bg-red-500 animate-pulse shadow-lg shadow-red-500/30"
                   : voiceInput.isTranscribing
@@ -817,21 +841,24 @@ export default function AIPracticePage() {
               )}
             </button>
 
-            {/* Text input */}
+            {/* Text input — taller, auto-grows */}
             <div className={cn(
-              "flex-1 bg-navy-card border rounded-xl flex items-end",
+              "flex-1 bg-navy-card border rounded-2xl flex items-end",
               inputError ? "border-red-500/40" : "border-court-border"
             )}>
               <textarea
                 value={inputText}
                 onChange={(e) => {
                   setInputText(e.target.value);
+                  setIsTyping(e.target.value.length > 0);
                   if (inputError && e.target.value.length <= MAX_MESSAGE_LENGTH) setInputError(null);
                 }}
+                onBlur={() => { if (!inputText.trim()) setIsTyping(false); }}
                 placeholder={exchangeCount >= MAX_EXCHANGES ? "Session limit reached." : isRecordingActive ? "Listening..." : "Make your submissions..."}
-                rows={1}
+                rows={2}
                 disabled={isLoading || exchangeCount >= MAX_EXCHANGES}
-                className="flex-1 bg-transparent text-court-base text-court-text px-3 py-2.5 resize-none outline-none placeholder:text-court-text-ter disabled:opacity-50"
+                className="flex-1 bg-transparent text-sm text-court-text px-3 py-2.5 resize-none outline-none placeholder:text-court-text-ter disabled:opacity-50 max-h-[120px]"
+                style={{ minHeight: "52px" }}
                 onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
               />
               {inputText.length > MAX_MESSAGE_LENGTH * 0.8 && (
@@ -844,18 +871,18 @@ export default function AIPracticePage() {
               )}
             </div>
 
-            {/* Send button */}
+            {/* Send button — 44px for comfortable tapping */}
             <button
               onClick={sendMessage}
               disabled={isLoading || exchangeCount >= MAX_EXCHANGES || !inputText.trim()}
               className={cn(
-                "w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-all",
+                "w-11 h-11 rounded-full flex items-center justify-center shrink-0 transition-all",
                 isLoading || exchangeCount >= MAX_EXCHANGES || !inputText.trim()
                   ? "bg-gold/30 cursor-not-allowed"
                   : "bg-gold hover:bg-gold/90"
               )}
             >
-              <ArrowUp size={16} className="text-navy" />
+              <ArrowUp size={18} className="text-navy" />
             </button>
           </div>
         </div>
