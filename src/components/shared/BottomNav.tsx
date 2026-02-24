@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { Home, Scale, Users, BookOpen } from "lucide-react";
+import { Home, Scale, Users, BookOpen, Target } from "lucide-react";
 import { cn } from "@/lib/utils/helpers";
 
 const tabs = [
   { href: "/home", label: "Home", Icon: Home },
   { href: "/sessions", label: "Sessions", Icon: Scale },
+  { href: "/ai-practice", label: "AI Practice", Icon: Target, center: true },
   { href: "/law-book", label: "Law Book", Icon: BookOpen },
   { href: "/community", label: "Community", Icon: Users },
 ];
@@ -25,12 +26,16 @@ export function BottomNav() {
       <div className="mx-auto flex justify-around items-center px-1 pt-2 pb-[max(env(safe-area-inset-bottom,0px),6px)]">
         {tabs.map((tab) => {
           const isActive = pathname?.startsWith(tab.href);
+          const isCenter = "center" in tab && tab.center;
           return (
             <Link
               key={tab.href}
               href={tab.href}
               aria-current={isActive ? "page" : undefined}
-              className="flex flex-col items-center gap-0.5 relative min-w-[60px] min-h-[48px] px-1.5 py-1.5 justify-center active:scale-[0.97] transition-transform"
+              className={cn(
+                "flex flex-col items-center gap-0.5 relative min-h-[48px] px-1 py-1.5 justify-center active:scale-[0.97] transition-transform",
+                isCenter ? "min-w-[56px] -mt-3" : "min-w-[52px]"
+              )}
             >
               {isActive && (
                 <motion.div
@@ -39,17 +44,28 @@ export function BottomNav() {
                   transition={{ type: "spring", stiffness: 500, damping: 35 }}
                 />
               )}
-              <tab.Icon
-                size={24}
-                strokeWidth={isActive ? 2.5 : 1.5}
-                className={cn(
-                  "transition-all duration-200 shrink-0",
-                  isActive ? "text-gold" : "text-court-text-sec"
-                )}
-              />
+              {isCenter ? (
+                <div className={cn(
+                  "w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200",
+                  isActive
+                    ? "bg-gold text-navy-deep shadow-[0_0_12px_rgba(212,175,55,0.3)]"
+                    : "bg-gold/15 text-gold border border-gold/30"
+                )}>
+                  <tab.Icon size={20} strokeWidth={2} />
+                </div>
+              ) : (
+                <tab.Icon
+                  size={22}
+                  strokeWidth={isActive ? 2.5 : 1.5}
+                  className={cn(
+                    "transition-all duration-200 shrink-0",
+                    isActive ? "text-gold" : "text-court-text-sec"
+                  )}
+                />
+              )}
               <span
                 className={cn(
-                  "text-[11px] leading-tight font-semibold tracking-wide transition-colors duration-200 text-center",
+                  "text-[10px] leading-tight font-semibold tracking-wide transition-colors duration-200 text-center",
                   isActive ? "text-gold" : "text-court-text-sec"
                 )}
               >
