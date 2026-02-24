@@ -5,7 +5,7 @@ import { useQuery, useMutation } from "convex/react";
 import { anyApi } from "convex/server";
 import { Avatar, Tag, Card, Button, ProgressBar, SectionHeader, Skeleton } from "@/components/ui";
 import { courtToast } from "@/lib/utils/toast";
-import { Flame, Timer, FileText, Star, Trophy, FolderOpen, Link as LinkIcon, Landmark, Settings, X, Loader2, LogOut } from "lucide-react";
+import { Flame, Timer, FileText, Star, Trophy, FolderOpen, Link as LinkIcon, Landmark, Settings, X, Loader2, LogOut, Bookmark } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { useAuthActions } from "@convex-dev/auth/react";
@@ -252,6 +252,7 @@ export default function ProfilePage() {
           { Icon: FolderOpen, label: "Export Advocacy Portfolio", tag: "PDF" },
           { Icon: LinkIcon, label: "Copy Profile Link" },
           { Icon: Landmark, label: profile.chamber ? `Your Chamber · ${profile.chamber}` : "Join a Chamber" },
+          { Icon: Bookmark, label: "My Brief", href: "/bookmarks", tag: "SAVED" },
           { Icon: FileText, label: "Digital Membership Card", tag: "WALLET" },
           { Icon: Settings, label: "Settings", href: "/settings" },
         ] as { Icon: LucideIcon; label: string; tag?: string; href?: string }[]).map((a) => (

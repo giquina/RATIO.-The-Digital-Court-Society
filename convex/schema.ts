@@ -686,6 +686,43 @@ export default defineSchema({
     .index("by_profile", ["profileId"])
     .index("by_profile_recent", ["profileId", "searchedAt"]),
 
+
+  // ═══════════════════════════════════════════
+  // POSTS & BOOKMARKS — SOCIAL FEED
+  // ═══════════════════════════════════════════
+  posts: defineTable({
+    profileId: v.id("profiles"),
+    body: v.string(), // max 500 chars
+    category: v.string(), // "insight" | "case_spot" | "question" | "moot_tip"
+    tags: v.optional(v.array(v.string())), // e.g. ["Contract Law", "IRAC"]
+    caseReference: v.optional(v.string()), // optional case citation
+    sustainedCount: v.number(), // "I agree" reaction
+    overruledCount: v.number(), // "I challenge" reaction
+    distinguishedCount: v.number(), // "Interesting nuance" reaction
+    bookmarkCount: v.number(), // how many people bookmarked (public count, private list)
+    citedCount: v.number(), // how many times shared/cited
+    commentCount: v.number(), // reply count
+  })
+    .index("by_profile", ["profileId"])
+    .index("by_category", ["category"]),
+
+  postReactions: defineTable({
+    profileId: v.id("profiles"),
+    postId: v.id("posts"),
+    reaction: v.string(), // "sustained" | "overruled" | "distinguished"
+  })
+    .index("by_post", ["postId"])
+    .index("by_profile_post", ["profileId", "postId"]),
+
+  bookmarks: defineTable({
+    profileId: v.id("profiles"),
+    targetType: v.string(), // "post" | "activity"
+    targetId: v.string(), // post._id or activity._id
+    note: v.optional(v.string()), // optional personal note
+  })
+    .index("by_profile", ["profileId"])
+    .index("by_profile_target", ["profileId", "targetId"]),
+
   // ═══════════════════════════════════════════
   // REFERRALS — SHARE & REWARD
   // ═══════════════════════════════════════════
