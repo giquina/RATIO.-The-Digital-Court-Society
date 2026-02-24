@@ -34,12 +34,12 @@ type BadgeItem = {
   requirement: { type: string; threshold: number };
 };
 
-const CATEGORIES = ["All", "Moots", "Streaks", "Community", "Skill"];
+const CATEGORIES = ["All", "Moots", "Streaks", "Society", "Skill"];
 const CATEGORY_MAP: Record<string, string> = {
   All: "all",
   Moots: "moots",
   Streaks: "streak",
-  Community: "community",
+  Society: "society",
   Skill: "skill",
 };
 

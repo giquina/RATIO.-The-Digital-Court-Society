@@ -5,6 +5,46 @@
 
 ---
 
+## 2026-02-24 — Animated Scales Judge Avatar
+
+### What Changed
+Replaced the real human photo avatar with a fully animated SVG scales-of-justice icon.
+
+### Visual Effects
+- **Metallic gold gradient** — Colours shift over time, simulating light on polished brass
+- **Scale pan tilt** — Pans tip based on judge expression (balanced = neutral, heavy tilt = stern)
+- **3D perspective wobble** — Subtle Y-axis rotation when session is active
+- **Glow ring** — Pulsing ring changes colour with expression (gold/red/green)
+- **Sparkle particles** — 4 floating gold dots orbit the avatar during session
+- **Status dot** — Expression-aware indicator (thinking/stern/approving)
+- **Collapsible** — 56px full → 28px inline with simplified animation
+
+### Expression States
+- **Neutral** — Scales balanced, gold glow
+- **Thinking** — Slight tilt (-3°), pulsing status dot
+- **Stern** — Heavy tilt (-10°), red glow + red sparkles
+- **Approving** — Barely tipped (+2°), green glow + green sparkles
+
+### Files Changed
+- `src/components/ai-practice/JudgeAvatar.tsx` — complete rewrite (photo → animated SVG)
+- `public/images/judge-avatar.jpg` — no longer used (can be deleted)
+
+---
+
+## 2026-02-24 — Convex Badge Category: `community` → `society`
+
+### What Changed
+Badge category string renamed from `"community"` to `"society"` in schema, seed data,
+constants, and badges page. "Community Builder" badge renamed to "Society Builder".
+
+### Files Changed
+- `convex/schema.ts` — category comment
+- `convex/seed.ts` — 7 badge entries + badge name
+- `src/lib/constants/app.ts` — 6 badge entries
+- `src/app/(app)/badges/page.tsx` — CATEGORIES array + filter mapping
+
+---
+
 ## 2026-02-24 — Route Migration: `/community` → `/society`
 
 ### What Changed

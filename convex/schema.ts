@@ -209,7 +209,7 @@ export default defineSchema({
     name: v.string(),
     description: v.string(),
     icon: v.string(),
-    category: v.string(), // "streak", "moots", "skill", "competition", "community"
+    category: v.string(), // "streak", "moots", "skill", "competition", "society"
     requirement: v.any(), // { type: "moots_completed", threshold: 10 }
   }),
 

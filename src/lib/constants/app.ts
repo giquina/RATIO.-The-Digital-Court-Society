@@ -79,10 +79,10 @@ export const BADGE_DEFINITIONS = [
   { name: "7-Day Streak", icon: "Flame", category: "streak", requirement: { type: "streak_days", threshold: 7 } },
   { name: "30-Day Streak", icon: "Flame", category: "streak", requirement: { type: "streak_days", threshold: 30 } },
   { name: "100-Day Streak", icon: "Trophy", category: "streak", requirement: { type: "streak_days", threshold: 100 } },
-  { name: "First Commendation", icon: "Star", category: "community", requirement: { type: "commendations_received", threshold: 1 } },
-  { name: "Respected Advocate", icon: "Star", category: "community", requirement: { type: "commendations_received", threshold: 50 } },
+  { name: "First Commendation", icon: "Star", category: "society", requirement: { type: "commendations_received", threshold: 1 } },
+  { name: "Respected Advocate", icon: "Star", category: "society", requirement: { type: "commendations_received", threshold: 50 } },
   { name: "AI Sparring Partner", icon: "Bot", category: "skill", requirement: { type: "ai_sessions", threshold: 5 } },
-  { name: "50 Followers", icon: "Users", category: "community", requirement: { type: "followers", threshold: 50 } },
+  { name: "50 Followers", icon: "Users", category: "society", requirement: { type: "followers", threshold: 50 } },
 ] as const;
 
 // ── AI Personas ──
@@ -134,7 +134,7 @@ export const REFERRAL = {
 } as const;
 
 export const REFERRAL_BADGE_DEFINITIONS = [
-  { name: "First Referral", icon: "UserPlus", category: "community", requirement: { type: "referrals_completed", threshold: 1 } },
-  { name: "Advocate Recruiter", icon: "Users", category: "community", requirement: { type: "referrals_completed", threshold: 5 } },
-  { name: "Chamber Builder", icon: "Shield", category: "community", requirement: { type: "referrals_completed", threshold: 15 } },
+  { name: "First Referral", icon: "UserPlus", category: "society", requirement: { type: "referrals_completed", threshold: 1 } },
+  { name: "Advocate Recruiter", icon: "Users", category: "society", requirement: { type: "referrals_completed", threshold: 5 } },
+  { name: "Chamber Builder", icon: "Shield", category: "society", requirement: { type: "referrals_completed", threshold: 15 } },
 ] as const;
