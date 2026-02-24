@@ -49,7 +49,7 @@ export function BottomNav() {
               {/* Icon wrapper — relative so the live dot can sit on top */}
               <div className="relative">
                 <tab.Icon
-                  size={22}
+                  size={26}
                   strokeWidth={isActive ? 2.5 : 1.5}
                   className={cn(
                     "transition-all duration-200 shrink-0",

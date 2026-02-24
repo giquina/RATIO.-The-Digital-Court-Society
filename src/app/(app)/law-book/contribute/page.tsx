@@ -109,7 +109,8 @@ export default function ContributePage() {
   }
 
   return (
-    <div className="pb-8">
+    <div className="flex flex-col h-[calc(100dvh-140px)] md:h-[calc(100dvh-80px)]">
+      <div className="flex-1 overflow-y-auto">
       {/* ── Back link ── */}
       <div className="px-4 md:px-6 lg:px-8 pt-3 pb-2">
         <div className="max-w-content-medium mx-auto">
@@ -355,31 +356,6 @@ export default function ContributePage() {
                 </div>
               )}
             </Card>
-
-            {/* Submit */}
-            <div className="flex flex-col gap-3">
-              <Button
-                fullWidth
-                onClick={handleSubmit}
-                disabled={!canSubmit}
-              >
-                Submit for Review
-              </Button>
-              {!canSubmit && (
-                <div className="flex items-center gap-2 justify-center text-court-xs text-court-text-ter">
-                  <Info size={12} />
-                  <span>
-                    {!module
-                      ? "Select a module"
-                      : !title.trim()
-                        ? "Enter a topic title"
-                        : !iracFilled
-                          ? "Complete all IRAC sections"
-                          : "Add at least 2 citations"}
-                  </span>
-                </div>
-              )}
-            </div>
           </div>
 
           {/* ── Guidelines sidebar ── */}
@@ -448,6 +424,34 @@ export default function ContributePage() {
               </div>
             </Card>
           </div>
+        </div>
+      </div>
+      </div>{/* end scrollable */}
+
+      {/* Sticky CTA */}
+      <div className="shrink-0 px-4 md:px-6 lg:px-8 py-3 border-t border-court-border-light/20 bg-navy">
+        <div className="max-w-content-medium mx-auto flex flex-col gap-2">
+          <Button
+            fullWidth
+            onClick={handleSubmit}
+            disabled={!canSubmit}
+          >
+            Submit for Review
+          </Button>
+          {!canSubmit && (
+            <div className="flex items-center gap-2 justify-center text-court-xs text-court-text-ter">
+              <Info size={12} />
+              <span>
+                {!module
+                  ? "Select a module"
+                  : !title.trim()
+                    ? "Enter a topic title"
+                    : !iracFilled
+                      ? "Complete all IRAC sections"
+                      : "Add at least 2 citations"}
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </div>

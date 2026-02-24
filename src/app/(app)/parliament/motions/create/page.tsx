@@ -38,7 +38,8 @@ export default function CreateMotionPage() {
 
   return (
     <VerifiedOnly fallbackMessage="Only verified advocates can propose motions.">
-      <div className="pb-6 md:max-w-content-narrow mx-auto">
+      <div className="flex flex-col h-[calc(100dvh-140px)] md:h-[calc(100dvh-80px)] md:max-w-content-narrow mx-auto">
+        <div className="flex-1 overflow-y-auto">
         {/* Header */}
         <div className="px-4 md:px-6 lg:px-8 pt-3 pb-4">
           <Link
@@ -189,18 +190,20 @@ export default function CreateMotionPage() {
                 />
               </div>
 
-              {/* Submit */}
-              <div className="pt-2">
-                <Button onClick={handleSubmit} disabled={!canSubmit || submitting} fullWidth>
-                  {submitting ? "Submitting Motion..." : "Table Motion"}
-                </Button>
-                <p className="text-court-xs text-court-text-ter text-center mt-2">
-                  Your motion will be tabled and require a second before it can proceed to debate.
-                </p>
-              </div>
             </div>
           </Card>
         </section>
+      </div>{/* end scrollable */}
+
+      {/* Sticky CTA */}
+      <div className="shrink-0 px-4 md:px-6 lg:px-8 py-3 border-t border-court-border-light/20 bg-navy">
+        <Button onClick={handleSubmit} disabled={!canSubmit || submitting} fullWidth>
+          {submitting ? "Submitting Motion..." : "Table Motion"}
+        </Button>
+        <p className="text-court-xs text-court-text-ter text-center mt-2">
+          Your motion will be tabled and require a second before it can proceed to debate.
+        </p>
+      </div>
       </div>
     </VerifiedOnly>
   );

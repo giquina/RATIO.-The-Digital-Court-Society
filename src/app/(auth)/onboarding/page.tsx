@@ -161,9 +161,9 @@ export default function OnboardingPage() {
   );
 
   return (
-    <div className="min-h-screen flex flex-col px-4 md:px-6 lg:px-8 pt-8 pb-12">
+    <div className="h-dvh flex flex-col px-4 md:px-6 lg:px-8 pt-8">
       {/* Progress + Skip */}
-      <div className="mb-8">
+      <div className="mb-8 shrink-0">
         <div className="flex items-center justify-between mb-3">
           <p className="text-court-xs text-court-text-ter">
             Step {step} of 4
@@ -200,6 +200,8 @@ export default function OnboardingPage() {
         </div>
       </div>
 
+      {/* Scrollable step content */}
+      <div className="flex-1 overflow-y-auto min-h-0 pb-2">
       {/* ── Step 1: University ── */}
       {step === 1 && (
         <>
@@ -369,8 +371,10 @@ export default function OnboardingPage() {
         </>
       )}
 
-      {/* Navigation */}
-      <div className="flex gap-3 mt-6 pt-4 border-t border-court-border-light">
+      </div>{/* end scrollable */}
+
+      {/* Navigation — sticky at bottom */}
+      <div className="shrink-0 flex gap-3 py-4 border-t border-court-border-light bg-navy">
         {step > 1 && (
           <button
             onClick={back}

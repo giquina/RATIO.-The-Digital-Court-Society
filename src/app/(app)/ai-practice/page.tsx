@@ -955,7 +955,8 @@ export default function AIPracticePage() {
   const keyImprovement = feedbackData?.keyImprovement || FALLBACK_KEY_IMPROVEMENT;
 
   return (
-    <div className="pb-6">
+    <div className="flex flex-col h-[calc(100dvh-140px)] md:h-[calc(100dvh-80px)]">
+      <div className="flex-1 overflow-y-auto pb-4">
       <div className="px-4 pt-3 pb-4">
         <h1 className="font-serif text-2xl font-bold text-court-text mb-1">Session Feedback</h1>
         <p className="text-xs text-court-text-sec">{displayPersonaName} · {brief.area}</p>
@@ -1027,7 +1028,10 @@ export default function AIPracticePage() {
           error={caseNoteError}
         />
       </section>
-      <section className="px-4 flex flex-col gap-2.5">
+      </div>
+
+      {/* Sticky CTAs */}
+      <div className="shrink-0 px-4 py-3 border-t border-court-border-light/20 bg-navy flex flex-col gap-2.5">
         <Button fullWidth onClick={() => {
           setScreen("select");
           setMessages([]);
@@ -1047,7 +1051,7 @@ export default function AIPracticePage() {
         }}>Practice Again</Button>
         <Button fullWidth variant="outline">Save to Portfolio</Button>
         <Button fullWidth variant="secondary">Share Result</Button>
-      </section>
+      </div>
     </div>
   );
 }
