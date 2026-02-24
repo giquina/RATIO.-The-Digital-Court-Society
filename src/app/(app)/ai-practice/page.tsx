@@ -10,6 +10,7 @@ import ObjectionButtons from "@/components/ai-practice/ObjectionButtons";
 import TranscriptPanel from "@/components/ai-practice/TranscriptPanel";
 import CaseNotePanel from "@/components/ai-practice/CaseNotePanel";
 import SpectatorShare from "@/components/ai-practice/SpectatorShare";
+import SessionDock from "@/components/ai-practice/SessionDock";
 import { useVoiceInput } from "@/hooks/useVoiceInput";
 import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
 import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
@@ -649,56 +650,32 @@ export default function AIPracticePage() {
   // ── LIVE SESSION ──
   if (screen === "session") {
     return (
-      <div className="flex flex-col h-[calc(100dvh-80px)]">
-        {/* Courtroom header bar — dark wood panelling effect */}
+      <div className="flex flex-col h-[calc(100dvh-64px)]">
+        {/* Minimal session header — just context, no controls */}
         <div className="bg-gradient-to-b from-[#1A0E08] to-navy border-b border-gold/10 shrink-0">
-          {/* Rate limit banner */}
           {rateLimited && (
-            <div className="px-4 py-2 bg-amber-500/10 border-b border-amber-500/20">
+            <div className="px-4 py-1.5 bg-amber-500/10 border-b border-amber-500/20">
               <p className="text-court-xs text-amber-400 text-center">
                 The court requires a brief recess. Please wait a moment.
               </p>
             </div>
           )}
 
-          <div className="px-3 pt-2 pb-1.5 flex justify-between items-center">
-            <div className="flex items-center gap-1.5 min-w-0">
+          <div className="px-3 py-2 flex justify-between items-center">
+            <div className="flex items-center gap-2 min-w-0">
+              {/* LIVE pulsing dot */}
+              <span className="flex h-2 w-2 shrink-0">
+                <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-red-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
+              </span>
               <DynamicIcon name={persona.icon} size={14} className="text-gold/70 shrink-0" />
               <span className="text-xs font-bold text-court-text truncate">{displayPersonaName}</span>
             </div>
-            <div className="flex items-center gap-1.5 shrink-0">
-              <TranscriptPanel
-                messages={messages}
-                caseTitle={brief.matter}
-                personaName={displayPersonaName}
-                areaOfLaw={brief.area}
-              />
-              <SpectatorShare
-                spectatorCode={spectatorCode}
-                spectatorCount={spectatorCount}
-                isEnabled={spectatorEnabled}
-                onEnable={enableSpectatorMode}
-                onDisable={disableSpectatorMode}
-              />
-              <button
-                onClick={() => { tts.setEnabled(!tts.enabled); if (tts.isSpeaking) tts.stop(); }}
-                className={cn(
-                  "p-1.5 rounded-lg transition-colors",
-                  tts.enabled ? "bg-gold/15 text-gold" : "bg-navy-card text-court-text-ter"
-                )}
-                title={tts.enabled ? "Mute judge voice" : "Enable judge voice"}
-              >
-                {tts.enabled ? <Volume2 size={14} /> : <VolumeX size={14} />}
-              </button>
-              {/* Merged counter + timer */}
-              <div className="bg-navy-card border border-court-border rounded-full px-2 py-0.5 text-[10px] text-court-text-ter font-mono flex items-center gap-1">
-                <span>{exchangeCount}/{MAX_EXCHANGES}</span>
-                <span className="text-court-border">·</span>
-                <span className="text-red-400 font-bold">{formatTime(timer)}</span>
-              </div>
-              <button onClick={endSession} className="text-[10px] bg-red-500/10 text-red-400 font-bold px-2 py-1 rounded-lg">
-                End
-              </button>
+            {/* Compact timer — just for quick glance */}
+            <div className="text-[11px] text-court-text-ter font-mono flex items-center gap-1.5">
+              <span>{exchangeCount}/{MAX_EXCHANGES}</span>
+              <span className="text-court-border">·</span>
+              <span className="text-red-400 font-bold">{formatTime(timer)}</span>
             </div>
           </div>
         </div>
@@ -895,6 +872,38 @@ export default function AIPracticePage() {
             </button>
           </div>
         </div>
+
+        {/* Session Dock — replaces bottom nav with contextual tools */}
+        <SessionDock
+          brief={brief}
+          exchangeCount={exchangeCount}
+          maxExchanges={MAX_EXCHANGES}
+          timerDisplay={formatTime(timer)}
+          ttsEnabled={tts.enabled}
+          onToggleTts={() => { tts.setEnabled(!tts.enabled); if (tts.isSpeaking) tts.stop(); }}
+          onEndSession={endSession}
+          spectatorEnabled={spectatorEnabled}
+          spectatorCount={spectatorCount}
+          personaName={displayPersonaName}
+          messages={messages}
+          transcriptSlot={
+            <TranscriptPanel
+              messages={messages}
+              caseTitle={brief.matter}
+              personaName={displayPersonaName}
+              areaOfLaw={brief.area}
+            />
+          }
+          spectatorSlot={
+            <SpectatorShare
+              spectatorCode={spectatorCode}
+              spectatorCount={spectatorCount}
+              isEnabled={spectatorEnabled}
+              onEnable={enableSpectatorMode}
+              onDisable={disableSpectatorMode}
+            />
+          }
+        />
       </div>
     );
   }
