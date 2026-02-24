@@ -649,7 +649,7 @@ export default function AIPracticePage() {
   // ── LIVE SESSION ──
   if (screen === "session") {
     return (
-      <div className="flex flex-col h-[100dvh] md:h-[calc(100dvh-80px)]">
+      <div className="flex flex-col h-[calc(100dvh-80px)]">
         {/* Courtroom header bar — dark wood panelling effect */}
         <div className="bg-gradient-to-b from-[#1A0E08] to-navy border-b border-gold/10 shrink-0">
           {/* Rate limit banner */}

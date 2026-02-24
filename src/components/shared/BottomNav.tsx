@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { Home, Scale, Users, BookOpen, Target } from "lucide-react";
 import { cn } from "@/lib/utils/helpers";
+import { useSessionStore } from "@/stores/sessionStore";
 
 const tabs = [
   { href: "/home", label: "Home", Icon: Home },
@@ -16,6 +17,7 @@ const tabs = [
 
 export function BottomNav() {
   const pathname = usePathname();
+  const { isSessionActive } = useSessionStore();
 
   return (
     <nav
@@ -26,6 +28,9 @@ export function BottomNav() {
       <div className="mx-auto flex px-1 pt-2 pb-[max(env(safe-area-inset-bottom,0px),6px)]">
         {tabs.map((tab) => {
           const isActive = pathname?.startsWith(tab.href);
+          const isAIPractice = tab.href === "/ai-practice";
+          const showLiveDot = isAIPractice && isSessionActive;
+
           return (
             <Link
               key={tab.href}
@@ -40,21 +45,38 @@ export function BottomNav() {
                   transition={{ type: "spring", stiffness: 500, damping: 35 }}
                 />
               )}
-              <tab.Icon
-                size={22}
-                strokeWidth={isActive ? 2.5 : 1.5}
-                className={cn(
-                  "transition-all duration-200 shrink-0",
-                  isActive ? "text-gold" : "text-court-text-sec"
+
+              {/* Icon wrapper — relative so the live dot can sit on top */}
+              <div className="relative">
+                <tab.Icon
+                  size={22}
+                  strokeWidth={isActive ? 2.5 : 1.5}
+                  className={cn(
+                    "transition-all duration-200 shrink-0",
+                    isActive
+                      ? showLiveDot ? "text-red-400" : "text-gold"
+                      : showLiveDot ? "text-red-400/70" : "text-court-text-sec"
+                  )}
+                />
+
+                {/* Pulsing red "live" dot — like a recording indicator */}
+                {showLiveDot && (
+                  <span className="absolute -top-1 -right-1.5 flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500" />
+                  </span>
                 )}
-              />
+              </div>
+
               <span
                 className={cn(
                   "text-[10px] leading-tight font-semibold tracking-wide transition-colors duration-200 text-center",
-                  isActive ? "text-gold" : "text-court-text-sec"
+                  isActive
+                    ? showLiveDot ? "text-red-400" : "text-gold"
+                    : showLiveDot ? "text-red-400/70" : "text-court-text-sec"
                 )}
               >
-                {tab.label}
+                {showLiveDot ? "LIVE" : tab.label}
               </span>
             </Link>
           );
