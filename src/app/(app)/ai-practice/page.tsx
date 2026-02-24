@@ -737,7 +737,9 @@ export default function AIPracticePage() {
         )}
 
         {/* Chat messages — flex-end so messages start from bottom */}
-        <div className="flex-1 overflow-y-auto px-3 no-scrollbar flex flex-col justify-end">
+        <div className="flex-1 overflow-y-auto px-3 no-scrollbar flex flex-col">
+          {/* Spacer pushes messages to bottom when few, collapses when content overflows */}
+          <div className="flex-1" />
           <div>
           {messages.map((msg, i) => (
             <div key={i} className={`mb-3 flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
