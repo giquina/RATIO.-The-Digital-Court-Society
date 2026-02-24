@@ -156,7 +156,7 @@ export default function SpectatePage() {
 
           {/* Messages */}
           <AnimatePresence initial={false}>
-            {session.transcript.map((msg, i) => (
+            {session.transcript.map((msg: { role: string; message: string; timestamp?: number }, i: number) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 10 }}
