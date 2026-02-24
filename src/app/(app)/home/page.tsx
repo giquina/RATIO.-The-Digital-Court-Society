@@ -19,6 +19,8 @@ import {
 import { Scale, Calendar, Target, Trophy, Flame, Award, MessageCircle, ExternalLink } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { StarterKit } from "@/components/shared/StarterKit";
+import { useIsDemoAccount } from "@/hooks/useIsDemoAccount";
+import { DEMO_ACTIVITY_FEED, DEMO_PROFILE_STATS } from "@/lib/constants/demo-data";
 
 // ── Activity type → icon & colour mapping ──
 const ACTIVITY_ICON_MAP: Record<string, { Icon: LucideIcon; color: string }> = {
@@ -49,6 +51,7 @@ export default function HomePage() {
   const router = useRouter();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const profile: any = useQuery(anyApi.users.myProfile);
+  const isDemo = useIsDemoAccount();
   const [feedTab, setFeedTab] = useState<"following" | "discover" | "chamber">("following");
 
   // Real Convex feed + notifications
@@ -76,6 +79,23 @@ export default function HomePage() {
 
   const isLoading = profile === undefined;
 
+  // Demo account stat overrides — so stats section isn't all zeros
+  const stats = isDemo ? {
+    streakDays: DEMO_PROFILE_STATS.streakDays,
+    readinessScore: DEMO_PROFILE_STATS.readinessScore,
+    followerCount: 7,
+    commendationCount: 3,
+    totalMoots: DEMO_PROFILE_STATS.totalSessions,
+    totalHours: 4,
+  } : {
+    streakDays: profile?.streakDays ?? 0,
+    readinessScore: profile?.readinessScore ?? 0,
+    followerCount: profile?.followerCount ?? 0,
+    commendationCount: profile?.commendationCount ?? 0,
+    totalMoots: profile?.totalMoots ?? 0,
+    totalHours: profile?.totalHours ?? 0,
+  };
+
   return (
     <div className="pt-2 pb-6">
       {/* ── Starter Kit (new advocates) ── */}
@@ -94,18 +114,18 @@ export default function HomePage() {
               <div>
                 <p className="text-court-xs text-court-text-ter uppercase tracking-widest mb-1">Practice Streak</p>
                 <div className="flex items-baseline gap-1.5">
-                  <span className="font-serif text-3xl sm:text-4xl font-bold text-gold">{profile?.streakDays ?? 0}</span>
+                  <span className="font-serif text-3xl sm:text-4xl font-bold text-gold">{stats.streakDays}</span>
                   <span className="text-sm text-court-text-sec">days</span>
                 </div>
                 <p className="text-court-xs text-court-text-ter mt-1 flex items-center gap-1">
-                  <Flame size={12} className="text-orange-400" /> {profile?.streakDays === 0 ? "Start your streak today" : "Keep it going"}
+                  <Flame size={12} className="text-orange-400" /> {stats.streakDays === 0 ? "Start your streak today" : "Keep it going"}
                 </p>
               </div>
               <div className="text-center">
                 <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center"
-                  style={{ background: `conic-gradient(#C9A84C 0% ${profile?.readinessScore ?? 0}%, rgba(255,255,255,0.05) ${profile?.readinessScore ?? 0}% 100%)` }}>
+                  style={{ background: `conic-gradient(#C9A84C 0% ${stats.readinessScore}%, rgba(255,255,255,0.05) ${stats.readinessScore}% 100%)` }}>
                   <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-navy-card flex items-center justify-center">
-                    <span className="text-sm font-bold text-court-text">{profile?.readinessScore ?? 0}%</span>
+                    <span className="text-sm font-bold text-court-text">{stats.readinessScore}%</span>
                   </div>
                 </div>
                 <p className="text-court-xs text-court-text-ter uppercase tracking-wider mt-1">SQE2 Ready</p>
@@ -114,10 +134,10 @@ export default function HomePage() {
             {/* Social stats row */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 mt-4 pt-3.5 border-t border-court-border">
               {[
-                { v: profile?.followerCount ?? 0, l: "Followers" },
-                { v: profile?.commendationCount ?? 0, l: "Comms" },
-                { v: profile?.totalMoots ?? 0, l: "Sessions" },
-                { v: `${profile?.totalHours ?? 0}h`, l: "Advocacy" },
+                { v: stats.followerCount, l: "Followers" },
+                { v: stats.commendationCount, l: "Comms" },
+                { v: stats.totalMoots, l: "Sessions" },
+                { v: `${stats.totalHours}h`, l: "Advocacy" },
               ].map((s) => (
                 <div key={s.l} className="text-center min-w-0">
                   <div className="font-serif text-base font-bold text-court-text">{s.v}</div>
@@ -155,12 +175,28 @@ export default function HomePage() {
       {/* ── Upcoming Session ── */}
       <section className="px-4 lg:px-0 mb-6">
         <SectionHeader title="Your Next Session" action="View all" onAction={() => router.push("/sessions")} />
+        {isDemo ? (
+          <Card className="p-4">
+            <div className="flex justify-between items-start mb-2">
+              <div>
+                <p className="text-court-sm font-bold text-court-text">Constitutional Law — Royal Prerogative</p>
+                <p className="text-court-xs text-court-text-ter">Public Law · Group Moot</p>
+              </div>
+              <Tag color="green">Upcoming</Tag>
+            </div>
+            <p className="text-court-xs text-court-text-sec">
+              {new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+              {" · "}4 advocates · Hosted by Amara K.
+            </p>
+          </Card>
+        ) : (
         <EmptyState
           icon={<Calendar size={28} />}
           title="No upcoming sessions"
           description="Create or join a session to get started"
           action={<Button onClick={() => router.push("/sessions")}>Browse Sessions</Button>}
         />
+        )}
       </section>
 
       {/* ── Activity Feed ── */}
@@ -203,12 +239,35 @@ export default function HomePage() {
           )}
 
           {/* Empty state */}
-          {feed !== undefined && feed.length === 0 && (
+          {feed !== undefined && feed.length === 0 && !isDemo && (
             <EmptyState
               icon={<MessageCircle size={28} />}
               title="No activity yet"
               description="Follow other advocates or join a session to see activity here"
             />
+          )}
+
+          {/* Demo feed items */}
+          {feed !== undefined && feed.length === 0 && isDemo && (
+            DEMO_ACTIVITY_FEED.map((item) => {
+              const iconConfig = ACTIVITY_ICON_MAP[item.type] || { Icon: Scale, color: "text-court-text-sec" };
+              return (
+                <Card key={item._id} className="p-3.5">
+                  <div className="flex gap-2.5 items-start">
+                    <div className={`w-8 h-8 rounded-full bg-navy-card border border-court-border flex items-center justify-center shrink-0 ${iconConfig.color}`}>
+                      <iconConfig.Icon size={14} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-court-sm font-bold text-court-text">{item.title}</p>
+                      <p className="text-court-xs text-court-text-sec mt-0.5">{item.description}</p>
+                      <p className="text-court-xs text-court-text-ter mt-1.5">
+                        {new Date(item.timestamp).toLocaleDateString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+              );
+            })
           )}
 
           {/* Real feed items */}

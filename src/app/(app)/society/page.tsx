@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { anyApi } from "convex/server";
 import { Avatar, Tag, Card, FollowButton, SectionHeader, Skeleton, EmptyState, CardSkeleton } from "@/components/ui";
+import { useIsDemoAccount } from "@/hooks/useIsDemoAccount";
+import { DEMO_ADVOCATES, DEMO_LEADERBOARD } from "@/lib/constants/demo-data";
 import { Search, Scale, Medal, Trophy, Users } from "lucide-react";
 import { courtToast } from "@/lib/utils/toast";
 import type { Id } from "../../../../convex/_generated/dataModel";
@@ -19,8 +21,11 @@ export default function SocietyPage() {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const profile: any = useQuery(anyApi.users.myProfile);
+  const isDemo = useIsDemoAccount();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const leaderboard: any[] | undefined = useQuery(anyApi.profiles.getLeaderboard, { limit: 50 });
+  const leaderboardRaw: any[] | undefined = useQuery(anyApi.profiles.getLeaderboard, { limit: 50 });
+  // Demo fallback: if leaderboard is empty (or just the demo user), show mock advocates
+  const leaderboard = (leaderboardRaw && leaderboardRaw.length > 1) ? leaderboardRaw : (isDemo ? DEMO_LEADERBOARD : leaderboardRaw);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const following: any[] | undefined = useQuery(anyApi.social.getFollowing, profile ? { profileId: profile._id } : "skip");
   const toggleFollow = useMutation(anyApi.social.toggleFollow);

@@ -6,6 +6,8 @@ import { useQuery, useMutation } from "convex/react";
 import { anyApi } from "convex/server";
 import type { Id } from "../../../../convex/_generated/dataModel";
 import { Avatar, Tag, Card, Button, ProgressBar, EmptyState, SessionCardSkeleton } from "@/components/ui";
+import { useIsDemoAccount } from "@/hooks/useIsDemoAccount";
+import { DEMO_UPCOMING_SESSIONS, DEMO_PAST_SESSIONS } from "@/lib/constants/demo-data";
 import { Calendar, Clock, Check, BookOpen } from "lucide-react";
 import { courtToast } from "@/lib/utils/toast";
 
@@ -155,6 +157,7 @@ export default function SessionsPage() {
   // ── Real Convex data ──
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const profile: any = useQuery(anyApi.users.myProfile);
+  const isDemo = useIsDemoAccount();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const upcomingSessions: any[] | undefined = useQuery(anyApi.sessions.list, { status: "upcoming" });
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -275,6 +278,23 @@ export default function SessionsPage() {
             {upcomingSessions === undefined ? (
               renderSkeletons()
             ) : upcomingSessions.length === 0 ? (
+              isDemo ? (
+                DEMO_UPCOMING_SESSIONS.map((s) => (
+                  <Card key={s._id} className="p-4">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <p className="text-court-sm font-bold text-court-text">{s.title}</p>
+                        <p className="text-court-xs text-court-text-ter">{s.area} · {s.mode}</p>
+                      </div>
+                      <Tag color="green">Upcoming</Tag>
+                    </div>
+                    <p className="text-court-xs text-court-text-sec">
+                      {new Date(s.scheduledAt).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+                      {" · "}{s.participantCount} advocates · Hosted by {s.hostName}
+                    </p>
+                  </Card>
+                ))
+              ) : (
               <EmptyState
                 icon={<Calendar size={32} className="text-court-text-ter" />}
                 title="No Upcoming Sessions"
@@ -285,6 +305,7 @@ export default function SessionsPage() {
                   </Button>
                 }
               />
+              )
             ) : (
               upcomingSessions.map((s) => renderSessionCard(s))
             )}
@@ -296,6 +317,23 @@ export default function SessionsPage() {
             {pastSessions === undefined ? (
               renderSkeletons()
             ) : pastSessions.length === 0 ? (
+              isDemo ? (
+                DEMO_PAST_SESSIONS.map((s) => (
+                  <Card key={s._id} className="p-4">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <p className="text-court-sm font-bold text-court-text">{s.title}</p>
+                        <p className="text-court-xs text-court-text-ter">{s.area} · {s.personaName}</p>
+                      </div>
+                      <Tag color="gold">{s.overallScore}/5.0</Tag>
+                    </div>
+                    <div className="flex items-center gap-3 text-court-xs text-court-text-sec">
+                      <span>{s.exchanges}/{s.maxExchanges} exchanges</span>
+                      <span>{new Date(s.completedAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}</span>
+                    </div>
+                  </Card>
+                ))
+              ) : (
               <EmptyState
                 icon={<BookOpen size={32} className="text-court-text-ter" />}
                 title="No Past Sessions"
@@ -306,6 +344,7 @@ export default function SessionsPage() {
                   </Button>
                 }
               />
+              )
             ) : (
               pastSessions.map((s) => renderSessionCard(s, true))
             )}

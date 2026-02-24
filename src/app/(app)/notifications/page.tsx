@@ -3,6 +3,8 @@
 import { useQuery, useMutation } from "convex/react";
 import { anyApi } from "convex/server";
 import { Card, DynamicIcon, EmptyState, Skeleton } from "@/components/ui";
+import { useIsDemoAccount } from "@/hooks/useIsDemoAccount";
+import { DEMO_NOTIFICATIONS } from "@/lib/constants/demo-data";
 import { courtToast } from "@/lib/utils/toast";
 import { Bell } from "lucide-react";
 
@@ -40,11 +42,14 @@ function formatTimeAgo(timestamp: number) {
 export default function NotificationsPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const profile: any = useQuery(anyApi.users.myProfile);
+  const isDemo = useIsDemoAccount();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const notifications: any[] | undefined = useQuery(
+  const notificationsRaw: any[] | undefined = useQuery(
     anyApi.notifications.getAll,
     profile ? { profileId: profile._id } : "skip"
   );
+  // Demo fallback: show mock notifications when real ones are empty
+  const notifications = (notificationsRaw && notificationsRaw.length > 0) ? notificationsRaw : (isDemo ? DEMO_NOTIFICATIONS : notificationsRaw);
   const markRead = useMutation(anyApi.notifications.markRead);
   const markAllRead = useMutation(anyApi.notifications.markAllRead);
 
