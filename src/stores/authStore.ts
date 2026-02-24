@@ -91,7 +91,7 @@ export function isFeatureLocked(path: string, profile: Profile | null): boolean 
 }
 
 // ── Always accessible (even without profile) ──
-// /home, /sessions (view only), /law-book (read only), /community (browse),
+// /home, /sessions (view only), /law-book (read only), /society (browse),
 // /profile (to complete it), /settings, /notifications, /help, /about
 
 interface AuthState {

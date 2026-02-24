@@ -2,7 +2,7 @@
 
 > **Project:** Ratio — The Digital Court Society
 > **Audience:** Contributors, maintainers, and auditors
-> **Last updated:** 2026-02-23
+> **Last updated:** 2026-02-24
 
 ---
 
@@ -15,6 +15,7 @@
 | [PLAN.md](../PLAN.md) | High-level development roadmap and phase tracking | Accurate |
 | [TASK.md](../TASK.md) | Detailed task checklist with completion dates | Accurate |
 | [LOGS.md](../LOGS.md) | Per-session development logs | Accurate |
+| [CHANGELOG.md](../CHANGELOG.md) | Breaking changes, route migrations, structural updates | Accurate |
 | [SUGGESTIONS.md](../SUGGESTIONS.md) | Deferred feature ideas and backlog | Accurate |
 | [ARCHITECTURE.md](../ARCHITECTURE.md) | System architecture, route structure, design system | Accurate |
 | [SECURITY.md](../SECURITY.md) | Security architecture and vulnerability reporting | Accurate |

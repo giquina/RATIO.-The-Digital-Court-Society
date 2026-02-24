@@ -140,3 +140,65 @@
 - Create demo account seed function
 - Begin Stripe payment infrastructure
 - Wire remaining demo data pages to Convex
+
+---
+
+## Session 5 — 2026-02-24
+**Phase**: Mobile UX Overhaul + Route Migration
+**Duration**: ~3 hours
+
+### What Was Done
+
+**AI Practice Session Screen (complete overhaul):**
+- Real photo judge avatar with gold ring pulse animation + expression-aware status dots
+- Collapsible avatar (56px → 28px after first message, frees ~100px screen space)
+- Bigger input area (2 lines default, auto-grows to 120px)
+- Smart quick phrases (hidden while typing, collapsed to single row after 2+ messages)
+- Session toolbar cleanup (merged exchange counter + timer into compact pill)
+- Chat messages anchored to bottom (like iMessage) with spacer trick
+
+**Fullscreen Session Mode:**
+- Created zustand sessionStore (isSessionActive state)
+- Layout hides MobileHeader during active sessions
+- Full viewport height (100dvh) for session screen
+
+**LIVE Indicator on Bottom Nav:**
+- AI Practice tab turns red with pulsing dot during active session
+- Label changes "AI Practice" → "LIVE"
+
+**Session Dock (contextual bottom nav):**
+- Replaces regular bottom nav during sessions with 5 tools:
+  - Brief (case summary), Cases (authorities with tap-to-copy), Hints (AI coaching),
+    Notes (scratchpad), Session (timer, TTS, transcript, end session)
+- Bottom sheet slides up from dock, chat visible behind backdrop
+- Mode-aware hints (different tips for Judge/Mentor/Examiner/Opponent sessions)
+
+**Bug Fix — Chat Scroll:**
+- `justify-end` on scroll container was breaking upward scrolling
+- Replaced with flex-1 spacer div
+
+**Community → Society Rename:**
+- Renamed all UI labels from "Community" to "Society"
+- Added subtitles to Sessions and Society pages
+
+**Route Migration: `/community` → `/society`:**
+- Renamed folder `src/app/(app)/community/` → `src/app/(app)/society/`
+- Updated 11 files (links, tour IDs, aria labels, config, docs)
+- Added 301 redirect in next.config.js for old bookmarks
+- Created CHANGELOG.md for tracking breaking changes
+
+### Decisions Made
+- Route rename done now while user count is low (avoids breaking links later)
+- Convex badge `category: "community"` left unchanged (internal data, no user impact)
+- Natural English "community" in sentences left unchanged (correct usage)
+- CHANGELOG.md created as a permanent record of breaking/structural changes
+
+### Issues Encountered
+- Chat scroll bug from justify-end CSS (fixed with flex spacer)
+- Stale .next cache after folder rename (fixed by deleting .next)
+
+### Next Session Should
+- Wire demo data to Convex (Rankings, Chambers, Badges)
+- Create demo account seed function
+- Begin Stripe payment infrastructure (Phase 2.0)
+- PWA install prompt and icons

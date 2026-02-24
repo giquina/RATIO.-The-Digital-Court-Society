@@ -12,7 +12,7 @@ function getInitials(name: string) {
   return name.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
 }
 
-export default function CommunityPage() {
+export default function SocietyPage() {
   const [tab, setTab] = useState(0);
   const [filterTab, setFilterTab] = useState(0);
   const [search, setSearch] = useState("");
@@ -96,7 +96,7 @@ export default function CommunityPage() {
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search advocates, universities..."
             className="flex-1 bg-transparent text-xs text-court-text outline-none placeholder:text-court-text-ter"
-            aria-label="Search community"
+            aria-label="Search society"
           />
           {search && (
             <button onClick={() => setSearch("")} className="text-court-text-ter text-xs">{"\u2715"}</button>

@@ -52,6 +52,11 @@ const nextConfig = {
         destination: "https://ratiothedigitalcourtsociety.com/:path*",
         permanent: true,
       },
+      {
+        source: "/community",
+        destination: "/society",
+        permanent: true,
+      },
     ];
   },
 

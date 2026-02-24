@@ -87,7 +87,7 @@ const sections: NavSection[] = [
     items: [
       { href: "/rankings", label: "Rankings", icon: Trophy, tooltip: "Advocate leaderboard", subtitle: "Advocate leaderboard" },
       { href: "/chambers", label: "Chambers", icon: Landmark, tooltip: "Your Inn of Court group", subtitle: "Your Inn of Court group" },
-      { href: "/community", label: "Society", icon: Users, tooltip: "Fellow advocates", tourId: "nav-community" },
+      { href: "/society", label: "Society", icon: Users, tooltip: "Fellow advocates", tourId: "nav-society" },
     ],
   },
   {

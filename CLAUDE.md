@@ -34,7 +34,7 @@ npx convex run seed:run # seed badges + starter resources
 
 Two route groups under `src/app/`:
 - `(auth)/` — login, register, onboarding, verify, forgot-password, reset-password. `layout-client.tsx` redirects already-authenticated users to `/home` (except `/onboarding` and `/register`).
-- `(app)/` — 19 authenticated routes: home, sessions, community, ai-practice, library, law-book, profile, notifications, settings, rankings, chambers, badges, research, parliament, tribunal, portfolio, tools, about, help. `layout-client.tsx` checks `useConvexAuth()` + `anyApi.users.hasProfile`; redirects unauthenticated → `/login`, no profile → `/onboarding`.
+- `(app)/` — 19 authenticated routes: home, sessions, society, ai-practice, library, law-book, profile, notifications, settings, rankings, chambers, badges, research, parliament, tribunal, portfolio, tools, about, help. `layout-client.tsx` checks `useConvexAuth()` + `anyApi.users.hasProfile`; redirects unauthenticated → `/login`, no profile → `/onboarding`.
 
 The `(app)` shell renders `<Sidebar>` (desktop), `<MobileHeader>` + `<BottomNav>` (mobile, 4 tabs: Home, Sessions, Law Book, Community), and `<TheClerk>` (help overlay). Sidebar width is managed by `useSidebarStore` (Zustand): collapsed = 72px, expanded = 240px. Main content uses `md:ml-[72px]` / `lg:ml-[240px]`.
 

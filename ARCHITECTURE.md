@@ -41,7 +41,7 @@ Authenticated routes (19+):
 - `/home` -- Dashboard
 - `/sessions` -- Practice sessions
 - `/ai-practice` -- AI-powered moot practice
-- `/community` -- Social feed
+- `/society` -- Social feed, discover advocates, rankings
 - `/profile` -- Advocate profile
 - `/settings` -- Account settings
 - `/rankings` -- Leaderboards

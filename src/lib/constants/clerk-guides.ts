@@ -112,7 +112,7 @@ export const ROUTE_GUIDES: RouteGuide[] = [
     ],
   },
   {
-    route: "/community",
+    route: "/society",
     title: "The Advocate Society",
     description:
       "Discover fellow advocates, build your network, and see how you compare across the national rankings.",

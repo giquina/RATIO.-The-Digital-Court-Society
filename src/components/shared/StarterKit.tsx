@@ -84,8 +84,8 @@ export function StarterKit({ profile, onDismiss }: StarterKitProps) {
       id: "follow",
       title: "Follow an advocate",
       description: "Connect with peers in your chamber",
-      href: "/community",
-      actionLabel: "Browse community",
+      href: "/society",
+      actionLabel: "Browse society",
       isComplete: false,
     },
   ];

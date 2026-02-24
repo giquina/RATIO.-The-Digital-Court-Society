@@ -55,8 +55,8 @@ export const TOUR_STEPS: TourStep[] = [
     position: "right",
   },
   {
-    id: "community",
-    target: "[data-tour='nav-community']",
+    id: "society",
+    target: "[data-tour='nav-society']",
     title: "Society",
     description:
       "Connect with fellow advocates. Follow peers, view chamber rankings, and commend outstanding contributions to the court.",
@@ -75,7 +75,7 @@ export const TOUR_STEPS: TourStep[] = [
     target: "[data-tour='nav-profile']",
     title: "Your Profile",
     description:
-      "Complete your advocate profile to appear in the community directory. Add your university, chamber preference, and areas of legal interest.",
+      "Complete your advocate profile to appear in the society directory. Add your university, chamber preference, and areas of legal interest.",
     position: "right",
   },
 ];

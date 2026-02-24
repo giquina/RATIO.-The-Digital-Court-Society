@@ -47,7 +47,7 @@ src/
 │   ├── (app)/           # Authenticated app with bottom nav
 │   │   ├── home/        # Dashboard, streak, activity feed
 │   │   ├── sessions/    # Browse, create, detail with role claiming
-│   │   ├── community/   # Discover, rankings, chambers
+│   │   ├── society/     # Discover, rankings, chambers
 │   │   ├── ai-practice/ # AI Judge, Mentor, SQE2 Examiner
 │   │   ├── library/     # Templates, guides, case bank
 │   │   └── profile/     # Stats, skills, portfolio
