@@ -653,7 +653,7 @@ export default function AIPracticePage() {
   // ── LIVE SESSION ──
   if (screen === "session") {
     return (
-      <div className="flex flex-col h-dvh pb-[60px]">
+      <div className="flex flex-col h-dvh pb-[60px] md:pb-0">
         {/* ── Courtroom Header ── */}
         <div className="bg-gradient-to-b from-[#1A0E08] via-[#130D06] to-navy border-b border-gold/10 shrink-0">
           {rateLimited && (
@@ -664,55 +664,57 @@ export default function AIPracticePage() {
             </div>
           )}
 
-          {/* Row 1: End Session | LIVE | Timer */}
-          <div className="px-3 pt-2 pb-1 flex justify-between items-center">
-            <button
-              onClick={() => {
-                if (confirm("End this session? You will receive your assessment.")) endSession();
-              }}
-              className="flex items-center gap-1 text-court-text-ter hover:text-court-text transition-colors"
-            >
-              <span className="text-xs">←</span>
-              <span className="text-[11px] font-medium">End</span>
-            </button>
+          <div className="max-w-3xl mx-auto">
+            {/* Row 1: End Session | LIVE | Timer */}
+            <div className="px-3 md:px-6 pt-2 md:pt-3 pb-1 flex justify-between items-center">
+              <button
+                onClick={() => {
+                  if (confirm("End this session? You will receive your assessment.")) endSession();
+                }}
+                className="flex items-center gap-1 text-court-text-ter hover:text-court-text transition-colors"
+              >
+                <span className="text-xs md:text-sm">←</span>
+                <span className="text-[11px] md:text-sm font-medium">End Session</span>
+              </button>
 
-            <div className="flex items-center gap-1.5">
-              <span className="flex h-2 w-2 shrink-0 relative">
-                <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-red-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
-              </span>
-              <span className="text-[10px] font-bold text-red-400 uppercase tracking-wider">Live</span>
+              <div className="flex items-center gap-1.5">
+                <span className="flex h-2 w-2 shrink-0 relative">
+                  <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-red-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
+                </span>
+                <span className="text-[10px] md:text-xs font-bold text-red-400 uppercase tracking-wider">Live</span>
+              </div>
+
+              <div className="text-[11px] md:text-sm text-court-text-ter font-mono flex items-center gap-1.5">
+                <span>{exchangeCount}/{MAX_EXCHANGES}</span>
+                <span className="text-court-border">·</span>
+                <span className="text-red-400 font-bold">{formatTime(timer)}</span>
+              </div>
             </div>
 
-            <div className="text-[11px] text-court-text-ter font-mono flex items-center gap-1.5">
-              <span>{exchangeCount}/{MAX_EXCHANGES}</span>
-              <span className="text-court-border">·</span>
-              <span className="text-red-400 font-bold">{formatTime(timer)}</span>
+            {/* Row 2: Judge avatar + name + temperament */}
+            <div className="px-3 md:px-6 pb-1.5 flex items-center gap-2 md:gap-3">
+              <JudgeAvatar
+                isActive={aiSpeaking || isLoading}
+                isListening={isRecordingActive}
+                responseText={lastAiResponse}
+                size={32}
+              />
+              <div className="min-w-0 flex-1">
+                <p className="text-xs md:text-sm font-bold text-court-text truncate">{displayPersonaName}</p>
+                <p className="text-[10px] md:text-xs text-court-text-ter truncate">
+                  {mode === "judge" ? JUDGE_TEMPERAMENTS[temperament]?.subtitle : persona.subtitle}
+                </p>
+              </div>
             </div>
-          </div>
 
-          {/* Row 2: Judge avatar + name + temperament */}
-          <div className="px-3 pb-1.5 flex items-center gap-2">
-            <JudgeAvatar
-              isActive={aiSpeaking || isLoading}
-              isListening={isRecordingActive}
-              responseText={lastAiResponse}
-              size={32}
-            />
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-bold text-court-text truncate">{displayPersonaName}</p>
-              <p className="text-[10px] text-court-text-ter truncate">
-                {mode === "judge" ? JUDGE_TEMPERAMENTS[temperament]?.subtitle : persona.subtitle}
-              </p>
-            </div>
-          </div>
-
-          {/* Row 3: Case + Role */}
-          <div className="px-3 pb-2 flex items-start gap-2">
-            <div className="w-[32px] shrink-0" /> {/* Align with avatar above */}
-            <div className="min-w-0 flex-1">
-              <p className="text-[10px] text-gold/70 truncate">{brief.matter.split('—')[0].trim()}</p>
-              <p className="text-[10px] text-court-text-ter truncate">{brief.yourRole}</p>
+            {/* Row 3: Case + Role */}
+            <div className="px-3 md:px-6 pb-2 md:pb-3 flex items-start gap-2 md:gap-3">
+              <div className="w-[32px] shrink-0" />
+              <div className="min-w-0 flex-1">
+                <p className="text-[10px] md:text-xs text-gold/70 truncate">{brief.matter.split('—')[0].trim()}</p>
+                <p className="text-[10px] md:text-xs text-court-text-ter truncate">{brief.yourRole}</p>
+              </div>
             </div>
           </div>
         </div>
@@ -729,41 +731,41 @@ export default function AIPracticePage() {
 
         {/* Status strip — shows judge state when in conversation */}
         {isLoading && (
-          <div className="px-3 py-1.5 bg-gold/[0.03] border-b border-gold/10 shrink-0">
-            <div className="flex items-center gap-2">
+          <div className="px-3 md:px-6 py-1.5 bg-gold/[0.03] border-b border-gold/10 shrink-0">
+            <div className="flex items-center gap-2 max-w-3xl mx-auto">
               <motion.div
                 animate={{ rotate: [0, -10, 0, 10, 0] }}
                 transition={{ duration: 2, repeat: Infinity }}
               >
                 <Scale size={12} className="text-gold/60" />
               </motion.div>
-              <p className="text-[11px] text-court-text-ter italic">The court is considering your submission...</p>
+              <p className="text-[11px] md:text-sm text-court-text-ter italic">The court is considering your submission...</p>
             </div>
           </div>
         )}
 
-        {/* Chat messages — flex-end so messages start from bottom */}
-        <div className="flex-1 overflow-y-auto px-3 no-scrollbar flex flex-col">
-          <div>
+        {/* Chat messages */}
+        <div className="flex-1 overflow-y-auto px-3 md:px-6 no-scrollbar flex flex-col">
+          <div className="max-w-3xl mx-auto w-full">
           {messages.map((msg, i) => (
-            <div key={i} className={`mb-3 flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+            <div key={i} className={`mb-3 md:mb-4 flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
               {msg.role === "user" ? (
                 /* User submissions — formal brief style */
-                <div className="max-w-[85%] rounded-2xl rounded-br-md bg-gold/10 border border-gold/20 px-4 py-2.5">
-                  <p className="text-[10px] font-bold text-gold/70 mb-1">
+                <div className="max-w-[85%] md:max-w-[70%] rounded-2xl rounded-br-md bg-gold/10 border border-gold/20 px-4 py-2.5">
+                  <p className="text-[10px] md:text-xs font-bold text-gold/70 mb-1">
                     Counsel · {msg.time}
                   </p>
-                  <p className="text-[13px] text-court-text leading-relaxed">{msg.text}</p>
+                  <p className="text-[13px] md:text-[15px] text-court-text leading-relaxed">{msg.text}</p>
                 </div>
               ) : (
                 /* Judge messages — transcript style with gold accent line */
-                <div className="max-w-[90%] flex gap-0">
+                <div className="max-w-[90%] md:max-w-[80%] flex gap-0">
                   <div className="w-[3px] rounded-full bg-gold/30 shrink-0 my-1" />
                   <div className="pl-3 py-1">
-                    <p className="text-[10px] font-medium text-gold/50 mb-1">
+                    <p className="text-[10px] md:text-xs font-medium text-gold/50 mb-1">
                       {displayPersonaName} · {msg.time} · Exchange {Math.ceil((i + 1) / 2)} of {MAX_EXCHANGES}
                     </p>
-                    <p className="text-[15px] text-court-text leading-[1.65] font-[410]">{msg.text}</p>
+                    <p className="text-[15px] md:text-base text-court-text leading-[1.65] font-[410]">{msg.text}</p>
                   </div>
                 </div>
               )}
@@ -772,7 +774,7 @@ export default function AIPracticePage() {
           {/* Enhanced loading indicator */}
           {isLoading && (
             <div className="mb-3 flex justify-start">
-              <div className="max-w-[90%] flex gap-0">
+              <div className="max-w-[90%] md:max-w-[80%] flex gap-0">
                 <div className="w-[3px] rounded-full bg-gold/20 shrink-0 my-1 animate-pulse" />
                 <div className="pl-3 py-1">
                   <p className="text-[10px] font-medium text-gold/40 mb-1">{displayPersonaName}</p>
@@ -796,18 +798,21 @@ export default function AIPracticePage() {
         {/* Quick phrases — hidden when typing, collapsed after first exchange */}
         {!isTyping && (
           <div className={cn(
-            "px-3 py-1 border-t border-court-border-light/20 shrink-0 transition-all",
+            "px-3 md:px-6 py-1 border-t border-court-border-light/20 shrink-0 transition-all",
             messages.length > 2 && "max-h-[44px] overflow-hidden"
           )}>
-            <ObjectionButtons
-              onInsert={(text) => setInputText((prev) => prev + text)}
-              disabled={isLoading || exchangeCount >= MAX_EXCHANGES}
-            />
+            <div className="max-w-3xl mx-auto">
+              <ObjectionButtons
+                onInsert={(text) => setInputText((prev) => prev + text)}
+                disabled={isLoading || exchangeCount >= MAX_EXCHANGES}
+              />
+            </div>
           </div>
         )}
 
         {/* Input area — larger and more comfortable */}
-        <div className="px-3 pt-1.5 pb-1 border-t border-court-border-light bg-gradient-to-t from-[#0A0A1A] to-navy shrink-0">
+        <div className="px-3 md:px-6 pt-1.5 pb-1 border-t border-court-border-light bg-gradient-to-t from-[#0A0A1A] to-navy shrink-0">
+          <div className="max-w-3xl mx-auto">
           {/* Voice/input errors */}
           {(inputError || (voiceInput.error && voiceInput.error !== "WHISPER_UNAVAILABLE")) && (
             <div className="flex items-center gap-1.5 mb-1.5 px-1">
@@ -893,6 +898,7 @@ export default function AIPracticePage() {
                 <ArrowUp size={18} className="text-navy" />
               </button>
             </div>
+          </div>
           </div>
         </div>
 
