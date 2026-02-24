@@ -67,6 +67,8 @@ export default function SocietyPage() {
 
   const handleFollow = async (targetProfileId: Id<"profiles">) => {
     if (!profile) return;
+    // Skip Convex mutation for demo mock profiles (IDs start with "demo_")
+    if (typeof targetProfileId === "string" && targetProfileId.startsWith("demo_")) return;
     try {
       await toggleFollow({ followerId: profile._id, followingId: targetProfileId });
     } catch {

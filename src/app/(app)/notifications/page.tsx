@@ -57,7 +57,7 @@ export default function NotificationsPage() {
   const read = (notifications ?? []).filter((n) => n.read);
 
   const handleMarkAllRead = async () => {
-    if (!profile) return;
+    if (!profile || isDemo) return;
     try {
       await markAllRead({ profileId: profile._id });
     } catch {
@@ -66,6 +66,8 @@ export default function NotificationsPage() {
   };
 
   const handleNotificationClick = async (notificationId: string) => {
+    // Skip Convex mutation for demo mock notifications
+    if (isDemo) return;
     try {
       await markRead({ notificationId: notificationId as any });
     } catch {
