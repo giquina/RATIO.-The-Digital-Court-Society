@@ -22,6 +22,9 @@ const MAX_BODY_SIZE = 256 * 1024;
 /** The four AI practice modes available in Ratio. */
 const AI_MODES = ["judge", "mentor", "examiner", "opponent"] as const;
 
+/** Judge temperament variants. */
+const JUDGE_TEMPERAMENTS = ["standard", "strict", "pragmatist", "socratic"] as const;
+
 /** Valid message roles for the chat history array. */
 const MESSAGE_ROLES = ["user", "assistant"] as const;
 
@@ -50,6 +53,7 @@ export const chatRequestSchema = z
     mode: modeSchema,
     messages: z.array(messageSchema).min(1).max(60),
     caseContext: z.string().max(5000).default(""),
+    temperament: z.enum(JUDGE_TEMPERAMENTS).default("standard"),
   })
   .strict();
 

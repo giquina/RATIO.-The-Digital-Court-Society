@@ -3,9 +3,28 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Tag, Card, Button, ProgressBar, DynamicIcon } from "@/components/ui";
 import { AI_PERSONAS, FEEDBACK_DIMENSIONS } from "@/lib/constants/app";
-import { Lightbulb, Book, Mic, Pause, ArrowUp, Scale, AlertCircle } from "lucide-react";
+import { Lightbulb, Book, Mic, MicOff, Pause, ArrowUp, Scale, AlertCircle, Volume2, VolumeX } from "lucide-react";
 import ModeSelector from "@/components/ai-practice/ModeSelector";
+import JudgeAvatar from "@/components/ai-practice/JudgeAvatar";
+import ObjectionButtons from "@/components/ai-practice/ObjectionButtons";
+import TranscriptPanel from "@/components/ai-practice/TranscriptPanel";
+import { useVoiceInput } from "@/hooks/useVoiceInput";
+import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
+import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
 import { cn } from "@/lib/utils/helpers";
+import {
+  playCourtInSession,
+  playJudgeResponse,
+  playMessageSent,
+  playChime,
+  playRecordBeep,
+  playRecordStopBeep,
+  resumeAudio,
+} from "@/lib/utils/sounds";
+import {
+  JUDGE_TEMPERAMENTS,
+  type JudgeTemperament,
+} from "@/lib/ai/system-prompts";
 
 type Screen = "select" | "briefing" | "session" | "loading-feedback" | "feedback";
 type Mode = "judge" | "mentor" | "examiner" | "opponent";
@@ -68,17 +87,23 @@ const FALLBACK_KEY_STRENGTH = "Well-structured opening submissions following IRA
 
 const FALLBACK_KEY_IMPROVEMENT = "When facing a judicial intervention, take a moment before responding. Your instinct to answer immediately led to imprecise language when discussing the GCHQ distinction. Pause, consider the exact question, then respond with specificity.";
 
+// ── Emote stripping safety net ──
+function stripEmotes(text: string): string {
+  return text.replace(/\*[^*]+\*/g, "").replace(/\s{2,}/g, " ").trim();
+}
+
 export default function AIPracticePage() {
   const [screen, setScreen] = useState<Screen>("select");
   const [mode, setMode] = useState<Mode>("judge");
+  const [temperament, setTemperament] = useState<JudgeTemperament>("standard");
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState("");
-  const [isListening, setIsListening] = useState(false);
   const [aiSpeaking, setAiSpeaking] = useState(false);
   const [timer, setTimer] = useState(900);
   const [timerActive, setTimerActive] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [lastAiResponse, setLastAiResponse] = useState("");
 
   // API integration state
   const [apiMessages, setApiMessages] = useState<Array<{role: 'user' | 'assistant'; content: string}>>([]);
@@ -97,13 +122,27 @@ export default function AIPracticePage() {
   const [inputError, setInputError] = useState<string | null>(null);
   const [feedbackFallback, setFeedbackFallback] = useState(false);
 
+  // Voice input (Whisper)
+  const voiceInput = useVoiceInput();
+  // Browser speech recognition (fallback)
+  const browserSpeech = useSpeechRecognition();
+  const [useWhisper, setUseWhisper] = useState(true);
+  // Text-to-speech
+  const tts = useSpeechSynthesis();
+
   const persona = AI_PERSONAS[mode];
   const brief = CASE_BRIEFS[mode];
+
+  // Get the display name for judge (may vary by temperament)
+  const displayPersonaName = mode === "judge"
+    ? JUDGE_TEMPERAMENTS[temperament]?.name || persona.name
+    : persona.name;
 
   const buildCaseContext = useCallback(() => {
     return `${brief.area}: ${brief.matter}. Role: ${brief.yourRole}. Authorities: ${brief.authorities.join(', ')}`;
   }, [brief]);
 
+  // Timer
   useEffect(() => {
     if (timerActive && timer > 0) {
       timerRef.current = setInterval(() => setTimer((t) => t - 1), 1000);
@@ -111,11 +150,12 @@ export default function AIPracticePage() {
     }
   }, [timerActive, timer]);
 
+  // Auto-scroll chat
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Auto-dismiss rate limit banner after 10 seconds
+  // Auto-dismiss rate limit banner
   useEffect(() => {
     if (rateLimited) {
       const timeout = setTimeout(() => setRateLimited(false), 10000);
@@ -123,8 +163,56 @@ export default function AIPracticePage() {
     }
   }, [rateLimited]);
 
+  // When Whisper transcript arrives, insert into input
+  useEffect(() => {
+    if (voiceInput.transcript) {
+      setInputText((prev) => (prev ? prev + " " : "") + voiceInput.transcript);
+      voiceInput.clearTranscript();
+    }
+  }, [voiceInput.transcript, voiceInput.clearTranscript]);
+
+  // When Whisper is unavailable, switch to browser fallback
+  useEffect(() => {
+    if (voiceInput.error === "WHISPER_UNAVAILABLE") {
+      setUseWhisper(false);
+      voiceInput.clearTranscript();
+    }
+  }, [voiceInput.error, voiceInput.clearTranscript]);
+
+  // When browser speech recognition transcript updates, insert into input
+  useEffect(() => {
+    if (!useWhisper && browserSpeech.transcript) {
+      setInputText(browserSpeech.transcript);
+    }
+  }, [useWhisper, browserSpeech.transcript]);
+
   const formatTime = (s: number) => `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, "0")}`;
 
+  // ── Voice toggle handler ──
+  const handleVoiceToggle = () => {
+    resumeAudio();
+    if (useWhisper) {
+      if (voiceInput.isRecording) {
+        voiceInput.stopRecording();
+        playRecordStopBeep();
+      } else {
+        voiceInput.startRecording();
+        playRecordBeep();
+      }
+    } else {
+      if (browserSpeech.isListening) {
+        browserSpeech.stopListening();
+        playRecordStopBeep();
+      } else {
+        browserSpeech.startListening();
+        playRecordBeep();
+      }
+    }
+  };
+
+  const isRecordingActive = useWhisper ? voiceInput.isRecording : browserSpeech.isListening;
+
+  // ── Start session ──
   const startSession = async () => {
     setScreen("session");
     setTimerActive(true);
@@ -132,6 +220,10 @@ export default function AIPracticePage() {
     setError(null);
     setFeedbackData(null);
     setFeedbackFallback(false);
+    setLastAiResponse("");
+
+    resumeAudio();
+    playCourtInSession();
 
     const openings: Record<Mode, string> = {
       judge: "This court is now in session. I have read the papers before me. Counsel for the Appellant, you may begin your submissions. Please state the central issue you invite this court to determine.",
@@ -140,7 +232,6 @@ export default function AIPracticePage() {
       opponent: "Counsel, I appear for the Defence. I will be making submissions that the confession evidence was obtained in breach of PACE. You may begin for the Prosecution.",
     };
 
-    // Try to get AI opening from the API
     let openingText = openings[mode];
     try {
       const initialApiMessages: Array<{role: 'user' | 'assistant'; content: string}> = [
@@ -154,25 +245,24 @@ export default function AIPracticePage() {
           mode,
           messages: initialApiMessages,
           caseContext: buildCaseContext(),
+          temperament: mode === "judge" ? temperament : "standard",
         }),
       });
 
       if (res.ok) {
         const data = await res.json();
         if (data.content) {
-          openingText = data.content;
+          openingText = stripEmotes(data.content);
           setApiMessages([
             { role: 'user', content: 'Begin the session. Provide your opening statement in character.' },
             { role: 'assistant', content: openingText },
           ]);
         }
       }
-      // On non-ok responses, fall through to use hardcoded opening
     } catch {
-      // API unavailable — use fallback opening (already set)
+      // API unavailable — use fallback
     }
 
-    // If apiMessages weren't set by the API call, initialize with the fallback
     setApiMessages((prev) => {
       if (prev.length === 0) {
         return [
@@ -188,25 +278,37 @@ export default function AIPracticePage() {
       text: openingText,
       time: new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }),
     }]);
+    setLastAiResponse(openingText);
     setAiSpeaking(true);
+
+    // TTS: speak the opening
+    tts.speak(openingText);
+
     setTimeout(() => setAiSpeaking(false), 3000);
   };
 
+  // ── Send message ──
   const sendMessage = async () => {
     if (!inputText.trim()) return;
 
-    // Validate message length
     if (inputText.length > MAX_MESSAGE_LENGTH) {
       setInputError(`Submissions must not exceed ${MAX_MESSAGE_LENGTH} characters. Current: ${inputText.length}`);
       return;
     }
     setInputError(null);
 
-    // Check exchange limit
     if (exchangeCount >= MAX_EXCHANGES) {
       setError("This session has reached its conclusion. Please end the session to receive your assessment.");
       return;
     }
+
+    // Stop any voice recording
+    if (isRecordingActive) {
+      if (useWhisper) voiceInput.stopRecording();
+      else browserSpeech.stopListening();
+    }
+    // Stop browser speech recognition transcript
+    if (!useWhisper) browserSpeech.resetTranscript();
 
     const userMsg: Message = {
       role: "user",
@@ -218,6 +320,10 @@ export default function AIPracticePage() {
     setAiSpeaking(true);
     setIsLoading(true);
     setError(null);
+    playMessageSent();
+
+    // Stop TTS if playing
+    tts.stop();
 
     const updatedApiMessages: Array<{role: 'user' | 'assistant'; content: string}> = [
       ...apiMessages,
@@ -232,6 +338,7 @@ export default function AIPracticePage() {
           mode,
           messages: updatedApiMessages,
           caseContext: buildCaseContext(),
+          temperament: mode === "judge" ? temperament : "standard",
         }),
       });
 
@@ -239,7 +346,6 @@ export default function AIPracticePage() {
         setRateLimited(true);
         setAiSpeaking(false);
         setIsLoading(false);
-        // Revert the user message from apiMessages since we didn't get a response
         return;
       }
 
@@ -251,15 +357,15 @@ export default function AIPracticePage() {
         return;
       }
 
-      if (!res.ok) {
-        throw new Error(`Server error: ${res.status}`);
-      }
+      if (!res.ok) throw new Error(`Server error: ${res.status}`);
 
       const data = await res.json();
-      const aiText = data.content || AI_RESPONSES[Math.min(exchangeCount, AI_RESPONSES.length - 1)];
+      const rawAiText = data.content || AI_RESPONSES[Math.min(exchangeCount, AI_RESPONSES.length - 1)];
+      const aiText = stripEmotes(rawAiText);
 
       setApiMessages([...updatedApiMessages, { role: 'assistant', content: aiText }]);
       setExchangeCount((c) => c + 1);
+      setLastAiResponse(aiText);
       setMessages((prev) => [
         ...prev,
         {
@@ -268,15 +374,19 @@ export default function AIPracticePage() {
           time: new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }),
         },
       ]);
+
+      playJudgeResponse();
+      tts.speak(aiText);
+
       setAiSpeaking(false);
       setIsLoading(false);
     } catch {
-      // Fallback to hardcoded responses
       const responseIdx = Math.min(exchangeCount, AI_RESPONSES.length - 1);
       const fallbackText = AI_RESPONSES[responseIdx];
 
       setApiMessages([...updatedApiMessages, { role: 'assistant', content: fallbackText }]);
       setExchangeCount((c) => c + 1);
+      setLastAiResponse(fallbackText);
       setMessages((prev) => [
         ...prev,
         {
@@ -291,8 +401,11 @@ export default function AIPracticePage() {
     }
   };
 
+  // ── End session ──
   const endSession = async () => {
     setTimerActive(false);
+    tts.stop();
+    playChime();
     setScreen("loading-feedback");
 
     const sessionDuration = 900 - timer;
@@ -323,7 +436,6 @@ export default function AIPracticePage() {
         throw new Error('Feedback API error');
       }
     } catch {
-      // Fall back to hardcoded scores
       setFeedbackData({
         scores: FALLBACK_SCORES,
         overall: parseFloat((Object.values(FALLBACK_SCORES).reduce((a, b) => a + b, 0) / 7).toFixed(1)),
@@ -334,10 +446,7 @@ export default function AIPracticePage() {
       setFeedbackFallback(true);
     }
 
-    // Brief interstitial delay before showing feedback
-    setTimeout(() => {
-      setScreen("feedback");
-    }, 4000);
+    setTimeout(() => setScreen("feedback"), 4000);
   };
 
   // ── LOADING FEEDBACK INTERSTITIAL ──
@@ -388,11 +497,41 @@ export default function AIPracticePage() {
               <DynamicIcon name={persona.icon} size={20} className="text-court-text" />
             </div>
             <div>
-              <h1 className="font-serif text-xl font-bold text-court-text">{persona.name}</h1>
+              <h1 className="font-serif text-xl font-bold text-court-text">{displayPersonaName}</h1>
               <p className="text-court-sm text-court-text-ter">{persona.subtitle}</p>
             </div>
           </div>
         </div>
+
+        {/* Judge Temperament Selector (only for judge mode) */}
+        {mode === "judge" && (
+          <div className="px-4 mb-4">
+            <p className="text-court-xs text-court-text-ter uppercase tracking-widest mb-2">Judicial Temperament</p>
+            <div className="grid grid-cols-2 gap-2">
+              {(Object.entries(JUDGE_TEMPERAMENTS) as [JudgeTemperament, typeof JUDGE_TEMPERAMENTS[JudgeTemperament]][]).map(([key, temp]) => (
+                <button
+                  key={key}
+                  onClick={() => setTemperament(key)}
+                  className={cn(
+                    "p-3 rounded-lg border text-left transition-all",
+                    temperament === key
+                      ? "border-gold/40 bg-gold/8"
+                      : "border-court-border bg-navy-card hover:border-white/10"
+                  )}
+                >
+                  <p className={cn(
+                    "text-court-sm font-bold mb-0.5",
+                    temperament === key ? "text-gold" : "text-court-text"
+                  )}>
+                    {temp.subtitle}
+                  </p>
+                  <p className="text-court-xs text-court-text-ter leading-snug">{temp.description}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="px-4">
           <Card className="p-4 mb-3">
             <h2 className="font-serif text-sm font-bold text-gold mb-3 uppercase tracking-wider">Session Briefing</h2>
@@ -433,31 +572,53 @@ export default function AIPracticePage() {
   if (screen === "session") {
     return (
       <div className="flex flex-col h-[calc(100dvh-80px)]">
-        {/* Rate limit banner */}
-        {rateLimited && (
-          <div className="px-4 py-2.5 bg-amber-500/10 border-b border-amber-500/20 shrink-0">
-            <p className="text-court-xs text-amber-400 text-center">
-              The court requires a brief recess. Please wait a moment before continuing.
-            </p>
-          </div>
-        )}
+        {/* Courtroom header bar — dark wood panelling effect */}
+        <div className="bg-gradient-to-b from-[#1A0E08] to-navy border-b border-gold/10 shrink-0">
+          {/* Rate limit banner */}
+          {rateLimited && (
+            <div className="px-4 py-2 bg-amber-500/10 border-b border-amber-500/20">
+              <p className="text-court-xs text-amber-400 text-center">
+                The court requires a brief recess. Please wait a moment.
+              </p>
+            </div>
+          )}
 
-        <div className="px-4 pt-3 pb-2 flex justify-between items-center border-b border-court-border-light shrink-0">
-          <div className="flex items-center gap-2">
-            <DynamicIcon name={persona.icon} size={16} className="text-court-text" />
-            <span className="text-xs font-bold text-court-text">{persona.name}</span>
-          </div>
-          <div className="flex items-center gap-3">
-            {/* Exchange count indicator */}
-            <div className="bg-navy-card border border-court-border rounded-full px-2.5 py-0.5 text-court-xs text-court-text-ter font-mono">
-              {exchangeCount}/{MAX_EXCHANGES}
+          <div className="px-4 pt-3 pb-2 flex justify-between items-center">
+            <div className="flex items-center gap-2">
+              <DynamicIcon name={persona.icon} size={16} className="text-gold/70" />
+              <span className="text-xs font-bold text-court-text">{displayPersonaName}</span>
             </div>
-            <div className="bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-1 text-xs font-bold text-red-400 font-mono">
-              {formatTime(timer)}
+            <div className="flex items-center gap-2">
+              {/* Transcript panel toggle */}
+              <TranscriptPanel
+                messages={messages}
+                caseTitle={brief.matter}
+                personaName={displayPersonaName}
+                areaOfLaw={brief.area}
+              />
+              {/* TTS toggle */}
+              <button
+                onClick={() => { tts.setEnabled(!tts.enabled); if (tts.isSpeaking) tts.stop(); }}
+                className={cn(
+                  "p-1.5 rounded-lg transition-colors",
+                  tts.enabled ? "bg-gold/15 text-gold" : "bg-navy-card text-court-text-ter"
+                )}
+                title={tts.enabled ? "Mute judge voice" : "Enable judge voice"}
+              >
+                {tts.enabled ? <Volume2 size={14} /> : <VolumeX size={14} />}
+              </button>
+              {/* Exchange counter */}
+              <div className="bg-navy-card border border-court-border rounded-full px-2.5 py-0.5 text-court-xs text-court-text-ter font-mono">
+                {exchangeCount}/{MAX_EXCHANGES}
+              </div>
+              {/* Timer */}
+              <div className="bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-1 text-xs font-bold text-red-400 font-mono">
+                {formatTime(timer)}
+              </div>
+              <button onClick={endSession} className="text-court-xs text-red-400 font-bold">
+                End
+              </button>
             </div>
-            <button onClick={endSession} className="text-court-xs text-red-400 font-bold">
-              End
-            </button>
           </div>
         </div>
 
@@ -471,31 +632,32 @@ export default function AIPracticePage() {
           </div>
         )}
 
-        {/* Avatar */}
-        <div className="flex justify-center py-5 relative shrink-0">
-          <div className="relative">
-            {(aiSpeaking || isLoading) && (
-              <>
-                <div className="absolute inset-0 rounded-full animate-pulse-ring" style={{ border: `2px solid ${persona.color}33` }} />
-                <div className="absolute inset-0 rounded-full animate-pulse-ring" style={{ border: `2px solid ${persona.color}22`, animationDelay: "0.8s" }} />
-              </>
-            )}
-            <div
-              className="w-20 h-20 rounded-full flex items-center justify-center relative z-10 transition-all duration-500"
-              style={{
-                background: `linear-gradient(135deg, ${persona.gradient[0]}, ${persona.gradient[1]})`,
-                boxShadow: (aiSpeaking || isLoading) ? `0 0 30px ${persona.color}40` : `0 0 15px ${persona.color}15`,
-              }}
-            >
-              <DynamicIcon name={persona.icon} size={32} className="text-court-text" />
-            </div>
+        {/* Judge Avatar */}
+        <div className="flex justify-center py-4 relative shrink-0">
+          <div className="flex flex-col items-center gap-2">
+            <JudgeAvatar
+              isActive={aiSpeaking || isLoading}
+              isListening={isRecordingActive}
+              responseText={lastAiResponse}
+              size={80}
+            />
+            <p className="text-court-xs text-court-text-ter italic">
+              {isLoading
+                ? `${displayPersonaName} is considering your submission...`
+                : voiceInput.isTranscribing
+                  ? "Transcribing your speech..."
+                  : isRecordingActive
+                    ? "Listening... tap mic to stop"
+                    : tts.isSpeaking
+                      ? "Judge is speaking..."
+                      : exchangeCount >= MAX_EXCHANGES
+                        ? "Session concluding. Please end the session."
+                        : "Awaiting your submissions..."}
+            </p>
           </div>
-          <p className="absolute bottom-2 text-court-xs text-court-text-ter">
-            {isLoading ? "Considering your submissions..." : aiSpeaking ? "Judge is speaking..." : exchangeCount >= MAX_EXCHANGES ? "Session concluding. Please end the session." : "Awaiting your submissions..."}
-          </p>
         </div>
 
-        {/* Chat */}
+        {/* Chat messages */}
         <div className="flex-1 overflow-y-auto px-4 no-scrollbar">
           {messages.map((msg, i) => (
             <div key={i} className={`mb-3 flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
@@ -505,19 +667,24 @@ export default function AIPracticePage() {
                   : "bg-navy-card border border-court-border-light rounded-bl-md"
               }`}>
                 <p className={`text-court-xs font-bold mb-1 ${msg.role === "user" ? "text-gold" : "text-court-text-ter"}`}>
-                  {msg.role === "user" ? "You" : persona.name} · {msg.time}
+                  {msg.role === "user" ? "Counsel" : displayPersonaName} · {msg.time}
                 </p>
                 <p className="text-court-base text-court-text leading-relaxed">{msg.text}</p>
               </div>
             </div>
           ))}
+          {/* Enhanced loading indicator */}
           {isLoading && (
             <div className="mb-3 flex justify-start">
-              <div className="max-w-[85%] rounded-2xl px-4 py-2.5 bg-navy-card border border-court-border-light rounded-bl-md">
-                <div className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-court-text-ter animate-bounce" style={{ animationDelay: '0ms' }} />
-                  <span className="w-1.5 h-1.5 rounded-full bg-court-text-ter animate-bounce" style={{ animationDelay: '200ms' }} />
-                  <span className="w-1.5 h-1.5 rounded-full bg-court-text-ter animate-bounce" style={{ animationDelay: '400ms' }} />
+              <div className="max-w-[85%] rounded-2xl px-4 py-3 bg-navy-card border border-court-border-light rounded-bl-md">
+                <p className="text-court-xs text-court-text-ter mb-1.5">{displayPersonaName}</p>
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-gold/60 animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <span className="w-1.5 h-1.5 rounded-full bg-gold/60 animate-bounce" style={{ animationDelay: '200ms' }} />
+                    <span className="w-1.5 h-1.5 rounded-full bg-gold/60 animate-bounce" style={{ animationDelay: '400ms' }} />
+                  </div>
+                  <span className="text-court-xs text-court-text-ter italic">Considering...</span>
                 </div>
               </div>
             </div>
@@ -525,24 +692,57 @@ export default function AIPracticePage() {
           <div ref={chatEndRef} />
         </div>
 
-        {/* Input */}
-        <div className="px-4 py-3 border-t border-court-border-light bg-navy shrink-0">
-          {/* Input validation error */}
-          {inputError && (
+        {/* Quick phrases */}
+        <div className="px-3 py-2 border-t border-court-border-light/30 shrink-0">
+          <ObjectionButtons
+            onInsert={(text) => setInputText((prev) => prev + text)}
+            disabled={isLoading || exchangeCount >= MAX_EXCHANGES}
+          />
+        </div>
+
+        {/* Input area */}
+        <div className="px-4 py-3 border-t border-court-border-light bg-gradient-to-t from-[#0A0A1A] to-navy shrink-0">
+          {/* Voice/input errors */}
+          {(inputError || (voiceInput.error && voiceInput.error !== "WHISPER_UNAVAILABLE")) && (
             <div className="flex items-center gap-1.5 mb-2 px-1">
               <AlertCircle size={11} className="text-red-400 shrink-0" />
-              <p className="text-court-xs text-red-400">{inputError}</p>
+              <p className="text-court-xs text-red-400">{inputError || voiceInput.error}</p>
             </div>
           )}
+
+          {/* Whisper transcribing indicator */}
+          {voiceInput.isTranscribing && (
+            <div className="flex items-center gap-2 mb-2 px-1">
+              <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+              <p className="text-court-xs text-blue-400">Transcribing your speech...</p>
+            </div>
+          )}
+
           <div className="flex gap-2 items-end pb-4">
+            {/* Voice input button */}
             <button
-              onClick={() => setIsListening(!isListening)}
-              className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-all ${
-                isListening ? "bg-red-500 animate-pulse" : "bg-gold-dim border border-gold/25"
-              }`}
+              onClick={handleVoiceToggle}
+              disabled={isLoading || exchangeCount >= MAX_EXCHANGES || voiceInput.isTranscribing}
+              className={cn(
+                "w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-all",
+                isRecordingActive
+                  ? "bg-red-500 animate-pulse shadow-lg shadow-red-500/30"
+                  : voiceInput.isTranscribing
+                    ? "bg-blue-500/20 border border-blue-500/30"
+                    : "bg-gold-dim border border-gold/25 hover:bg-gold/20",
+                (isLoading || exchangeCount >= MAX_EXCHANGES) && "opacity-40 cursor-not-allowed"
+              )}
             >
-              {isListening ? <Pause size={16} className="text-white" /> : <Mic size={16} className="text-gold" />}
+              {isRecordingActive ? (
+                <Pause size={16} className="text-white" />
+              ) : voiceInput.isTranscribing ? (
+                <div className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <Mic size={16} className="text-gold" />
+              )}
             </button>
+
+            {/* Text input */}
             <div className={cn(
               "flex-1 bg-navy-card border rounded-xl flex items-end",
               inputError ? "border-red-500/40" : "border-court-border"
@@ -551,17 +751,14 @@ export default function AIPracticePage() {
                 value={inputText}
                 onChange={(e) => {
                   setInputText(e.target.value);
-                  if (inputError && e.target.value.length <= MAX_MESSAGE_LENGTH) {
-                    setInputError(null);
-                  }
+                  if (inputError && e.target.value.length <= MAX_MESSAGE_LENGTH) setInputError(null);
                 }}
-                placeholder={exchangeCount >= MAX_EXCHANGES ? "Session limit reached. Please end the session." : "Make your submissions..."}
+                placeholder={exchangeCount >= MAX_EXCHANGES ? "Session limit reached." : isRecordingActive ? "Listening..." : "Make your submissions..."}
                 rows={1}
                 disabled={isLoading || exchangeCount >= MAX_EXCHANGES}
                 className="flex-1 bg-transparent text-court-base text-court-text px-3 py-2.5 resize-none outline-none placeholder:text-court-text-ter disabled:opacity-50"
                 onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
               />
-              {/* Character count when approaching limit */}
               {inputText.length > MAX_MESSAGE_LENGTH * 0.8 && (
                 <span className={cn(
                   "text-court-xs px-2 py-2.5 tabular-nums shrink-0",
@@ -571,6 +768,8 @@ export default function AIPracticePage() {
                 </span>
               )}
             </div>
+
+            {/* Send button */}
             <button
               onClick={sendMessage}
               disabled={isLoading || exchangeCount >= MAX_EXCHANGES || !inputText.trim()}
@@ -578,7 +777,7 @@ export default function AIPracticePage() {
                 "w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-all",
                 isLoading || exchangeCount >= MAX_EXCHANGES || !inputText.trim()
                   ? "bg-gold/30 cursor-not-allowed"
-                  : "bg-gold"
+                  : "bg-gold hover:bg-gold/90"
               )}
             >
               <ArrowUp size={16} className="text-navy" />
@@ -599,10 +798,9 @@ export default function AIPracticePage() {
     <div className="pb-6">
       <div className="px-4 pt-3 pb-4">
         <h1 className="font-serif text-2xl font-bold text-court-text mb-1">Session Feedback</h1>
-        <p className="text-xs text-court-text-sec">{persona.name} · {brief.area}</p>
+        <p className="text-xs text-court-text-sec">{displayPersonaName} · {brief.area}</p>
       </div>
 
-      {/* Fallback notice */}
       {feedbackFallback && (
         <div className="px-4 mb-3">
           <div className="px-3 py-2 rounded-lg bg-navy-card border border-court-border-light">
@@ -648,17 +846,13 @@ export default function AIPracticePage() {
       <section className="px-4 mb-4">
         <Card className="p-4">
           <h3 className="font-serif text-sm font-bold text-court-text mb-2">Judgment</h3>
-          <p className="text-court-base text-court-text-sec leading-relaxed">
-            {judgment}
-          </p>
+          <p className="text-court-base text-court-text-sec leading-relaxed">{judgment}</p>
         </Card>
       </section>
       <section className="px-4 mb-4">
         <Card className="p-4 bg-gold-dim border-gold/25">
           <h3 className="text-court-xs text-gold uppercase tracking-widest font-bold mb-2">Key Improvement</h3>
-          <p className="text-court-base text-court-text leading-relaxed">
-            {keyImprovement}
-          </p>
+          <p className="text-court-base text-court-text leading-relaxed">{keyImprovement}</p>
         </Card>
       </section>
       <p className="text-court-xs text-court-text-ter text-center px-4 mb-4">
@@ -674,6 +868,8 @@ export default function AIPracticePage() {
           setError(null);
           setFeedbackData(null);
           setFeedbackFallback(false);
+          setLastAiResponse("");
+          setTemperament("standard");
         }}>Practice Again</Button>
         <Button fullWidth variant="outline">Save to Portfolio</Button>
         <Button fullWidth variant="secondary">Share Result</Button>

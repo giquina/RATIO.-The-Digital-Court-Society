@@ -123,6 +123,48 @@ export function playRecordingStart() {
   } catch (e) {}
 }
 
+// ── Judge response incoming (authoritative low tone) ──
+export function playJudgeResponse() {
+  try {
+    playTone(180, 0.2, "sine", 0.06);
+    playTone(220, 0.15, "sine", 0.04, 0.1);
+  } catch (e) {}
+}
+
+// ── Court in session (richer gavel with resonance) ──
+export function playCourtInSession() {
+  try {
+    const ctx = getCtx();
+    // Triple gavel
+    playTone(120, 0.15, "sine", 0.25);
+    playTone(80, 0.2, "triangle", 0.15);
+    playTone(240, 0.08, "square", 0.04, 0.02);
+    // Second tap
+    playTone(130, 0.12, "sine", 0.18, 0.35);
+    playTone(85, 0.15, "triangle", 0.1, 0.35);
+    // Third tap (loudest)
+    playTone(125, 0.18, "sine", 0.3, 0.65);
+    playTone(82, 0.22, "triangle", 0.18, 0.65);
+    playTone(250, 0.1, "square", 0.05, 0.67);
+  } catch (e) {}
+}
+
+// ── Voice recording start beep ──
+export function playRecordBeep() {
+  try {
+    playTone(880, 0.08, "sine", 0.1);
+    playTone(1100, 0.12, "sine", 0.08, 0.1);
+  } catch (e) {}
+}
+
+// ── Voice recording stop beep ──
+export function playRecordStopBeep() {
+  try {
+    playTone(1100, 0.08, "sine", 0.08);
+    playTone(880, 0.12, "sine", 0.06, 0.1);
+  } catch (e) {}
+}
+
 // ── Resume audio context after user interaction (required by browsers) ──
 export function resumeAudio() {
   if (audioCtx?.state === "suspended") {

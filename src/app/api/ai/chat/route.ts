@@ -35,10 +35,11 @@ import {
 } from "@/lib/ai/token-budget";
 import { logAiRequest } from "@/lib/ai/usage-tracker";
 import {
-  JUDGE_SYSTEM_PROMPT,
+  JUDGE_PROMPTS,
   MENTOR_SYSTEM_PROMPT,
   EXAMINER_SYSTEM_PROMPT,
   OPPONENT_SYSTEM_PROMPT,
+  type JudgeTemperament,
 } from "@/lib/ai/system-prompts";
 
 export const runtime = "edge";
@@ -46,7 +47,7 @@ export const runtime = "edge";
 // ── System prompt lookup ────────────────────────────────────────────────────
 
 const SYSTEM_PROMPTS: Record<string, string> = {
-  judge: JUDGE_SYSTEM_PROMPT,
+  judge: JUDGE_PROMPTS.standard,
   mentor: MENTOR_SYSTEM_PROMPT,
   examiner: EXAMINER_SYSTEM_PROMPT,
   opponent: OPPONENT_SYSTEM_PROMPT,
@@ -121,7 +122,7 @@ export async function POST(request: Request): Promise<Response> {
     );
   }
 
-  const { mode, messages, caseContext } = validation.data;
+  const { mode, messages, caseContext, temperament } = validation.data;
 
   // ── Layer 5: Daily budget check ─────────────────────────────────────────
   const budget = checkDailyBudget();
@@ -143,7 +144,9 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   // ── Build system prompt with case context ──────────────────────────────
-  const basePrompt = SYSTEM_PROMPTS[mode] || SYSTEM_PROMPTS.judge;
+  const basePrompt = mode === "judge" && temperament
+    ? (JUDGE_PROMPTS[temperament as JudgeTemperament] || JUDGE_PROMPTS.standard)
+    : (SYSTEM_PROMPTS[mode] || SYSTEM_PROMPTS.judge);
   const systemPrompt = caseContext
     ? `${basePrompt}\n\n## CASE CONTEXT\n${sanitizeInput(caseContext, 5000)}`
     : basePrompt;
