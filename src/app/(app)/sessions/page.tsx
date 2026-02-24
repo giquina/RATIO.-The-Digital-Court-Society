@@ -250,7 +250,10 @@ export default function SessionsPage() {
   return (
     <div className="pb-6">
       <div className="px-4 pt-3 pb-4">
-        <h1 className="font-serif text-2xl font-bold text-court-text mb-3.5">Sessions</h1>
+        <h1 className="font-serif text-2xl font-bold text-court-text mb-1">Sessions</h1>
+        <p className="text-xs text-court-text-sec mb-3.5">
+          Schedule, join, and review your moot court sessions
+        </p>
         <div className="flex gap-1 bg-white/[0.04] rounded-xl p-0.5">
           {["Upcoming", "Create", "Past"].map((t, i) => (
             <button

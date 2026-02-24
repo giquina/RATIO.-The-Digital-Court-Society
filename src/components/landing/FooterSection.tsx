@@ -29,13 +29,13 @@ const FOOTER_SECTIONS = [
     ],
   },
   {
-    title: "Community",
+    title: "Society",
     links: [
       { name: "Chambers", href: "/#chambers" },
       { name: "Rankings", href: "/#features" },
       { name: "Parliament", href: "/#governance" },
       { name: "Tribunal", href: "/#governance" },
-      { name: "Community", href: "/#features" },
+      { name: "Society", href: "/#features" },
     ],
   },
   {

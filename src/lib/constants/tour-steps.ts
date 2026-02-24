@@ -57,7 +57,7 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: "community",
     target: "[data-tour='nav-community']",
-    title: "Community",
+    title: "Society",
     description:
       "Connect with fellow advocates. Follow peers, view chamber rankings, and commend outstanding contributions to the court.",
     position: "right",

@@ -54,7 +54,7 @@ export function GovernanceShowcase({ id }: { id?: string }) {
     >
       {/* Section heading */}
       <h2 className="font-serif text-2xl md:text-3xl font-bold text-court-text text-center mb-3">
-        Govern Your Community
+        Govern Your Society
       </h2>
       <p className="text-court-base text-court-text-sec text-center max-w-lg mx-auto mb-10">
         Ratio is not just a platform you use. It is a society you run.

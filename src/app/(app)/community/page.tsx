@@ -81,8 +81,11 @@ export default function CommunityPage() {
   return (
     <div className="pb-6">
       <div className="px-4 pt-3 pb-4">
-        <h1 className="font-serif text-2xl font-bold text-court-text mb-1">Community</h1>
-        <p className="text-xs text-court-text-sec mb-3.5">
+        <h1 className="font-serif text-2xl font-bold text-court-text mb-1">Society</h1>
+        <p className="text-xs text-court-text-sec mb-1">
+          Connect with fellow advocates, compare rankings, and build your chamber
+        </p>
+        <p className="text-xs text-court-text-ter mb-3.5">
           {profile ? statsLine : <Skeleton className="h-3 w-48 inline-block" />}
         </p>
         <div className="bg-white/[0.05] rounded-xl px-3.5 py-2.5 flex items-center gap-2 mb-3.5">

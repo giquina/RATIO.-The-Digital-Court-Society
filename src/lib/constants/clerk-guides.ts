@@ -113,7 +113,7 @@ export const ROUTE_GUIDES: RouteGuide[] = [
   },
   {
     route: "/community",
-    title: "The Advocate Community",
+    title: "The Advocate Society",
     description:
       "Discover fellow advocates, build your network, and see how you compare across the national rankings.",
     steps: [
@@ -315,7 +315,7 @@ export const FALLBACK_GUIDE: RouteGuide = {
     },
     {
       icon: "Users",
-      title: "Community",
+      title: "Society",
       description:
         "Discover advocates, follow peers, and view rankings.",
     },
