@@ -10,6 +10,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/", priority: 1.0, changeFrequency: "weekly" as const },
     { path: "/login", priority: 0.5, changeFrequency: "monthly" as const },
     { path: "/register", priority: 0.6, changeFrequency: "monthly" as const },
+    { path: "/careers", priority: 0.6, changeFrequency: "weekly" as const },
+    { path: "/ambassadors", priority: 0.5, changeFrequency: "monthly" as const },
   ];
 
   // App pages (discoverable by search engines for SEO)

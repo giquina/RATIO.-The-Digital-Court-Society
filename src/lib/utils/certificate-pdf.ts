@@ -86,7 +86,7 @@ export async function generateCertificatePDF(data: CertificateData): Promise<Uin
   page.drawRectangle({
     x: borderInner, y: borderInner,
     width: W - borderInner * 2, height: H - borderInner * 2,
-    borderColor: rgb(201 / 255, 168 / 255, 76 / 255, 0.3 as never), borderWidth: 0.5,
+    borderColor: rgb(201 / 255, 168 / 255, 76 / 255), borderWidth: 0.5,
   });
 
   // ── Corner accents (small L-shaped decorations) ──
@@ -192,7 +192,7 @@ export async function generateCertificatePDF(data: CertificateData): Promise<Uin
     page.drawRectangle({
       x: colLeft + 110, y: barY - 1,
       width: barWidth, height: barHeight,
-      color: rgb(1, 1, 1, 0.06 as never),
+      color: rgb(0.94, 0.94, 0.94),
     });
     // Score bar
     page.drawRectangle({
@@ -291,7 +291,7 @@ export async function generateCertificatePDF(data: CertificateData): Promise<Uin
  * Trigger a browser download of the certificate PDF.
  */
 export function downloadCertificatePDF(pdfBytes: Uint8Array, filename: string): void {
-  const blob = new Blob([pdfBytes], { type: "application/pdf" });
+  const blob = new Blob([pdfBytes as unknown as BlobPart], { type: "application/pdf" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
