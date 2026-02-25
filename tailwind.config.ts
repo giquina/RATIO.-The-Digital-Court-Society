@@ -33,9 +33,9 @@ const config: Config = {
         },
       },
       fontSize: {
-        "court-xs": ["10px", { lineHeight: "14px", letterSpacing: "0.02em" }],
-        "court-sm": ["11px", { lineHeight: "16px" }],
-        "court-base": ["13px", { lineHeight: "20px" }],
+        "court-xs": ["11px", { lineHeight: "16px", letterSpacing: "0.02em" }],
+        "court-sm": ["12px", { lineHeight: "18px" }],
+        "court-base": ["14px", { lineHeight: "22px" }],
         "court-md": ["15px", { lineHeight: "22px" }],
         "court-lg": ["16px", { lineHeight: "24px" }],
         "court-xl": ["18px", { lineHeight: "26px" }],
