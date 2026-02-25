@@ -4,7 +4,15 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Scale, ArrowRight } from "lucide-react";
 
-export function HeroSection() {
+/*
+ * HeroSection — the first thing visitors see.
+ *
+ * If the user is already signed in, we swap the CTAs:
+ *   "Join as an Advocate" → "Open Dashboard"
+ *   "Sign In" → "Ambassador Programme" (useful for sharing)
+ */
+
+export function HeroSection({ isAuthenticated = false }: { isAuthenticated?: boolean }) {
   return (
     <motion.section
       initial={{ opacity: 0, y: 20 }}
@@ -42,19 +50,39 @@ export function HeroSection() {
 
       {/* Registration CTAs */}
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-sm mx-auto">
-        <Link
-          href="/register"
-          className="w-full sm:w-auto bg-gold text-navy font-bold rounded-xl px-8 py-3.5 text-court-base tracking-wide hover:bg-gold/90 transition-colors inline-flex items-center justify-center gap-2"
-        >
-          Join as an Advocate
-          <ArrowRight size={16} />
-        </Link>
-        <Link
-          href="/login"
-          className="w-full sm:w-auto border border-court-border text-court-text-sec font-semibold rounded-xl px-8 py-3.5 text-court-base hover:border-white/10 transition-colors inline-flex items-center justify-center"
-        >
-          Sign In
-        </Link>
+        {isAuthenticated ? (
+          <>
+            <Link
+              href="/home"
+              className="w-full sm:w-auto bg-gold text-navy font-bold rounded-xl px-8 py-3.5 text-court-base tracking-wide hover:bg-gold/90 transition-colors inline-flex items-center justify-center gap-2"
+            >
+              Open Dashboard
+              <ArrowRight size={16} />
+            </Link>
+            <Link
+              href="/ambassadors"
+              className="w-full sm:w-auto border border-court-border text-court-text-sec font-semibold rounded-xl px-8 py-3.5 text-court-base hover:border-white/10 transition-colors inline-flex items-center justify-center"
+            >
+              Ambassador Programme
+            </Link>
+          </>
+        ) : (
+          <>
+            <Link
+              href="/register"
+              className="w-full sm:w-auto bg-gold text-navy font-bold rounded-xl px-8 py-3.5 text-court-base tracking-wide hover:bg-gold/90 transition-colors inline-flex items-center justify-center gap-2"
+            >
+              Join as an Advocate
+              <ArrowRight size={16} />
+            </Link>
+            <Link
+              href="/login"
+              className="w-full sm:w-auto border border-court-border text-court-text-sec font-semibold rounded-xl px-8 py-3.5 text-court-base hover:border-white/10 transition-colors inline-flex items-center justify-center"
+            >
+              Sign In
+            </Link>
+          </>
+        )}
       </div>
       <p className="text-court-xs text-court-text-ter mt-4">
         Free for students. Professional plans from £14.99/mo.
