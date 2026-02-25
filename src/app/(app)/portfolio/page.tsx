@@ -209,7 +209,7 @@ export default function PortfolioPage() {
             {isProfessional && profileQuery?.practiceAreas?.length > 0 && (
               <div className="flex flex-wrap gap-1 mt-2">
                 {profileQuery.practiceAreas.map((area: string) => (
-                  <Tag key={area} size="sm" color="gold">{area}</Tag>
+                  <Tag key={area} small color="gold">{area}</Tag>
                 ))}
               </div>
             )}
