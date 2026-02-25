@@ -191,6 +191,8 @@ export function useSpeechSynthesis(): UseSpeechSynthesisReturn {
   );
 
   // ── Browser SpeechSynthesis fallback ──
+  // Android Chrome silently stops speaking after ~15s on long text.
+  // Fix: split text into sentences and queue them one-by-one.
   const speakViaBrowser = useCallback(
     (text: string) => {
       if (!isSupported) return;
@@ -198,31 +200,53 @@ export function useSpeechSynthesis(): UseSpeechSynthesisReturn {
       window.speechSynthesis.cancel();
       clearResumeInterval();
 
-      const utterance = new SpeechSynthesisUtterance(text);
-      utteranceRef.current = utterance;
+      // Split into sentences — keeps punctuation attached
+      const sentences = text.match(/[^.!?]+[.!?]+[\s]*/g) || [text];
 
-      if (voiceRef.current) {
-        utterance.voice = voiceRef.current;
-      }
+      let index = 0;
 
-      utterance.rate = 0.9; // Slightly slower — judicial gravitas
-      utterance.pitch = 0.85; // Slightly deeper
-      utterance.volume = 0.8;
+      const speakNext = () => {
+        if (index >= sentences.length) {
+          setIsSpeaking(false);
+          clearResumeInterval();
+          return;
+        }
 
-      utterance.onstart = () => {
-        setIsSpeaking(true);
-        startResumeInterval(); // iOS fix
+        const chunk = sentences[index].trim();
+        index++;
+
+        if (!chunk) {
+          speakNext();
+          return;
+        }
+
+        const utterance = new SpeechSynthesisUtterance(chunk);
+        utteranceRef.current = utterance;
+
+        if (voiceRef.current) {
+          utterance.voice = voiceRef.current;
+        }
+
+        utterance.rate = 0.9;
+        utterance.pitch = 0.85;
+        utterance.volume = 0.8;
+
+        utterance.onstart = () => {
+          setIsSpeaking(true);
+          startResumeInterval();
+        };
+        utterance.onend = () => {
+          speakNext(); // Chain to next sentence
+        };
+        utterance.onerror = () => {
+          setIsSpeaking(false);
+          clearResumeInterval();
+        };
+
+        window.speechSynthesis.speak(utterance);
       };
-      utterance.onend = () => {
-        setIsSpeaking(false);
-        clearResumeInterval();
-      };
-      utterance.onerror = () => {
-        setIsSpeaking(false);
-        clearResumeInterval();
-      };
 
-      window.speechSynthesis.speak(utterance);
+      speakNext();
     },
     [isSupported, startResumeInterval, clearResumeInterval],
   );

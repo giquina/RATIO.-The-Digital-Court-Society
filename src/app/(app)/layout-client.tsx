@@ -37,7 +37,7 @@ function AppShell({ children }: { children: React.ReactNode }) {
         !collapsed && "lg:ml-[240px]"
       )}>
         {!isSessionActive && <MobileHeader />}
-        <main className={cn("flex-1 min-w-0", "pb-24 md:pb-0")}>
+        <main className={cn("flex-1 min-w-0", !isSessionActive && "pb-24 md:pb-0")}>
           {children}
         </main>
       </div>
