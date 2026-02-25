@@ -22,11 +22,12 @@ const CONVEX_URL = process.env.NEXT_PUBLIC_CONVEX_URL;
 function AppShell({ children }: { children: React.ReactNode }) {
   const { collapsed } = useSidebarStore();
   const { isSessionActive } = useSessionStore();
+  const pathname = usePathname();
 
-  // Ensure page starts at top after auth redirect
+  // Scroll to top on every page navigation
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+  }, [pathname]);
 
   return (
     <div className="min-h-screen flex">
