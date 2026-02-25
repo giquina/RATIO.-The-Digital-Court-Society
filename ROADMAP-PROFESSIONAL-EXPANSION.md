@@ -53,30 +53,33 @@ Expand RATIO from a student-only platform to serve the entire UK legal advocacy 
 
 ## Phases
 
-### Phase 1: Foundation (Week 1-2) ← CURRENT
+### Phase 1: Foundation (Week 1-2) ✅ COMPLETE
 Add the ability for non-students to sign up and use the platform.
 
-- [ ] Add `userType` field to profile schema ("student" | "professional")
-- [ ] Add professional-specific profile fields (role, firm/chambers, practiceArea)
-- [ ] Create branching onboarding: Step 0 asks "I am a..." → Student or Professional
-- [ ] Student path: existing flow (university → year → modules → chamber)
-- [ ] Professional path: role → firm/chambers (optional) → practice areas → chamber
-- [ ] Update `createProfile` mutation to handle both user types
-- [ ] Update profile display to show role instead of university for professionals
-- [ ] Update settings page to show professional info where applicable
+- [x] Add `userType` field to profile schema ("student" | "professional")
+- [x] Add professional-specific profile fields (role, firm/chambers, practiceArea)
+- [x] Create branching onboarding: Step 0 asks "I am a..." → Student or Professional
+- [x] Student path: existing flow (university → year → modules → chamber)
+- [x] Professional path: role → firm/chambers (optional) → practice areas → chamber
+- [x] Update `createProfile` mutation to handle both user types
+- [x] Update profile display to show role instead of university for professionals
+- [x] Update settings page to show professional info where applicable
 
-### Phase 2: Pricing & Payments (Week 3-4)
+### Phase 2: Pricing & Payments (Week 3-4) ✅ COMPLETE
 Redesign pricing and add Stripe tiers for professionals.
 
-- [ ] Redesign `PricingSection.tsx` with Student/Professional tabs
-- [ ] Create new Stripe Price IDs for Professional and Professional+ tiers
-- [ ] Add `professional` and `professional_plus` to subscription plan types
-- [ ] Update `useSubscription.ts` with new plan types and feature access map
-- [ ] Update `FeatureGate.tsx` to handle professional plan hierarchy
-- [ ] Update FAQ to reflect broader audience
-- [ ] Update landing page hero/copy to say "UK legal community" not just "students"
+- [x] Redesign `PricingSection.tsx` with Student/Professional tabs
+- [x] Add professional and professional_plus to subscription plan types
+- [x] Update `useSubscription.ts` with new plan types and feature access map
+- [x] Update Stripe checkout and webhook for professional plans
+- [x] Update FAQ to reflect broader audience
+- [x] Update landing page hero/copy to say "UK legal community" not just "students"
+- [x] Update SEO metadata, OpenGraph, Twitter cards
+- [x] Update referral messaging
+- [ ] Create new Stripe Price IDs in Stripe Dashboard (manual step — needs Giquina)
+- [ ] Add STRIPE_PROFESSIONAL_PRICE_ID and STRIPE_PROFESSIONAL_PLUS_PRICE_ID to Vercel env
 
-### Phase 3: Professional-Specific Value (Week 5-8)
+### Phase 3: Professional-Specific Value (Week 5-8) ← NEXT
 Build features that justify the premium professional pricing.
 
 - [ ] Professional portfolio branding (title shows "Barrister" not "LLB Student")
