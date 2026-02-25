@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Tag, Card, Button, ProgressBar, DynamicIcon } from "@/components/ui";
 import { AI_PERSONAS, FEEDBACK_DIMENSIONS } from "@/lib/constants/app";
+import { courtToast } from "@/lib/utils/toast";
 import { Lightbulb, Book, Mic, MicOff, Pause, ArrowUp, Scale, AlertCircle, Volume2, VolumeX } from "lucide-react";
 import { motion } from "framer-motion";
 import ModeSelector from "@/components/ai-practice/ModeSelector";
@@ -1053,7 +1054,37 @@ export default function AIPracticePage() {
           setSpectatorCount(0);
         }}>Practice Again</Button>
         <Button className="flex-1 text-xs px-2" variant="outline">Save to Portfolio</Button>
-        <Button className="flex-1 text-xs px-2" variant="secondary">Share Result</Button>
+        <Button className="flex-1 text-xs px-2" variant="secondary" onClick={async () => {
+          // Build the share URL with scores encoded as query params
+          const shareParams = new URLSearchParams();
+          shareParams.set("s", overall);
+          shareParams.set("a", brief.area);
+          shareParams.set("j", displayPersonaName);
+          // Top 4 breakdown scores for the preview card
+          if (scores.argumentStructure != null) shareParams.set("s1", scores.argumentStructure.toFixed(1));
+          if (scores.useOfAuthorities != null) shareParams.set("s2", (scores.useOfAuthorities as number).toFixed(1));
+          if (scores.oralDelivery != null) shareParams.set("s3", (scores.oralDelivery as number).toFixed(1));
+          if (scores.judicialHandling != null) shareParams.set("s4", (scores.judicialHandling as number).toFixed(1));
+
+          const shareUrl = `https://ratiothedigitalcourtsociety.com/share/result?${shareParams.toString()}`;
+          const shareText = `I scored ${overall}/5.0 in ${brief.area} on RATIO. — The Digital Court Society`;
+
+          // Use native share menu if available (mobile), otherwise copy to clipboard
+          if (navigator.share) {
+            try {
+              await navigator.share({ title: "My RATIO. Result", text: shareText, url: shareUrl });
+            } catch {
+              // User cancelled — that's fine
+            }
+          } else {
+            try {
+              await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
+              courtToast.success("Link copied to clipboard!");
+            } catch {
+              // Fallback: do nothing
+            }
+          }
+        }}>Share Result</Button>
       </div>
     </div>
   );
