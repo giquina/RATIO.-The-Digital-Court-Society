@@ -1034,8 +1034,8 @@ export default function AIPracticePage() {
       </div>
 
       {/* Sticky CTAs */}
-      <div className="shrink-0 px-4 py-3 border-t border-court-border-light/20 bg-navy flex flex-col gap-2.5">
-        <Button fullWidth onClick={() => {
+      <div className="shrink-0 px-4 py-3 border-t border-court-border-light/20 bg-navy flex flex-row gap-2">
+        <Button className="flex-1 text-xs px-2" onClick={() => {
           setScreen("select");
           setMessages([]);
           setTimer(900);
@@ -1052,8 +1052,8 @@ export default function AIPracticePage() {
           setSpectatorCode(null);
           setSpectatorCount(0);
         }}>Practice Again</Button>
-        <Button fullWidth variant="outline">Save to Portfolio</Button>
-        <Button fullWidth variant="secondary">Share Result</Button>
+        <Button className="flex-1 text-xs px-2" variant="outline">Save to Portfolio</Button>
+        <Button className="flex-1 text-xs px-2" variant="secondary">Share Result</Button>
       </div>
     </div>
   );
