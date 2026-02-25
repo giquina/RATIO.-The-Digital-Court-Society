@@ -26,6 +26,7 @@ import {
   Flame,
   Plus,
   ClipboardList,
+  Award,
 } from "lucide-react";
 import { Avatar, Tag, Skeleton, Tooltip } from "@/components/ui";
 import { cn } from "@/lib/utils/helpers";
@@ -96,6 +97,7 @@ const sections: NavSection[] = [
     items: [
       { href: "/profile", label: "Profile", icon: User, tooltip: "Your profile", tourId: "nav-profile" },
       { href: "/portfolio", label: "Portfolio", icon: FolderOpen, tooltip: "Your advocacy record", subtitle: "Your advocacy record" },
+      { href: "/certificates", label: "Certificates", icon: Award, tooltip: "Verified advocacy credentials", subtitle: "Earn verified credentials" },
       { href: "/settings", label: "Settings", icon: Settings, tooltip: "Settings" },
     ],
   },

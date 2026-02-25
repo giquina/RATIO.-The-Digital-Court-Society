@@ -55,6 +55,16 @@ const FAQ_ITEMS = [
     answer:
       "Your data is yours. We store only what is necessary to operate the platform: your profile information, session records, and scores. We do not sell personal data to third parties. AI Judge sessions are processed securely and are not used to train external models. You can export or delete your data at any time. Full details are in our Privacy Policy.",
   },
+  {
+    question: "What are RATIO Certificates?",
+    answer:
+      "RATIO offers three levels of verified advocacy certificates — Foundation, Intermediate, and Advanced — earned by completing structured requirements including AI Judge sessions, group moots, and scoring thresholds across 7 dimensions of advocacy. Each certificate includes a skills breakdown, is signed by the Founder, and comes with a unique QR code for instant verification by employers. Certificates are included free for all subscribers, or available as one-time purchases for free-tier users.",
+  },
+  {
+    question: "How does the Ambassador Programme work?",
+    answer:
+      "The RATIO Ambassador Programme invites moot society leaders, law society members, and advocacy enthusiasts at UK universities to represent RATIO at their campus. Ambassadors receive free Premium+ access, all certificates included, a personalised letter of recommendation, and are featured on the RATIO website. Applications are reviewed personally by the Founder. Visit the Ambassadors page to apply.",
+  },
 ];
 
 export function FAQSection() {

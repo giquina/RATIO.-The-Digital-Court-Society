@@ -35,7 +35,8 @@ const FOOTER_SECTIONS = [
       { name: "Rankings", href: "/#features" },
       { name: "Parliament", href: "/#governance" },
       { name: "Tribunal", href: "/#governance" },
-      { name: "Society", href: "/#features" },
+      { name: "Ambassadors", href: "/ambassadors" },
+      { name: "Certificates", href: "/#features" },
     ],
   },
   {

@@ -51,6 +51,10 @@ export default defineSchema({
     handle: v.optional(v.string()), // URL-safe slug for referral links: /join/[handle]
     referredByProfileId: v.optional(v.id("profiles")), // who referred this advocate
     referralCount: v.optional(v.number()), // cached count of successful referrals
+    // ── Ambassador fields ──
+    isAmbassador: v.optional(v.boolean()),
+    ambassadorTier: v.optional(v.string()), // "ambassador" | "society_partner" | "university_champion"
+    ambassadorSince: v.optional(v.string()), // ISO date
   })
     .index("by_user", ["userId"])
     .index("by_university", ["university"])
@@ -798,4 +802,59 @@ export default defineSchema({
     topUniversities: v.optional(v.array(v.string())), // top 5 universities by referral
   })
     .index("by_period", ["period"]),
+
+  // ═══════════════════════════════════════════
+  // CERTIFICATES — PROFESSIONAL CREDENTIALS
+  // ═══════════════════════════════════════════
+  certificates: defineTable({
+    profileId: v.id("profiles"),
+    level: v.string(), // "foundation" | "intermediate" | "advanced" | "specialist_criminal" etc.
+    status: v.string(), // "in_progress" | "requirements_met" | "issued" | "revoked"
+    issuedAt: v.optional(v.string()), // ISO timestamp
+    certificateNumber: v.optional(v.string()), // "RATIO-2026-00001"
+    verificationCode: v.optional(v.string()), // unique code for QR/URL verification
+    // Skills snapshot at time of issue
+    skillsSnapshot: v.optional(v.object({
+      argumentStructure: v.number(),
+      useOfAuthorities: v.number(),
+      oralDelivery: v.number(),
+      judicialHandling: v.number(),
+      courtManner: v.number(),
+      persuasiveness: v.number(),
+      timeManagement: v.number(),
+    })),
+    overallAverage: v.optional(v.number()),
+    totalSessions: v.optional(v.number()),
+    areasOfLaw: v.optional(v.array(v.string())),
+    strengths: v.optional(v.array(v.string())), // top 2-3 strengths at time of issue
+    improvements: v.optional(v.array(v.string())), // top 2-3 areas for development
+    // Payment
+    paymentStatus: v.optional(v.string()), // "free" | "paid" | "included_in_subscription"
+    stripePaymentId: v.optional(v.string()),
+  })
+    .index("by_profile", ["profileId"])
+    .index("by_verification", ["verificationCode"])
+    .index("by_status", ["status"])
+    .index("by_level", ["level"]),
+
+  // ═══════════════════════════════════════════
+  // AMBASSADOR PROGRAMME
+  // ═══════════════════════════════════════════
+  ambassadorApplications: defineTable({
+    // Applicant info (may not have a profile yet if applying from public page)
+    profileId: v.optional(v.id("profiles")),
+    fullName: v.string(),
+    email: v.string(),
+    university: v.string(),
+    societyRole: v.optional(v.string()), // "Moot Society President", "Law Society VP", etc.
+    country: v.optional(v.string()),
+    motivation: v.string(), // "Why do you want to be a RATIO Ambassador?"
+    socialLinks: v.optional(v.string()), // Instagram, LinkedIn, etc.
+    status: v.string(), // "pending" | "accepted" | "rejected"
+    reviewedAt: v.optional(v.string()),
+    reviewNotes: v.optional(v.string()), // internal notes from Giquina
+    appliedAt: v.string(), // ISO timestamp
+  })
+    .index("by_status", ["status"])
+    .index("by_email", ["email"]),
 });
