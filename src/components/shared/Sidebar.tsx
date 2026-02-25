@@ -217,11 +217,12 @@ export function Sidebar() {
   const dynamicSections = useMemo(() => {
     return sections.map((section) => {
       if (section.title === "ACCOUNT" && isProfessional) {
+        const cpdItem: NavItem = { href: "/cpd", label: "CPD Tracker", icon: ClipboardList, tooltip: "CPD tracking dashboard", subtitle: "Track professional development" };
         return {
           ...section,
           items: [
             ...section.items.slice(0, 2), // Profile + Portfolio
-            { href: "/cpd", label: "CPD Tracker", icon: ClipboardList, tooltip: "CPD tracking dashboard", subtitle: "Track professional development" },
+            cpdItem,
             ...section.items.slice(2), // Settings
           ],
         };
