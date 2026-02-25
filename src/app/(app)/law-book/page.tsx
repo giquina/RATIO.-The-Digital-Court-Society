@@ -176,10 +176,10 @@ export default function LawBookIndexPage() {
 
                     {/* Card body */}
                     <div className="p-4">
-                      <h3 className="font-serif text-court-base font-bold text-court-text mb-1 group-hover:text-gold transition-colors">
+                      <h3 className="font-serif text-court-lg font-bold text-court-text mb-1 group-hover:text-gold transition-colors">
                         {mod.title}
                       </h3>
-                      <p className="text-court-xs text-court-text-sec leading-relaxed line-clamp-2 mb-3">
+                      <p className="text-court-sm text-court-text-sec leading-relaxed line-clamp-2 mb-3">
                         {mod.description}
                       </p>
 
@@ -194,7 +194,7 @@ export default function LawBookIndexPage() {
                                 ? "Specialist"
                                 : "Academic"}
                         </Tag>
-                        <span className="flex items-center gap-1 text-court-xs text-court-text-ter">
+                        <span className="flex items-center gap-1 text-court-sm text-court-text-ter">
                           <Hash size={11} />
                           {mod.topicCount} topics
                         </span>
