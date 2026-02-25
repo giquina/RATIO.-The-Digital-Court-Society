@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { anyApi } from "convex/server";
 import { useDemoQuery } from "@/hooks/useDemoSafe";
 import { motion, AnimatePresence } from "framer-motion";
@@ -25,6 +25,7 @@ import {
   Wrench,
   Flame,
   Plus,
+  ClipboardList,
 } from "lucide-react";
 import { Avatar, Tag, Skeleton, Tooltip } from "@/components/ui";
 import { cn } from "@/lib/utils/helpers";
@@ -211,6 +212,24 @@ export function Sidebar() {
   const profile = CONVEX_URL ? convexProfile : DEMO_PROFILE;
   const counts = useSidebarCounts();
 
+  // Build dynamic nav sections — inject CPD link for professional users
+  const isProfessional = profile?.userType === "professional";
+  const dynamicSections = useMemo(() => {
+    return sections.map((section) => {
+      if (section.title === "ACCOUNT" && isProfessional) {
+        return {
+          ...section,
+          items: [
+            ...section.items.slice(0, 2), // Profile + Portfolio
+            { href: "/cpd", label: "CPD Tracker", icon: ClipboardList, tooltip: "CPD tracking dashboard", subtitle: "Track professional development" },
+            ...section.items.slice(2), // Settings
+          ],
+        };
+      }
+      return section;
+    });
+  }, [isProfessional]);
+
   // Detect beginner: no moots + no points
   const isBeginner = profile ? profile.totalMoots === 0 && profile.totalPoints === 0 : false;
   const showSubtitles = beginnerMode && isBeginner && !collapsed;
@@ -275,7 +294,7 @@ export function Sidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto no-scrollbar py-4 px-2">
-        {sections.map((section) => (
+        {dynamicSections.map((section) => (
           <div key={section.title} className="mb-4">
             {!collapsed && (
               <h3 className="hidden lg:block text-court-xs font-bold tracking-[0.15em] text-court-text-ter px-3 mb-2" role="heading" aria-level={3}>

@@ -18,6 +18,7 @@ import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
 import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
 import { cn } from "@/lib/utils/helpers";
 import { useSessionStore } from "@/stores/sessionStore";
+import { useAIUserContext } from "@/hooks/useAIUserContext";
 import {
   playCourtInSession,
   playJudgeResponse,
@@ -100,6 +101,7 @@ function stripEmotes(text: string): string {
 
 export default function AIPracticePage() {
   const [screen, setScreen] = useState<Screen>("select");
+  const aiUserContext = useAIUserContext();
   const { enterSession, exitSession } = useSessionStore();
 
   // Tell the layout to hide header/nav when in active session
@@ -276,6 +278,7 @@ export default function AIPracticePage() {
           messages: initialApiMessages,
           caseContext: buildCaseContext(),
           temperament: mode === "judge" ? temperament : "standard",
+          userContext: aiUserContext,
         }),
       });
 
@@ -370,6 +373,7 @@ export default function AIPracticePage() {
           messages: updatedApiMessages,
           caseContext: buildCaseContext(),
           temperament: mode === "judge" ? temperament : "standard",
+          userContext: aiUserContext,
         }),
       });
 
@@ -450,6 +454,7 @@ export default function AIPracticePage() {
           messages: apiMessages,
           caseContext: buildCaseContext(),
           sessionDuration,
+          userContext: aiUserContext,
         }),
       });
 

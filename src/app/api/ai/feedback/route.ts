@@ -35,10 +35,17 @@ export const runtime = "edge";
 
 // ── Feedback prompt template ────────────────────────────────────────────────
 
+interface FeedbackUserContext {
+  userType?: "student" | "professional";
+  professionalRole?: string;
+  practiceAreas?: string[];
+}
+
 function buildFeedbackPrompt(
   mode: string,
   caseContext: string,
   sessionDuration: number,
+  userContext?: FeedbackUserContext,
 ): string {
   const modeLabel =
     mode === "judge"
@@ -49,14 +56,28 @@ function buildFeedbackPrompt(
           ? "SQE2 advocacy examiner"
           : "opposing counsel";
 
-  return `You are an expert legal advocacy assessor. You have just observed a moot court session where you played the role of ${modeLabel}.
+  const isProfessional = userContext?.userType === "professional";
+  const role = userContext?.professionalRole || "legal professional";
+  const advocateDesc = isProfessional
+    ? `a practising ${role}`
+    : "a law student";
+  const standardRef = isProfessional
+    ? "Reference professional standards (BSB Handbook, SRA Competence Statement) where relevant. Frame feedback in terms of CPD and professional development."
+    : "Frame feedback in educational and developmental terms appropriate for a law student.";
+
+  return `You are an expert legal advocacy assessor. You have just observed a moot court session where you played the role of ${modeLabel}. The advocate is ${advocateDesc}.
 
 Analyse the transcript below and provide structured feedback.
 
 ## SESSION CONTEXT
 - Mode: ${mode}
 - Duration: ${Math.round(sessionDuration / 60)} minutes
+- Advocate: ${advocateDesc}
 ${caseContext ? `- Case context: ${caseContext}` : ""}
+
+## ASSESSMENT STANDARD
+${standardRef}
+${isProfessional ? "Hold the advocate to a higher standard expected of practising professionals." : ""}
 
 ## SCORING GUIDE
 Rate each dimension from 1.0 to 5.0:
@@ -176,7 +197,7 @@ export async function POST(request: Request): Promise<Response> {
     );
   }
 
-  const { mode, messages, caseContext, sessionDuration } = validation.data;
+  const { mode, messages, caseContext, sessionDuration, userContext } = validation.data;
 
   // ── Layer 5: Daily budget check ─────────────────────────────────────────
   const budget = checkDailyBudget();
@@ -196,7 +217,7 @@ export async function POST(request: Request): Promise<Response> {
 
   // ── Build the transcript for the LLM ───────────────────────────────────
   const sanitisedCaseContext = sanitizeInput(caseContext, 5000);
-  const systemPrompt = buildFeedbackPrompt(mode, sanitisedCaseContext, sessionDuration);
+  const systemPrompt = buildFeedbackPrompt(mode, sanitisedCaseContext, sessionDuration, userContext);
 
   const transcript = messages
     .map(

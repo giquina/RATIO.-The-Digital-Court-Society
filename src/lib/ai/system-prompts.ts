@@ -157,6 +157,52 @@ export const JUDGE_PROMPTS: Record<JudgeTemperament, string> = {
   socratic: JUDGE_SOCRATIC_PROMPT,
 };
 
+// ── Professional Context Modifier ────────────────────────────────────────
+// When the user is a professional, inject additional instructions into the
+// system prompt so the AI adapts its tone and feedback style accordingly.
+
+export interface UserContext {
+  userType: "student" | "professional";
+  professionalRole?: string;
+  practiceAreas?: string[];
+}
+
+export function buildProfessionalModifier(ctx?: UserContext): string {
+  if (!ctx || ctx.userType !== "professional") return "";
+
+  const role = ctx.professionalRole || "legal professional";
+  const areas = ctx.practiceAreas?.length
+    ? `Their practice areas include: ${ctx.practiceAreas.join(", ")}.`
+    : "";
+
+  return `
+
+## ADVOCATE CONTEXT
+The advocate before you is a practising ${role}, not a student. ${areas}
+Adjust your approach accordingly:
+- Address them with the formality appropriate to their standing at the Bar or in practice.
+- Do not explain basic legal concepts they would already know — focus on advanced technique.
+- Your feedback should reference professional standards (BSB Handbook, SRA Competence Statement) where relevant.
+- Frame improvement areas in terms of professional development and CPD, not academic assessment.
+- Be more demanding in your expectations of advocacy skill, court manner, and use of authorities.
+- If they hold themselves out as a barrister, expect a higher standard of oral delivery.`;
+}
+
+// ── Prompt Builder ──────────────────────────────────────────────────────
+// Combines base prompt + case context + professional modifier into one.
+
+export function buildFullSystemPrompt(
+  basePrompt: string,
+  caseContext?: string,
+  userContext?: UserContext,
+): string {
+  const parts = [basePrompt];
+  const profMod = buildProfessionalModifier(userContext);
+  if (profMod) parts.push(profMod);
+  if (caseContext) parts.push(`\n## CASE CONTEXT\n${caseContext}`);
+  return parts.join("\n");
+}
+
 // ── Other Personas ──────────────────────────────────────────────────────
 
 export const MENTOR_SYSTEM_PROMPT = `You are a Senior Counsel serving as a Chambers Mentor at a UK university on Ratio.

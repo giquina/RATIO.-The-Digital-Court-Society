@@ -126,6 +126,22 @@ export const complete = mutation({
     await ctx.db.patch(session.profileId, {
       totalPoints: callerProfile.totalPoints + 25, // 25 points per AI session
     });
+
+    // Auto-log CPD entry for professional users
+    if (callerProfile.userType === "professional") {
+      const durationMinutes = Math.max(1, Math.round(args.durationSeconds / 60));
+      await ctx.db.insert("cpdEntries", {
+        profileId: session.profileId,
+        activityType: "ai_practice",
+        title: `AI ${session.mode.charAt(0).toUpperCase() + session.mode.slice(1)} — ${session.caseTitle}`,
+        description: `${session.areaOfLaw} practice session. Overall score: ${args.overallScore}%.`,
+        durationMinutes,
+        date: new Date().toISOString().split("T")[0],
+        practiceArea: session.areaOfLaw,
+        aiSessionId: sessionId,
+        competencyArea: "Advocacy",
+      });
+    }
   },
 });
 

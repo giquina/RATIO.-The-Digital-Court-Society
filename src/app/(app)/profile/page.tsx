@@ -5,7 +5,7 @@ import { useQuery, useMutation } from "convex/react";
 import { anyApi } from "convex/server";
 import { Avatar, Tag, Card, Button, ProgressBar, SectionHeader, Skeleton } from "@/components/ui";
 import { courtToast } from "@/lib/utils/toast";
-import { Flame, Timer, FileText, Star, Trophy, FolderOpen, Link as LinkIcon, Landmark, Settings, X, Loader2, LogOut, Bookmark } from "lucide-react";
+import { Flame, Timer, FileText, Star, Trophy, FolderOpen, Link as LinkIcon, Landmark, Settings, X, Loader2, LogOut, Bookmark, ClipboardList } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { useAuthActions } from "@convex-dev/auth/react";
@@ -194,6 +194,16 @@ export default function ProfilePage() {
             <Button variant="outline" size="sm" onClick={startEdit}>Edit Profile</Button>
             <Button size="sm">Share Profile</Button>
           </div>
+          {/* CPD quick-link for professional users (especially useful on mobile) */}
+          {profile.userType === "professional" && (
+            <Link
+              href="/cpd"
+              className="mt-3 flex items-center justify-center gap-1.5 text-court-sm text-gold hover:text-gold/80 transition-colors"
+            >
+              <ClipboardList size={14} />
+              <span>CPD Tracker</span>
+            </Link>
+          )}
         </Card>
       </section>
 

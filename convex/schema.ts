@@ -164,6 +164,27 @@ export default defineSchema({
   // ═══════════════════════════════════════════
   // AI SESSIONS
   // ═══════════════════════════════════════════
+  // ═══════════════════════════════════════════
+  // CPD TRACKING (Professional users)
+  // ═══════════════════════════════════════════
+  cpdEntries: defineTable({
+    profileId: v.id("profiles"),
+    activityType: v.string(), // "ai_practice" | "live_moot" | "research" | "manual"
+    title: v.string(), // e.g. "AI Judge — Contract Formation"
+    description: v.optional(v.string()),
+    durationMinutes: v.number(), // duration in minutes
+    date: v.string(), // ISO date string
+    practiceArea: v.optional(v.string()), // e.g. "Criminal"
+    // Link to source (optional — allows tracing back to the AI session or moot)
+    aiSessionId: v.optional(v.id("aiSessions")),
+    mootSessionId: v.optional(v.id("sessions")),
+    // Regulatory framework
+    regulatoryBody: v.optional(v.string()), // "BSB" | "SRA"
+    competencyArea: v.optional(v.string()), // e.g. "Advocacy", "Ethics", "Case Analysis"
+  })
+    .index("by_profile", ["profileId"])
+    .index("by_profile_date", ["profileId", "date"]),
+
   aiSessions: defineTable({
     profileId: v.id("profiles"),
     mode: v.string(), // "judge", "mentor", "examiner", "opponent"

@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useQuery } from "convex/react";
+import { anyApi } from "convex/server";
 import { Card, Tag, ProgressBar, SectionHeader, Button } from "@/components/ui";
 import {
   BarChart3, Flame, Trophy, Target, Calendar, Download, Filter, ArrowRight,
@@ -108,6 +110,10 @@ function getScoreTextColor(score: number): string {
 export default function PortfolioPage() {
   const [filter, setFilter] = useState(0);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const profileQuery: any = useQuery(anyApi.users.myProfile);
+  const isProfessional = profileQuery?.userType === "professional";
+
   const filteredSessions = SESSIONS.filter((s) => {
     if (filter === 0) return true;
     if (filter === 1) return s.mode === "AI Judge";
@@ -136,10 +142,21 @@ export default function PortfolioPage() {
       <div className="px-4 md:px-6 lg:px-8 pt-3 pb-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="font-serif text-2xl font-bold text-court-text">Your Portfolio</h1>
+            <h1 className="font-serif text-2xl font-bold text-court-text">
+              {isProfessional ? "Professional Portfolio" : "Your Portfolio"}
+            </h1>
             <p className="text-court-sm text-court-text-sec mt-1">
-              Track your advocacy journey
+              {isProfessional
+                ? `${profileQuery?.professionalRole ?? "Legal Professional"} ${profileQuery?.firmOrChambers ? `· ${profileQuery.firmOrChambers}` : ""}`
+                : "Track your advocacy journey"}
             </p>
+            {isProfessional && profileQuery?.practiceAreas?.length > 0 && (
+              <div className="flex flex-wrap gap-1 mt-2">
+                {profileQuery.practiceAreas.map((area: string) => (
+                  <Tag key={area} size="sm" color="gold">{area}</Tag>
+                ))}
+              </div>
+            )}
           </div>
           <Button variant="secondary" size="sm" disabled>
             <Download size={14} className="inline mr-1.5" />

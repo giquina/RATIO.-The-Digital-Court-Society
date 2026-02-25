@@ -48,12 +48,25 @@ const modeSchema = z.enum(AI_MODES);
  * `messages`    – conversation history (1-60 messages)
  * `caseContext`  – optional scenario / case description (max 5 000 chars)
  */
+/**
+ * Optional user context — passed from the frontend so AI personas
+ * can adapt their behaviour for students vs professionals.
+ */
+const userContextSchema = z
+  .object({
+    userType: z.enum(["student", "professional"]).default("student"),
+    professionalRole: z.string().max(100).optional(),
+    practiceAreas: z.array(z.string().max(50)).max(10).optional(),
+  })
+  .optional();
+
 export const chatRequestSchema = z
   .object({
     mode: modeSchema,
     messages: z.array(messageSchema).min(1).max(60),
     caseContext: z.string().max(5000).default(""),
     temperament: z.enum(JUDGE_TEMPERAMENTS).default("standard"),
+    userContext: userContextSchema,
   })
   .strict();
 
@@ -69,6 +82,7 @@ export const feedbackRequestSchema = z
     messages: z.array(messageSchema).min(2).max(60),
     caseContext: z.string().max(5000).default(""),
     sessionDuration: z.number().min(0).max(3600),
+    userContext: userContextSchema,
   })
   .strict();
 
