@@ -156,7 +156,7 @@ export default function OnboardingPage() {
           )}
         </p>
       </div>
-      <span className="text-xs font-bold text-court-text-ter">{u.short}</span>
+      <span className="text-court-sm font-bold text-court-text-ter">{u.short}</span>
     </button>
   );
 
@@ -208,7 +208,7 @@ export default function OnboardingPage() {
           <h1 className="font-serif text-2xl font-bold text-court-text mb-1">
             Your University
           </h1>
-          <p className="text-xs text-court-text-sec mb-3">
+          <p className="text-court-sm text-court-text-sec mb-3">
             Select your law school ({UK_UNIVERSITIES.length} UK universities)
           </p>
 
@@ -252,7 +252,7 @@ export default function OnboardingPage() {
               filteredUnis.map(renderUniButton)
             )}
             {filteredUnis.length === 0 && (
-              <p className="text-center text-court-text-ter text-sm py-8">
+              <p className="text-center text-court-text-ter text-court-base py-8">
                 No universities found. Try a different search term.
               </p>
             )}
@@ -266,7 +266,7 @@ export default function OnboardingPage() {
           <h1 className="font-serif text-2xl font-bold text-court-text mb-1">
             Year of Study
           </h1>
-          <p className="text-xs text-court-text-sec mb-5">
+          <p className="text-court-sm text-court-text-sec mb-5">
             What year are you in?
           </p>
           <div className="flex flex-col gap-2">
@@ -299,7 +299,7 @@ export default function OnboardingPage() {
           <h1 className="font-serif text-2xl font-bold text-court-text mb-1">
             Your Modules
           </h1>
-          <p className="text-xs text-court-text-sec mb-5">
+          <p className="text-court-sm text-court-text-sec mb-5">
             Select modules you&apos;re studying ({modules.length} selected)
           </p>
           <div className="flex flex-wrap gap-2">
@@ -307,7 +307,7 @@ export default function OnboardingPage() {
               <button
                 key={m}
                 onClick={() => toggleModule(m)}
-                className={`px-3.5 py-2 rounded-xl text-xs font-semibold border transition-all focus:outline-none focus:ring-1 focus:ring-gold/30 ${
+                className={`px-3.5 py-2 rounded-xl text-court-sm font-semibold border transition-all focus:outline-none focus:ring-1 focus:ring-gold/30 ${
                   modules.includes(m)
                     ? "border-gold/40 bg-gold-dim text-gold"
                     : "border-court-border text-court-text-sec hover:border-white/10"
@@ -326,7 +326,7 @@ export default function OnboardingPage() {
           <h1 className="font-serif text-2xl font-bold text-court-text mb-1">
             Choose Your Chamber
           </h1>
-          <p className="text-xs text-court-text-sec mb-5">
+          <p className="text-court-sm text-court-text-sec mb-5">
             Your Chamber is your team. Compete, collaborate, rise together.
           </p>
           <div className="flex flex-col gap-3">
@@ -379,7 +379,7 @@ export default function OnboardingPage() {
           <button
             onClick={back}
             disabled={saving}
-            className="flex-1 py-3 text-sm font-semibold text-court-text-sec border border-court-border rounded-xl disabled:opacity-40"
+            className="flex-1 py-3 text-court-base font-semibold text-court-text-sec border border-court-border rounded-xl disabled:opacity-40"
           >
             Back
           </button>
@@ -392,7 +392,7 @@ export default function OnboardingPage() {
             (step === 3 && modules.length === 0) ||
             saving
           }
-          className="flex-1 py-3 text-sm font-bold bg-gold text-navy rounded-xl disabled:opacity-40 flex items-center justify-center gap-2"
+          className="flex-1 py-3 text-court-base font-bold bg-gold text-navy rounded-xl disabled:opacity-40 flex items-center justify-center gap-2"
         >
           {saving && <Loader2 size={16} className="animate-spin" />}
           {step === 4 ? (saving ? "Creating profile..." : "Enter Ratio") : "Continue"}

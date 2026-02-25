@@ -172,7 +172,7 @@ export default function ArgumentBuilderPage() {
       <div className="px-4 md:px-6 lg:px-8 pt-3 pb-4">
         <Link
           href="/tools"
-          className="flex items-center gap-1.5 text-court-text-sec text-xs mb-3 hover:text-court-text transition-colors"
+          className="flex items-center gap-1.5 text-court-text-sec text-court-sm mb-3 hover:text-court-text transition-colors"
         >
           <ArrowLeft size={14} />
           Back to Tools
@@ -183,7 +183,7 @@ export default function ArgumentBuilderPage() {
             Argument Builder
           </h1>
         </div>
-        <p className="text-xs text-court-text-sec mt-1">
+        <p className="text-court-sm text-court-text-sec mt-1">
           Submit your skeleton argument and receive detailed analysis with counter-arguments
         </p>
       </div>
@@ -195,7 +195,7 @@ export default function ArgumentBuilderPage() {
             {/* Area of Law + Side */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-bold text-court-text-sec tracking-wider mb-1.5">
+                <label className="block text-court-sm font-bold text-court-text-sec tracking-wider mb-1.5">
                   AREA OF LAW *
                 </label>
                 <select
@@ -212,7 +212,7 @@ export default function ArgumentBuilderPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-bold text-court-text-sec tracking-wider mb-1.5">
+                <label className="block text-court-sm font-bold text-court-text-sec tracking-wider mb-1.5">
                   YOUR SIDE *
                 </label>
                 <div className="flex gap-2">
@@ -235,7 +235,7 @@ export default function ArgumentBuilderPage() {
 
             {/* Skeleton Argument */}
             <div>
-              <label className="block text-xs font-bold text-court-text-sec tracking-wider mb-1.5">
+              <label className="block text-court-sm font-bold text-court-text-sec tracking-wider mb-1.5">
                 YOUR SKELETON ARGUMENT *
               </label>
               <textarea
@@ -252,7 +252,7 @@ export default function ArgumentBuilderPage() {
 
             {/* Authorities */}
             <div>
-              <label className="block text-xs font-bold text-court-text-sec tracking-wider mb-1.5">
+              <label className="block text-court-sm font-bold text-court-text-sec tracking-wider mb-1.5">
                 CITED AUTHORITIES (OPTIONAL)
               </label>
               <input

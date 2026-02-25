@@ -118,7 +118,7 @@ function SessionRolesList({
                   size="xs"
                 />
               )}
-              <span className="text-xs text-court-text-sec">{r.roleName}</span>
+              <span className="text-court-sm text-court-text-sec">{r.roleName}</span>
             </div>
             {r.isClaimed ? (
               isClaimedByMe ? (
@@ -214,7 +214,7 @@ export default function SessionsPage() {
           {hasMax && (
             <div className="mb-3.5">
               <div className="flex justify-between mb-1.5">
-                <span className="text-xs text-court-text-sec">{s.participantCount}/{s.maxParticipants} participants</span>
+                <span className="text-court-sm text-court-text-sec">{s.participantCount}/{s.maxParticipants} participants</span>
                 {!isPast && spotsLeft > 0 && (
                   <span className="text-court-sm text-gold font-semibold">{spotsLeft} spots left</span>
                 )}
@@ -254,7 +254,7 @@ export default function SessionsPage() {
     <div className="pb-6">
       <div className="px-4 pt-3 pb-4">
         <h1 className="font-serif text-2xl font-bold text-court-text mb-1">Sessions</h1>
-        <p className="text-xs text-court-text-sec mb-3.5">
+        <p className="text-court-sm text-court-text-sec mb-3.5">
           Schedule, join, and review your moot court sessions
         </p>
         <div className="flex gap-1 bg-white/[0.04] rounded-xl p-0.5">
@@ -262,7 +262,7 @@ export default function SessionsPage() {
             <button
               key={t}
               onClick={() => handleTabClick(i)}
-              className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${
+              className={`flex-1 py-2 rounded-lg text-court-sm font-bold transition-all ${
                 tab === i && i !== 1 ? "bg-gold text-navy" : "text-court-text-sec"
               } ${i === 1 ? "hover:text-gold" : ""}`}
             >

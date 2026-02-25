@@ -57,12 +57,12 @@ function ResetPasswordForm() {
           <h1 className="font-serif text-xl font-bold text-court-text mb-2">
             Invalid Reset Link
           </h1>
-          <p className="text-sm text-court-text-sec mb-6">
+          <p className="text-court-base text-court-text-sec mb-6">
             This password reset link is invalid or has expired. Please request a new one.
           </p>
           <Link
             href="/forgot-password"
-            className="w-full inline-block py-3 text-sm font-bold bg-gold text-navy rounded-xl hover:bg-gold/90 transition-colors"
+            className="w-full inline-block py-3 text-court-base font-bold bg-gold text-navy rounded-xl hover:bg-gold/90 transition-colors"
           >
             Request New Link
           </Link>
@@ -81,12 +81,12 @@ function ResetPasswordForm() {
           <h1 className="font-serif text-xl font-bold text-court-text mb-2">
             Password Reset
           </h1>
-          <p className="text-sm text-court-text-sec mb-6">
+          <p className="text-court-base text-court-text-sec mb-6">
             Your password has been successfully updated. You can now sign in with your new password.
           </p>
           <Link
             href="/login"
-            className="w-full inline-block py-3 text-sm font-bold bg-gold text-navy rounded-xl hover:bg-gold/90 transition-colors"
+            className="w-full inline-block py-3 text-court-base font-bold bg-gold text-navy rounded-xl hover:bg-gold/90 transition-colors"
           >
             Sign In
           </Link>
@@ -104,7 +104,7 @@ function ResetPasswordForm() {
         <h1 className="font-serif text-2xl font-bold text-court-text">
           Create New Password
         </h1>
-        <p className="text-xs text-court-text-sec mt-1">
+        <p className="text-court-sm text-court-text-sec mt-1">
           Choose a strong password for your account
         </p>
       </div>
@@ -156,7 +156,7 @@ function ResetPasswordForm() {
         <button
           type="submit"
           disabled={!canSubmit || loading}
-          className="w-full bg-gold text-navy font-bold rounded-xl py-3 text-sm tracking-wide hover:bg-gold/90 transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
+          className="w-full bg-gold text-navy font-bold rounded-xl py-3 text-court-base tracking-wide hover:bg-gold/90 transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
         >
           {loading && <Loader2 size={16} className="animate-spin" />}
           {loading ? "Resetting..." : "Reset Password"}

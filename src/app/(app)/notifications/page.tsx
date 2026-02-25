@@ -104,7 +104,7 @@ export default function NotificationsPage() {
       <div className="pb-6">
         <div className="px-4 pt-3 pb-4">
           <h1 className="font-serif text-2xl font-bold text-court-text">Notifications</h1>
-          <p className="text-xs text-court-text-sec mt-0.5">0 unread</p>
+          <p className="text-court-sm text-court-text-sec mt-0.5">0 unread</p>
         </div>
         <EmptyState
           icon={<Bell size={28} />}
@@ -120,12 +120,12 @@ export default function NotificationsPage() {
       <div className="px-4 pt-3 pb-4 flex justify-between items-center">
         <div>
           <h1 className="font-serif text-2xl font-bold text-court-text">Notifications</h1>
-          <p className="text-xs text-court-text-sec mt-0.5">{unread.length} unread</p>
+          <p className="text-court-sm text-court-text-sec mt-0.5">{unread.length} unread</p>
         </div>
         {unread.length > 0 && (
           <button
             onClick={handleMarkAllRead}
-            className="text-xs text-gold font-semibold hover:text-gold/80 transition-colors"
+            className="text-court-sm text-gold font-semibold hover:text-gold/80 transition-colors"
           >
             Mark all read
           </button>
@@ -199,7 +199,7 @@ export default function NotificationsPage() {
       {unread.length === 0 && read.length > 0 && (
         <div className="px-4 mb-4">
           <div className="text-center py-4 bg-white/[0.02] rounded-xl border border-court-border-light">
-            <p className="text-sm text-court-text-sec">All caught up</p>
+            <p className="text-court-base text-court-text-sec">All caught up</p>
           </div>
         </div>
       )}

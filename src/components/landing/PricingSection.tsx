@@ -180,7 +180,7 @@ export function PricingSection() {
             {/* CTA Button */}
             <Link
               href={tier.name === "Free" ? "/register" : `/register?plan=${tier.name.toLowerCase().replace("+", "_plus")}`}
-              className={`w-full mt-5 py-2.5 rounded-xl text-sm font-bold tracking-wide transition-all duration-200 text-center block ${
+              className={`w-full mt-5 py-2.5 rounded-xl text-court-base font-bold tracking-wide transition-all duration-200 text-center block ${
                 tier.ctaVariant === "primary"
                   ? "bg-gold text-navy hover:bg-gold/90"
                   : "bg-white/5 text-court-text-sec border border-court-border hover:bg-white/10"

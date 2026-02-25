@@ -162,7 +162,7 @@ export default function ProfilePage() {
           <div className="flex flex-col items-center text-center">
             <Avatar initials={initials} chamber={profile.chamber} size="xl" border />
             <h1 className="font-serif text-xl font-bold text-court-text mt-3">{profile.fullName}</h1>
-            <p className="text-xs text-court-text-sec mt-1">{profile.university}</p>
+            <p className="text-court-sm text-court-text-sec mt-1">{profile.university}</p>
             <p className="text-court-sm text-court-text-ter mt-0.5">{yearLabel}{profile.chamber ? ` · ${profile.chamber} Chamber` : ""}</p>
             {profile.bio && (
               <p className="text-court-sm text-court-text-sec mt-2 max-w-[280px] sm:max-w-xs leading-relaxed">{profile.bio}</p>
@@ -264,7 +264,7 @@ export default function ProfilePage() {
               </div>
               <div className="flex gap-2 items-center">
                 {a.tag && <Tag small>{a.tag}</Tag>}
-                <span className="text-court-text-ter text-sm">&rsaquo;</span>
+                <span className="text-court-text-ter text-court-base">&rsaquo;</span>
               </div>
             </div>
           </Link>

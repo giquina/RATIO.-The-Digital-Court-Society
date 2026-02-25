@@ -227,7 +227,7 @@ export function PostCard({ post, currentProfileId, isDemo }: PostCardProps) {
               <div className="absolute right-0 top-7 z-20 bg-navy-card border border-court-border rounded-lg shadow-xl overflow-hidden min-w-[140px]">
                 <button
                   onClick={handleDelete}
-                  className="flex items-center gap-2 w-full px-3 py-2.5 text-xs text-red-400 hover:bg-red-500/10 transition-colors"
+                  className="flex items-center gap-2 w-full px-3 py-2.5 text-court-sm text-red-400 hover:bg-red-500/10 transition-colors"
                 >
                   <Trash2 size={12} />
                   Delete Post
@@ -266,7 +266,7 @@ export function PostCard({ post, currentProfileId, isDemo }: PostCardProps) {
             <button
               key={r.key}
               onClick={() => handleReaction(r.key)}
-              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-semibold transition-all border ${
+              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-full text-court-sm font-semibold transition-all border ${
                 isActive
                   ? r.bgActive
                   : "bg-transparent border-transparent text-court-text-ter hover:bg-white/[0.04]"
@@ -287,7 +287,7 @@ export function PostCard({ post, currentProfileId, isDemo }: PostCardProps) {
         {/* Bookmark — pushed to right */}
         <button
           onClick={handleBookmark}
-          className={`ml-auto flex items-center gap-1 px-2 py-1.5 rounded-full text-xs transition-all ${
+          className={`ml-auto flex items-center gap-1 px-2 py-1.5 rounded-full text-court-sm transition-all ${
             bookmarked
               ? "text-gold"
               : "text-court-text-ter hover:text-court-text-sec"

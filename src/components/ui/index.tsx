@@ -58,7 +58,7 @@ export function Avatar({
 }) {
   const display = initials ?? (name ? getInitials(name) : "?");
   const color = chamber ? CHAMBER_COLORS[chamber] ?? "#6B2D3E" : "#6B2D3E";
-  const sizes = { xs: "w-6 h-6 text-court-xs", sm: "w-8 h-8 text-xs", md: "w-10 h-10 text-sm", lg: "w-12 h-12 text-base", xl: "w-16 h-16 text-lg" };
+  const sizes = { xs: "w-6 h-6 text-court-xs", sm: "w-8 h-8 text-court-sm", md: "w-10 h-10 text-court-base", lg: "w-12 h-12 text-base", xl: "w-16 h-16 text-lg" };
 
   return (
     <div className="relative shrink-0">
@@ -136,9 +136,9 @@ export function Button({
     ghost: "text-court-text-sec hover:text-court-text hover:bg-white/5",
   };
   const sizes = {
-    sm: "px-3 py-1.5 text-xs rounded-lg",
-    md: "px-5 py-2.5 text-sm rounded-xl",
-    lg: "px-6 py-3 text-sm rounded-xl",
+    sm: "px-3 py-1.5 text-court-sm rounded-lg",
+    md: "px-5 py-2.5 text-court-base rounded-xl",
+    lg: "px-6 py-3 text-court-base rounded-xl",
   };
 
   return (
@@ -228,7 +228,7 @@ export function SectionHeader({
     <div className="flex justify-between items-center mb-3">
       <h2 className="font-serif text-lg font-bold text-court-text">{title}</h2>
       {action && (
-        <button onClick={onAction} className="text-xs text-gold font-semibold">
+        <button onClick={onAction} className="text-court-sm text-gold font-semibold">
           {action} →
         </button>
       )}
@@ -251,7 +251,7 @@ export function FollowButton({
       onClick={onToggle}
       className={cn(
         "font-bold rounded-xl transition-all duration-200",
-        small ? "px-3 py-1 text-court-xs" : "px-4 py-1.5 text-xs",
+        small ? "px-3 py-1 text-court-xs" : "px-4 py-1.5 text-court-sm",
         isFollowing
           ? "border border-white/10 text-court-text-sec hover:border-red-400/30 hover:text-red-400"
           : "border border-gold bg-gold text-navy hover:bg-gold/90"
@@ -277,7 +277,7 @@ export function CommendButton({
       <button
         onClick={onToggle}
         className={cn(
-          "flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all duration-200",
+          "flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-court-sm font-semibold transition-all duration-200",
           isCommended
             ? "bg-gold-dim border border-gold/25 text-gold"
             : "text-court-text-ter hover:text-gold hover:bg-gold-dim"
@@ -308,7 +308,7 @@ export function EmptyState({
         {icon}
       </div>
       <h3 className="font-serif text-lg font-bold text-court-text mb-2">{title}</h3>
-      <p className="text-sm text-court-text-ter mb-6 max-w-xs">{description}</p>
+      <p className="text-court-base text-court-text-ter mb-6 max-w-xs">{description}</p>
       {action}
     </div>
   );
@@ -522,7 +522,7 @@ export function ErrorState({
         <X size={28} className="text-red-500" />
       </div>
       <h3 className="font-serif text-lg font-bold text-court-text mb-2">{title}</h3>
-      <p className="text-sm text-court-text-ter mb-6 max-w-xs">{description}</p>
+      <p className="text-court-base text-court-text-ter mb-6 max-w-xs">{description}</p>
       {onRetry && (
         <Button variant="outline" size="sm" onClick={onRetry}>Try Again</Button>
       )}

@@ -89,10 +89,10 @@ export default function SocietyPage() {
     <div className="pb-6">
       <div className="px-4 pt-3 pb-4">
         <h1 className="font-serif text-2xl font-bold text-court-text mb-1">Society</h1>
-        <p className="text-xs text-court-text-sec mb-1">
+        <p className="text-court-sm text-court-text-sec mb-1">
           Connect with fellow advocates, compare rankings, and build your chamber
         </p>
-        <p className="text-xs text-court-text-ter mb-3.5">
+        <p className="text-court-sm text-court-text-ter mb-3.5">
           {profile ? statsLine : <Skeleton className="h-3 w-48 inline-block" />}
         </p>
         <div className="bg-white/[0.05] rounded-xl px-3.5 py-2.5 flex items-center gap-2 mb-3.5">
@@ -102,17 +102,17 @@ export default function SocietyPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search advocates, universities..."
-            className="flex-1 bg-transparent text-xs text-court-text outline-none placeholder:text-court-text-ter"
+            className="flex-1 bg-transparent text-court-sm text-court-text outline-none placeholder:text-court-text-ter"
             aria-label="Search society"
           />
           {search && (
-            <button onClick={() => setSearch("")} className="text-court-text-ter text-xs">{"\u2715"}</button>
+            <button onClick={() => setSearch("")} className="text-court-text-ter text-court-sm">{"\u2715"}</button>
           )}
         </div>
         <div className="flex gap-1 bg-white/[0.04] rounded-xl p-0.5">
           {tabs.map((t, i) => (
             <button key={t} onClick={() => { setTab(i); setFilterTab(0); }}
-              className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all truncate px-1 ${tab === i ? "bg-gold text-navy" : "text-court-text-sec"}`}>
+              className={`flex-1 py-2 rounded-lg text-court-sm font-bold transition-all truncate px-1 ${tab === i ? "bg-gold text-navy" : "text-court-text-sec"}`}>
               {t}
             </button>
           ))}
@@ -154,7 +154,7 @@ export default function SocietyPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-center">
                         <div>
-                          <p className="text-sm font-bold text-court-text truncate">{p.fullName}</p>
+                          <p className="text-court-base font-bold text-court-text truncate">{p.fullName}</p>
                           <p className="text-court-xs text-court-text-ter mt-0.5">
                             {p.universityShort} · Year {p.yearOfStudy}{p.chamber ? ` \u00B7 ${p.chamber} Chamber` : ""}
                           </p>
@@ -167,7 +167,7 @@ export default function SocietyPage() {
                     </div>
                   </div>
                   {p.bio && (
-                    <p className="text-xs text-court-text-sec mt-2 leading-relaxed">{p.bio}</p>
+                    <p className="text-court-sm text-court-text-sec mt-2 leading-relaxed">{p.bio}</p>
                   )}
                   <div className="flex flex-wrap gap-x-3 gap-y-1 mt-3 pt-2.5 border-t border-court-border-light items-center">
                     {[
@@ -248,7 +248,7 @@ export default function SocietyPage() {
                   const isMe = r._id === profile?._id;
                   return (
                     <Card key={r._id} highlight={isMe} className="px-3.5 py-3 flex items-center gap-3">
-                      <span className="text-sm font-bold text-court-text-ter w-6 text-center font-serif">{r.pos}</span>
+                      <span className="text-court-base font-bold text-court-text-ter w-6 text-center font-serif">{r.pos}</span>
                       <Avatar initials={getInitials(r.fullName)} chamber={r.chamber} size="sm" />
                       <div className="flex-1 min-w-0">
                         <p className={`text-court-base font-bold truncate ${isMe ? "text-gold" : "text-court-text"}`}>
@@ -257,7 +257,7 @@ export default function SocietyPage() {
                         <p className="text-court-xs text-court-text-ter truncate">{r.universityShort} · {r.totalMoots} moots</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-bold text-court-text font-serif">{r.totalPoints}</p>
+                        <p className="text-court-base font-bold text-court-text font-serif">{r.totalPoints}</p>
                         <p className="text-court-xs text-court-text-ter uppercase">points</p>
                       </div>
                     </Card>

@@ -82,7 +82,7 @@ export default function ParliamentPage() {
             <Landmark size={20} className="text-gold" />
             <h1 className="font-serif text-2xl font-bold text-court-text">Parliament</h1>
           </div>
-          <p className="text-xs text-court-text-sec mt-1">
+          <p className="text-court-sm text-court-text-sec mt-1">
             The legislative body of Ratio. Propose motions, debate, and vote on institutional matters.
           </p>
         </div>
@@ -117,7 +117,7 @@ export default function ParliamentPage() {
         <section className="px-4 md:px-6 lg:px-8 mb-5">
           <div className="flex justify-between items-center mb-3">
             <h2 className="font-serif text-lg font-bold text-court-text">Active Motions</h2>
-            <Link href="/parliament/motions" className="text-xs text-gold font-semibold">
+            <Link href="/parliament/motions" className="text-court-sm text-gold font-semibold">
               View all →
             </Link>
           </div>

@@ -188,7 +188,7 @@ export default function ChangelogPage() {
         <div className="max-w-content-medium mx-auto">
           <Link
             href="/law-book"
-            className="inline-flex items-center gap-1.5 text-xs text-court-text-ter hover:text-gold transition-colors"
+            className="inline-flex items-center gap-1.5 text-court-sm text-court-text-ter hover:text-gold transition-colors"
           >
             <ArrowLeft size={14} /> Back to Law Book
           </Link>
@@ -204,7 +204,7 @@ export default function ChangelogPage() {
               Recent Changes
             </h1>
           </div>
-          <p className="text-sm text-court-text-sec">
+          <p className="text-court-base text-court-text-sec">
             Version history and recent edits to the Law Book
           </p>
         </div>
@@ -216,7 +216,7 @@ export default function ChangelogPage() {
           <select
             value={moduleFilter}
             onChange={(e) => setModuleFilter(e.target.value)}
-            className="bg-white/[0.05] border border-court-border rounded-xl px-3.5 py-2 text-sm text-court-text outline-none focus:border-gold/40"
+            className="bg-white/[0.05] border border-court-border rounded-xl px-3.5 py-2 text-court-base text-court-text outline-none focus:border-gold/40"
           >
             {MODULE_FILTERS.map((m) => (
               <option key={m.value} value={m.value}>
@@ -233,12 +233,12 @@ export default function ChangelogPage() {
           {filtered.length === 0 ? (
             <div className="text-center py-12">
               <Clock size={32} className="text-court-text-ter mx-auto mb-3" />
-              <p className="text-sm text-court-text-ter">
+              <p className="text-court-base text-court-text-ter">
                 No changes found for this module.
               </p>
               <button
                 onClick={() => setModuleFilter("")}
-                className="text-xs text-gold font-semibold mt-2"
+                className="text-court-sm text-gold font-semibold mt-2"
               >
                 Clear filter
               </button>

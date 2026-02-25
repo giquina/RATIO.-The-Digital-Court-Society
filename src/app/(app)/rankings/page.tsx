@@ -86,7 +86,7 @@ export default function RankingsPage() {
             <Trophy size={20} className="text-gold" />
             <h1 className="font-serif text-2xl font-bold text-court-text">National Rankings</h1>
           </div>
-          <p className="text-xs text-court-text-sec">Top advocates across all UK law schools</p>
+          <p className="text-court-sm text-court-text-sec">Top advocates across all UK law schools</p>
         </div>
         <div className="px-4 md:px-6 lg:px-8 space-y-2">
           {Array.from({ length: 8 }).map((_, i) => (
@@ -105,7 +105,7 @@ export default function RankingsPage() {
           <Trophy size={20} className="text-gold" />
           <h1 className="font-serif text-2xl font-bold text-court-text">National Rankings</h1>
         </div>
-        <p className="text-xs text-court-text-sec">
+        <p className="text-court-sm text-court-text-sec">
           Top advocates across all UK law schools
         </p>
       </div>
@@ -197,7 +197,7 @@ export default function RankingsPage() {
           const isMe = idx + 3 === myIndex;
           return (
             <Card key={person.fullName + rank} highlight={isMe} className="px-3.5 py-3 flex items-center gap-3">
-              <span className="text-sm font-bold text-court-text-ter w-7 text-center font-serif">
+              <span className="text-court-base font-bold text-court-text-ter w-7 text-center font-serif">
                 {rank}
               </span>
               <Avatar initials={getInitials(person.fullName)} chamber={person.chamber} size="sm" />
@@ -211,7 +211,7 @@ export default function RankingsPage() {
               </div>
               <Tag color={isMe ? "gold" : "blue"}>{person.chamber}</Tag>
               <div className="text-right ml-1">
-                <p className="text-sm font-bold text-court-text font-serif">
+                <p className="text-court-base font-bold text-court-text font-serif">
                   {person.totalPoints.toLocaleString()}
                 </p>
                 <p className="text-court-xs text-court-text-ter uppercase">points</p>
@@ -233,7 +233,7 @@ export default function RankingsPage() {
                 <p className="text-court-xs text-court-text-ter uppercase tracking-widest">Your Position</p>
                 <div className="flex items-baseline gap-2 mt-0.5">
                   <span className="font-serif text-2xl font-bold text-gold">#{myIndex + 1}</span>
-                  <span className="text-xs text-court-text-sec">of {advocates.length} advocates</span>
+                  <span className="text-court-sm text-court-text-sec">of {advocates.length} advocates</span>
                 </div>
               </div>
               <div className="text-right">

@@ -82,7 +82,7 @@ export default function ModeSelector({
         <h1 className="font-serif text-2xl font-bold text-court-text mb-1">
           AI Practice
         </h1>
-        <p className="text-xs text-court-text-sec">
+        <p className="text-court-sm text-court-text-sec">
           Train with AI-powered legal personas. Select a mode to begin.
         </p>
       </motion.div>

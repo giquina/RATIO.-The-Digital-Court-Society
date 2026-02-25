@@ -108,7 +108,7 @@ export default function BadgesPage() {
             Badges & Achievements
           </h1>
         </div>
-        <p className="text-xs text-court-text-sec mt-1">
+        <p className="text-court-sm text-court-text-sec mt-1">
           Track your milestones and unlock achievements
         </p>
       </div>

@@ -50,7 +50,7 @@ export function LawBookPreview({ id }: { id?: string }) {
             </ul>
             <Link
               href="/law-book"
-              className="inline-flex items-center gap-2 bg-gold text-navy font-bold rounded-xl px-6 py-3 text-sm tracking-wide hover:bg-gold/90 transition-colors"
+              className="inline-flex items-center gap-2 bg-gold text-navy font-bold rounded-xl px-6 py-3 text-court-base tracking-wide hover:bg-gold/90 transition-colors"
             >
               Explore the Law Book
             </Link>

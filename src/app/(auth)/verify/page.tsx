@@ -59,7 +59,7 @@ export default function VerifyPage() {
         <h1 className="font-serif text-2xl font-bold text-court-text mb-1">
           Student Verification
         </h1>
-        <p className="text-xs text-court-text-sec">
+        <p className="text-court-sm text-court-text-sec">
           Verify your university status to unlock exclusive features.
         </p>
       </div>
@@ -158,7 +158,7 @@ export default function VerifyPage() {
               University Email Verification
             </h3>
             <div>
-              <label className="block text-xs font-bold text-court-text-sec tracking-wider mb-1.5">
+              <label className="block text-court-sm font-bold text-court-text-sec tracking-wider mb-1.5">
                 YOUR UNIVERSITY EMAIL
               </label>
               <input
@@ -210,7 +210,7 @@ export default function VerifyPage() {
             </h3>
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-bold text-court-text-sec tracking-wider mb-1.5">
+                <label className="block text-court-sm font-bold text-court-text-sec tracking-wider mb-1.5">
                   UNIVERSITY NAME
                 </label>
                 <input
@@ -223,7 +223,7 @@ export default function VerifyPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-court-text-sec tracking-wider mb-1.5">
+                <label className="block text-court-sm font-bold text-court-text-sec tracking-wider mb-1.5">
                   STUDENT ID NUMBER
                 </label>
                 <input

@@ -70,7 +70,7 @@ export default function TribunalPage() {
               Digital Review Tribunal
             </h1>
           </div>
-          <p className="text-xs text-court-text-sec mt-1">
+          <p className="text-court-sm text-court-text-sec mt-1">
             The judicial body of Ratio. File cases, submit arguments, and seek remedies.
           </p>
         </div>

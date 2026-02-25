@@ -86,7 +86,7 @@ export default function ContributePage() {
           <h1 className="font-serif text-xl font-bold text-court-text mb-2">
             Submission Received
           </h1>
-          <p className="text-sm text-court-text-sec mb-2 max-w-sm mx-auto">
+          <p className="text-court-base text-court-text-sec mb-2 max-w-sm mx-auto">
             Your contribution &quot;{title}&quot; has been submitted for peer
             review. You will be notified when reviewers provide feedback.
           </p>
@@ -116,7 +116,7 @@ export default function ContributePage() {
         <div className="max-w-content-medium mx-auto">
           <Link
             href="/law-book"
-            className="inline-flex items-center gap-1.5 text-xs text-court-text-ter hover:text-gold transition-colors"
+            className="inline-flex items-center gap-1.5 text-court-sm text-court-text-ter hover:text-gold transition-colors"
           >
             <ArrowLeft size={14} /> Back to Law Book
           </Link>
@@ -132,7 +132,7 @@ export default function ContributePage() {
               Contribute to the Law Book
             </h1>
           </div>
-          <p className="text-sm text-court-text-sec">
+          <p className="text-court-base text-court-text-sec">
             Submit a topic for peer review. All contributions must follow the
             IRAC structure and include a minimum of 2 citations.
           </p>
@@ -156,7 +156,7 @@ export default function ContributePage() {
                 <select
                   value={module}
                   onChange={(e) => setModule(e.target.value)}
-                  className="w-full bg-white/[0.05] border border-court-border rounded-xl px-3.5 py-2.5 text-sm text-court-text outline-none focus:border-gold/40"
+                  className="w-full bg-white/[0.05] border border-court-border rounded-xl px-3.5 py-2.5 text-court-base text-court-text outline-none focus:border-gold/40"
                 >
                   {MODULES.map((m) => (
                     <option key={m.value} value={m.value}>
@@ -175,7 +175,7 @@ export default function ContributePage() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="e.g., Offer and Acceptance"
-                  className="w-full bg-white/[0.05] border border-court-border rounded-xl px-3.5 py-2.5 text-sm text-court-text outline-none focus:border-gold/40 placeholder:text-court-text-ter"
+                  className="w-full bg-white/[0.05] border border-court-border rounded-xl px-3.5 py-2.5 text-court-base text-court-text outline-none focus:border-gold/40 placeholder:text-court-text-ter"
                 />
               </label>
             </Card>
@@ -204,7 +204,7 @@ export default function ContributePage() {
                   onChange={(e) => setIssue(e.target.value)}
                   placeholder="What legal question does this address?"
                   rows={4}
-                  className="w-full bg-white/[0.05] border border-court-border rounded-xl px-3.5 py-2.5 text-sm text-court-text outline-none focus:border-gold/40 placeholder:text-court-text-ter resize-y"
+                  className="w-full bg-white/[0.05] border border-court-border rounded-xl px-3.5 py-2.5 text-court-base text-court-text outline-none focus:border-gold/40 placeholder:text-court-text-ter resize-y"
                 />
               </label>
 
@@ -223,7 +223,7 @@ export default function ContributePage() {
                   onChange={(e) => setRule(e.target.value)}
                   placeholder="What is the governing law?"
                   rows={4}
-                  className="w-full bg-white/[0.05] border border-court-border rounded-xl px-3.5 py-2.5 text-sm text-court-text outline-none focus:border-gold/40 placeholder:text-court-text-ter resize-y"
+                  className="w-full bg-white/[0.05] border border-court-border rounded-xl px-3.5 py-2.5 text-court-base text-court-text outline-none focus:border-gold/40 placeholder:text-court-text-ter resize-y"
                 />
               </label>
 
@@ -242,7 +242,7 @@ export default function ContributePage() {
                   onChange={(e) => setApplication(e.target.value)}
                   placeholder="How has this been applied in key cases?"
                   rows={4}
-                  className="w-full bg-white/[0.05] border border-court-border rounded-xl px-3.5 py-2.5 text-sm text-court-text outline-none focus:border-gold/40 placeholder:text-court-text-ter resize-y"
+                  className="w-full bg-white/[0.05] border border-court-border rounded-xl px-3.5 py-2.5 text-court-base text-court-text outline-none focus:border-gold/40 placeholder:text-court-text-ter resize-y"
                 />
               </label>
 
@@ -261,7 +261,7 @@ export default function ContributePage() {
                   onChange={(e) => setConclusion(e.target.value)}
                   placeholder="What is the current state of the law?"
                   rows={4}
-                  className="w-full bg-white/[0.05] border border-court-border rounded-xl px-3.5 py-2.5 text-sm text-court-text outline-none focus:border-gold/40 placeholder:text-court-text-ter resize-y"
+                  className="w-full bg-white/[0.05] border border-court-border rounded-xl px-3.5 py-2.5 text-court-base text-court-text outline-none focus:border-gold/40 placeholder:text-court-text-ter resize-y"
                 />
               </label>
             </Card>
@@ -311,7 +311,7 @@ export default function ContributePage() {
                 <select
                   value={newCitationType}
                   onChange={(e) => setNewCitationType(e.target.value)}
-                  className="bg-white/[0.05] border border-court-border rounded-xl px-3 py-2.5 text-sm text-court-text outline-none focus:border-gold/40 shrink-0"
+                  className="bg-white/[0.05] border border-court-border rounded-xl px-3 py-2.5 text-court-base text-court-text outline-none focus:border-gold/40 shrink-0"
                 >
                   {CITATION_TYPES.map((t) => (
                     <option key={t} value={t}>
@@ -330,7 +330,7 @@ export default function ContributePage() {
                     }
                   }}
                   placeholder="Enter citation in OSCOLA format..."
-                  className="flex-1 bg-white/[0.05] border border-court-border rounded-xl px-3.5 py-2.5 text-sm text-court-text outline-none focus:border-gold/40 placeholder:text-court-text-ter"
+                  className="flex-1 bg-white/[0.05] border border-court-border rounded-xl px-3.5 py-2.5 text-court-base text-court-text outline-none focus:border-gold/40 placeholder:text-court-text-ter"
                 />
                 <Button
                   size="sm"

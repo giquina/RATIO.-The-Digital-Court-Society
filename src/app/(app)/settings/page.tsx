@@ -156,7 +156,7 @@ export default function SettingsPage() {
       {/* Header */}
       <div className="px-4 md:px-6 lg:px-8 pt-3 pb-4">
         <h1 className="font-serif text-2xl font-bold text-court-text">Settings</h1>
-        <p className="text-xs text-court-text-sec mt-1">Manage your account and preferences</p>
+        <p className="text-court-sm text-court-text-sec mt-1">Manage your account and preferences</p>
       </div>
 
       <div className="px-4 md:px-6 lg:px-8 space-y-5">
@@ -292,12 +292,12 @@ export default function SettingsPage() {
                 <button
                   onClick={handleSignOut}
                   disabled={signingOut}
-                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-red-500/30 text-red-400 text-xs font-bold hover:bg-red-500/10 transition-colors disabled:opacity-50"
+                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-red-500/30 text-red-400 text-court-sm font-bold hover:bg-red-500/10 transition-colors disabled:opacity-50"
                 >
                   {signingOut ? <Loader2 size={14} className="animate-spin" /> : <LogOut size={14} />}
                   {signingOut ? "Signing out..." : "Sign Out"}
                 </button>
-                <button className="text-xs text-red-400/60 hover:text-red-400 transition-colors flex items-center gap-1 px-3 py-2.5">
+                <button className="text-court-sm text-red-400/60 hover:text-red-400 transition-colors flex items-center gap-1 px-3 py-2.5">
                   <Trash2 size={12} />
                   Delete Account
                 </button>

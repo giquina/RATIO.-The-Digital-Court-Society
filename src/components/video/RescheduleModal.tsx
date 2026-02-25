@@ -43,7 +43,7 @@ export function RescheduleModal({
         <div className="w-10 h-1 rounded-full bg-white/10 mx-auto mb-5" />
 
         <h2 className="font-serif text-lg font-bold text-court-text mb-1">Reschedule Session</h2>
-        <p className="text-xs text-court-text-sec mb-4">{sessionTitle}</p>
+        <p className="text-court-sm text-court-text-sec mb-4">{sessionTitle}</p>
 
         <p className="text-court-xs text-court-text-ter mb-4">
           Currently: {currentDate} &middot; {currentTime}

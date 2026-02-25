@@ -127,7 +127,7 @@ export default function HelpPage() {
           <HelpCircle size={20} className="text-gold" />
           <h1 className="font-serif text-2xl font-bold text-court-text">Help & FAQ</h1>
         </div>
-        <p className="text-xs text-court-text-sec mt-1">
+        <p className="text-court-sm text-court-text-sec mt-1">
           Find answers to common questions about Ratio
         </p>
       </div>
@@ -141,13 +141,13 @@ export default function HelpPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search questions..."
-            className="flex-1 bg-transparent text-sm text-court-text outline-none placeholder:text-court-text-ter"
+            className="flex-1 bg-transparent text-court-base text-court-text outline-none placeholder:text-court-text-ter"
             aria-label="Search FAQ"
           />
           {search && (
             <button
               onClick={() => setSearch("")}
-              className="text-court-text-ter text-xs hover:text-court-text transition-colors"
+              className="text-court-text-ter text-court-sm hover:text-court-text transition-colors"
             >
               Clear
             </button>
@@ -228,7 +228,7 @@ export default function HelpPage() {
         {filteredSections.length === 0 && (
           <div className="text-center py-12">
             <HelpCircle size={32} className="text-court-text-ter mx-auto mb-3" />
-            <p className="text-sm text-court-text-ter">
+            <p className="text-court-base text-court-text-ter">
               No results found for &ldquo;{search}&rdquo;
             </p>
           </div>
@@ -250,7 +250,7 @@ export default function HelpPage() {
             </p>
             <a
               href="mailto:mgiqui01@student.bbk.ac.uk"
-              className="inline-flex items-center gap-2 bg-gold text-navy font-bold text-xs px-5 py-2.5 rounded-xl hover:bg-gold/90 transition-colors"
+              className="inline-flex items-center gap-2 bg-gold text-navy font-bold text-court-sm px-5 py-2.5 rounded-xl hover:bg-gold/90 transition-colors"
             >
               <Mail size={14} />
               mgiqui01@student.bbk.ac.uk

@@ -26,7 +26,7 @@ export function VerifiedOnly({ children, fallbackMessage }: VerifiedOnlyProps) {
         <h3 className="font-serif text-lg font-bold text-court-text mb-2">
           Verification Expired
         </h3>
-        <p className="text-sm text-court-text-ter mb-6 max-w-xs">
+        <p className="text-court-base text-court-text-ter mb-6 max-w-xs">
           Your student verification has expired. Please re-verify to continue
           accessing institutional features.
         </p>
@@ -48,7 +48,7 @@ export function VerifiedOnly({ children, fallbackMessage }: VerifiedOnlyProps) {
         <h3 className="font-serif text-lg font-bold text-court-text mb-2">
           Verification Required
         </h3>
-        <p className="text-sm text-court-text-ter mb-2 max-w-xs">
+        <p className="text-court-base text-court-text-ter mb-2 max-w-xs">
           {fallbackMessage ||
             "This feature is available to verified Advocates. Verify your university email to unlock it."}
         </p>

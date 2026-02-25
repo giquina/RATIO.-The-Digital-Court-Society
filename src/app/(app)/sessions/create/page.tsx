@@ -97,7 +97,7 @@ export default function CreateSessionPage() {
         <h1 className="font-serif text-2xl font-bold text-court-text mb-1">
           {isDebateMode ? "Create Structured Debate" : "Create Session"}
         </h1>
-        <p className="text-xs text-court-text-sec">
+        <p className="text-court-sm text-court-text-sec">
           {isDebateMode
             ? "Build a well-reasoned academic debate with structured arguments"
             : "Organise a moot, mock trial, or debate"}

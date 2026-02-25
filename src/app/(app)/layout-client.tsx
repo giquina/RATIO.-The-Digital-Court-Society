@@ -93,7 +93,7 @@ function AppLayoutWithConvex({ children }: { children: React.ReactNode }) {
               </p>
               <button
                 onClick={() => window.location.reload()}
-                className="px-4 py-2 bg-gold text-navy text-sm font-bold rounded-xl hover:bg-gold/90 transition-colors"
+                className="px-4 py-2 bg-gold text-navy text-court-base font-bold rounded-xl hover:bg-gold/90 transition-colors"
               >
                 Retry
               </button>

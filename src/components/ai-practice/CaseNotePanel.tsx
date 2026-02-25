@@ -174,7 +174,7 @@ export default function CaseNotePanel({
               {/* Header */}
               <div className="flex items-center justify-between px-4 py-3 border-b border-court-border-light shrink-0">
                 <div>
-                  <h3 className="font-serif text-sm font-bold text-court-text">Case Note</h3>
+                  <h3 className="font-serif text-court-base font-bold text-court-text">Case Note</h3>
                   <p className="text-court-xs text-court-text-ter">{caseNote.areaOfLaw}</p>
                 </div>
                 <div className="flex items-center gap-2">

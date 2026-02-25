@@ -578,7 +578,7 @@ export default function AIPracticePage() {
         {/* Scrollable content */}
         <div className="flex-1 overflow-y-auto pb-4">
         <div className="px-4 pt-3 pb-4">
-          <button onClick={() => setScreen("select")} className="text-xs text-court-text-ter mb-3">&larr; Back to modes</button>
+          <button onClick={() => setScreen("select")} className="text-court-sm text-court-text-ter mb-3">&larr; Back to modes</button>
           <div className="flex items-center gap-3 mb-4">
             <div className="w-12 h-12 rounded-court flex items-center justify-center"
               style={{ background: `linear-gradient(135deg, ${persona.gradient[0]}, ${persona.gradient[1]})` }}>
@@ -622,7 +622,7 @@ export default function AIPracticePage() {
 
         <div className="px-4">
           <Card className="p-4 mb-3">
-            <h2 className="font-serif text-sm font-bold text-gold mb-3 uppercase tracking-wider">Session Briefing</h2>
+            <h2 className="font-serif text-court-base font-bold text-gold mb-3 uppercase tracking-wider">Session Briefing</h2>
             {[
               { label: "Area of Law", value: brief.area },
               { label: "Matter", value: brief.matter },
@@ -685,8 +685,8 @@ export default function AIPracticePage() {
                 }}
                 className="flex items-center gap-1 text-court-text-ter hover:text-court-text transition-colors"
               >
-                <span className="text-xs md:text-sm">←</span>
-                <span className="text-[11px] md:text-sm font-medium">End Session</span>
+                <span className="text-court-sm md:text-court-base">←</span>
+                <span className="text-court-xs md:text-court-base font-medium">End Session</span>
               </button>
 
               <div className="flex items-center gap-1.5">
@@ -694,10 +694,10 @@ export default function AIPracticePage() {
                   <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-red-400 opacity-75" />
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
                 </span>
-                <span className="text-[10px] md:text-xs font-bold text-red-400 uppercase tracking-wider">Live</span>
+                <span className="text-court-xs md:text-court-sm font-bold text-red-400 uppercase tracking-wider">Live</span>
               </div>
 
-              <div className="text-[11px] md:text-sm text-court-text-ter font-mono flex items-center gap-1.5">
+              <div className="text-court-xs md:text-court-base text-court-text-ter font-mono flex items-center gap-1.5">
                 <span>{exchangeCount}/{MAX_EXCHANGES}</span>
                 <span className="text-court-border">·</span>
                 <span className="text-red-400 font-bold">{formatTime(timer)}</span>
@@ -713,8 +713,8 @@ export default function AIPracticePage() {
                 size={32}
               />
               <div className="min-w-0 flex-1">
-                <p className="text-xs md:text-sm font-bold text-court-text truncate">{displayPersonaName}</p>
-                <p className="text-[10px] md:text-xs text-court-text-ter truncate">
+                <p className="text-court-sm md:text-court-base font-bold text-court-text truncate">{displayPersonaName}</p>
+                <p className="text-court-xs md:text-court-sm text-court-text-ter truncate">
                   {mode === "judge" ? JUDGE_TEMPERAMENTS[temperament]?.subtitle : persona.subtitle}
                 </p>
               </div>
@@ -724,8 +724,8 @@ export default function AIPracticePage() {
             <div className="px-3 md:px-6 pb-2 md:pb-3 flex items-start gap-2 md:gap-3">
               <div className="w-[32px] shrink-0" />
               <div className="min-w-0 flex-1">
-                <p className="text-[10px] md:text-xs text-gold/70 truncate">{brief.matter.split('—')[0].trim()}</p>
-                <p className="text-[10px] md:text-xs text-court-text-ter truncate">{brief.yourRole}</p>
+                <p className="text-court-xs md:text-court-sm text-gold/70 truncate">{brief.matter.split('—')[0].trim()}</p>
+                <p className="text-court-xs md:text-court-sm text-court-text-ter truncate">{brief.yourRole}</p>
               </div>
             </div>
           </div>
@@ -751,7 +751,7 @@ export default function AIPracticePage() {
               >
                 <Scale size={12} className="text-gold/60" />
               </motion.div>
-              <p className="text-[11px] md:text-sm text-court-text-ter italic">The court is considering your submission...</p>
+              <p className="text-court-xs md:text-court-base text-court-text-ter italic">The court is considering your submission...</p>
             </div>
           </div>
         )}
@@ -764,17 +764,17 @@ export default function AIPracticePage() {
               {msg.role === "user" ? (
                 /* User submissions — formal brief style */
                 <div className="max-w-[85%] md:max-w-[70%] rounded-2xl rounded-br-md bg-gold/10 border border-gold/20 px-4 py-2.5">
-                  <p className="text-[10px] md:text-xs font-bold text-gold/70 mb-1">
+                  <p className="text-court-xs md:text-court-sm font-bold text-gold/70 mb-1">
                     Counsel · {msg.time}
                   </p>
-                  <p className="text-[13px] md:text-[15px] text-court-text leading-relaxed">{msg.text}</p>
+                  <p className="text-court-base md:text-[15px] text-court-text leading-relaxed">{msg.text}</p>
                 </div>
               ) : (
                 /* Judge messages — transcript style with gold accent line */
                 <div className="max-w-[90%] md:max-w-[80%] flex gap-0">
                   <div className="w-[3px] rounded-full bg-gold/30 shrink-0 my-1" />
                   <div className="pl-3 py-1">
-                    <p className="text-[10px] md:text-xs font-medium text-gold/50 mb-1">
+                    <p className="text-court-xs md:text-court-sm font-medium text-gold/50 mb-1">
                       {msg.time} · Exchange {Math.ceil((i + 1) / 2)} of {MAX_EXCHANGES}
                     </p>
                     <p className="text-[15px] md:text-base text-court-text leading-[1.65] font-[410]">{msg.text}</p>
@@ -797,7 +797,7 @@ export default function AIPracticePage() {
                     >
                       <Scale size={14} className="text-gold/40" />
                     </motion.div>
-                    <span className="text-[13px] text-court-text-ter italic">Considering...</span>
+                    <span className="text-court-base text-court-text-ter italic">Considering...</span>
                   </div>
                 </div>
               </div>
@@ -857,7 +857,7 @@ export default function AIPracticePage() {
                 placeholder={exchangeCount >= MAX_EXCHANGES ? "Session limit reached." : isRecordingActive ? "Listening..." : "Make your submissions..."}
                 rows={3}
                 disabled={isLoading || exchangeCount >= MAX_EXCHANGES}
-                className="flex-1 bg-transparent text-sm text-court-text px-3 py-2.5 resize-none outline-none placeholder:text-court-text-ter disabled:opacity-50 max-h-[140px]"
+                className="flex-1 bg-transparent text-court-base text-court-text px-3 py-2.5 resize-none outline-none placeholder:text-court-text-ter disabled:opacity-50 max-h-[140px]"
                 style={{ minHeight: "72px" }}
                 onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
               />
@@ -963,7 +963,7 @@ export default function AIPracticePage() {
       <div className="flex-1 overflow-y-auto pb-4">
       <div className="px-4 pt-3 pb-4">
         <h1 className="font-serif text-2xl font-bold text-court-text mb-1">Session Feedback</h1>
-        <p className="text-xs text-court-text-sec">{displayPersonaName} · {brief.area}</p>
+        <p className="text-court-sm text-court-text-sec">{displayPersonaName} · {brief.area}</p>
       </div>
 
       {feedbackFallback && (
@@ -987,12 +987,12 @@ export default function AIPracticePage() {
               <span className="font-serif text-3xl font-bold text-gold">{overall}</span>
             </div>
           </div>
-          <p className="text-xs text-court-text-sec mt-2">out of 5.0</p>
+          <p className="text-court-sm text-court-text-sec mt-2">out of 5.0</p>
         </Card>
       </section>
       <section className="px-4 mb-4">
         <Card className="p-4">
-          <h3 className="font-serif text-sm font-bold text-court-text mb-3">Assessment Breakdown</h3>
+          <h3 className="font-serif text-court-base font-bold text-court-text mb-3">Assessment Breakdown</h3>
           {FEEDBACK_DIMENSIONS.map((dim) => {
             const score = scores[dim.key as keyof typeof scores] as number | undefined;
             const safeScore = score ?? 0;
@@ -1010,7 +1010,7 @@ export default function AIPracticePage() {
       </section>
       <section className="px-4 mb-4">
         <Card className="p-4">
-          <h3 className="font-serif text-sm font-bold text-court-text mb-2">Judgment</h3>
+          <h3 className="font-serif text-court-base font-bold text-court-text mb-2">Judgment</h3>
           <p className="text-court-base text-court-text-sec leading-relaxed">{judgment}</p>
         </Card>
       </section>
@@ -1036,7 +1036,7 @@ export default function AIPracticePage() {
 
       {/* Sticky CTAs */}
       <div className="shrink-0 px-4 py-3 border-t border-court-border-light/20 bg-navy flex flex-row gap-2">
-        <Button className="flex-1 text-xs px-2" onClick={() => {
+        <Button className="flex-1 text-court-sm px-2" onClick={() => {
           setScreen("select");
           setMessages([]);
           setTimer(900);
@@ -1053,8 +1053,8 @@ export default function AIPracticePage() {
           setSpectatorCode(null);
           setSpectatorCount(0);
         }}>Practice Again</Button>
-        <Button className="flex-1 text-xs px-2" variant="outline">Save to Portfolio</Button>
-        <Button className="flex-1 text-xs px-2" variant="secondary" onClick={async () => {
+        <Button className="flex-1 text-court-sm px-2" variant="outline">Save to Portfolio</Button>
+        <Button className="flex-1 text-court-sm px-2" variant="secondary" onClick={async () => {
           // Build the share URL with scores encoded as query params
           const shareParams = new URLSearchParams();
           shareParams.set("s", overall);

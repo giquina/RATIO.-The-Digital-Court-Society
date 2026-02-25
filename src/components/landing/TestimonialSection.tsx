@@ -65,7 +65,7 @@ export function TestimonialSection() {
             </p>
             <div className="flex items-center gap-3 pt-3 border-t border-court-border-light">
               <div
-                className="w-8 h-8 rounded-full flex items-center justify-center font-serif text-xs font-bold text-white/80 shrink-0"
+                className="w-8 h-8 rounded-full flex items-center justify-center font-serif text-court-sm font-bold text-white/80 shrink-0"
                 style={{ background: t.chamberColor }}
               >
                 {t.name

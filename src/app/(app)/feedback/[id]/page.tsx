@@ -161,7 +161,7 @@ export default function FeedbackDetailPage() {
       <div className="px-4 md:px-6 lg:px-8 pt-3">
         <Link
           href="/portfolio"
-          className="inline-flex items-center gap-1.5 text-xs text-court-text-sec hover:text-court-text transition-colors"
+          className="inline-flex items-center gap-1.5 text-court-sm text-court-text-sec hover:text-court-text transition-colors"
         >
           <ArrowLeft size={14} /> Back to Portfolio
         </Link>
@@ -313,7 +313,7 @@ export default function FeedbackDetailPage() {
       <div className="px-4 md:px-6 lg:px-8 mt-6 text-center">
         <Link
           href="/portfolio"
-          className="inline-flex items-center gap-1.5 text-sm text-gold font-semibold hover:text-gold/80 transition-colors"
+          className="inline-flex items-center gap-1.5 text-court-base text-gold font-semibold hover:text-gold/80 transition-colors"
         >
           <ArrowLeft size={16} /> Back to Portfolio
         </Link>

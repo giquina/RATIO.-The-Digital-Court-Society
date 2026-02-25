@@ -265,19 +265,19 @@ export default function SessionDock(props: SessionDockProps) {
           <>
             <div>
               <p className="text-[10px] uppercase tracking-wider text-court-text-ter mb-0.5">Area of Law</p>
-              <p className="text-sm text-court-text font-medium">{props.brief.area}</p>
+              <p className="text-court-base text-court-text font-medium">{props.brief.area}</p>
             </div>
             <div>
               <p className="text-[10px] uppercase tracking-wider text-court-text-ter mb-0.5">Matter</p>
-              <p className="text-sm text-court-text leading-relaxed">{props.brief.matter}</p>
+              <p className="text-court-base text-court-text leading-relaxed">{props.brief.matter}</p>
             </div>
             <div>
               <p className="text-[10px] uppercase tracking-wider text-court-text-ter mb-0.5">Your Role</p>
-              <p className="text-sm text-gold font-semibold">{props.brief.yourRole}</p>
+              <p className="text-court-base text-gold font-semibold">{props.brief.yourRole}</p>
             </div>
             <div>
               <p className="text-[10px] uppercase tracking-wider text-court-text-ter mb-0.5">Instructions</p>
-              <p className="text-sm text-court-text-sec leading-relaxed">{props.brief.instructions}</p>
+              <p className="text-court-base text-court-text-sec leading-relaxed">{props.brief.instructions}</p>
             </div>
           </>
         )}
@@ -285,7 +285,7 @@ export default function SessionDock(props: SessionDockProps) {
         {/* AUTHORITIES */}
         {activeTab === "authorities" && (
           <>
-            <p className="text-xs text-court-text-ter">
+            <p className="text-court-sm text-court-text-ter">
               Tap an authority to copy it for your submissions.
             </p>
             {props.brief.authorities.map((auth, i) => (
@@ -295,8 +295,8 @@ export default function SessionDock(props: SessionDockProps) {
                 className="w-full text-left bg-navy-card border border-court-border rounded-xl px-3 py-2.5 hover:border-gold/30 transition-colors group"
               >
                 <div className="flex items-start gap-2">
-                  <span className="text-gold font-bold text-xs mt-0.5">{i + 1}</span>
-                  <p className="text-sm text-court-text leading-relaxed group-hover:text-gold transition-colors">
+                  <span className="text-gold font-bold text-court-sm mt-0.5">{i + 1}</span>
+                  <p className="text-court-base text-court-text leading-relaxed group-hover:text-gold transition-colors">
                     {auth}
                   </p>
                 </div>
@@ -311,7 +311,7 @@ export default function SessionDock(props: SessionDockProps) {
         {/* HINTS */}
         {activeTab === "hints" && (
           <>
-            <p className="text-xs text-court-text-ter">
+            <p className="text-court-sm text-court-text-ter">
               {props.mode === "judge" && "Advocacy coaching based on the judge's responses:"}
               {props.mode === "mentor" && "Tips for getting the most from your mentoring session:"}
               {props.mode === "examiner" && "SQE2 competency reminders and exam technique:"}
@@ -323,7 +323,7 @@ export default function SessionDock(props: SessionDockProps) {
                 className="bg-gold/5 border border-gold/15 rounded-xl px-3 py-2.5 flex items-start gap-2"
               >
                 <Lightbulb size={14} className="text-gold shrink-0 mt-0.5" />
-                <p className="text-sm text-court-text leading-relaxed">{hint}</p>
+                <p className="text-court-base text-court-text leading-relaxed">{hint}</p>
               </div>
             ))}
           </>
@@ -332,14 +332,14 @@ export default function SessionDock(props: SessionDockProps) {
         {/* NOTES */}
         {activeTab === "notes" && (
           <>
-            <p className="text-xs text-court-text-ter">
+            <p className="text-court-sm text-court-text-ter">
               Jot down points to address or arguments to remember:
             </p>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder={"e.g. Judge asked about CCSU distinction — address in closing\n\nRemember to cite para 43 of Miller..."}
-              className="w-full h-40 bg-navy-card border border-court-border rounded-xl px-3 py-2.5 text-sm text-court-text resize-none outline-none focus:border-gold/30 placeholder:text-court-text-ter"
+              className="w-full h-40 bg-navy-card border border-court-border rounded-xl px-3 py-2.5 text-court-base text-court-text resize-none outline-none focus:border-gold/30 placeholder:text-court-text-ter"
             />
             <p className="text-[10px] text-court-text-ter text-right">
               {notes.length > 0 ? `${notes.length} chars` : "Notes are saved for this session"}
@@ -354,7 +354,7 @@ export default function SessionDock(props: SessionDockProps) {
               <div className="bg-navy-card border border-court-border rounded-xl px-3 py-2.5 text-center">
                 <p className="text-[10px] uppercase tracking-wider text-court-text-ter mb-0.5">Exchanges</p>
                 <p className="text-lg font-bold text-court-text font-mono">
-                  {props.exchangeCount}<span className="text-court-text-ter text-sm">/{props.maxExchanges}</span>
+                  {props.exchangeCount}<span className="text-court-text-ter text-court-base">/{props.maxExchanges}</span>
                 </p>
               </div>
               <div className="bg-navy-card border border-court-border rounded-xl px-3 py-2.5 text-center">
@@ -364,7 +364,7 @@ export default function SessionDock(props: SessionDockProps) {
             </div>
             <div className="bg-navy-card border border-court-border rounded-xl px-3 py-2.5">
               <p className="text-[10px] uppercase tracking-wider text-court-text-ter mb-0.5">Presiding</p>
-              <p className="text-sm font-bold text-gold">{props.personaName}</p>
+              <p className="text-court-base font-bold text-gold">{props.personaName}</p>
             </div>
             <div className="space-y-2">
               <button
@@ -377,7 +377,7 @@ export default function SessionDock(props: SessionDockProps) {
                 )}
               >
                 {props.ttsEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
-                <span className="text-sm font-medium">
+                <span className="text-court-base font-medium">
                   Judge voice {props.ttsEnabled ? "on" : "off"}
                 </span>
               </button>
@@ -386,7 +386,7 @@ export default function SessionDock(props: SessionDockProps) {
             </div>
             <button
               onClick={props.onEndSession}
-              className="w-full py-3 rounded-xl bg-red-500/10 border border-red-500/25 text-red-400 font-bold text-sm hover:bg-red-500/20 transition-colors"
+              className="w-full py-3 rounded-xl bg-red-500/10 border border-red-500/25 text-red-400 font-bold text-court-base hover:bg-red-500/20 transition-colors"
             >
               End Session
             </button>
@@ -600,7 +600,7 @@ export default function SessionDock(props: SessionDockProps) {
           ) : (
             <div className="flex flex-col items-center justify-center h-full text-center opacity-40">
               <FileText size={24} className="text-court-text-ter mb-2" />
-              <p className="text-xs text-court-text-ter">Select a tool above</p>
+              <p className="text-court-sm text-court-text-ter">Select a tool above</p>
             </div>
           )}
         </div>

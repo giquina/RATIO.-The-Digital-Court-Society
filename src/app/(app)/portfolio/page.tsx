@@ -137,7 +137,7 @@ export default function PortfolioPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="font-serif text-2xl font-bold text-court-text">Your Portfolio</h1>
-            <p className="text-xs text-court-text-sec mt-1">
+            <p className="text-court-sm text-court-text-sec mt-1">
               Track your advocacy journey
             </p>
           </div>
@@ -214,7 +214,7 @@ export default function PortfolioPage() {
                   <div className="flex-1">
                     <ProgressBar pct={session.score} color={getScoreColor(session.score)} height={6} />
                   </div>
-                  <span className={`text-sm font-bold font-serif ${getScoreTextColor(session.score)}`}>
+                  <span className={`text-court-base font-bold font-serif ${getScoreTextColor(session.score)}`}>
                     {session.score}%
                   </span>
                   <Tag small>{session.module}</Tag>
@@ -231,7 +231,7 @@ export default function PortfolioPage() {
 
         {filteredSessions.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-sm text-court-text-ter">No sessions match this filter.</p>
+            <p className="text-court-base text-court-text-ter">No sessions match this filter.</p>
           </div>
         )}
       </section>

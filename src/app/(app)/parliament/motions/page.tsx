@@ -101,7 +101,7 @@ export default function MotionsListPage() {
         <div className="px-4 md:px-6 lg:px-8 pt-3 pb-4">
           <Link
             href="/parliament"
-            className="flex items-center gap-1.5 text-court-text-sec text-xs mb-3 hover:text-court-text transition-colors"
+            className="flex items-center gap-1.5 text-court-text-sec text-court-sm mb-3 hover:text-court-text transition-colors"
           >
             <ArrowLeft size={14} />
             Parliament
@@ -109,7 +109,7 @@ export default function MotionsListPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="font-serif text-2xl font-bold text-court-text">Motions</h1>
-              <p className="text-xs text-court-text-sec mt-1">
+              <p className="text-court-sm text-court-text-sec mt-1">
                 {MOTIONS.length} motions · {MOTIONS.filter((m) => m.status === "voting").length} open for voting
               </p>
             </div>

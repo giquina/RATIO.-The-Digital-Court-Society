@@ -103,7 +103,7 @@ export default function ReviewQueuePage() {
         <div className="max-w-content-medium mx-auto">
           <Link
             href="/law-book"
-            className="inline-flex items-center gap-1.5 text-xs text-court-text-ter hover:text-gold transition-colors"
+            className="inline-flex items-center gap-1.5 text-court-sm text-court-text-ter hover:text-gold transition-colors"
           >
             <ArrowLeft size={14} /> Back to Law Book
           </Link>
@@ -119,7 +119,7 @@ export default function ReviewQueuePage() {
               Review Queue
             </h1>
           </div>
-          <p className="text-sm text-court-text-sec">
+          <p className="text-court-base text-court-text-sec">
             Pending contributions awaiting peer review
           </p>
         </div>
@@ -138,7 +138,7 @@ export default function ReviewQueuePage() {
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200 ${
+                  className={`px-4 py-2 rounded-lg text-court-sm font-semibold transition-all duration-200 ${
                     activeTab === tab
                       ? "bg-navy-card text-court-text border border-court-border-light"
                       : "text-court-text-ter hover:text-court-text"

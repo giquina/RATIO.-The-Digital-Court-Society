@@ -34,7 +34,7 @@ export function MobileHeader() {
         <div className="flex items-center gap-2 min-w-0">
           <Scale size={18} className="text-gold shrink-0" />
           <div className="min-w-0">
-            <span className="font-serif text-xs text-gold tracking-[0.14em] uppercase font-bold">
+            <span className="font-serif text-court-sm text-gold tracking-[0.14em] uppercase font-bold">
               RATIO<span className="text-gold">.</span>
             </span>
             {isLoading ? (

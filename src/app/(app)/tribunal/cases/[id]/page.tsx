@@ -73,7 +73,7 @@ export default function CaseDetailPage() {
         <div className="px-4 md:px-6 lg:px-8 pt-3 pb-4">
           <Link
             href="/tribunal"
-            className="flex items-center gap-1.5 text-court-text-sec text-xs mb-3 hover:text-court-text transition-colors"
+            className="flex items-center gap-1.5 text-court-text-sec text-court-sm mb-3 hover:text-court-text transition-colors"
           >
             <ArrowLeft size={14} />
             Tribunal

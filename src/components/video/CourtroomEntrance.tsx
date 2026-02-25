@@ -131,7 +131,7 @@ export function CourtroomEntrance({ onComplete, sessionTitle }: CourtroomEntranc
               </h1>
               {sessionTitle && (
                 <motion.p
-                  className="text-court-text-sec text-xs mt-3 max-w-[260px]"
+                  className="text-court-text-sec text-court-sm mt-3 max-w-[260px]"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.3 }}

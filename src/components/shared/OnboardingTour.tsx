@@ -179,14 +179,14 @@ function TourTooltip({
           {!isFirst && (
             <button
               onClick={onPrev}
-              className="px-3 py-1.5 text-xs font-semibold text-court-text-sec hover:text-court-text hover:bg-white/5 rounded-lg transition-all duration-200"
+              className="px-3 py-1.5 text-court-sm font-semibold text-court-text-sec hover:text-court-text hover:bg-white/5 rounded-lg transition-all duration-200"
             >
               Back
             </button>
           )}
           <button
             onClick={onNext}
-            className="px-4 py-1.5 text-xs font-bold bg-gold text-navy rounded-xl hover:bg-gold/90 transition-all duration-200"
+            className="px-4 py-1.5 text-court-sm font-bold bg-gold text-navy rounded-xl hover:bg-gold/90 transition-all duration-200"
           >
             {isLast ? "Get Started" : "Next"}
           </button>

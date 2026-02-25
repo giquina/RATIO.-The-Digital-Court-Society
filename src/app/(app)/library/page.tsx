@@ -124,7 +124,7 @@ export default function LibraryPage() {
       <div className="pb-6">
         <div className="px-4 pt-3 pb-4">
           <h1 className="font-serif text-2xl font-bold text-court-text mb-1">Library</h1>
-          <p className="text-xs text-court-text-sec">Templates, guides, and preparation materials</p>
+          <p className="text-court-sm text-court-text-sec">Templates, guides, and preparation materials</p>
         </div>
         <div className="px-4 grid grid-cols-2 lg:grid-cols-3 gap-2.5">
           {Array.from({ length: 6 }).map((_, i) => (
@@ -139,7 +139,7 @@ export default function LibraryPage() {
     <div className="pb-6">
       <div className="px-4 pt-3 pb-4">
         <h1 className="font-serif text-2xl font-bold text-court-text mb-1">Library</h1>
-        <p className="text-xs text-court-text-sec">Templates, guides, and preparation materials</p>
+        <p className="text-court-sm text-court-text-sec">Templates, guides, and preparation materials</p>
       </div>
 
       {/* Search */}
@@ -151,13 +151,13 @@ export default function LibraryPage() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search resources..."
-            className="w-full bg-white/[0.05] border border-court-border rounded-xl px-3.5 py-2.5 pl-9 text-sm text-court-text outline-none focus:border-gold/40 placeholder:text-court-text-ter"
+            className="w-full bg-white/[0.05] border border-court-border rounded-xl px-3.5 py-2.5 pl-9 text-court-base text-court-text outline-none focus:border-gold/40 placeholder:text-court-text-ter"
             aria-label="Search library"
           />
           {searchTerm && (
             <button
               onClick={() => setSearchTerm("")}
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-court-text-ter text-xs hover:text-court-text transition-colors"
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-court-text-ter text-court-sm hover:text-court-text transition-colors"
             >
               &#x2715;
             </button>
@@ -174,7 +174,7 @@ export default function LibraryPage() {
         />
         {filteredCategories.length === 0 ? (
           <div className="text-center py-6">
-            <p className="text-court-text-ter text-sm">No categories match &quot;{searchTerm}&quot;</p>
+            <p className="text-court-text-ter text-court-base">No categories match &quot;{searchTerm}&quot;</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-2.5">
@@ -212,11 +212,11 @@ export default function LibraryPage() {
         <div className="flex flex-col gap-2">
           {filteredResources.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-court-text-ter text-sm">No resources found</p>
+              <p className="text-court-text-ter text-court-base">No resources found</p>
               {(searchTerm || selectedCat) && (
                 <button
                   onClick={() => { setSearchTerm(""); setSelectedCat(null); }}
-                  className="text-xs text-gold font-semibold mt-2"
+                  className="text-court-sm text-gold font-semibold mt-2"
                 >
                   Clear filters
                 </button>
@@ -225,7 +225,7 @@ export default function LibraryPage() {
           ) : null}
           {filteredResources.map((r, i) => (
             <Card key={r.title + i} className="px-3.5 py-3 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-white/[0.04] flex items-center justify-center text-xs font-bold text-court-text-sec shrink-0">
+              <div className="w-10 h-10 rounded-lg bg-white/[0.04] flex items-center justify-center text-court-sm font-bold text-court-text-sec shrink-0">
                 {r.type}
               </div>
               <div className="flex-1 min-w-0">

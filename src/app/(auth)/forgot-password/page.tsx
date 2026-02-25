@@ -42,23 +42,23 @@ export default function ForgotPasswordPage() {
           <h1 className="font-serif text-2xl font-bold text-court-text mb-2">
             Check Your Email
           </h1>
-          <p className="text-sm text-court-text-sec mb-6 leading-relaxed">
+          <p className="text-court-base text-court-text-sec mb-6 leading-relaxed">
             If an account exists for <span className="text-court-text font-semibold">{email}</span>,
             we have sent a password reset link. The link expires in 30 minutes.
           </p>
-          <p className="text-xs text-court-text-ter mb-8">
+          <p className="text-court-sm text-court-text-ter mb-8">
             Did not receive it? Check your spam folder, or try again in a few minutes.
           </p>
           <div className="flex flex-col gap-3">
             <button
               onClick={() => { setSent(false); setEmail(""); }}
-              className="w-full py-3 text-sm font-semibold text-court-text-sec border border-court-border rounded-xl hover:border-white/10 transition-colors"
+              className="w-full py-3 text-court-base font-semibold text-court-text-sec border border-court-border rounded-xl hover:border-white/10 transition-colors"
             >
               Try a different email
             </button>
             <Link
               href="/login"
-              className="w-full py-3 text-sm font-bold bg-gold text-navy rounded-xl flex items-center justify-center gap-2 hover:bg-gold/90 transition-colors"
+              className="w-full py-3 text-court-base font-bold bg-gold text-navy rounded-xl flex items-center justify-center gap-2 hover:bg-gold/90 transition-colors"
             >
               Back to Sign In
             </Link>
@@ -77,7 +77,7 @@ export default function ForgotPasswordPage() {
         <h1 className="font-serif text-2xl font-bold text-court-text">
           Reset Password
         </h1>
-        <p className="text-xs text-court-text-sec mt-1">
+        <p className="text-court-sm text-court-text-sec mt-1">
           Enter your email and we will send a reset link
         </p>
       </div>
@@ -112,7 +112,7 @@ export default function ForgotPasswordPage() {
         <button
           type="submit"
           disabled={loading || !email}
-          className="w-full bg-gold text-navy font-bold rounded-xl py-3 text-sm tracking-wide hover:bg-gold/90 transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
+          className="w-full bg-gold text-navy font-bold rounded-xl py-3 text-court-base tracking-wide hover:bg-gold/90 transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
         >
           {loading && <Loader2 size={16} className="animate-spin" />}
           {loading ? "Sending..." : "Send Reset Link"}

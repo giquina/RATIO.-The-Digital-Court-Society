@@ -99,7 +99,7 @@ export function PostComposer({ onPosted }: { onPosted?: () => void }) {
             <button
               key={cat.key}
               onClick={() => setCategory(cat.key)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-court-sm font-semibold whitespace-nowrap transition-all ${
                 active
                   ? "bg-gold/15 text-gold border border-gold/30"
                   : "bg-white/[0.03] text-court-text-sec border border-court-border-light hover:border-white/10"
@@ -138,14 +138,14 @@ export function PostComposer({ onPosted }: { onPosted?: () => void }) {
           value={caseRef}
           onChange={(e) => setCaseRef(e.target.value)}
           placeholder="Case reference (optional) e.g. R v Miller [1983] 2 AC 161"
-          className="w-full bg-white/[0.03] border border-court-border-light rounded-lg px-3 py-2 text-xs text-court-text placeholder:text-court-text-ter outline-none focus:border-gold/30 transition-colors"
+          className="w-full bg-white/[0.03] border border-court-border-light rounded-lg px-3 py-2 text-court-sm text-court-text placeholder:text-court-text-ter outline-none focus:border-gold/30 transition-colors"
         />
       </div>
 
       {/* Footer */}
       <div className="flex items-center justify-between px-4 py-3 border-t border-court-border-light">
         <span
-          className={`text-xs ${overLimit ? "text-red-400 font-bold" : "text-court-text-ter"}`}
+          className={`text-court-sm ${overLimit ? "text-red-400 font-bold" : "text-court-text-ter"}`}
         >
           {charCount}/500
         </span>

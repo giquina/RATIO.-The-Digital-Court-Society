@@ -62,7 +62,7 @@ export default function TournamentsPage() {
     return (
       <div className="pb-6">
         <div className="px-5 pt-3 pb-2">
-          <button onClick={() => setSelectedTournament(null)} className="text-xs text-court-text-ter">
+          <button onClick={() => setSelectedTournament(null)} className="text-court-sm text-court-text-ter">
             &larr; Tournaments
           </button>
         </div>
@@ -92,7 +92,7 @@ export default function TournamentsPage() {
         <section className="px-4 mb-4">
           <Card className="p-4">
             <div className="flex justify-between items-center mb-3">
-              <h3 className="text-xs font-bold text-court-text tracking-wider uppercase">Your Status</h3>
+              <h3 className="text-court-sm font-bold text-court-text tracking-wider uppercase">Your Status</h3>
               <span className="text-court-xs font-bold text-green-500 bg-green-500/10 px-2.5 py-0.5 rounded-full">
                 {tournament.yourStatus}
               </span>
@@ -104,7 +104,7 @@ export default function TournamentsPage() {
                   <div className="flex items-center gap-2">
                     <Avatar initials={tournament.nextMatch.opponent.initials} chamber={tournament.nextMatch.opponent.chamber} size="sm" />
                     <div>
-                      <p className="text-xs font-semibold text-court-text">vs {tournament.nextMatch.opponent.name}</p>
+                      <p className="text-court-sm font-semibold text-court-text">vs {tournament.nextMatch.opponent.name}</p>
                       <p className="text-court-xs text-court-text-ter">{tournament.nextMatch.date} &middot; {tournament.nextMatch.time}</p>
                     </div>
                   </div>
@@ -120,12 +120,12 @@ export default function TournamentsPage() {
         {/* Bracket progress */}
         {tournament.bracket.length > 0 && (
           <section className="px-4 mb-4">
-            <h3 className="text-xs font-bold text-court-text tracking-wider uppercase mb-3">Tournament Progress</h3>
+            <h3 className="text-court-sm font-bold text-court-text tracking-wider uppercase mb-3">Tournament Progress</h3>
             <div className="flex flex-col gap-2">
               {tournament.bracket.map((round, i) => (
                 <Card key={i} className="px-3.5 py-2.5">
                   <div className="flex justify-between items-center mb-1.5">
-                    <span className="text-xs font-semibold text-court-text">{round.round}</span>
+                    <span className="text-court-sm font-semibold text-court-text">{round.round}</span>
                     <span className="text-court-xs text-court-text-sec">{round.completed}/{round.matches}</span>
                   </div>
                   <ProgressBar pct={(round.completed / round.matches) * 100} height={2} />
@@ -137,7 +137,7 @@ export default function TournamentsPage() {
 
         {/* Live bracket */}
         <section className="px-4 mb-4">
-          <h3 className="text-xs font-bold text-court-text tracking-wider uppercase mb-3">Quarter-Final Bracket</h3>
+          <h3 className="text-court-sm font-bold text-court-text tracking-wider uppercase mb-3">Quarter-Final Bracket</h3>
           <div className="flex flex-col gap-2">
             {BRACKET_DEMO.map((match, i) => (
               <Card key={i} className="p-3">
@@ -146,7 +146,7 @@ export default function TournamentsPage() {
                   <div className={"flex items-center justify-between py-1.5 rounded-lg px-2 " + (match.p1.result === "W" ? "bg-green-500/5" : "")}>
                     <div className="flex items-center gap-2">
                       <Avatar initials={match.p1.initials} chamber="Gray's" size="xs" />
-                      <span className={"text-xs " + (match.p1.result === "W" ? "font-bold text-court-text" : "text-court-text-sec")}>{match.p1.name}</span>
+                      <span className={"text-court-sm " + (match.p1.result === "W" ? "font-bold text-court-text" : "text-court-text-sec")}>{match.p1.name}</span>
                     </div>
                     {match.p1.result && (
                       <span className={"text-court-xs font-bold " + (match.p1.result === "W" ? "text-green-500" : "text-red-400")}>{match.p1.result}</span>
@@ -156,7 +156,7 @@ export default function TournamentsPage() {
                   <div className={"flex items-center justify-between py-1.5 rounded-lg px-2 " + (match.p2.result === "W" ? "bg-green-500/5" : "")}>
                     <div className="flex items-center gap-2">
                       <Avatar initials={match.p2.initials} chamber="Lincoln's" size="xs" />
-                      <span className={"text-xs " + (match.p2.result === "W" ? "font-bold text-court-text" : "text-court-text-sec")}>{match.p2.name}</span>
+                      <span className={"text-court-sm " + (match.p2.result === "W" ? "font-bold text-court-text" : "text-court-text-sec")}>{match.p2.name}</span>
                     </div>
                     {match.p2.result && (
                       <span className={"text-court-xs font-bold " + (match.p2.result === "W" ? "text-green-500" : "text-red-400")}>{match.p2.result}</span>
@@ -177,7 +177,7 @@ export default function TournamentsPage() {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="font-serif text-2xl font-bold text-court-text mb-1">Tournaments</h1>
-            <p className="text-xs text-court-text-sec">Competitive mooting brackets</p>
+            <p className="text-court-sm text-court-text-sec">Competitive mooting brackets</p>
           </div>
           <Link href="/sessions">
             <Button size="sm" variant="ghost">&larr; Sessions</Button>

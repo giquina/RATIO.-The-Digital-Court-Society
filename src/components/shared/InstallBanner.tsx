@@ -51,12 +51,12 @@ export default function InstallBanner() {
           /* iOS instructions */
           <div className="flex flex-col gap-2">
             <div className="flex justify-between items-start">
-              <p className="text-sm font-bold text-court-text">Add to Home Screen</p>
+              <p className="text-court-base font-bold text-court-text">Add to Home Screen</p>
               <button onClick={handleDismiss} className="text-court-text-ter p-1">
                 <X size={16} />
               </button>
             </div>
-            <div className="flex items-center gap-3 text-[13px] text-court-text-sec leading-relaxed">
+            <div className="flex items-center gap-3 text-court-base text-court-text-sec leading-relaxed">
               <div className="flex flex-col gap-1.5">
                 <p>1. Tap <Share size={14} className="inline text-blue-400" /> at the bottom of Safari</p>
                 <p>2. Scroll down and tap <span className="font-semibold text-court-text">Add to Home Screen</span></p>
@@ -71,19 +71,19 @@ export default function InstallBanner() {
               <Download size={18} className="text-gold" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-court-text">Install Ratio.</p>
-              <p className="text-[11px] text-court-text-ter">Add to your home screen for the full experience</p>
+              <p className="text-court-base font-bold text-court-text">Install Ratio.</p>
+              <p className="text-court-xs text-court-text-ter">Add to your home screen for the full experience</p>
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={handleDismiss}
-                className="text-[12px] text-court-text-ter px-2 py-1.5"
+                className="text-court-sm text-court-text-ter px-2 py-1.5"
               >
                 Later
               </button>
               <button
                 onClick={handleInstall}
-                className="text-[12px] font-bold text-navy bg-gold rounded-lg px-3 py-1.5"
+                className="text-court-sm font-bold text-navy bg-gold rounded-lg px-3 py-1.5"
               >
                 Install
               </button>

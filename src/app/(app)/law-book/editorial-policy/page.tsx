@@ -129,7 +129,7 @@ export default function EditorialPolicyPage() {
         <div className="max-w-content-narrow mx-auto">
           <Link
             href="/law-book"
-            className="inline-flex items-center gap-1.5 text-xs text-court-text-ter hover:text-gold transition-colors"
+            className="inline-flex items-center gap-1.5 text-court-sm text-court-text-ter hover:text-gold transition-colors"
           >
             <ArrowLeft size={14} /> Back to Law Book
           </Link>
@@ -145,7 +145,7 @@ export default function EditorialPolicyPage() {
               Editorial Policy
             </h1>
           </div>
-          <p className="text-sm text-court-text-sec">
+          <p className="text-court-base text-court-text-sec">
             Standards and procedures governing contributions to the RATIO Law
             Book
           </p>
@@ -164,7 +164,7 @@ export default function EditorialPolicyPage() {
               <Card key={section.number} className="p-5 md:p-6">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-9 h-9 rounded-xl bg-gold-dim flex items-center justify-center shrink-0">
-                    <span className="text-sm font-serif font-bold text-gold">
+                    <span className="text-court-base font-serif font-bold text-gold">
                       {section.number}
                     </span>
                   </div>
@@ -195,7 +195,7 @@ export default function EditorialPolicyPage() {
                       return (
                         <p
                           key={i}
-                          className="text-sm text-court-text-sec leading-relaxed"
+                          className="text-court-base text-court-text-sec leading-relaxed"
                         >
                           <span className="font-bold text-court-text">
                             {heading}
@@ -207,7 +207,7 @@ export default function EditorialPolicyPage() {
                     return (
                       <p
                         key={i}
-                        className="text-sm text-court-text-sec leading-relaxed"
+                        className="text-court-base text-court-text-sec leading-relaxed"
                       >
                         {paragraph}
                       </p>

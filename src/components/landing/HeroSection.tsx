@@ -44,14 +44,14 @@ export function HeroSection() {
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-sm mx-auto">
         <Link
           href="/register"
-          className="w-full sm:w-auto bg-gold text-navy font-bold rounded-xl px-8 py-3.5 text-sm tracking-wide hover:bg-gold/90 transition-colors inline-flex items-center justify-center gap-2"
+          className="w-full sm:w-auto bg-gold text-navy font-bold rounded-xl px-8 py-3.5 text-court-base tracking-wide hover:bg-gold/90 transition-colors inline-flex items-center justify-center gap-2"
         >
           Join as an Advocate
           <ArrowRight size={16} />
         </Link>
         <Link
           href="/login"
-          className="w-full sm:w-auto border border-court-border text-court-text-sec font-semibold rounded-xl px-8 py-3.5 text-sm hover:border-white/10 transition-colors inline-flex items-center justify-center"
+          className="w-full sm:w-auto border border-court-border text-court-text-sec font-semibold rounded-xl px-8 py-3.5 text-court-base hover:border-white/10 transition-colors inline-flex items-center justify-center"
         >
           Sign In
         </Link>

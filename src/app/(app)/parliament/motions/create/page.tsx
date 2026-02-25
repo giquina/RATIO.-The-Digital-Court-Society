@@ -44,7 +44,7 @@ export default function CreateMotionPage() {
         <div className="px-4 md:px-6 lg:px-8 pt-3 pb-4">
           <Link
             href="/parliament/motions"
-            className="flex items-center gap-1.5 text-court-text-sec text-xs mb-3 hover:text-court-text transition-colors"
+            className="flex items-center gap-1.5 text-court-text-sec text-court-sm mb-3 hover:text-court-text transition-colors"
           >
             <ArrowLeft size={14} />
             Motions
@@ -55,7 +55,7 @@ export default function CreateMotionPage() {
               Propose a Motion
             </h1>
           </div>
-          <p className="text-xs text-court-text-sec mt-1">
+          <p className="text-court-sm text-court-text-sec mt-1">
             Draft your motion using IRAC structure. It must be seconded before debate.
           </p>
         </div>
@@ -78,7 +78,7 @@ export default function CreateMotionPage() {
             <div className="space-y-5">
               {/* Title */}
               <div>
-                <label className="block text-xs font-bold text-court-text-sec tracking-wider mb-1.5">
+                <label className="block text-court-sm font-bold text-court-text-sec tracking-wider mb-1.5">
                   MOTION TITLE *
                 </label>
                 <input
@@ -92,7 +92,7 @@ export default function CreateMotionPage() {
 
               {/* Category */}
               <div>
-                <label className="block text-xs font-bold text-court-text-sec tracking-wider mb-1.5">
+                <label className="block text-court-sm font-bold text-court-text-sec tracking-wider mb-1.5">
                   CATEGORY *
                 </label>
                 <div className="grid grid-cols-2 gap-2">
@@ -124,7 +124,7 @@ export default function CreateMotionPage() {
 
               {/* Issue */}
               <div>
-                <label className="block text-xs font-bold text-court-text-sec tracking-wider mb-1.5">
+                <label className="block text-court-sm font-bold text-court-text-sec tracking-wider mb-1.5">
                   ISSUE *
                 </label>
                 <p className="text-court-xs text-court-text-ter mb-1.5">
@@ -141,7 +141,7 @@ export default function CreateMotionPage() {
 
               {/* Rule */}
               <div>
-                <label className="block text-xs font-bold text-court-text-sec tracking-wider mb-1.5">
+                <label className="block text-court-sm font-bold text-court-text-sec tracking-wider mb-1.5">
                   RULE *
                 </label>
                 <p className="text-court-xs text-court-text-ter mb-1.5">
@@ -158,7 +158,7 @@ export default function CreateMotionPage() {
 
               {/* Application */}
               <div>
-                <label className="block text-xs font-bold text-court-text-sec tracking-wider mb-1.5">
+                <label className="block text-court-sm font-bold text-court-text-sec tracking-wider mb-1.5">
                   APPLICATION *
                 </label>
                 <p className="text-court-xs text-court-text-ter mb-1.5">
@@ -175,7 +175,7 @@ export default function CreateMotionPage() {
 
               {/* Conclusion */}
               <div>
-                <label className="block text-xs font-bold text-court-text-sec tracking-wider mb-1.5">
+                <label className="block text-court-sm font-bold text-court-text-sec tracking-wider mb-1.5">
                   CONCLUSION *
                 </label>
                 <p className="text-court-xs text-court-text-ter mb-1.5">

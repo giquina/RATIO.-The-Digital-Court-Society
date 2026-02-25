@@ -58,7 +58,7 @@ export default function ChambersPage() {
       <div className="pb-6 md:max-w-content-medium mx-auto">
         <div className="px-4 md:px-6 lg:px-8 pt-3 pb-4">
           <h1 className="font-serif text-2xl font-bold text-court-text">Chambers</h1>
-          <p className="text-xs text-court-text-sec mt-1">Four chambers. One standard of excellence.</p>
+          <p className="text-court-sm text-court-text-sec mt-1">Four chambers. One standard of excellence.</p>
         </div>
         <div className="px-4 md:px-6 lg:px-8 grid grid-cols-2 md:grid-cols-4 gap-3">
           {Array.from({ length: 4 }).map((_, i) => (
@@ -74,7 +74,7 @@ export default function ChambersPage() {
       {/* Header */}
       <div className="px-4 md:px-6 lg:px-8 pt-3 pb-4">
         <h1 className="font-serif text-2xl font-bold text-court-text">Chambers</h1>
-        <p className="text-xs text-court-text-sec mt-1">
+        <p className="text-court-sm text-court-text-sec mt-1">
           Four chambers. One standard of excellence.
         </p>
       </div>

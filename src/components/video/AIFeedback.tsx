@@ -147,7 +147,7 @@ export function AIFeedback({ sessionTitle, module, duration, onClose }: AIFeedba
             <Tag color="blue">{module.toUpperCase()}</Tag>
           </div>
           <h1 className="font-serif text-xl font-bold text-court-text mb-1">Session Analysis</h1>
-          <p className="text-xs text-court-text-sec">{sessionTitle} &middot; {duration}</p>
+          <p className="text-court-sm text-court-text-sec">{sessionTitle} &middot; {duration}</p>
         </motion.div>
 
         {/* Overall score */}
@@ -171,7 +171,7 @@ export function AIFeedback({ sessionTitle, module, duration, onClose }: AIFeedba
                 <span className="font-serif text-2xl font-bold text-gold">{overallScore}</span>
               </div>
             </div>
-            <p className="text-sm font-semibold text-court-text">
+            <p className="text-court-base font-semibold text-court-text">
               {overallScore >= 80 ? "Strong Performance" : overallScore >= 70 ? "Competent Showing" : "Room for Growth"}
             </p>
             <p className="text-court-xs text-court-text-ter mt-1">
@@ -182,7 +182,7 @@ export function AIFeedback({ sessionTitle, module, duration, onClose }: AIFeedba
 
         {/* Dimension breakdown */}
         <div className="mb-4">
-          <h3 className="text-xs font-bold text-court-text tracking-wider uppercase mb-3 px-1">
+          <h3 className="text-court-sm font-bold text-court-text tracking-wider uppercase mb-3 px-1">
             Detailed Breakdown
           </h3>
           <div className="flex flex-col gap-2">
@@ -199,8 +199,8 @@ export function AIFeedback({ sessionTitle, module, duration, onClose }: AIFeedba
                 >
                   <div className="p-3.5">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-xs font-semibold text-court-text">{f.category}</span>
-                      <span className={`text-sm font-bold font-mono ${
+                      <span className="text-court-sm font-semibold text-court-text">{f.category}</span>
+                      <span className={`text-court-base font-bold font-mono ${
                         f.score >= 80 ? "text-green-500" : f.score >= 70 ? "text-gold" : "text-orange-400"
                       }`}>
                         {f.score}
@@ -253,10 +253,10 @@ export function AIFeedback({ sessionTitle, module, duration, onClose }: AIFeedba
               className="w-full flex justify-between items-center"
             >
               <div>
-                <p className="text-xs font-bold text-court-text">SQE2 Readiness Impact</p>
+                <p className="text-court-sm font-bold text-court-text">SQE2 Readiness Impact</p>
                 <p className="text-court-xs text-court-text-ter mt-0.5">How this session affects your exam preparedness</p>
               </div>
-              <span className="text-court-text-ter text-sm">{showSQE2 ? "−" : "+"}</span>
+              <span className="text-court-text-ter text-court-base">{showSQE2 ? "−" : "+"}</span>
             </button>
 
             <AnimatePresence>
@@ -291,7 +291,7 @@ export function AIFeedback({ sessionTitle, module, duration, onClose }: AIFeedba
           transition={{ delay: 0.9 }}
         >
           <Card className="p-4 mb-4" highlight>
-            <p className="text-xs font-bold text-gold tracking-wider uppercase mb-2">Judge&apos;s Summary</p>
+            <p className="text-court-sm font-bold text-gold tracking-wider uppercase mb-2">Judge&apos;s Summary</p>
             <p className="text-court-base text-court-text leading-relaxed mb-3">
               Counsel demonstrated a solid grasp of constitutional principles and conducted themselves with proper decorum throughout.
               The primary area for development is time management and depth of authorities — a broader case base would significantly

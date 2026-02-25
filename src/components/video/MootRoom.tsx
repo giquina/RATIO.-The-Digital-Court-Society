@@ -268,7 +268,7 @@ export function MootRoom({
                   }`} style={{ background: `linear-gradient(135deg, ${opponentChamber === "Lincoln's" ? "#2E5090" : "#6B2D3E"}, ${opponentChamber === "Lincoln's" ? "#2E509088" : "#6B2D3E88"})` }}>
                     <span className="font-serif text-2xl font-bold text-court-text">{oppInitials}</span>
                   </div>
-                  <span className="text-sm font-semibold text-court-text">{opponent}</span>
+                  <span className="text-court-base font-semibold text-court-text">{opponent}</span>
                   {opponentSpeaking && (
                     <motion.div
                       className="flex items-center gap-1"
@@ -326,8 +326,8 @@ export function MootRoom({
             transition={{ duration: 0.2 }}
           >
             <div className="px-4 py-2.5 border-b border-court-border flex justify-between items-center">
-              <span className="text-xs font-bold text-court-text">Session Chat</span>
-              <button onClick={() => setShowChat(false)} className="text-court-text-ter text-sm"><X size={14} /></button>
+              <span className="text-court-sm font-bold text-court-text">Session Chat</span>
+              <button onClick={() => setShowChat(false)} className="text-court-text-ter text-court-base"><X size={14} /></button>
             </div>
             <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-2 min-h-[100px]">
               {messages.length === 0 && (
@@ -355,9 +355,9 @@ export function MootRoom({
                 onChange={(e) => setChatInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && sendChat()}
                 placeholder="Type a message..."
-                className="flex-1 bg-white/5 border border-court-border rounded-xl px-3 py-2 text-xs text-court-text outline-none focus:border-gold/40 placeholder:text-court-text-ter"
+                className="flex-1 bg-white/5 border border-court-border rounded-xl px-3 py-2 text-court-sm text-court-text outline-none focus:border-gold/40 placeholder:text-court-text-ter"
               />
-              <button onClick={sendChat} className="bg-gold text-navy rounded-xl px-3 py-2 text-xs font-bold">
+              <button onClick={sendChat} className="bg-gold text-navy rounded-xl px-3 py-2 text-court-sm font-bold">
                 Send
               </button>
             </div>
@@ -385,7 +385,7 @@ export function MootRoom({
                   <div className="w-3 h-3 rounded-full bg-red-500" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-court-text">Enable Recording?</p>
+                  <p className="text-court-base font-bold text-court-text">Enable Recording?</p>
                   <p className="text-court-xs text-court-text-ter">Both parties must consent</p>
                 </div>
               </div>
@@ -397,13 +397,13 @@ export function MootRoom({
               <div className="flex gap-2">
                 <button
                   onClick={() => setShowRecordingConsent(false)}
-                  className="flex-1 py-2.5 rounded-xl border border-court-border text-xs font-semibold text-court-text-sec"
+                  className="flex-1 py-2.5 rounded-xl border border-court-border text-court-sm font-semibold text-court-text-sec"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={confirmRecording}
-                  className="flex-1 py-2.5 rounded-xl bg-red-500/20 border border-red-500/30 text-xs font-bold text-red-400"
+                  className="flex-1 py-2.5 rounded-xl bg-red-500/20 border border-red-500/30 text-court-sm font-bold text-red-400"
                 >
                   Start Recording
                 </button>
@@ -428,20 +428,20 @@ export function MootRoom({
               animate={{ scale: 1 }}
               exit={{ scale: 0.9 }}
             >
-              <p className="text-sm font-bold text-court-text mb-1">Leave Session?</p>
+              <p className="text-court-base font-bold text-court-text mb-1">Leave Session?</p>
               <p className="text-court-sm text-court-text-sec mb-4">
                 This will end your participation. The session will be marked as complete.
               </p>
               <div className="flex gap-2">
                 <button
                   onClick={() => setShowLeaveConfirm(false)}
-                  className="flex-1 py-2.5 rounded-xl border border-court-border text-xs font-semibold text-court-text-sec"
+                  className="flex-1 py-2.5 rounded-xl border border-court-border text-court-sm font-semibold text-court-text-sec"
                 >
                   Stay
                 </button>
                 <button
                   onClick={confirmLeave}
-                  className="flex-1 py-2.5 rounded-xl bg-red-500 text-xs font-bold text-white"
+                  className="flex-1 py-2.5 rounded-xl bg-red-500 text-court-sm font-bold text-white"
                 >
                   Leave Session
                 </button>

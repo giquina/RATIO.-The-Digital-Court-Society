@@ -60,7 +60,7 @@ export default function ChamberDetailPage() {
     return (
       <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
         <h3 className="font-serif text-lg font-bold text-court-text mb-2">Chamber Not Found</h3>
-        <p className="text-sm text-court-text-ter mb-6">The chamber you are looking for does not exist.</p>
+        <p className="text-court-base text-court-text-ter mb-6">The chamber you are looking for does not exist.</p>
         <Link href="/chambers">
           <Button variant="outline" size="sm">Back to Chambers</Button>
         </Link>
@@ -78,7 +78,7 @@ export default function ChamberDetailPage() {
       <div className="px-4 md:px-6 lg:px-8 pt-3">
         <Link
           href="/chambers"
-          className="inline-flex items-center gap-1.5 text-xs text-court-text-sec hover:text-court-text transition-colors"
+          className="inline-flex items-center gap-1.5 text-court-sm text-court-text-sec hover:text-court-text transition-colors"
         >
           <ArrowLeft size={14} /> All Chambers
         </Link>
@@ -133,7 +133,7 @@ export default function ChamberDetailPage() {
       <section className="px-4 md:px-6 lg:px-8 mt-4">
         {isMine ? (
           <div
-            className="w-full py-3 rounded-xl text-center text-sm font-bold border"
+            className="w-full py-3 rounded-xl text-center text-court-base font-bold border"
             style={{
               background: `${chamber.color}15`,
               borderColor: `${chamber.color}30`,
@@ -162,7 +162,7 @@ export default function ChamberDetailPage() {
             const isMe = member.name === "Ali Giquina";
             return (
               <Card key={member.name} highlight={isMe} className="px-3.5 py-3 flex items-center gap-3">
-                <span className="font-serif text-sm font-bold text-court-text-ter w-6 text-center">
+                <span className="font-serif text-court-base font-bold text-court-text-ter w-6 text-center">
                   {i + 1}
                 </span>
                 <Avatar

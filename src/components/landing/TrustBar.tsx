@@ -31,13 +31,13 @@ export function TrustBar() {
         {UNIVERSITIES.map((u) => (
           <span
             key={u}
-            className="font-serif text-sm font-bold text-court-text-sec"
+            className="font-serif text-court-base font-bold text-court-text-sec"
           >
             {u}
           </span>
         ))}
       </div>
-      <p className="text-xs text-court-text-ter mt-4">
+      <p className="text-court-sm text-court-text-ter mt-4">
         + 132 more UK law schools
       </p>
     </motion.section>

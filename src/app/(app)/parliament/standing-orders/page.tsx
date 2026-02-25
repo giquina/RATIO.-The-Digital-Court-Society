@@ -112,7 +112,7 @@ export default function StandingOrdersPage() {
         <div className="px-4 md:px-6 lg:px-8 pt-3 pb-4">
           <Link
             href="/parliament"
-            className="flex items-center gap-1.5 text-court-text-sec text-xs mb-3 hover:text-court-text transition-colors"
+            className="flex items-center gap-1.5 text-court-text-sec text-court-sm mb-3 hover:text-court-text transition-colors"
           >
             <ArrowLeft size={14} />
             Parliament
@@ -123,7 +123,7 @@ export default function StandingOrdersPage() {
               Standing Orders
             </h1>
           </div>
-          <p className="text-xs text-court-text-sec mt-1">
+          <p className="text-court-sm text-court-text-sec mt-1">
             The procedural rules governing the Ratio General Assembly
           </p>
         </div>

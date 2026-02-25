@@ -266,7 +266,7 @@ export default function TopicReadingPage() {
           <div className="max-w-content-narrow mx-auto">
             <Link
               href={`/law-book/${moduleSlug}`}
-              className="inline-flex items-center gap-1.5 text-xs text-court-text-ter hover:text-gold transition-colors"
+              className="inline-flex items-center gap-1.5 text-court-sm text-court-text-ter hover:text-gold transition-colors"
             >
               <ArrowLeft size={14} /> Back to {moduleName}
             </Link>
@@ -281,7 +281,7 @@ export default function TopicReadingPage() {
             <h1 className="font-serif text-xl font-bold text-court-text mb-2">
               {fallback?.title}
             </h1>
-            <p className="text-sm text-court-text-sec mb-4">
+            <p className="text-court-base text-court-text-sec mb-4">
               Full content for this topic is being developed by contributors.
             </p>
             <div className="flex items-center justify-center gap-3 text-court-xs text-court-text-ter mb-6">
@@ -316,7 +316,7 @@ export default function TopicReadingPage() {
         <div className="max-w-content-narrow mx-auto">
           <Link
             href={`/law-book/${moduleSlug}`}
-            className="inline-flex items-center gap-1.5 text-xs text-court-text-ter hover:text-gold transition-colors"
+            className="inline-flex items-center gap-1.5 text-court-sm text-court-text-ter hover:text-gold transition-colors"
           >
             <ArrowLeft size={14} /> Back to {moduleName}
           </Link>
@@ -387,7 +387,7 @@ export default function TopicReadingPage() {
             {DEMO_TOPIC.issue.content.split("\n\n").map((para, i) => (
               <p
                 key={i}
-                className="text-sm text-court-text-sec leading-relaxed mb-3 last:mb-0"
+                className="text-court-base text-court-text-sec leading-relaxed mb-3 last:mb-0"
               >
                 {para}
               </p>
@@ -405,7 +405,7 @@ export default function TopicReadingPage() {
               </h2>
             </div>
 
-            <p className="text-sm text-court-text-sec leading-relaxed mb-4">
+            <p className="text-court-base text-court-text-sec leading-relaxed mb-4">
               {DEMO_TOPIC.rule.content}
             </p>
 
@@ -413,14 +413,14 @@ export default function TopicReadingPage() {
             <h3 className="font-serif text-base font-bold text-court-text mb-2">
               Statutory Provisions
             </h3>
-            <p className="text-sm text-court-text-sec leading-relaxed mb-3">
+            <p className="text-court-base text-court-text-sec leading-relaxed mb-3">
               {DEMO_TOPIC.rule.statute}
             </p>
             <ul className="space-y-1.5 mb-5">
               {DEMO_TOPIC.rule.statutes.map((s, i) => (
                 <li
                   key={i}
-                  className="text-sm text-court-text-sec flex items-start gap-2"
+                  className="text-court-base text-court-text-sec flex items-start gap-2"
                 >
                   <span className="text-gold mt-0.5">&bull;</span>
                   {s}
@@ -438,7 +438,7 @@ export default function TopicReadingPage() {
                   key={i}
                   className="bg-white/[0.03] rounded-lg p-3.5 border-l-[3px] border-gold/40"
                 >
-                  <p className="text-sm font-bold text-court-text mb-1.5">
+                  <p className="text-court-base font-bold text-court-text mb-1.5">
                     {c.name}
                   </p>
                   <p className="text-court-sm text-court-text-sec leading-relaxed">
@@ -460,7 +460,7 @@ export default function TopicReadingPage() {
               </h2>
             </div>
 
-            <p className="text-sm text-court-text-sec leading-relaxed mb-4">
+            <p className="text-court-base text-court-text-sec leading-relaxed mb-4">
               {DEMO_TOPIC.application.content}
             </p>
 
@@ -470,7 +470,7 @@ export default function TopicReadingPage() {
                   <h3 className="font-serif text-base font-bold text-court-text mb-2">
                     {c.scenario}
                   </h3>
-                  <p className="text-sm text-court-text-sec leading-relaxed">
+                  <p className="text-court-base text-court-text-sec leading-relaxed">
                     {c.analysis}
                   </p>
                 </div>
@@ -494,7 +494,7 @@ export default function TopicReadingPage() {
                 return (
                   <p
                     key={i}
-                    className="text-sm text-court-text-sec leading-relaxed mb-2 pl-4"
+                    className="text-court-base text-court-text-sec leading-relaxed mb-2 pl-4"
                   >
                     {para}
                   </p>
@@ -503,7 +503,7 @@ export default function TopicReadingPage() {
               return (
                 <p
                   key={i}
-                  className="text-sm text-court-text-sec leading-relaxed mb-3 last:mb-0"
+                  className="text-court-base text-court-text-sec leading-relaxed mb-3 last:mb-0"
                 >
                   {para}
                 </p>

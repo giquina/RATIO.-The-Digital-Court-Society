@@ -32,10 +32,10 @@ export default function ObjectionButtons({ onInsert, disabled }: ObjectionButton
   return (
     <div className="px-1">
       <div className="flex items-center justify-between mb-2">
-        <p className="text-court-sm md:text-sm text-court-text-ter">Quick phrases</p>
+        <p className="text-court-sm md:text-court-base text-court-text-ter">Quick phrases</p>
         <button
           onClick={() => setExpanded(!expanded)}
-          className="flex items-center gap-1 text-court-sm md:text-sm text-court-text-ter hover:text-court-text transition-colors"
+          className="flex items-center gap-1 text-court-sm md:text-court-base text-court-text-ter hover:text-court-text transition-colors"
         >
           {expanded ? "Less" : "More"}
           {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}

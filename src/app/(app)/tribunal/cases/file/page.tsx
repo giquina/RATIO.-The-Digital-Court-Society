@@ -50,7 +50,7 @@ export default function FileCasePage() {
         <div className="px-4 md:px-6 lg:px-8 pt-3 pb-4">
           <Link
             href="/tribunal"
-            className="flex items-center gap-1.5 text-court-text-sec text-xs mb-3 hover:text-court-text transition-colors"
+            className="flex items-center gap-1.5 text-court-text-sec text-court-sm mb-3 hover:text-court-text transition-colors"
           >
             <ArrowLeft size={14} />
             Tribunal
@@ -59,7 +59,7 @@ export default function FileCasePage() {
             <Gavel size={20} className="text-gold" />
             <h1 className="font-serif text-2xl font-bold text-court-text">File a Case</h1>
           </div>
-          <p className="text-xs text-court-text-sec mt-1">
+          <p className="text-court-sm text-court-text-sec mt-1">
             Submit your case using IRAC structure for Tribunal review
           </p>
         </div>
@@ -82,7 +82,7 @@ export default function FileCasePage() {
             <div className="space-y-5">
               {/* Title */}
               <div>
-                <label className="block text-xs font-bold text-court-text-sec tracking-wider mb-1.5">
+                <label className="block text-court-sm font-bold text-court-text-sec tracking-wider mb-1.5">
                   CASE TITLE *
                 </label>
                 <input
@@ -97,7 +97,7 @@ export default function FileCasePage() {
               {/* Type + Respondent */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-court-text-sec tracking-wider mb-1.5">
+                  <label className="block text-court-sm font-bold text-court-text-sec tracking-wider mb-1.5">
                     CASE TYPE *
                   </label>
                   <select
@@ -112,7 +112,7 @@ export default function FileCasePage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-court-text-sec tracking-wider mb-1.5">
+                  <label className="block text-court-sm font-bold text-court-text-sec tracking-wider mb-1.5">
                     RESPONDENT *
                   </label>
                   <input
@@ -135,7 +135,7 @@ export default function FileCasePage() {
 
               {/* Issue */}
               <div>
-                <label className="block text-xs font-bold text-court-text-sec tracking-wider mb-1.5">
+                <label className="block text-court-sm font-bold text-court-text-sec tracking-wider mb-1.5">
                   ISSUE *
                 </label>
                 <textarea
@@ -149,7 +149,7 @@ export default function FileCasePage() {
 
               {/* Rule */}
               <div>
-                <label className="block text-xs font-bold text-court-text-sec tracking-wider mb-1.5">
+                <label className="block text-court-sm font-bold text-court-text-sec tracking-wider mb-1.5">
                   RULE *
                 </label>
                 <textarea
@@ -163,7 +163,7 @@ export default function FileCasePage() {
 
               {/* Application */}
               <div>
-                <label className="block text-xs font-bold text-court-text-sec tracking-wider mb-1.5">
+                <label className="block text-court-sm font-bold text-court-text-sec tracking-wider mb-1.5">
                   APPLICATION *
                 </label>
                 <textarea
@@ -177,7 +177,7 @@ export default function FileCasePage() {
 
               {/* Conclusion */}
               <div>
-                <label className="block text-xs font-bold text-court-text-sec tracking-wider mb-1.5">
+                <label className="block text-court-sm font-bold text-court-text-sec tracking-wider mb-1.5">
                   CONCLUSION *
                 </label>
                 <textarea
@@ -191,7 +191,7 @@ export default function FileCasePage() {
 
               {/* Remedy */}
               <div>
-                <label className="block text-xs font-bold text-court-text-sec tracking-wider mb-1.5">
+                <label className="block text-court-sm font-bold text-court-text-sec tracking-wider mb-1.5">
                   REMEDY SOUGHT *
                 </label>
                 <div className="grid grid-cols-2 gap-2">

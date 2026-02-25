@@ -189,7 +189,7 @@ export default function SessionDetailPage() {
     return (
       <div className="pb-6">
         <div className="px-4 pt-3 pb-2">
-          <Link href="/sessions" className="text-xs text-court-text-ter">&larr; Sessions</Link>
+          <Link href="/sessions" className="text-court-sm text-court-text-ter">&larr; Sessions</Link>
         </div>
         <section className="px-4 space-y-3">
           <Card className="overflow-hidden">
@@ -221,11 +221,11 @@ export default function SessionDetailPage() {
     return (
       <div className="pb-6">
         <div className="px-4 pt-3 pb-2">
-          <Link href="/sessions" className="text-xs text-court-text-ter">&larr; Sessions</Link>
+          <Link href="/sessions" className="text-court-sm text-court-text-ter">&larr; Sessions</Link>
         </div>
         <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
           <h2 className="font-serif text-xl font-bold text-court-text mb-2">Session not found</h2>
-          <p className="text-sm text-court-text-sec mb-6">This session may have been removed or the link is invalid.</p>
+          <p className="text-court-base text-court-text-sec mb-6">This session may have been removed or the link is invalid.</p>
           <Link href="/sessions"><Button>Back to Sessions</Button></Link>
         </div>
       </div>
@@ -313,7 +313,7 @@ export default function SessionDetailPage() {
     return (
       <div className="pb-6">
         <div className="px-4 pt-3 pb-2">
-          <Link href="/sessions" className="text-xs text-court-text-ter">&larr; Sessions</Link>
+          <Link href="/sessions" className="text-court-sm text-court-text-ter">&larr; Sessions</Link>
         </div>
         <motion.div
           className="flex flex-col items-center justify-center px-6 py-12 text-center"
@@ -329,8 +329,8 @@ export default function SessionDetailPage() {
             <Check size={28} className="text-green-500" />
           </motion.div>
           <h2 className="font-serif text-xl font-bold text-court-text mb-2">Session Complete</h2>
-          <p className="text-sm text-court-text-sec mb-1">Saved to your portfolio</p>
-          <p className="text-xs text-court-text-ter mb-6">Duration: {sessionDuration}</p>
+          <p className="text-court-base text-court-text-sec mb-1">Saved to your portfolio</p>
+          <p className="text-court-sm text-court-text-ter mb-6">Duration: {sessionDuration}</p>
 
           <div className="w-full max-w-xs mb-6">
             <Card className="p-3.5 text-center" highlight>
@@ -356,7 +356,7 @@ export default function SessionDetailPage() {
   return (
     <div className="pb-6">
       <div className="px-4 pt-3 pb-2 flex justify-between items-center">
-        <Link href="/sessions" className="text-xs text-court-text-ter">&larr; Sessions</Link>
+        <Link href="/sessions" className="text-court-sm text-court-text-ter">&larr; Sessions</Link>
         <div className="flex gap-2">
           <button
             onClick={() => setShowReschedule(true)}
@@ -405,7 +405,7 @@ export default function SessionDetailPage() {
         <div className="flex gap-2">
           <button
             onClick={handleCalendarExport}
-            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-white/[0.03] border border-court-border text-xs text-court-text-sec"
+            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-white/[0.03] border border-court-border text-court-sm text-court-text-sec"
           >
             <Calendar size={12} /> Download .ics
           </button>
@@ -419,7 +419,7 @@ export default function SessionDetailPage() {
             })}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-white/[0.03] border border-court-border text-xs text-court-text-sec"
+            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-white/[0.03] border border-court-border text-court-sm text-court-text-sec"
           >
             Google Calendar
           </a>
@@ -453,7 +453,7 @@ export default function SessionDetailPage() {
           </button>
           <button
             onClick={() => { setSpectatorMode(true); setPhase("lobby"); }}
-            className="w-full py-2.5 rounded-xl border border-court-border bg-white/[0.02] text-xs text-court-text-sec font-semibold flex items-center justify-center gap-2"
+            className="w-full py-2.5 rounded-xl border border-court-border bg-white/[0.02] text-court-sm text-court-text-sec font-semibold flex items-center justify-center gap-2"
           >
             Join as Spectator
           </button>
@@ -475,7 +475,7 @@ export default function SessionDetailPage() {
                   <Avatar initials={r.initials} chamber={r.chamber} size="sm" />
                 ) : (
                   <div className="w-8 h-8 rounded-full border-2 border-dashed border-court-border flex items-center justify-center shrink-0">
-                    <span className="text-court-text-ter text-xs">?</span>
+                    <span className="text-court-text-ter text-court-sm">?</span>
                   </div>
                 )}
                 <div className="flex-1 min-w-0">

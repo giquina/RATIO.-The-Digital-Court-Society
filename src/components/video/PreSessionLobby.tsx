@@ -114,7 +114,7 @@ export function PreSessionLobby({
             <Scale size={28} className="text-gold" />
           </motion.div>
           <h1 className="font-serif text-xl font-bold text-court-text mb-1">Pre-Session Lobby</h1>
-          <p className="text-xs text-court-text-sec">Prepare to enter chambers</p>
+          <p className="text-court-sm text-court-text-sec">Prepare to enter chambers</p>
         </motion.div>
 
         {/* Session info */}
@@ -144,13 +144,13 @@ export function PreSessionLobby({
           <div className="flex gap-2 mb-3">
             <button
               onClick={handleCalendarExport}
-              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-white/[0.03] border border-court-border text-xs text-court-text-sec"
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-white/[0.03] border border-court-border text-court-sm text-court-text-sec"
             >
               <Calendar size={14} className="shrink-0" /> Add to Calendar
             </button>
             <button
               onClick={handleEnableNotifications}
-              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border text-xs ${
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border text-court-sm ${
                 notificationsEnabled
                   ? "bg-green-500/10 border-green-500/20 text-green-500"
                   : "bg-white/[0.03] border-court-border text-court-text-sec"
@@ -164,7 +164,7 @@ export function PreSessionLobby({
         {/* Device checks */}
         <motion.div custom={2} variants={stagger} initial="hidden" animate="visible">
           <Card className="p-4 mb-3">
-            <h3 className="text-xs font-bold text-court-text tracking-wider uppercase mb-3">Device Check</h3>
+            <h3 className="text-court-sm font-bold text-court-text tracking-wider uppercase mb-3">Device Check</h3>
             <div className="flex flex-col gap-3">
               {([
                 { icon: Video, label: "Camera", ready: cameraReady, checking: checking && !cameraReady },
@@ -174,7 +174,7 @@ export function PreSessionLobby({
                 <div key={i} className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
                     <item.icon size={18} className="text-court-text" />
-                    <span className="text-xs text-court-text">{item.label}</span>
+                    <span className="text-court-sm text-court-text">{item.label}</span>
                   </div>
                   <AnimatePresence mode="wait">
                     {item.checking ? (
@@ -210,7 +210,7 @@ export function PreSessionLobby({
             <div className="h-40 bg-gradient-to-br from-[#162033] to-[#0C1220] flex items-center justify-center relative">
               <div className="flex flex-col items-center gap-2">
                 <Avatar initials={userInitials} chamber={userChamber} size="lg" border />
-                <span className="text-sm font-semibold text-court-text">{userName}</span>
+                <span className="text-court-base font-semibold text-court-text">{userName}</span>
               </div>
               <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-black/40 backdrop-blur-sm rounded-full px-2.5 py-1">
                 <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
@@ -223,7 +223,7 @@ export function PreSessionLobby({
         {/* Opponent status */}
         <motion.div custom={4} variants={stagger} initial="hidden" animate="visible">
           <Card className="p-4 mb-3">
-            <h3 className="text-xs font-bold text-court-text tracking-wider uppercase mb-3">Opponent</h3>
+            <h3 className="text-court-sm font-bold text-court-text tracking-wider uppercase mb-3">Opponent</h3>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Avatar
@@ -233,7 +233,7 @@ export function PreSessionLobby({
                   online={opponentOnline}
                 />
                 <div>
-                  <p className="text-xs font-semibold text-court-text">{session.opponent.name}</p>
+                  <p className="text-court-sm font-semibold text-court-text">{session.opponent.name}</p>
                   <p className="text-court-xs text-court-text-ter">{session.opponent.university}</p>
                 </div>
               </div>
@@ -279,7 +279,7 @@ export function PreSessionLobby({
                 {consentGiven && <Check size={12} className="text-navy" />}
               </motion.div>
               <div>
-                <p className="text-xs font-semibold text-court-text mb-0.5">
+                <p className="text-court-sm font-semibold text-court-text mb-0.5">
                   I consent to camera &amp; microphone access
                 </p>
                 <p className="text-court-xs text-court-text-ter leading-relaxed">
@@ -315,7 +315,7 @@ export function PreSessionLobby({
                 >
                   <span className="font-serif text-4xl font-bold text-gold">{countdown}</span>
                 </motion.div>
-                <p className="text-sm font-semibold text-court-text">Entering Chambers...</p>
+                <p className="text-court-base font-semibold text-court-text">Entering Chambers...</p>
                 <p className="text-court-xs text-court-text-ter mt-1">Prepare your submissions</p>
               </motion.div>
             ) : (

@@ -73,7 +73,7 @@ export default function RegisterPage() {
       <div className="text-center mb-12">
         <div className="flex justify-center mb-4"><Scale size={44} className="text-gold" /></div>
         <h1 className="font-serif text-2xl font-bold text-court-text">Join the Bar</h1>
-        <p className="text-xs text-court-text-sec mt-1.5">Begin your advocacy journey</p>
+        <p className="text-court-sm text-court-text-sec mt-1.5">Begin your advocacy journey</p>
       </div>
 
       <DemoCredentialsBanner variant="register" />
@@ -116,7 +116,7 @@ export default function RegisterPage() {
           type="submit"
           disabled={!canSubmit || loading}
           aria-busy={loading}
-          className="w-full bg-gold text-navy font-bold rounded-xl py-3 text-sm tracking-wide hover:bg-gold/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-1"
+          className="w-full bg-gold text-navy font-bold rounded-xl py-3 text-court-base tracking-wide hover:bg-gold/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-1"
         >
           {loading && <Loader2 size={16} className="animate-spin" />}
           {loading ? "Creating account..." : "Create Account"}
@@ -130,7 +130,7 @@ export default function RegisterPage() {
           Open to all. Verify with .ac.uk for full access.
         </p>
 
-        <p className="text-center text-xs text-court-text-ter mt-1">
+        <p className="text-center text-court-sm text-court-text-ter mt-1">
           Already a member?{" "}
           <Link href="/login" className="text-gold font-semibold">Sign in</Link>
         </p>

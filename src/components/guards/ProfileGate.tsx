@@ -31,12 +31,12 @@ export function ProfileGate({ children }: { children: React.ReactNode }) {
           <h2 className="font-serif text-xl font-bold text-court-text mb-2">
             Feature Locked
           </h2>
-          <p className="text-sm text-court-text-sec mb-6 leading-relaxed">
+          <p className="text-court-base text-court-text-sec mb-6 leading-relaxed">
             Complete your Advocate profile to unlock this feature. It only takes a moment.
           </p>
           <button
             onClick={() => router.push("/onboarding")}
-            className="w-full bg-gold text-navy font-bold rounded-xl py-3 text-sm flex items-center justify-center gap-2 hover:bg-gold/90 transition-colors"
+            className="w-full bg-gold text-navy font-bold rounded-xl py-3 text-court-base flex items-center justify-center gap-2 hover:bg-gold/90 transition-colors"
           >
             Complete Profile
             <ArrowRight size={16} />
@@ -63,16 +63,16 @@ export function ProfileCompletionBanner() {
     <div className="bg-gold-dim border border-gold/20 rounded-xl mx-4 mt-3 mb-1 p-3 flex items-center gap-3">
       <div className="flex-shrink-0">
         <div className="w-10 h-10 rounded-full bg-navy flex items-center justify-center">
-          <span className="text-gold text-xs font-bold">{percentage}%</span>
+          <span className="text-gold text-court-sm font-bold">{percentage}%</span>
         </div>
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-xs font-semibold text-court-text">Profile incomplete</p>
-        <p className="text-xs text-court-text-sec">Complete your profile to unlock all features.</p>
+        <p className="text-court-sm font-semibold text-court-text">Profile incomplete</p>
+        <p className="text-court-sm text-court-text-sec">Complete your profile to unlock all features.</p>
       </div>
       <button
         onClick={() => router.push("/onboarding")}
-        className="flex-shrink-0 text-xs font-bold text-gold px-3 py-1.5 border border-gold/30 rounded-lg hover:bg-gold/10 transition-colors"
+        className="flex-shrink-0 text-court-sm font-bold text-gold px-3 py-1.5 border border-gold/30 rounded-lg hover:bg-gold/10 transition-colors"
       >
         Finish
       </button>

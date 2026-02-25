@@ -64,7 +64,7 @@ export function HowItWorks() {
         {STEPS.map((s) => (
           <div key={s.step} className="flex gap-5 items-start">
             <div className="w-10 h-10 rounded-court bg-gold-dim border border-gold/25 flex items-center justify-center shrink-0">
-              <span className="font-serif text-sm font-bold text-gold">
+              <span className="font-serif text-court-base font-bold text-gold">
                 {s.step}
               </span>
             </div>

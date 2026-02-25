@@ -122,7 +122,7 @@ export function PostSessionRating({
             Rating Submitted
           </motion.h2>
           <motion.p
-            className="text-sm text-court-text-sec"
+            className="text-court-base text-court-text-sec"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
@@ -152,7 +152,7 @@ export function PostSessionRating({
             <Check size={28} className="text-green-500" />
           </motion.div>
           <h1 className="font-serif text-xl font-bold text-court-text mb-1">Session Complete</h1>
-          <p className="text-xs text-court-text-sec">Duration: {duration}</p>
+          <p className="text-court-sm text-court-text-sec">Duration: {duration}</p>
         </motion.div>
 
         {/* Session summary */}
@@ -164,7 +164,7 @@ export function PostSessionRating({
             <div className="flex items-center gap-3">
               <Avatar initials={opponent.initials} chamber={opponent.chamber} size="sm" />
               <div>
-                <p className="text-xs font-semibold text-court-text">{opponent.name}</p>
+                <p className="text-court-sm font-semibold text-court-text">{opponent.name}</p>
                 <p className="text-court-xs text-court-text-ter">Opposing Counsel</p>
               </div>
             </div>
@@ -183,7 +183,7 @@ export function PostSessionRating({
                   <Bot size={22} className="text-gold" />
                 </div>
                 <div className="flex-1 text-left">
-                  <p className="text-sm font-bold text-gold">View AI Judge Feedback</p>
+                  <p className="text-court-base font-bold text-gold">View AI Judge Feedback</p>
                   <p className="text-court-xs text-court-text-sec mt-0.5">
                     Detailed analysis of your advocacy performance
                   </p>
@@ -196,7 +196,7 @@ export function PostSessionRating({
 
         {/* Rate opponent */}
         <motion.div custom={2} variants={stagger} initial="hidden" animate="visible">
-          <h3 className="text-xs font-bold text-court-text tracking-wider uppercase mb-3 px-1">
+          <h3 className="text-court-sm font-bold text-court-text tracking-wider uppercase mb-3 px-1">
             Rate Your Opponent
           </h3>
           <div className="flex flex-col gap-3 mb-4">
@@ -212,7 +212,7 @@ export function PostSessionRating({
                   <div className="flex items-start gap-2.5 mb-2.5">
                     <dim.icon size={18} className="text-gold" />
                     <div>
-                      <p className="text-xs font-semibold text-court-text">{dim.label}</p>
+                      <p className="text-court-sm font-semibold text-court-text">{dim.label}</p>
                       <p className="text-court-xs text-court-text-ter">{dim.desc}</p>
                     </div>
                   </div>
@@ -229,7 +229,7 @@ export function PostSessionRating({
         {/* Overall */}
         <motion.div custom={6} variants={stagger} initial="hidden" animate="visible">
           <Card className="p-4 mb-4" highlight>
-            <p className="text-xs font-bold text-court-text tracking-wider uppercase mb-2.5">
+            <p className="text-court-sm font-bold text-court-text tracking-wider uppercase mb-2.5">
               Overall Performance
             </p>
             <StarRating value={overall} onChange={setOverall} />

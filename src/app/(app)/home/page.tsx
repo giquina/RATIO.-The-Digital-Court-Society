@@ -183,7 +183,7 @@ export default function HomePage() {
                 <p className="text-court-xs text-court-text-ter uppercase tracking-widest mb-1">Practice Streak</p>
                 <div className="flex items-baseline gap-1.5">
                   <span className="font-serif text-3xl sm:text-4xl font-bold text-gold">{stats.streakDays}</span>
-                  <span className="text-sm text-court-text-sec">days</span>
+                  <span className="text-court-base text-court-text-sec">days</span>
                 </div>
                 <p className="text-court-xs text-court-text-ter mt-1 flex items-center gap-1">
                   <Flame size={12} className="text-orange-400" /> {stats.streakDays === 0 ? "Start your streak today" : "Keep it going"}
@@ -193,7 +193,7 @@ export default function HomePage() {
                 <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center"
                   style={{ background: `conic-gradient(#C9A84C 0% ${stats.readinessScore}%, rgba(255,255,255,0.05) ${stats.readinessScore}% 100%)` }}>
                   <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-navy-card flex items-center justify-center">
-                    <span className="text-sm font-bold text-court-text">{stats.readinessScore}%</span>
+                    <span className="text-court-base font-bold text-court-text">{stats.readinessScore}%</span>
                   </div>
                 </div>
                 <p className="text-court-xs text-court-text-ter uppercase tracking-wider mt-1">SQE2 Ready</p>

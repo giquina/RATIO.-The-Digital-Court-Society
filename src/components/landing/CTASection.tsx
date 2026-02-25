@@ -22,7 +22,7 @@ export function CTASection() {
       </p>
       <Link
         href="/register"
-        className="bg-gold text-navy font-bold rounded-xl px-8 py-3.5 text-sm tracking-wide hover:bg-gold/90 transition-colors inline-flex items-center justify-center gap-2"
+        className="bg-gold text-navy font-bold rounded-xl px-8 py-3.5 text-court-base tracking-wide hover:bg-gold/90 transition-colors inline-flex items-center justify-center gap-2"
       >
         Join as an Advocate
         <ArrowRight size={16} />

@@ -103,7 +103,7 @@ export default async function ShareResultPage({ searchParams }: Props) {
           </span>
           <span className="font-serif text-2xl font-bold text-[#C9A84C]">.</span>
         </div>
-        <p className="text-[11px] text-[rgba(242,237,230,0.35)] tracking-[0.15em] uppercase mb-8">
+        <p className="text-court-xs text-[rgba(242,237,230,0.35)] tracking-[0.15em] uppercase mb-8">
           Session Result
         </p>
 
@@ -142,11 +142,11 @@ export default async function ShareResultPage({ searchParams }: Props) {
             {score}
           </span>
         </div>
-        <p className="text-sm text-[rgba(242,237,230,0.4)] mb-6">out of 5.0</p>
+        <p className="text-court-base text-[rgba(242,237,230,0.4)] mb-6">out of 5.0</p>
 
         {/* Area & Judge */}
         <h1 className="font-serif text-xl font-semibold text-[#F2EDE6] mb-1">{area}</h1>
-        <p className="text-sm text-[rgba(242,237,230,0.4)] mb-8">{judge}</p>
+        <p className="text-court-base text-[rgba(242,237,230,0.4)] mb-8">{judge}</p>
 
         {/* Score breakdown */}
         <div className="w-full grid grid-cols-2 gap-3 mb-8">
@@ -162,7 +162,7 @@ export default async function ShareResultPage({ searchParams }: Props) {
                   <p className="text-[10px] text-[rgba(242,237,230,0.35)] truncate">
                     {cat.label}
                   </p>
-                  <p className="text-sm font-bold text-[#C9A84C]">{val || "—"}</p>
+                  <p className="text-court-base font-bold text-[#C9A84C]">{val || "—"}</p>
                 </div>
               </div>
             );
@@ -172,7 +172,7 @@ export default async function ShareResultPage({ searchParams }: Props) {
         {/* CTA */}
         <Link
           href="/register"
-          className="w-full py-3 rounded-lg bg-[#C9A84C] text-[#0C1220] font-semibold text-center text-sm hover:bg-[#d4b85c] transition-colors"
+          className="w-full py-3 rounded-lg bg-[#C9A84C] text-[#0C1220] font-semibold text-center text-court-base hover:bg-[#d4b85c] transition-colors"
         >
           Try RATIO. — Practice Your Advocacy
         </Link>

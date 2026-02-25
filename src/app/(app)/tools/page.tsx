@@ -60,7 +60,7 @@ export default function ToolsPage() {
           <Bot size={20} className="text-gold" />
           <h1 className="font-serif text-2xl font-bold text-court-text">AI Tools</h1>
         </div>
-        <p className="text-xs text-court-text-sec mt-1">
+        <p className="text-court-sm text-court-text-sec mt-1">
           Practice, analyse, and prepare with AI-powered legal tools
         </p>
       </div>
