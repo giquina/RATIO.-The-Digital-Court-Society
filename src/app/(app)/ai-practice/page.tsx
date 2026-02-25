@@ -19,6 +19,7 @@ import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
 import { cn } from "@/lib/utils/helpers";
 import { useSessionStore } from "@/stores/sessionStore";
 import { useAIUserContext } from "@/hooks/useAIUserContext";
+import { selectScenario, CASE_BRIEFS, type CaseBrief } from "@/lib/ai/scenario-bank";
 import {
   playCourtInSession,
   playJudgeResponse,
@@ -45,36 +46,7 @@ interface Message {
 const MAX_MESSAGE_LENGTH = 2000;
 const MAX_EXCHANGES = 30;
 
-const CASE_BRIEFS: Record<Mode, { area: string; matter: string; yourRole: string; instructions: string; authorities: string[] }> = {
-  judge: {
-    area: "Public Law",
-    matter: "R (on the application of Miller) v Secretary of State — Whether the exercise of prerogative power to trigger Article 50 TEU without Parliamentary authority is unlawful.",
-    yourRole: "Leading Counsel for the Appellant",
-    instructions: "You will make submissions to the Judge arguing that the prerogative power cannot be used to nullify statutory rights granted under the European Communities Act 1972.",
-    authorities: ["R (Miller) v Secretary of State [2017] UKSC 5", "CCSU v Minister for the Civil Service [1985] AC 374", "R (UNISON) v Lord Chancellor [2017] UKSC 51"],
-  },
-  mentor: {
-    area: "Contract Law",
-    matter: "Review of skeleton argument on anticipatory breach and mitigation of loss.",
-    yourRole: "Mentee — Year 2 LLB student",
-    instructions: "Senior Counsel will review your approach, question your reasoning, and help you improve your written advocacy technique.",
-    authorities: ["Hochster v De La Tour (1853) 2 E&B 678", "White & Carter v McGregor [1962] AC 413"],
-  },
-  examiner: {
-    area: "Dispute Resolution",
-    matter: "Summary Judgment Application under CPR Part 24 — Claimant seeks judgment on breach of contract claim.",
-    yourRole: "Counsel for the Applicant",
-    instructions: "You have 45 minutes to prepare, then 15 minutes to make oral submissions. You will be assessed against SQE2 advocacy competency standards.",
-    authorities: ["Easyair Ltd v Opal Telecom Ltd [2009] EWHC 339", "Swain v Hillman [2001] 1 All ER 91"],
-  },
-  opponent: {
-    area: "Criminal Law",
-    matter: "R v Daniels — Admissibility of confession evidence obtained during informal questioning.",
-    yourRole: "Prosecution Counsel",
-    instructions: "Opposing Counsel will argue for the defence. You must rebut their submissions in real time.",
-    authorities: ["R v Fulling [1987] QB 426", "PACE 1984, s.76 and s.78"],
-  },
-};
+// Case briefs imported from @/lib/ai/scenario-bank
 
 const AI_RESPONSES = [
   "Counsel, I'll stop you there. You cite Miller, but the ratio in Miller concerned prorogation specifically. How do you say the ratio extends to the broader prerogative power at issue in this appeal? Be precise.",
@@ -158,7 +130,16 @@ export default function AIPracticePage() {
   const [spectatorCount, setSpectatorCount] = useState(0);
 
   const persona = AI_PERSONAS[mode];
-  const brief = CASE_BRIEFS[mode];
+  // Select a scenario matching the user's practice areas (professional) or default (student).
+  // We store it in state so it doesn't re-randomise on every render.
+  const [brief, setBrief] = useState<CaseBrief>(CASE_BRIEFS[mode]);
+
+  // When mode changes or we move to briefing, select an appropriate scenario
+  useEffect(() => {
+    setBrief(
+      selectScenario(mode, aiUserContext?.practiceAreas, aiUserContext?.userType)
+    );
+  }, [mode, aiUserContext?.practiceAreas, aiUserContext?.userType]);
 
   // Get the display name for judge (may vary by temperament)
   const displayPersonaName = mode === "judge"
@@ -657,6 +638,14 @@ export default function AIPracticePage() {
 
         {/* Sticky CTA buttons — always visible */}
         <div className="shrink-0 px-4 pt-3 pb-1 border-t border-court-border-light/20 bg-navy">
+          {aiUserContext?.userType === "professional" && (
+            <button
+              onClick={() => setBrief(selectScenario(mode, aiUserContext?.practiceAreas, aiUserContext?.userType))}
+              className="w-full text-court-xs text-gold/60 hover:text-gold transition-colors mb-2 py-1"
+            >
+              ↻ Different scenario
+            </button>
+          )}
           <div className="flex gap-2.5">
             <Button variant="secondary" fullWidth onClick={() => setScreen("select")}>Cancel</Button>
             <Button fullWidth onClick={startSession}>Begin Session</Button>

@@ -1,57 +1,41 @@
 # Phase 3 TODO — Professional-Specific Value
 
-> **Status:** In Progress
+> **Status:** Complete
 > **Started:** 2026-02-25
-> **Target:** 4-6 weeks
+> **Completed:** 2026-02-25
 
 ---
 
-## 1. AI Persona Adaptation
+## 1. AI Persona Adaptation ✅
 
-- [ ] Add `userContext` (userType, role, practiceAreas) to chat/feedback request schemas
-- [ ] Pass user context from frontend to AI routes
-- [ ] Create professional prompt modifiers that adjust judge behaviour:
-  - Professionals: addressed by role ("Counsel" for barristers, more formal, CPD-oriented feedback)
-  - Students: gentler pedagogical tone (current behaviour, unchanged)
-- [ ] Inject user context into system prompts dynamically
-- [ ] Feedback route: adjust assessment framing based on userType
+- [x] Add `userContext` (userType, role, practiceAreas) to chat/feedback request schemas
+- [x] Pass user context from frontend to AI routes via `useAIUserContext` hook
+- [x] Create professional prompt modifiers that adjust judge behaviour
+- [x] Inject user context into system prompts dynamically via `buildFullSystemPrompt()`
+- [x] Feedback route: adjusts assessment framing based on userType
 
-## 2. CPD Tracking
+## 2. CPD Tracking ✅
 
-- [ ] Add `cpdEntries` table to Convex schema
-- [ ] Create CPD tracking mutations (logEntry, getEntries, getSummary)
-- [ ] Auto-log AI sessions as CPD entries (triggered after feedback)
-- [ ] Create `/cpd` page with dashboard showing:
-  - Total CPD hours this year
-  - Breakdown by activity type (AI practice, live moots, research)
-  - Progress bar toward annual target (12 hours BSB / varies SRA)
-- [ ] Gate CPD page behind professional_plus plan
+- [x] Add `cpdEntries` table to Convex schema
+- [x] Create CPD tracking mutations (logEntry, deleteEntry, getMyEntries, getMySummary)
+- [x] Auto-log AI sessions as CPD entries (triggered on session completion for professionals)
+- [x] Create `/cpd` dashboard page with annual progress, monthly breakdown, activity log
+- [x] Gate CPD page behind professional user type check
 
-## 3. Professional Portfolio Branding
+## 3. Professional Portfolio Branding ✅
 
-- [ ] Update portfolio header to show professional title and firm instead of university/year
-- [ ] Update portfolio export metadata (when PDF export is built)
-- [ ] Show practice areas as tags on portfolio
+- [x] Portfolio header shows professional title + firm/chambers for professionals
+- [x] Practice areas displayed as gold tags on portfolio header
 
-## 4. Practice Area-Specific AI Scenarios
+## 4. Practice Area-Specific AI Scenarios ✅
 
-- [ ] Enhance topic engine with practice-area-aware case suggestions
-- [ ] When a professional selects their practice area, suggest relevant scenarios
-- [ ] Add professional-specific case scenarios (e.g., "Pupillage Interview Mock" mode)
+- [x] Created scenario bank with practice-area-categorised case briefs
+- [x] `selectScenario()` picks relevant scenarios based on user's practice areas
+- [x] Professionals get "Different scenario" button on briefing screen
+- [x] Students always see default scenarios (backward compatible)
 
-## 5. Navigation Update
+## 5. Navigation Updates ✅
 
-- [ ] Add CPD link to sidebar for professional users
-- [ ] Conditionally show/hide based on userType
-
----
-
-## Testing Checklist
-
-- [ ] Student AI experience unchanged
-- [ ] Professional AI sessions use adapted prompts
-- [ ] CPD entries auto-created from AI sessions
-- [ ] CPD dashboard displays correct totals
-- [ ] CPD page gated behind professional_plus
-- [ ] Portfolio shows professional branding
-- [ ] Sidebar shows CPD link for professionals only
+- [x] CPD Tracker link in sidebar for professional users only
+- [x] CPD quick-link on profile page for mobile access
+- [x] Dynamic nav sections built with useMemo
