@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     template: "%s | Ratio.",
   },
   description:
-    "The constitutional training ground for UK law students. Organise moots, practise with an AI Judge, track your advocacy, and build your portfolio.",
+    "The digital court society for the UK legal community. Organise moots, practise with an AI Judge, track your advocacy, and build your portfolio. Free for students, professional plans available.",
   keywords: [
     "moot court",
     "UK law students",
@@ -41,6 +41,9 @@ export const metadata: Metadata = {
     "law society",
     "SQE preparation",
     "legal portfolio",
+    "barrister training",
+    "pupillage preparation",
+    "CPD advocacy",
   ],
   authors: [{ name: "Ratio." }],
   creator: "Ratio.",
@@ -55,7 +58,7 @@ export const metadata: Metadata = {
     siteName: "Ratio.",
     title: "Ratio. — The Digital Court Society",
     description:
-      "The constitutional training ground for UK law students. Organise moots, practise with an AI Judge, and build your portfolio.",
+      "The digital court society for the UK legal community. Organise moots, practise with an AI Judge, and build your portfolio.",
     images: [
       {
         url: "/api/og",
@@ -69,7 +72,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Ratio. — The Digital Court Society",
     description:
-      "The constitutional training ground for UK law students. Organise moots, practise with an AI Judge, and build your portfolio.",
+      "The digital court society for the UK legal community. Organise moots, practise with an AI Judge, and build your portfolio.",
     images: ["/api/og"],
   },
   robots: {

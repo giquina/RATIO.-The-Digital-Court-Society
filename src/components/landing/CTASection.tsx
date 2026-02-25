@@ -18,7 +18,7 @@ export function CTASection() {
         Ready to prove it?
       </h2>
       <p className="text-court-base text-court-text-sec mb-6">
-        Join advocates from 142 UK universities already practising.
+        Join advocates from across the UK legal community already practising.
       </p>
       <Link
         href="/register"

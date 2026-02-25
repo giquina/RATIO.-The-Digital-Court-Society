@@ -14,15 +14,23 @@ The focus is on the jurisdiction of England and Wales. Ratio provides structured
 
 ## Who It Is For
 
-Ratio is built for UK law students at every stage of qualification:
+Ratio serves the UK legal community at every stage of qualification and career:
 
+**Students:**
 - LLB (undergraduate law)
 - GDL (Graduate Diploma in Law)
 - LPC (Legal Practice Course)
 - BPC (Bar Practice Course)
 - SQE preparation (Solicitors Qualifying Examination)
 
-142 UK universities are supported. Verification via `.ac.uk` email addresses is planned to ensure the platform remains a dedicated space for law students.
+**Professionals:**
+- Barristers and solicitor advocates
+- Pupillage applicants
+- Solicitors
+- Paralegals and legal executives
+- SQE and BPC candidates (distance/private)
+
+142 UK universities are supported for students. Verification via `.ac.uk` email addresses is planned. Professionals register through a separate onboarding path that does not require university affiliation.
 
 ## Core Features
 
@@ -46,11 +54,20 @@ Ratio is built for UK law students at every stage of qualification:
 
 ## Pricing
 
+### Student Plans
+
 | Tier | Cost | Includes |
 |------|------|----------|
 | Free | Free | 3 AI sessions per month, unlimited live moots, legal research, advocacy portfolio |
 | Premium | £5.99/month | Unlimited AI sessions, advanced analytics, priority features |
 | Premium+ | £7.99/month | Everything in Premium, plus extended research tools and tournament priority |
+
+### Professional Plans
+
+| Tier | Cost | Includes |
+|------|------|----------|
+| Professional | £14.99/month | Unlimited AI sessions, all tools, professional portfolio branding |
+| Professional+ | £24.99/month | Everything in Professional, plus CPD tracking and compliance reports |
 
 Payment processing via Stripe is planned.
 

@@ -8,17 +8,17 @@ const FAQ_ITEMS = [
   {
     question: "What is Ratio?",
     answer:
-      "Ratio is a digital court society built for UK law students. It combines AI-powered advocacy training, live video mooting, legal research, moot organisation, competitive tournaments, a peer-reviewed law book, democratic governance through Parliament and Tribunal, and a national inter-university league. It is the complete infrastructure for UK law student advocacy.",
+      "Ratio is a digital court society built for the UK legal community. It combines AI-powered advocacy training, live video mooting, legal research, moot organisation, competitive tournaments, a peer-reviewed law book, democratic governance through Parliament and Tribunal, and a national inter-university league. It serves law students and legal professionals alike with structured, accessible advocacy practice.",
   },
   {
     question: "Is Ratio free to use?",
     answer:
-      "Yes. The core platform is free forever. This includes live video mooting, unlimited moot organisation, the Legal Research Engine, Parliament voting rights, role claiming, social features, Chamber membership, and 3 AI Judge sessions per month. Premium tiers unlock unlimited AI sessions, the Case Brief Generator, Argument Builder, tournament creation, advanced analytics, exportable portfolios, and SQE2 preparation tools.",
+      "Yes. The core platform is free forever for students. This includes live video mooting, unlimited moot organisation, the Legal Research Engine, Parliament voting rights, role claiming, social features, Chamber membership, and 3 AI Judge sessions per month. Premium tiers unlock unlimited AI sessions, the Case Brief Generator, Argument Builder, tournament creation, advanced analytics, exportable portfolios, and SQE2 preparation tools. Professional plans start at £14.99/month for practising lawyers and legal professionals.",
   },
   {
     question: "Who can join Ratio?",
     answer:
-      "Ratio is open to all UK law students. During the initial launch, we verify identity through .ac.uk university email addresses. This includes LLB, GDL, LPC, BPC, and LLM students at any UK university with a law programme. We plan to expand to international law students in future.",
+      "Ratio is open to the entire UK legal community. Law students at any UK university — including LLB, GDL, LPC, BPC, and LLM programmes — can join for free. Legal professionals including barristers, solicitors, solicitor advocates, pupillage applicants, paralegals, and legal executives can join on a Professional plan. During onboarding you select whether you are a student or professional, and the platform tailors your experience accordingly.",
   },
   {
     question: "How does live video mooting work?",

@@ -13,7 +13,7 @@ const STEPS: {
   {
     step: "01",
     title: "Verify your identity",
-    desc: "Sign up with your .ac.uk university email. Verification takes seconds and ensures every Advocate is a genuine UK law student.",
+    desc: "Create your account in seconds. Students select their university, professionals choose their role. Everyone joins a Chamber.",
     Icon: ShieldCheck,
   },
   {

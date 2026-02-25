@@ -114,7 +114,7 @@ export function FeaturesGrid({ id }: { id?: string }) {
       <p className="text-court-base text-court-text-sec text-center max-w-lg mx-auto mb-10">
         Advocacy training, legal research, moot organisation,
         competitive tournaments, and democratic governance. All in one
-        platform, built for UK law students.
+        platform, built for the UK legal community.
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">

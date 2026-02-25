@@ -123,8 +123,8 @@ export default function JoinPage() {
                 <span className="font-semibold text-court-text">
                   {referrer.fullName.split(" ")[0]}
                 </span>{" "}
-                invites you to join Ratio — a constitutional training ground for
-                UK law students.
+                invites you to join Ratio — the digital court society for the
+                UK legal community.
               </p>
             </div>
           </div>

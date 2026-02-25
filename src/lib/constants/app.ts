@@ -130,7 +130,7 @@ export const REFERRAL = {
     archive_unlock: { label: "Archive Access", icon: "FolderOpen", description: "Term-based access to the session archive" },
   },
   WHATSAPP_MESSAGE: (handle: string) =>
-    `I invite you to join Ratio — The Digital Court Society. A constitutional training ground for UK law students. Join as an Advocate: https://ratiothedigitalcourtsociety.com/join/${handle}`,
+    `I invite you to join Ratio — The Digital Court Society. A training ground for the UK legal community. Join as an Advocate: https://ratiothedigitalcourtsociety.com/join/${handle}`,
 } as const;
 
 export const REFERRAL_BADGE_DEFINITIONS = [

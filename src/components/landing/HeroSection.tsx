@@ -27,17 +27,17 @@ export function HeroSection() {
           ))}
         </div>
         <span className="text-court-sm text-gold font-semibold">
-          142 UK universities supported
+          142 universities · students and professionals
         </span>
       </div>
 
       <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-court-text leading-[1.1] mb-5">
-        The Digital Constitutional Society for UK Law Students.
+        The Digital Court Society for the UK Legal Community.
       </h1>
 
       <p className="text-court-lg text-court-text-sec leading-relaxed max-w-lg mx-auto mb-10">
         AI advocacy training. Live video mooting. Legal research.
-        Tournaments. Democratic governance. One platform, built for the Bar.
+        Tournaments. Democratic governance. One platform, from student to silk.
       </p>
 
       {/* Registration CTAs */}
@@ -57,7 +57,7 @@ export function HeroSection() {
         </Link>
       </div>
       <p className="text-court-xs text-court-text-ter mt-4">
-        Free forever. Built for UK law students.
+        Free for students. Professional plans from £14.99/mo.
       </p>
     </motion.section>
   );

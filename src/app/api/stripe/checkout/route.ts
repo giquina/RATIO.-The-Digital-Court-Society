@@ -13,9 +13,13 @@ export async function POST(req: NextRequest) {
   try {
     const { plan, userId, email } = await req.json();
 
+    // Maps plan names to Stripe Price IDs from environment variables.
+    // Student and professional plans each have their own Stripe prices.
     const PRICE_MAP: Record<string, string> = {
       premium: process.env.STRIPE_PREMIUM_PRICE_ID!,
       premium_plus: process.env.STRIPE_PREMIUM_PLUS_PRICE_ID!,
+      professional: process.env.STRIPE_PROFESSIONAL_PRICE_ID!,
+      professional_plus: process.env.STRIPE_PROFESSIONAL_PLUS_PRICE_ID!,
     };
 
     if (!plan || !PRICE_MAP[plan]) {

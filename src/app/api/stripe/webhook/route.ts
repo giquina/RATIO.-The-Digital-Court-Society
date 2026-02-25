@@ -80,8 +80,15 @@ export async function POST(req: NextRequest) {
       case "customer.subscription.updated": {
         const subscription = event.data.object as Stripe.Subscription;
         const priceId = subscription.items.data[0].price.id;
+
+        // Detect plan from Stripe Price ID — checks professional tiers first,
+        // then student tiers, defaulting to premium if unknown.
         let plan = "premium";
-        if (priceId === process.env.STRIPE_PREMIUM_PLUS_PRICE_ID) {
+        if (priceId === process.env.STRIPE_PROFESSIONAL_PLUS_PRICE_ID) {
+          plan = "professional_plus";
+        } else if (priceId === process.env.STRIPE_PROFESSIONAL_PRICE_ID) {
+          plan = "professional";
+        } else if (priceId === process.env.STRIPE_PREMIUM_PLUS_PRICE_ID) {
           plan = "premium_plus";
         }
         const { periodStart, periodEnd } = getPeriodData(subscription as unknown as Record<string, unknown>);
