@@ -109,6 +109,7 @@ function getScoreTextColor(score: number): string {
 
 export default function PortfolioPage() {
   const [filter, setFilter] = useState(0);
+  const [exporting, setExporting] = useState(false);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const profileQuery: any = useQuery(anyApi.users.myProfile);
@@ -136,6 +137,61 @@ export default function PortfolioPage() {
     return avg > best.avg ? { mod, avg } : best;
   }, { mod: "", avg: 0 }).mod;
 
+  // ── PDF Export ──
+  const handleExport = async () => {
+    if (!profileQuery) return;
+    setExporting(true);
+    try {
+      const payload = {
+        fullName: profileQuery.fullName ?? "Advocate",
+        userType: profileQuery.userType ?? "student",
+        university: profileQuery.university,
+        yearOfStudy: profileQuery.yearOfStudy,
+        professionalRole: profileQuery.professionalRole,
+        firmOrChambers: profileQuery.firmOrChambers,
+        practiceAreas: profileQuery.practiceAreas,
+        totalSessions: SESSIONS.length,
+        averageScore: avgScore,
+        bestModule,
+        streakDays: profileQuery.streakDays ?? 0,
+        sessions: SESSIONS.map((s) => ({
+          date: s.date,
+          title: s.title,
+          role: s.role,
+          score: s.score,
+          module: s.module,
+          mode: s.mode,
+        })),
+        generatedAt: new Date().toLocaleDateString("en-GB", {
+          day: "numeric", month: "long", year: "numeric",
+        }),
+      };
+
+      const res = await fetch("/api/portfolio/export", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) throw new Error("Export failed");
+
+      // Download the PDF
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${profileQuery.fullName ?? "Portfolio"}_RATIO.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch {
+      alert("Failed to export PDF. Please try again.");
+    } finally {
+      setExporting(false);
+    }
+  };
+
   return (
     <div className="pb-6 md:max-w-content-medium mx-auto">
       {/* Header */}
@@ -158,12 +214,11 @@ export default function PortfolioPage() {
               </div>
             )}
           </div>
-          <Button variant="secondary" size="sm" disabled>
+          <Button variant="secondary" size="sm" onClick={handleExport} disabled={exporting || !profileQuery}>
             <Download size={14} className="inline mr-1.5" />
-            Export PDF
+            {exporting ? "Exporting…" : "Export PDF"}
           </Button>
         </div>
-        <p className="text-court-xs text-court-text-ter mt-1">PDF export coming soon</p>
       </div>
 
       {/* Summary Stats */}
