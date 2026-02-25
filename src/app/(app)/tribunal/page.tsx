@@ -89,7 +89,7 @@ export default function TribunalPage() {
                 </p>
               </Card>
             </Link>
-            <Link href="/tribunal/cases">
+            <Link href="#active-cases">
               <Card className="p-4 hover:border-white/10 transition-all h-full">
                 <div className="flex items-center gap-2 mb-1.5">
                   <FileText size={16} className="text-blue-400" />
@@ -100,7 +100,7 @@ export default function TribunalPage() {
                 </p>
               </Card>
             </Link>
-            <Link href="/tribunal/judgments">
+            <Link href="#active-cases">
               <Card className="p-4 hover:border-white/10 transition-all h-full">
                 <div className="flex items-center gap-2 mb-1.5">
                   <BookOpen size={16} className="text-green-400" />
@@ -115,7 +115,7 @@ export default function TribunalPage() {
         </section>
 
         {/* Active Cases */}
-        <section className="px-4 md:px-6 lg:px-8 mb-5">
+        <section id="active-cases" className="px-4 md:px-6 lg:px-8 mb-5">
           <h2 className="font-serif text-lg font-bold text-court-text mb-3">Active Cases</h2>
           <div className="space-y-2">
             {CASES.map((c) => {

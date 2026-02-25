@@ -6,8 +6,9 @@ import { useQuery } from "convex/react";
 import { anyApi } from "convex/server";
 import { Scale, GraduationCap, Shield, Trophy, Users, ArrowRight } from "lucide-react";
 import { CHAMBER_COLORS } from "@/lib/constants/app";
+import { QuerySafeBoundary } from "@/components/shared/QuerySafeBoundary";
 
-export default function JoinPage() {
+function JoinPageContent() {
   const params = useParams();
   const handle = params.handle as string;
 
@@ -176,5 +177,26 @@ export default function JoinPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function JoinPage() {
+  return (
+    <QuerySafeBoundary
+      fallback={
+        <div className="min-h-screen bg-navy flex flex-col items-center justify-center px-6">
+          <Scale size={48} className="text-gold/40 mb-4" />
+          <h1 className="font-serif text-xl font-bold text-court-text mb-2">Invitation</h1>
+          <p className="text-court-text-sec text-court-sm text-center max-w-sm mb-6">
+            Something went wrong loading this invitation. You can still join Ratio directly.
+          </p>
+          <Link href="/register" className="inline-flex items-center gap-2 bg-gold text-navy-mid font-semibold text-court-sm px-6 py-3 rounded-xl">
+            Join as an Advocate <ArrowRight size={16} />
+          </Link>
+        </div>
+      }
+    >
+      <JoinPageContent />
+    </QuerySafeBoundary>
   );
 }

@@ -10,6 +10,7 @@ import {
   Gift, FileText, Zap, CheckCircle2, Send, ArrowRight,
   GraduationCap, Globe, Trophy, Heart,
 } from "lucide-react";
+import { QuerySafeBoundary } from "@/components/shared/QuerySafeBoundary";
 
 const BENEFITS = [
   {
@@ -180,11 +181,62 @@ function ApplicationForm() {
   );
 }
 
-export default function AmbassadorsPage() {
+/**
+ * Safely loads ambassador count from Convex.
+ * Wrapped in QuerySafeBoundary so the hero still renders
+ * even if the Convex function isn't deployed yet.
+ */
+function AmbassadorCount() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const ambassadors: any[] | undefined = useQuery(anyApi.certificates.getAmbassadors);
   const ambassadorCount = ambassadors?.length ?? 0;
 
+  if (ambassadorCount === 0) return null;
+  return (
+    <p className="text-[#C9A84C] text-sm font-semibold mt-4">
+      {ambassadorCount} ambassador{ambassadorCount !== 1 ? "s" : ""} and counting
+    </p>
+  );
+}
+
+/**
+ * Safely loads and displays the current ambassadors grid.
+ * Wrapped in QuerySafeBoundary — renders nothing if backend unavailable.
+ */
+function AmbassadorGrid() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const ambassadors: any[] | undefined = useQuery(anyApi.certificates.getAmbassadors);
+
+  if (!ambassadors || ambassadors.length === 0) return null;
+  return (
+    <motion.section
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      className="mb-12"
+    >
+      <h2 className="font-serif text-xl font-bold text-white mb-5 text-center">Current Ambassadors</h2>
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+        {ambassadors.map((a, i) => (
+          <div key={i} className="bg-white/[0.04] border border-white/10 rounded-xl p-4 text-center">
+            <div className="w-12 h-12 rounded-full bg-[#C9A84C]/10 flex items-center justify-center mx-auto mb-2">
+              <span className="text-[#C9A84C] font-serif font-bold text-sm">
+                {a.fullName.split(" ").map((w: string) => w[0]).join("").slice(0, 2)}
+              </span>
+            </div>
+            <p className="text-white font-semibold text-sm truncate">{a.fullName}</p>
+            <p className="text-gray-400 text-xs truncate">{a.university}</p>
+            {a.ambassadorTier === "society_partner" && (
+              <span className="inline-block text-[#C9A84C] text-xs font-bold mt-1">Society Partner</span>
+            )}
+          </div>
+        ))}
+      </div>
+    </motion.section>
+  );
+}
+
+export default function AmbassadorsPage() {
   return (
     <div className="min-h-screen bg-[#0B1120] overflow-hidden relative">
       {/* Background effects */}
@@ -225,11 +277,9 @@ export default function AmbassadorsPage() {
             Join moot society leaders, law society presidents, and advocacy champions at universities
             across the UK who are shaping the future of legal education.
           </p>
-          {ambassadorCount > 0 && (
-            <p className="text-[#C9A84C] text-sm font-semibold mt-4">
-              {ambassadorCount} ambassador{ambassadorCount !== 1 ? "s" : ""} and counting
-            </p>
-          )}
+          <QuerySafeBoundary fallback={null}>
+            <AmbassadorCount />
+          </QuerySafeBoundary>
         </motion.section>
 
         {/* What ambassadors do */}
@@ -273,33 +323,10 @@ export default function AmbassadorsPage() {
           </div>
         </motion.section>
 
-        {/* Current ambassadors */}
-        {ambassadors && ambassadors.length > 0 && (
-          <motion.section
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mb-12"
-          >
-            <h2 className="font-serif text-xl font-bold text-white mb-5 text-center">Current Ambassadors</h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {ambassadors.map((a, i) => (
-                <div key={i} className="bg-white/[0.04] border border-white/10 rounded-xl p-4 text-center">
-                  <div className="w-12 h-12 rounded-full bg-[#C9A84C]/10 flex items-center justify-center mx-auto mb-2">
-                    <span className="text-[#C9A84C] font-serif font-bold text-sm">
-                      {a.fullName.split(" ").map((w: string) => w[0]).join("").slice(0, 2)}
-                    </span>
-                  </div>
-                  <p className="text-white font-semibold text-sm truncate">{a.fullName}</p>
-                  <p className="text-gray-400 text-xs truncate">{a.university}</p>
-                  {a.ambassadorTier === "society_partner" && (
-                    <span className="inline-block text-[#C9A84C] text-xs font-bold mt-1">Society Partner</span>
-                  )}
-                </div>
-              ))}
-            </div>
-          </motion.section>
-        )}
+        {/* Current ambassadors — safe if Convex functions not deployed */}
+        <QuerySafeBoundary fallback={null}>
+          <AmbassadorGrid />
+        </QuerySafeBoundary>
 
         {/* Application form */}
         <motion.section
@@ -313,7 +340,13 @@ export default function AmbassadorsPage() {
           <p className="text-gray-400 text-sm text-center mb-6">
             Applications are reviewed personally by our Founder. We&apos;ll respond within 7 days.
           </p>
-          <ApplicationForm />
+          <QuerySafeBoundary fallback={
+            <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-8 text-center">
+              <p className="text-gray-400 text-sm">Application form is temporarily unavailable. Please try again later or email mgiqui01@student.bbk.ac.uk</p>
+            </div>
+          }>
+            <ApplicationForm />
+          </QuerySafeBoundary>
         </motion.section>
 
         {/* FAQ */}

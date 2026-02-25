@@ -153,7 +153,7 @@ export default function LandingPage() {
           ═══════════════════════════════════════════ */}
       <TestimonialSection />
       <PricingSection />
-      <FAQSection />
+      <FAQSection id="faq" />
       <CTASection />
       <FooterSection />
 

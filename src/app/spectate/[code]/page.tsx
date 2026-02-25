@@ -6,6 +6,7 @@ import { useQuery, useMutation } from "convex/react";
 import { anyApi } from "convex/server";
 import { Eye, Users, Scale, ArrowLeft, Clock, Radio } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { QuerySafeBoundary } from "@/components/shared/QuerySafeBoundary";
 
 /**
  * Spectator Mode — /spectate/[code]
@@ -23,7 +24,7 @@ const MODE_LABELS: Record<string, { title: string; icon: string }> = {
   opponent: { title: "Opposing Counsel", icon: "🏛️" },
 };
 
-export default function SpectatePage() {
+function SpectatePageContent() {
   const params = useParams();
   const router = useRouter();
   const code = typeof params.code === "string" ? params.code.toUpperCase() : "";
@@ -246,5 +247,20 @@ export default function SpectatePage() {
         </div>
       </footer>
     </div>
+  );
+}
+
+export default function SpectatePage() {
+  return (
+    <QuerySafeBoundary
+      fallback={
+        <div className="min-h-screen bg-[#0A0E1A] flex flex-col items-center justify-center px-6">
+          <Eye size={32} className="text-gold/40 mb-4" />
+          <p className="text-gray-400 text-sm text-center">Spectator mode is temporarily unavailable. Please try again later.</p>
+        </div>
+      }
+    >
+      <SpectatePageContent />
+    </QuerySafeBoundary>
   );
 }

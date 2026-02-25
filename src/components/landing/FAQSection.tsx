@@ -67,7 +67,7 @@ const FAQ_ITEMS = [
   },
 ];
 
-export function FAQSection() {
+export function FAQSection({ id }: { id?: string }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const toggle = (index: number) => {
@@ -76,6 +76,7 @@ export function FAQSection() {
 
   return (
     <motion.section
+      id={id}
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}

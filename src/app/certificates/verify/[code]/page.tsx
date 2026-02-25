@@ -5,6 +5,7 @@ import { anyApi } from "convex/server";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { ShieldCheck, XCircle, Scale, Award, Loader2 } from "lucide-react";
+import { QuerySafeBoundary } from "@/components/shared/QuerySafeBoundary";
 
 const DIMENSION_LABELS: Record<string, string> = {
   argumentStructure: "Argument Structure",
@@ -31,7 +32,7 @@ function SkillBar({ label, score }: { label: string; score: number }) {
   );
 }
 
-export default function VerifyCertificatePage() {
+function VerifyCertificateContent() {
   const params = useParams();
   const code = params?.code as string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -180,5 +181,23 @@ export default function VerifyCertificatePage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function VerifyCertificatePage() {
+  return (
+    <QuerySafeBoundary
+      fallback={
+        <div className="min-h-screen bg-[#0B1120] flex items-center justify-center p-4">
+          <div className="w-full max-w-lg text-center">
+            <Scale size={24} className="text-[#C9A84C] mx-auto mb-4" />
+            <p className="text-gray-400 text-sm">Certificate verification is temporarily unavailable. Please try again later.</p>
+            <Link href="/" className="text-[#C9A84C] text-sm font-semibold mt-4 inline-block">Visit RATIO →</Link>
+          </div>
+        </div>
+      }
+    >
+      <VerifyCertificateContent />
+    </QuerySafeBoundary>
   );
 }
