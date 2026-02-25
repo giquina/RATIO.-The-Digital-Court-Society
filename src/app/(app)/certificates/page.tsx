@@ -177,7 +177,9 @@ export default function CertificatesPage() {
           </>
         ) : data?.progress ? (
           data.progress.map((level: Parameters<typeof CertificateCard>[0]["level"]) => (
-            <CertificateCard key={level.level} level={level} />
+            <Link key={level.level} href={`/certificates/${level.level}`}>
+              <CertificateCard level={level} />
+            </Link>
           ))
         ) : (
           <Card className="p-6 text-center">

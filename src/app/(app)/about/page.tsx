@@ -50,13 +50,19 @@ const PRINCIPLES = [
     icon: <Globe size={24} className="text-gold" />,
     title: "Open Access",
     description:
-      "Free for all UK law students. No paywall, no premium tier. Equal access to advocacy training.",
+      "Free for all UK law students to get started. Core features are always accessible, with optional premium tiers for deeper training.",
   },
   {
     icon: <Scale size={24} className="text-gold" />,
     title: "Advocacy Excellence",
     description:
       "Modelled on the Inns of Court tradition, adapted for the modern law student experience.",
+  },
+  {
+    icon: <Award size={24} className="text-gold" />,
+    title: "Verified Credentials",
+    description:
+      "Earn professional certificates assessed across 7 dimensions of advocacy, with QR-verified credentials signed by the Founder.",
   },
 ];
 

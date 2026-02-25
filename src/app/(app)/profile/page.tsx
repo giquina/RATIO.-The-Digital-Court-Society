@@ -5,7 +5,7 @@ import { useQuery, useMutation } from "convex/react";
 import { anyApi } from "convex/server";
 import { Avatar, Tag, Card, Button, ProgressBar, SectionHeader, Skeleton } from "@/components/ui";
 import { courtToast } from "@/lib/utils/toast";
-import { Flame, Timer, FileText, Star, Trophy, FolderOpen, Link as LinkIcon, Landmark, Settings, X, Loader2, LogOut, Bookmark, ClipboardList } from "lucide-react";
+import { Flame, Timer, FileText, Star, Trophy, FolderOpen, Link as LinkIcon, Landmark, Settings, X, Loader2, LogOut, Bookmark, ClipboardList, Award } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { useAuthActions } from "@convex-dev/auth/react";
@@ -170,6 +170,12 @@ export default function ProfilePage() {
           <div className="flex flex-col items-center text-center">
             <Avatar initials={initials} chamber={profile.chamber} size="xl" border />
             <h1 className="font-serif text-xl font-bold text-court-text mt-3">{profile.fullName}</h1>
+            {profile.isAmbassador && (
+              <div className="flex items-center gap-1.5 mt-1.5 bg-gold/10 border border-gold/20 rounded-full px-3 py-1">
+                <Award size={12} className="text-gold" />
+                <span className="text-court-xs font-bold text-gold tracking-wide uppercase">RATIO Ambassador</span>
+              </div>
+            )}
             <p className="text-court-sm text-court-text-sec mt-1">{subtitleLine1}</p>
             <p className="text-court-sm text-court-text-ter mt-0.5">{subtitleLine2}</p>
             {profile.bio && (

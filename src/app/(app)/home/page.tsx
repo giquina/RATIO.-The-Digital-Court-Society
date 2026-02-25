@@ -115,6 +115,62 @@ function PostsFeedContent({ profile, isDemo }: { profile: any; isDemo: boolean }
   );
 }
 
+// ── Certificate Progress ──
+function CertificateProgressCards() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const certData: any = useQuery(anyApi.certificates.getMyProgress);
+
+  if (!certData?.progress) return null;
+
+  // Show only the highest incomplete level (or the highest completed one)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const activeLevel = certData.progress.find((p: any) => !p.certificate || p.certificate.status !== "issued")
+    ?? certData.progress[certData.progress.length - 1];
+
+  if (!activeLevel) return null;
+
+  const isIssued = activeLevel.certificate?.status === "issued";
+
+  return (
+    <section className="px-4 mb-5">
+      <Link href="/certificates">
+        <Card className="p-3.5 hover:border-white/10 flex items-center gap-3">
+          <div className="relative shrink-0">
+            <div className="w-10 h-10 rounded-full flex items-center justify-center"
+              style={{ background: `${activeLevel.color}20`, border: `1.5px solid ${activeLevel.color}40` }}>
+              {isIssued ? (
+                <Award size={18} style={{ color: activeLevel.color }} />
+              ) : (
+                <span className="text-court-xs font-bold text-court-text">{activeLevel.percentComplete}%</span>
+              )}
+            </div>
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <p className="text-court-sm font-bold text-court-text truncate">
+                {activeLevel.shortName} Certificate
+              </p>
+              {isIssued && (
+                <Tag color="gold" small>ISSUED</Tag>
+              )}
+              {activeLevel.allRequirementsMet && !isIssued && (
+                <Tag color="gold" small>READY</Tag>
+              )}
+            </div>
+            <p className="text-court-xs text-court-text-ter truncate">
+              {isIssued
+                ? `Issued · № ${activeLevel.certificate.certificateNumber}`
+                : `${activeLevel.completedChecks}/${activeLevel.totalChecks} requirements complete`
+              }
+            </p>
+          </div>
+          <span className="text-court-xs text-court-text-ter shrink-0">View →</span>
+        </Card>
+      </Link>
+    </section>
+  );
+}
+
 export default function HomePage() {
   const router = useRouter();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -236,6 +292,11 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+
+      {/* ── Certificate Progress ── */}
+      <QuerySafeBoundary fallback={null}>
+        <CertificateProgressCards />
+      </QuerySafeBoundary>
 
       {/* ── Desktop: two-column layout for session + feed ── */}
       <div className="lg:grid lg:grid-cols-2 lg:gap-6 lg:px-4">

@@ -228,6 +228,7 @@ export default function SocietyPage() {
                       <Avatar initials={getInitials(r.fullName)} size={isFirst ? "xl" : "lg"} chamber={r.chamber} border={isFirst} />
                       <p className={`${isFirst ? "text-court-base" : "text-court-sm"} font-bold ${isMe ? "text-gold" : "text-court-text"} mt-1.5`}>
                         {r.fullName.split(" ")[0]} {isMe && <span className="text-court-xs font-normal">(You)</span>}
+                        {r.isAmbassador && <span className="ml-0.5 text-court-xs text-gold" title="RATIO Ambassador">⭐</span>}
                       </p>
                       <p className="text-court-xs text-court-text-ter truncate">{r.universityShort}</p>
                       <div className={`mt-1.5 py-1 rounded-lg ${isFirst ? "bg-gold-dim border border-gold/25" : "bg-white/[0.04] border border-court-border-light"}`}>
@@ -253,6 +254,7 @@ export default function SocietyPage() {
                       <div className="flex-1 min-w-0">
                         <p className={`text-court-base font-bold truncate ${isMe ? "text-gold" : "text-court-text"}`}>
                           {r.fullName} {isMe && <span className="text-court-xs font-normal">(You)</span>}
+                          {r.isAmbassador && <span className="ml-1 text-court-xs text-gold" title="RATIO Ambassador">⭐</span>}
                         </p>
                         <p className="text-court-xs text-court-text-ter truncate">{r.universityShort} · {r.totalMoots} moots</p>
                       </div>

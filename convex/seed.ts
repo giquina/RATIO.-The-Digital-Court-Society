@@ -29,6 +29,10 @@ export const run = mutation({
       { name: "100 Followers", description: "Gain 100 followers", icon: "Globe", category: "society", requirement: { type: "followers", threshold: 100 } },
       { name: "Chamber Champion", description: "Reach top 3 in your chamber rankings", icon: "Trophy", category: "competition", requirement: { type: "chamber_top_3", threshold: 1 } },
       { name: "National Top 10", description: "Reach the national top 10", icon: "Crown", category: "competition", requirement: { type: "national_top_10", threshold: 1 } },
+      { name: "RATIO Ambassador", description: "Represent RATIO at your university", icon: "Megaphone", category: "society", requirement: { type: "ambassador", threshold: 1 } },
+      { name: "Foundation Certified", description: "Earn the Foundation Certificate in Advocacy", icon: "Award", category: "skill", requirement: { type: "certificate_foundation", threshold: 1 } },
+      { name: "Intermediate Certified", description: "Earn the Intermediate Certificate in Advocacy", icon: "Award", category: "skill", requirement: { type: "certificate_intermediate", threshold: 1 } },
+      { name: "Advanced Certified", description: "Earn the Advanced Certificate in Advocacy Excellence", icon: "Award", category: "skill", requirement: { type: "certificate_advanced", threshold: 1 } },
     ];
 
     for (const badge of badges) {
