@@ -342,31 +342,61 @@ export default function HomePage() {
             </>
           )}
 
-          {/* Empty state */}
+          {/* Empty state — tab-specific messaging */}
           {feed !== undefined && feed.length === 0 && !isDemo && (
-            <EmptyState
-              icon={<MessageCircle size={28} />}
-              title="No activity yet"
-              description="Follow other advocates or join a session to see activity here"
-            />
+            feedTab === "following" ? (
+              <EmptyState
+                icon={<MessageCircle size={28} />}
+                title="Your feed is empty"
+                description="Follow advocates in the Society tab to see their activity here"
+                action={<Button onClick={() => router.push("/society")}>Discover Advocates</Button>}
+              />
+            ) : feedTab === "chamber" ? (
+              <EmptyState
+                icon={<MessageCircle size={28} />}
+                title="No chamber activity yet"
+                description="Once your chamber members start practising, their activity will appear here"
+              />
+            ) : (
+              <EmptyState
+                icon={<MessageCircle size={28} />}
+                title="No activity yet"
+                description="Join a session or start practising to see what the community is up to"
+              />
+            )
           )}
 
           {/* Demo feed items */}
           {feed !== undefined && feed.length === 0 && isDemo && (
             DEMO_ACTIVITY_FEED.map((item) => {
               const iconConfig = ACTIVITY_ICON_MAP[item.type] || { Icon: Scale, color: "text-court-text-sec" };
+              const author = (item as any).author;
+              const initials = author?.name ? author.name.split(" ").map((w: string) => w[0]).join("").toUpperCase().slice(0, 2) : "??";
               return (
                 <Card key={item._id} className="p-3.5">
+                  {/* Author header */}
+                  <div className="flex gap-2.5 items-center mb-2.5">
+                    <Avatar initials={initials} chamber={author?.chamber} size="sm" />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-court-base font-bold text-court-text truncate">{author?.name ?? "Advocate"}</span>
+                        <span className="text-court-xs text-court-text-ter">
+                          {new Date(item.timestamp).toLocaleDateString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+                        </span>
+                      </div>
+                      <p className="text-court-xs text-court-text-ter">
+                        {author?.uni ?? ""}{author?.chamber ? ` · ${author.chamber} Chamber` : ""}
+                      </p>
+                    </div>
+                  </div>
+                  {/* Activity content */}
                   <div className="flex gap-2.5 items-start">
-                    <div className={`w-8 h-8 rounded-full bg-navy-card border border-court-border flex items-center justify-center shrink-0 ${iconConfig.color}`}>
-                      <iconConfig.Icon size={14} />
+                    <div className={`w-7 h-7 rounded-full bg-navy-card border border-court-border flex items-center justify-center shrink-0 ${iconConfig.color}`}>
+                      <iconConfig.Icon size={13} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-court-sm font-bold text-court-text">{item.title}</p>
                       <p className="text-court-xs text-court-text-sec mt-0.5">{item.description}</p>
-                      <p className="text-court-xs text-court-text-ter mt-1.5">
-                        {new Date(item.timestamp).toLocaleDateString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
-                      </p>
                     </div>
                   </div>
                 </Card>
