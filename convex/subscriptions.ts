@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { query, mutation } from "./_generated/server";
+import { query, mutation, internalMutation, internalQuery } from "./_generated/server";
 import { auth } from "./auth";
 
 // Get the current user's subscription
@@ -17,6 +17,7 @@ export const getMySubscription = query({
 });
 
 // Get subscription by Stripe customer ID (used by webhooks)
+// TODO: Convert to internalQuery when webhook moves to convex/http.ts
 export const getByStripeCustomer = query({
   args: { stripeCustomerId: v.string() },
   handler: async (ctx, args) => {
@@ -30,6 +31,7 @@ export const getByStripeCustomer = query({
 });
 
 // Create or update subscription from Stripe webhook
+// TODO: Convert to internalMutation and move webhook handler to convex/http.ts httpAction
 export const upsertFromStripe = mutation({
   args: {
     userId: v.id("users"),
@@ -49,6 +51,28 @@ export const upsertFromStripe = mutation({
       .first();
 
     if (existing) {
+      // Log subscription lifecycle event
+      const fromPlan = existing.plan;
+      const toPlan = args.plan;
+      let event = "updated";
+      if (fromPlan !== toPlan) {
+        const planOrder = ["free", "premium", "professional", "premium_plus", "professional_plus"];
+        const fromIdx = planOrder.indexOf(fromPlan);
+        const toIdx = planOrder.indexOf(toPlan);
+        event = toIdx > fromIdx ? "upgraded" : "downgraded";
+      } else if (existing.status === "canceled" && args.status === "active") {
+        event = "reactivated";
+      }
+
+      await ctx.db.insert("subscriptionEvents", {
+        userId: args.userId,
+        event,
+        fromPlan,
+        toPlan,
+        timestamp: Date.now(),
+        stripeSubscriptionId: args.stripeSubscriptionId,
+      });
+
       await ctx.db.patch(existing._id, {
         plan: args.plan,
         stripeCustomerId: args.stripeCustomerId,
@@ -62,11 +86,21 @@ export const upsertFromStripe = mutation({
       return existing._id;
     }
 
+    // Log creation event
+    await ctx.db.insert("subscriptionEvents", {
+      userId: args.userId,
+      event: "created",
+      toPlan: args.plan,
+      timestamp: Date.now(),
+      stripeSubscriptionId: args.stripeSubscriptionId,
+    });
+
     return ctx.db.insert("subscriptions", args);
   },
 });
 
 // Cancel subscription (mark as canceled at period end)
+// TODO: Convert to internalMutation when webhook moves to convex/http.ts
 export const markCanceled = mutation({
   args: { stripeSubscriptionId: v.string() },
   handler: async (ctx, args) => {
@@ -77,6 +111,15 @@ export const markCanceled = mutation({
       )
       .first();
     if (sub) {
+      // Log cancellation event
+      await ctx.db.insert("subscriptionEvents", {
+        userId: sub.userId,
+        event: "canceled",
+        fromPlan: sub.plan,
+        timestamp: Date.now(),
+        stripeSubscriptionId: args.stripeSubscriptionId,
+      });
+
       await ctx.db.patch(sub._id, {
         status: "canceled",
         cancelAtPeriodEnd: true,

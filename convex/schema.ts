@@ -55,6 +55,8 @@ export default defineSchema({
     isAmbassador: v.optional(v.boolean()),
     ambassadorTier: v.optional(v.string()), // "ambassador" | "society_partner" | "university_champion"
     ambassadorSince: v.optional(v.string()), // ISO date
+    // ── Marketing ──
+    marketingConsent: v.optional(v.boolean()), // GDPR: explicit opt-in for marketing emails
   })
     .index("by_user", ["userId"])
     .index("by_university", ["university"])
@@ -857,4 +859,69 @@ export default defineSchema({
   })
     .index("by_status", ["status"])
     .index("by_email", ["email"]),
+
+  // ═══════════════════════════════════════════
+  // ADMIN & ANALYTICS
+  // ═══════════════════════════════════════════
+  adminRoles: defineTable({
+    userId: v.id("users"),
+    role: v.string(), // "owner" | "admin" | "analyst"
+    grantedBy: v.optional(v.id("users")),
+    grantedAt: v.string(), // ISO timestamp
+  })
+    .index("by_user", ["userId"]),
+
+  analyticsDaily: defineTable({
+    date: v.string(), // "2026-02-25"
+    totalUsers: v.number(),
+    newSignups: v.number(),
+    activeUsers: v.number(), // logged in + performed an action
+    sessionsCreated: v.number(),
+    aiSessionsCompleted: v.number(),
+    aiTokensUsed: v.number(),
+    aiCostCents: v.number(),
+    paidUsers: v.number(),
+    mrrCents: v.number(), // monthly recurring revenue in pence
+    churnedUsers: v.number(),
+    referralSignups: v.number(),
+  })
+    .index("by_date", ["date"]),
+
+  analyticsCohorts: defineTable({
+    cohortWeek: v.string(), // "2026-W08"
+    signupCount: v.number(),
+    retentionWeek1: v.number(),
+    retentionWeek4: v.number(),
+    retentionWeek8: v.number(),
+    retentionWeek12: v.number(),
+    conversionToPaid: v.number(),
+  })
+    .index("by_week", ["cohortWeek"]),
+
+  subscriptionEvents: defineTable({
+    userId: v.id("users"),
+    event: v.string(), // "created" | "upgraded" | "downgraded" | "canceled" | "reactivated"
+    fromPlan: v.optional(v.string()),
+    toPlan: v.optional(v.string()),
+    timestamp: v.number(),
+    stripeSubscriptionId: v.optional(v.string()),
+  })
+    .index("by_user", ["userId"])
+    .index("by_event", ["event"])
+    .index("by_timestamp", ["timestamp"]),
+
+  // ── Signup Attribution (UTM tracking) ──
+  signupAttribution: defineTable({
+    userId: v.id("users"),
+    utmSource: v.optional(v.string()),
+    utmMedium: v.optional(v.string()),
+    utmCampaign: v.optional(v.string()),
+    utmContent: v.optional(v.string()),
+    utmTerm: v.optional(v.string()),
+    referrerUrl: v.optional(v.string()),
+    landingPage: v.optional(v.string()),
+    signupTimestamp: v.string(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_campaign", ["utmCampaign"]),
 });

@@ -8,6 +8,7 @@ import { anyApi } from "convex/server";
 import Link from "next/link";
 import { Scale, Loader2, ArrowLeft } from "lucide-react";
 import { DemoCredentialsBanner } from "@/components/shared/DemoCredentialsBanner";
+import { getStoredUTM, clearUTM } from "@/lib/utils/utm";
 
 /** Captures ?ref= param from referral links and stores in localStorage */
 function ReferralCapture() {
@@ -27,6 +28,7 @@ export default function RegisterPage() {
   const authActions = useAuthActions();
   const signIn = authActions?.signIn;
   const updateName = useMutation(anyApi.users.updateName);
+  const recordAttribution = useMutation(anyApi.attribution.recordAttribution);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -51,6 +53,16 @@ export default function RegisterPage() {
         if (typeof window !== "undefined") {
           localStorage.setItem("ratio_pending_name", name);
         }
+      }
+      // Record UTM attribution if available
+      try {
+        const utm = getStoredUTM();
+        if (utm) {
+          await recordAttribution(utm);
+          clearUTM();
+        }
+      } catch {
+        // Attribution is non-critical — don't block signup
       }
       router.push("/onboarding");
     } catch (err: unknown) {

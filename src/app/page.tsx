@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useConvexAuth } from "convex/react";
+import { captureUTMParams } from "@/lib/utils/utm";
 
 /*
  * Landing Page — RATIO's public-facing homepage.
@@ -80,6 +82,9 @@ export default function LandingPage() {
   // Detect whether the visitor is already signed in.
   // This works because ConvexClientProvider wraps the entire app in layout.tsx.
   const { isAuthenticated } = useConvexAuth();
+
+  // Capture UTM params from URL on first visit (for signup attribution)
+  useEffect(() => { captureUTMParams(); }, []);
 
   return (
     <FirstVisitSplash>

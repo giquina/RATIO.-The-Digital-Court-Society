@@ -66,8 +66,8 @@ export const search = query({
         (p) =>
           p.isPublic !== false &&
           (p.fullName.toLowerCase().includes(term) ||
-            p.university.toLowerCase().includes(term) ||
-            p.universityShort.toLowerCase().includes(term))
+            (p.university ?? "").toLowerCase().includes(term) ||
+            (p.universityShort ?? "").toLowerCase().includes(term))
       )
       .slice(0, 20);
   },
@@ -340,5 +340,22 @@ export const incrementMoots = mutation({
         }
       }
     }
+  },
+});
+
+// Update marketing consent (GDPR opt-in)
+export const updateMarketingConsent = mutation({
+  args: { consent: v.boolean() },
+  handler: async (ctx, args) => {
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!profile) throw new Error("Profile not found");
+
+    await ctx.db.patch(profile._id, { marketingConsent: args.consent });
   },
 });

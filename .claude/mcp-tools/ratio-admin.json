@@ -1,0 +1,324 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "ratio-admin",
+  "description": "MCP tool definitions for the Ratio admin API. These tools call Convex HTTP endpoints authenticated via X-Admin-Key header to provide Claude Code with read/write access to Ratio's business operations data.",
+  "version": "1.0.0",
+  "baseUrl": "${NEXT_PUBLIC_CONVEX_URL}",
+  "auth": {
+    "type": "header",
+    "header": "X-Admin-Key",
+    "envVar": "ADMIN_API_KEY"
+  },
+  "tools": [
+    {
+      "name": "ratio_get_kpis",
+      "description": "Get today's KPI snapshot including total advocates, MRR, paid users, today's signups, and recent AI session count. Use this for a quick health check or daily standup summary.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "endpoint": {
+        "method": "GET",
+        "path": "/api/admin/kpis"
+      },
+      "requiresConfirmation": false
+    },
+    {
+      "name": "ratio_get_revenue",
+      "description": "Get revenue breakdown by subscription plan with MRR/ARR totals and per-plan user counts. Use this to understand revenue composition and identify which plans drive the most revenue.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "endpoint": {
+        "method": "GET",
+        "path": "/api/admin/revenue"
+      },
+      "requiresConfirmation": false
+    },
+    {
+      "name": "ratio_get_cohorts",
+      "description": "Get the retention cohort matrix showing signup counts and week-over-week retention rates. Use this to assess whether new advocates are sticking around or dropping off.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "weeks": {
+            "type": "number",
+            "description": "Number of weekly cohorts to return. Defaults to 12, maximum 52.",
+            "default": 12,
+            "minimum": 1,
+            "maximum": 52
+          }
+        },
+        "required": []
+      },
+      "endpoint": {
+        "method": "GET",
+        "path": "/api/admin/cohorts"
+      },
+      "requiresConfirmation": false
+    },
+    {
+      "name": "ratio_get_advocates",
+      "description": "Get a paginated list of advocates with optional filters by search term, subscription plan, and rank. Use this to browse the advocate base, find specific users, or segment by plan/rank.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "number",
+            "description": "Maximum number of advocates to return per page. Defaults to 20, maximum 200.",
+            "default": 20,
+            "minimum": 1,
+            "maximum": 200
+          },
+          "offset": {
+            "type": "number",
+            "description": "Number of records to skip for pagination. Defaults to 0.",
+            "default": 0,
+            "minimum": 0
+          },
+          "search": {
+            "type": "string",
+            "description": "Free-text search across advocate name and university."
+          },
+          "plan": {
+            "type": "string",
+            "description": "Filter by subscription plan: free, premium, premium_plus, professional, or professional_plus.",
+            "enum": ["free", "premium", "premium_plus", "professional", "professional_plus"]
+          },
+          "rank": {
+            "type": "string",
+            "description": "Filter by advocate rank (e.g. Pupil, Junior Counsel, Senior Counsel, King's Counsel)."
+          }
+        },
+        "required": []
+      },
+      "endpoint": {
+        "method": "GET",
+        "path": "/api/admin/advocates"
+      },
+      "requiresConfirmation": false
+    },
+    {
+      "name": "ratio_get_advocate_detail",
+      "description": "Get the full profile, subscription status, activity metrics, and engagement history for a single advocate. Use this to deep-dive into a specific user before taking action (e.g. outreach, plan override).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The Convex document ID of the advocate profile (e.g. from ratio_get_advocates results)."
+          }
+        },
+        "required": ["id"]
+      },
+      "endpoint": {
+        "method": "GET",
+        "path": "/api/admin/advocate/{id}"
+      },
+      "requiresConfirmation": false
+    },
+    {
+      "name": "ratio_get_churn_risk",
+      "description": "Get a list of advocates who have an active paid subscription but have shown declining engagement (no activity in 14+ days). Use this to identify at-risk users for re-engagement outreach.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "endpoint": {
+        "method": "GET",
+        "path": "/api/admin/churn-risk"
+      },
+      "requiresConfirmation": false
+    },
+    {
+      "name": "ratio_get_ai_usage",
+      "description": "Get AI session metrics including total sessions, sessions today, mode breakdown, token counts, estimated costs, and a 30-day daily cost trend. Use this to monitor AI spend and usage patterns.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "endpoint": {
+        "method": "GET",
+        "path": "/api/admin/ai-usage"
+      },
+      "requiresConfirmation": false
+    },
+    {
+      "name": "ratio_get_referral_stats",
+      "description": "Get referral funnel metrics including total invites sent, link clicks, signups from referrals, and activated referrals. Use this to evaluate the referral programme's effectiveness.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "endpoint": {
+        "method": "GET",
+        "path": "/api/admin/referral-stats"
+      },
+      "requiresConfirmation": false
+    },
+    {
+      "name": "ratio_get_snapshots",
+      "description": "Get daily analytics snapshots including signups, active users, sessions, AI usage, MRR, and churn for a configurable number of past days. Use this to plot trends or compare periods.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "days": {
+            "type": "number",
+            "description": "Number of past days to retrieve. Defaults to 30, maximum 90.",
+            "default": 30,
+            "minimum": 1,
+            "maximum": 90
+          }
+        },
+        "required": []
+      },
+      "endpoint": {
+        "method": "GET",
+        "path": "/api/admin/snapshots"
+      },
+      "requiresConfirmation": false
+    },
+    {
+      "name": "ratio_search_advocates",
+      "description": "Search advocates by name or university using a free-text query. Returns matching profiles with key metrics. Use this for quick lookups when you know part of a name or university.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "q": {
+            "type": "string",
+            "description": "Search query string to match against advocate names and universities."
+          }
+        },
+        "required": ["q"]
+      },
+      "endpoint": {
+        "method": "GET",
+        "path": "/api/admin/search"
+      },
+      "requiresConfirmation": false
+    },
+    {
+      "name": "ratio_send_email",
+      "description": "Send an email to an advocate via Resend. Supports transactional and marketing emails with HTML content. Requires explicit confirmation before sending.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "to": {
+            "type": "string",
+            "description": "Recipient email address."
+          },
+          "subject": {
+            "type": "string",
+            "description": "Email subject line."
+          },
+          "html": {
+            "type": "string",
+            "description": "HTML body content of the email. Use Ratio branding (navy/gold colour scheme)."
+          }
+        },
+        "required": ["to", "subject", "html"]
+      },
+      "endpoint": {
+        "method": "POST",
+        "path": "/api/admin/email"
+      },
+      "requiresConfirmation": true
+    },
+    {
+      "name": "ratio_update_advocate",
+      "description": "Perform an admin edit on an advocate's profile, such as changing their rank, overriding their subscription plan, or toggling ambassador status. Requires explicit confirmation before applying changes.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "profileId": {
+            "type": "string",
+            "description": "The Convex document ID of the advocate profile to update."
+          },
+          "rank": {
+            "type": "string",
+            "description": "New rank to assign (e.g. Pupil, Junior Counsel, Senior Counsel, King's Counsel)."
+          },
+          "planOverride": {
+            "type": "string",
+            "description": "Override the subscription plan for this advocate. Use with caution.",
+            "enum": ["free", "premium", "premium_plus", "professional", "professional_plus"]
+          },
+          "isAmbassador": {
+            "type": "boolean",
+            "description": "Set or remove ambassador status for this advocate."
+          }
+        },
+        "required": ["profileId"]
+      },
+      "endpoint": {
+        "method": "PATCH",
+        "path": "/api/admin/advocate/{profileId}"
+      },
+      "requiresConfirmation": true
+    },
+    {
+      "name": "ratio_create_announcement",
+      "description": "Broadcast a notification to a segment of advocates. Creates in-app notifications for all users in the target segment. Requires explicit confirmation before broadcasting.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Announcement title (shown as notification heading)."
+          },
+          "body": {
+            "type": "string",
+            "description": "Announcement body text (shown as notification content)."
+          },
+          "segment": {
+            "type": "string",
+            "description": "Target audience segment. Defaults to 'all'.",
+            "enum": ["all", "paid", "free"],
+            "default": "all"
+          }
+        },
+        "required": ["title", "body"]
+      },
+      "endpoint": {
+        "method": "POST",
+        "path": "/api/admin/announcements"
+      },
+      "requiresConfirmation": true
+    },
+    {
+      "name": "ratio_record_marketing_spend",
+      "description": "Log monthly marketing spend for customer acquisition cost (CAC) calculation. Records the amount spent on a given channel for a specific month. Requires explicit confirmation.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "month": {
+            "type": "string",
+            "description": "The month to record spend for, in YYYY-MM format (e.g. 2026-02).",
+            "pattern": "^\\d{4}-\\d{2}$"
+          },
+          "amountPence": {
+            "type": "number",
+            "description": "Marketing spend amount in pence (e.g. 50000 = 500.00 GBP).",
+            "minimum": 0
+          },
+          "channel": {
+            "type": "string",
+            "description": "Marketing channel name (e.g. 'google_ads', 'instagram', 'university_partnerships', 'referral_programme'). Optional, for breakdown reporting."
+          }
+        },
+        "required": ["month", "amountPence"]
+      },
+      "endpoint": {
+        "method": "POST",
+        "path": "/api/admin/marketing-spend"
+      },
+      "requiresConfirmation": true
+    }
+  ]
+}

@@ -18,6 +18,7 @@ export const seedDemoAccount = action({
     const name = "Demo Advocate";
 
     // Check if account already exists
+    // @ts-expect-error — deep type instantiation from Convex internal API refs
     const existing: any = await ctx.runQuery(internal.seed.checkDemoExists);
     if (existing && existing.secret) {
       // Account exists — delete it and recreate through official flow

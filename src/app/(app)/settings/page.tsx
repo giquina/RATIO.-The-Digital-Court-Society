@@ -10,8 +10,10 @@ import { Card, Button, SectionHeader, Skeleton } from "@/components/ui";
 import {
   User, Mail, GraduationCap, Eye, Users, Bell, Mail as MailIcon,
   Smartphone, Clock, Moon, FileText, Shield, Scale, ChevronRight,
-  LogOut, Trash2, AlertTriangle, Loader2, RotateCcw,
+  LogOut, Trash2, AlertTriangle, Loader2, RotateCcw, CreditCard,
+  Crown, Megaphone,
 } from "lucide-react";
+import { PLAN_LABELS, PLAN_PRICE_FORMATTED } from "@/lib/constants/stripe";
 import { useTourStore } from "@/stores/tourStore";
 
 // ── Toggle Switch ──
@@ -99,7 +101,10 @@ export default function SettingsPage() {
   const user: any = useQuery(anyApi.users.currentUser);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const profile: any = useQuery(anyApi.users.myProfile);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const subscription: any = useQuery(anyApi.subscriptions.getMySubscription);
   const updateSettings = useMutation(anyApi.users.updateSettings);
+  const updateMarketingConsent = useMutation(anyApi.profiles.updateMarketingConsent);
   const [signingOut, setSigningOut] = useState(false);
 
   const [toggles, setToggles] = useState<Record<string, boolean>>({
@@ -108,6 +113,7 @@ export default function SettingsPage() {
     emailNotifs: true,
     pushNotifs: false,
     sessionReminders: true,
+    marketingEmails: false,
     darkMode: true,
   });
 
@@ -117,6 +123,7 @@ export default function SettingsPage() {
       setToggles((prev) => ({
         ...prev,
         profileVisible: profile.isPublic ?? true,
+        marketingEmails: profile.marketingConsent ?? false,
       }));
     }
   }, [profile]);
@@ -131,6 +138,12 @@ export default function SettingsPage() {
       updateSettings({ settings: { profileVisible: newValue } }).catch(() => {
         setToggles((prev) => ({ ...prev, [key]: !newValue }));
         courtToast.error("Failed to update setting");
+      });
+    }
+    if (key === "marketingEmails") {
+      updateMarketingConsent({ consent: newValue }).catch(() => {
+        setToggles((prev) => ({ ...prev, [key]: !newValue }));
+        courtToast.error("Failed to update marketing preference");
       });
     }
   };
@@ -175,6 +188,64 @@ export default function SettingsPage() {
             { icon: <GraduationCap size={16} />, label: identifierLabel, type: "info", value: userIdentifier },
           ]}
         />
+
+        {/* Subscription */}
+        <div>
+          <h3 className="text-court-xs font-bold text-court-text-ter uppercase tracking-widest mb-2 px-1">
+            Subscription
+          </h3>
+          <Card className="divide-y divide-court-border-light">
+            <div className="flex items-center gap-3 px-4 py-3.5">
+              <div className="w-8 h-8 rounded-lg bg-gold/10 flex items-center justify-center text-gold shrink-0">
+                <Crown size={16} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-court-base font-medium text-court-text">
+                  {PLAN_LABELS[subscription?.plan ?? "free"] ?? "Free"}
+                </p>
+                <p className="text-court-sm text-court-text-ter mt-0.5">
+                  {PLAN_PRICE_FORMATTED[subscription?.plan ?? "free"] ?? "Free"}
+                  {subscription?.cancelAtPeriodEnd && " · Cancels at period end"}
+                </p>
+              </div>
+              {subscription?.plan && subscription.plan !== "free" ? (
+                <button
+                  onClick={() => {
+                    fetch("/api/stripe/portal", { method: "POST" })
+                      .then((r) => r.json())
+                      .then((data) => {
+                        if (data.url) window.location.href = data.url;
+                      })
+                      .catch(() => courtToast.error("Failed to open billing portal"));
+                  }}
+                  className="px-3 py-1.5 rounded-xl border border-court-border text-court-xs text-court-text-sec hover:text-court-text hover:border-gold/30 transition-colors"
+                >
+                  Manage
+                </button>
+              ) : (
+                <button
+                  onClick={() => router.push("/home")}
+                  className="px-3 py-1.5 rounded-xl bg-gold/10 text-gold text-court-xs font-bold hover:bg-gold/20 transition-colors"
+                >
+                  Upgrade
+                </button>
+              )}
+            </div>
+            {subscription?.currentPeriodEnd && (
+              <div className="flex items-center gap-3 px-4 py-3.5">
+                <div className="w-8 h-8 rounded-lg bg-white/[0.05] flex items-center justify-center text-court-text-sec shrink-0">
+                  <CreditCard size={16} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-court-base font-medium text-court-text">Billing Period</p>
+                  <p className="text-court-sm text-court-text-ter mt-0.5">
+                    Renews {new Date(subscription.currentPeriodEnd).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
+                  </p>
+                </div>
+              </div>
+            )}
+          </Card>
+        </div>
 
         {/* Privacy */}
         <SettingsSection
@@ -225,6 +296,13 @@ export default function SettingsPage() {
               description: "Reminders 30 minutes before sessions",
               type: "toggle",
               key: "sessionReminders",
+            },
+            {
+              icon: <Megaphone size={16} />,
+              label: "Marketing Emails",
+              description: "Product updates, tips, and new features",
+              type: "toggle",
+              key: "marketingEmails",
             },
           ]}
         />

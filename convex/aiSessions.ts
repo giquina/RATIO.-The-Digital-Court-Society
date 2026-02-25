@@ -363,6 +363,8 @@ export const getBySpectatorCode = query({
 export const joinAsSpectator = mutation({
   args: { sessionId: v.id("aiSessions") },
   handler: async (ctx, args) => {
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
     const session = await ctx.db.get(args.sessionId);
     if (!session || !session.spectatorEnabled) {
       throw new Error("Session not available for spectating");
@@ -379,6 +381,8 @@ export const joinAsSpectator = mutation({
 export const leaveAsSpectator = mutation({
   args: { sessionId: v.id("aiSessions") },
   handler: async (ctx, args) => {
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
     const session = await ctx.db.get(args.sessionId);
     if (!session) return;
     await ctx.db.patch(args.sessionId, {
