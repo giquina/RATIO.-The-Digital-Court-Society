@@ -6,8 +6,14 @@ import { useQuery } from "convex/react";
 import { anyApi } from "convex/server";
 import { Card, Tag, ProgressBar, SectionHeader, Button } from "@/components/ui";
 import {
-  BarChart3, Flame, Trophy, Target, Calendar, Download, Filter, ArrowRight,
+  BarChart3, Flame, Trophy, Target, Calendar, Download, Filter, ArrowRight, Loader2,
 } from "lucide-react";
+import {
+  generatePortfolioPDF,
+  downloadPDF,
+  type PDFExportData,
+} from "@/lib/utils/pdf-export";
+import { courtToast } from "@/lib/utils/toast";
 
 // ── Demo sessions ──
 const SESSIONS = [
@@ -115,6 +121,19 @@ export default function PortfolioPage() {
   const profileQuery: any = useQuery(anyApi.users.myProfile);
   const isProfessional = profileQuery?.userType === "professional";
 
+  // CPD data for professional PDF export
+  const currentYear = new Date().getFullYear();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const cpdSummary: any = useQuery(
+    anyApi.cpd.getMySummary,
+    isProfessional ? { year: currentYear } : "skip"
+  );
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const cpdEntries: any[] | undefined = useQuery(
+    anyApi.cpd.getMyEntries,
+    isProfessional ? { year: currentYear } : "skip"
+  );
+
   const filteredSessions = SESSIONS.filter((s) => {
     if (filter === 0) return true;
     if (filter === 1) return s.mode === "AI Judge";
@@ -137,23 +156,27 @@ export default function PortfolioPage() {
     return avg > best.avg ? { mod, avg } : best;
   }, { mod: "", avg: 0 }).mod;
 
-  // ── PDF Export ──
+  // ── PDF Export (client-side with pdf-lib) ──
   const handleExport = async () => {
     if (!profileQuery) return;
     setExporting(true);
     try {
-      const payload = {
-        fullName: profileQuery.fullName ?? "Advocate",
-        userType: profileQuery.userType ?? "student",
-        university: profileQuery.university,
-        yearOfStudy: profileQuery.yearOfStudy,
-        professionalRole: profileQuery.professionalRole,
-        firmOrChambers: profileQuery.firmOrChambers,
-        practiceAreas: profileQuery.practiceAreas,
-        totalSessions: SESSIONS.length,
-        averageScore: avgScore,
-        bestModule,
-        streakDays: profileQuery.streakDays ?? 0,
+      const exportData: PDFExportData = {
+        profile: {
+          fullName: profileQuery.fullName ?? "Advocate",
+          userType: profileQuery.userType ?? "student",
+          university: profileQuery.university,
+          yearOfStudy: profileQuery.yearOfStudy,
+          professionalRole: profileQuery.professionalRole,
+          firmOrChambers: profileQuery.firmOrChambers,
+          practiceAreas: profileQuery.practiceAreas,
+          totalSessions: SESSIONS.length,
+          averageScore: avgScore,
+          bestModule,
+          streakDays: profileQuery.streakDays ?? 0,
+          rank: profileQuery.rank,
+          chamber: profileQuery.chamber,
+        },
         sessions: SESSIONS.map((s) => ({
           date: s.date,
           title: s.title,
@@ -167,26 +190,31 @@ export default function PortfolioPage() {
         }),
       };
 
-      const res = await fetch("/api/portfolio/export", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      // Include CPD data for professionals
+      if (isProfessional && cpdSummary && cpdEntries) {
+        exportData.cpd = {
+          summary: {
+            year: cpdSummary.year,
+            totalHours: cpdSummary.totalHours,
+            entryCount: cpdSummary.entryCount,
+            targetHours: 12,
+          },
+          entries: cpdEntries.map((e: Record<string, unknown>) => ({
+            date: e.date as string,
+            title: e.title as string,
+            activityType: e.activityType as string,
+            durationMinutes: e.durationMinutes as number,
+          })),
+        };
+      }
 
-      if (!res.ok) throw new Error("Export failed");
-
-      // Download the PDF
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${profileQuery.fullName ?? "Portfolio"}_RATIO.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    } catch {
-      alert("Failed to export PDF. Please try again.");
+      const pdfBytes = await generatePortfolioPDF(exportData);
+      const safeName = (profileQuery.fullName ?? "Portfolio").replace(/[^a-zA-Z0-9]/g, "_");
+      downloadPDF(pdfBytes, `${safeName}_RATIO_Portfolio.pdf`);
+      courtToast.success("Portfolio exported");
+    } catch (err) {
+      console.error("[PDF Export]", err);
+      courtToast.error("Failed to export PDF. Please try again.");
     } finally {
       setExporting(false);
     }
@@ -215,8 +243,10 @@ export default function PortfolioPage() {
             )}
           </div>
           <Button variant="secondary" size="sm" onClick={handleExport} disabled={exporting || !profileQuery}>
-            <Download size={14} className="inline mr-1.5" />
-            {exporting ? "Exporting…" : "Export PDF"}
+            {exporting
+              ? <><Loader2 size={14} className="inline mr-1.5 animate-spin" />Exporting…</>
+              : <><Download size={14} className="inline mr-1.5" />Export PDF</>
+            }
           </Button>
         </div>
       </div>
