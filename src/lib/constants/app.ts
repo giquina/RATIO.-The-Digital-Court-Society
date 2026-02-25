@@ -138,3 +138,44 @@ export const REFERRAL_BADGE_DEFINITIONS = [
   { name: "Advocate Recruiter", icon: "Users", category: "society", requirement: { type: "referrals_completed", threshold: 5 } },
   { name: "Chamber Builder", icon: "Shield", category: "society", requirement: { type: "referrals_completed", threshold: 15 } },
 ] as const;
+
+// ── User Types ──
+export const USER_TYPES = [
+  { value: "student", label: "Law Student", icon: "🎓", description: "Currently studying law at a UK university" },
+  { value: "professional", label: "Legal Professional", icon: "⚖️", description: "Practising or training in the legal profession" },
+] as const;
+
+// ── Professional Roles ──
+export const PROFESSIONAL_ROLES = [
+  "Barrister",
+  "Solicitor",
+  "Solicitor Advocate",
+  "Pupillage Applicant",
+  "Paralegal",
+  "Legal Executive",
+  "SQE Candidate",
+  "BPC Candidate",
+  "Academic",
+  "Other",
+] as const;
+
+// ── Practice Areas ──
+export const PRACTICE_AREAS = [
+  "Criminal",
+  "Commercial",
+  "Family",
+  "Employment",
+  "Property",
+  "Public Law",
+  "Human Rights",
+  "Immigration",
+  "Personal Injury",
+  "Tax",
+  "Intellectual Property",
+  "Environmental",
+  "Clinical Negligence",
+  "Construction",
+  "Chancery",
+  "Regulatory",
+  "International",
+] as const;

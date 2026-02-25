@@ -149,7 +149,11 @@ export default function SettingsPage() {
   const resetTour = useTourStore((s) => s.resetTour);
   const userName = profile?.fullName ?? user?.name ?? "—";
   const userEmail = user?.email ?? "—";
-  const userUni = profile?.universityShort ?? profile?.university ?? "—";
+  const isProfessional = profile?.userType === "professional";
+  const userIdentifier = isProfessional
+    ? (profile?.professionalRole ?? "Legal Professional")
+    : (profile?.universityShort ?? profile?.university ?? "—");
+  const identifierLabel = isProfessional ? "Role" : "University";
 
   return (
     <div className="pb-6 md:max-w-content-medium mx-auto">
@@ -168,7 +172,7 @@ export default function SettingsPage() {
           rows={[
             { icon: <User size={16} />, label: "Name", type: "info", value: userName },
             { icon: <Mail size={16} />, label: "Email", type: "info", value: userEmail },
-            { icon: <GraduationCap size={16} />, label: "University", type: "info", value: userUni },
+            { icon: <GraduationCap size={16} />, label: identifierLabel, type: "info", value: userIdentifier },
           ]}
         />
 

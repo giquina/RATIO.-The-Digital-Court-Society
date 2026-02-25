@@ -22,9 +22,17 @@ export default defineSchema({
   profiles: defineTable({
     userId: v.id("users"),
     fullName: v.string(),
-    university: v.string(),
-    universityShort: v.string(), // "UCL", "KCL"
-    yearOfStudy: v.number(), // 0=foundation, 1-4
+    // ── User type ──
+    userType: v.optional(v.string()), // "student" | "professional" — undefined treated as "student" for backward compat
+    // ── Student fields (optional for professionals) ──
+    university: v.optional(v.string()), // optional: professionals may not have one
+    universityShort: v.optional(v.string()), // "UCL", "KCL" — optional for professionals
+    yearOfStudy: v.optional(v.number()), // 0=foundation, 1-4 — optional for professionals
+    // ── Professional fields ──
+    professionalRole: v.optional(v.string()), // "Barrister", "Solicitor", "Pupil", etc.
+    firmOrChambers: v.optional(v.string()), // name of their firm or barristers' chambers
+    practiceAreas: v.optional(v.array(v.string())), // ["Criminal", "Commercial", "Family", ...]
+    // ── Shared fields ──
     chamber: v.optional(v.string()), // "Gray's", "Lincoln's", "Inner", "Middle" — optional, can choose later
     bio: v.optional(v.string()),
     avatarUrl: v.optional(v.string()),
@@ -39,7 +47,7 @@ export default defineSchema({
     followingCount: v.number(),
     commendationCount: v.number(),
     isPublic: v.boolean(),
-    modules: v.array(v.string()), // ["Contract Law", "Public Law", ...]
+    modules: v.optional(v.array(v.string())), // ["Contract Law", "Public Law", ...] — optional for professionals
     handle: v.optional(v.string()), // URL-safe slug for referral links: /join/[handle]
     referredByProfileId: v.optional(v.id("profiles")), // who referred this advocate
     referralCount: v.optional(v.number()), // cached count of successful referrals

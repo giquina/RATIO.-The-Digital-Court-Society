@@ -96,7 +96,15 @@ export default function ProfilePage() {
   };
 
   const initials = getInitials(profile.fullName);
-  const yearLabel = YEAR_LABELS[profile.yearOfStudy] ?? `Year ${profile.yearOfStudy}`;
+  const isProfessional = profile.userType === "professional";
+  const yearLabel = isProfessional ? "" : (YEAR_LABELS[profile.yearOfStudy] ?? `Year ${profile.yearOfStudy}`);
+  // For professionals, show role + firm; for students, show university + year
+  const subtitleLine1 = isProfessional
+    ? (profile.professionalRole ?? "Legal Professional")
+    : profile.university;
+  const subtitleLine2 = isProfessional
+    ? [profile.firmOrChambers, profile.chamber ? `${profile.chamber} Chamber` : ""].filter(Boolean).join(" · ")
+    : `${yearLabel}${profile.chamber ? ` · ${profile.chamber} Chamber` : ""}`;
 
   // Calculate moots to next rank
   const rankThresholds = [
@@ -162,8 +170,8 @@ export default function ProfilePage() {
           <div className="flex flex-col items-center text-center">
             <Avatar initials={initials} chamber={profile.chamber} size="xl" border />
             <h1 className="font-serif text-xl font-bold text-court-text mt-3">{profile.fullName}</h1>
-            <p className="text-court-sm text-court-text-sec mt-1">{profile.university}</p>
-            <p className="text-court-sm text-court-text-ter mt-0.5">{yearLabel}{profile.chamber ? ` · ${profile.chamber} Chamber` : ""}</p>
+            <p className="text-court-sm text-court-text-sec mt-1">{subtitleLine1}</p>
+            <p className="text-court-sm text-court-text-ter mt-0.5">{subtitleLine2}</p>
             {profile.bio && (
               <p className="text-court-sm text-court-text-sec mt-2 max-w-[280px] sm:max-w-xs leading-relaxed">{profile.bio}</p>
             )}

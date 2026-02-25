@@ -105,11 +105,15 @@ export const create = mutation({
   args: {
     userId: v.id("users"),
     fullName: v.string(),
-    university: v.string(),
-    universityShort: v.string(),
-    yearOfStudy: v.number(),
-    chamber: v.string(),
-    modules: v.array(v.string()),
+    userType: v.optional(v.string()), // "student" | "professional"
+    university: v.optional(v.string()),
+    universityShort: v.optional(v.string()),
+    yearOfStudy: v.optional(v.number()),
+    chamber: v.optional(v.string()),
+    modules: v.optional(v.array(v.string())),
+    professionalRole: v.optional(v.string()),
+    firmOrChambers: v.optional(v.string()),
+    practiceAreas: v.optional(v.array(v.string())),
     bio: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
@@ -120,19 +124,24 @@ export const create = mutation({
 
     // Input validation
     validateStringLength(args.fullName, "Full name", LIMITS.NAME);
-    validateStringLength(args.university, "University", LIMITS.NAME);
-    validateStringLength(args.universityShort, "University abbreviation", 20);
-    validateStringLength(args.chamber, "Chamber", LIMITS.NAME);
+    if (args.university) validateStringLength(args.university, "University", LIMITS.NAME);
+    if (args.universityShort) validateStringLength(args.universityShort, "University abbreviation", 20);
+    if (args.chamber) validateStringLength(args.chamber, "Chamber", LIMITS.NAME);
     validateOptionalStringLength(args.bio, "Bio", LIMITS.BIO);
-    validateArrayLength(args.modules, "Modules", LIMITS.MODULES);
+    if (args.modules) validateArrayLength(args.modules, "Modules", LIMITS.MODULES);
 
     const profileId = await ctx.db.insert("profiles", {
       userId: args.userId,
       fullName: args.fullName,
-      university: args.university,
-      universityShort: args.universityShort,
+      userType: args.userType || "student",
+      university: args.university || (args.userType === "professional" ? "Independent" : ""),
+      universityShort: args.universityShort || (args.userType === "professional" ? "—" : ""),
       yearOfStudy: args.yearOfStudy,
-      chamber: args.chamber,
+      chamber: args.chamber || undefined,
+      modules: args.modules || [],
+      professionalRole: args.professionalRole,
+      firmOrChambers: args.firmOrChambers,
+      practiceAreas: args.practiceAreas,
       bio: args.bio ?? "",
       avatarUrl: undefined,
       rank: "Pupil",
@@ -146,7 +155,6 @@ export const create = mutation({
       followingCount: 0,
       commendationCount: 0,
       isPublic: true,
-      modules: args.modules,
     });
 
     // Initialize skills

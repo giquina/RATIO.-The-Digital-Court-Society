@@ -52,11 +52,19 @@ export const updateName = mutation({
 // Create profile during onboarding (authenticated)
 export const createProfile = mutation({
   args: {
-    university: v.string(),
-    universityShort: v.string(),
-    yearOfStudy: v.number(),
+    // ── User type ──
+    userType: v.optional(v.string()), // "student" | "professional"
+    // ── Student fields ──
+    university: v.optional(v.string()),
+    universityShort: v.optional(v.string()),
+    yearOfStudy: v.optional(v.number()),
+    modules: v.optional(v.array(v.string())),
+    // ── Professional fields ──
+    professionalRole: v.optional(v.string()),
+    firmOrChambers: v.optional(v.string()),
+    practiceAreas: v.optional(v.array(v.string())),
+    // ── Shared ──
     chamber: v.optional(v.string()),
-    modules: v.array(v.string()),
     fullName: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
@@ -81,9 +89,17 @@ export const createProfile = mutation({
     const profileId = await ctx.db.insert("profiles", {
       userId,
       fullName,
-      university: args.university,
-      universityShort: args.universityShort,
+      userType: args.userType || "student",
+      // Student fields (defaults for professionals)
+      university: args.university || (args.userType === "professional" ? "Independent" : ""),
+      universityShort: args.universityShort || (args.userType === "professional" ? "—" : ""),
       yearOfStudy: args.yearOfStudy,
+      modules: args.modules || [],
+      // Professional fields
+      professionalRole: args.professionalRole,
+      firmOrChambers: args.firmOrChambers,
+      practiceAreas: args.practiceAreas,
+      // Shared
       chamber: args.chamber || undefined,
       bio: "",
       avatarUrl: undefined,
@@ -98,7 +114,6 @@ export const createProfile = mutation({
       followingCount: 0,
       commendationCount: 0,
       isPublic: true,
-      modules: args.modules,
     });
 
     // Initialize skills
@@ -133,6 +148,11 @@ export const updateProfile = mutation({
     bio: v.optional(v.string()),
     modules: v.optional(v.array(v.string())),
     isPublic: v.optional(v.boolean()),
+    // Professional fields
+    userType: v.optional(v.string()),
+    professionalRole: v.optional(v.string()),
+    firmOrChambers: v.optional(v.string()),
+    practiceAreas: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
     const userId = await auth.getUserId(ctx);
@@ -154,6 +174,10 @@ export const updateProfile = mutation({
     if (args.bio !== undefined) patch.bio = args.bio;
     if (args.modules !== undefined) patch.modules = args.modules;
     if (args.isPublic !== undefined) patch.isPublic = args.isPublic;
+    if (args.userType !== undefined) patch.userType = args.userType;
+    if (args.professionalRole !== undefined) patch.professionalRole = args.professionalRole;
+    if (args.firmOrChambers !== undefined) patch.firmOrChambers = args.firmOrChambers;
+    if (args.practiceAreas !== undefined) patch.practiceAreas = args.practiceAreas;
 
     if (Object.keys(patch).length === 0) return profile._id;
 
