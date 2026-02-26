@@ -96,7 +96,7 @@ export default function TribunalPage() {
               <Loader2 size={20} className="animate-spin text-court-text-ter" />
             </div>
           ) : cases.length === 0 ? (
-            <EmptyState message="No cases have been filed yet." />
+            <EmptyState icon={<Gavel size={28} />} title="No Cases" description="No cases have been filed yet." />
           ) : (
           <div className="space-y-2">
             {cases.map((c: any) => {

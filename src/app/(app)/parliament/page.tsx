@@ -90,7 +90,7 @@ export default function ParliamentPage() {
               <Loader2 size={20} className="animate-spin text-court-text-ter" />
             </div>
           ) : motions.length === 0 ? (
-            <EmptyState message="No motions have been proposed yet." />
+            <EmptyState icon={<FileText size={28} />} title="No Motions" description="No motions have been proposed yet." />
           ) : (
           <div className="space-y-2">
             {motions.map((motion: any) => {

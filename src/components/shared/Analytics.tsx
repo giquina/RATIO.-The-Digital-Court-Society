@@ -2,7 +2,7 @@
 
 import { usePathname, useSearchParams } from "next/navigation";
 import Script from "next/script";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect } from "react";
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
@@ -22,28 +22,50 @@ function AnalyticsPageView() {
 }
 
 export function Analytics() {
-  const [consentGranted, setConsentGranted] = useState(false);
-
   useEffect(() => {
-    // Check existing consent on mount
+    // Listen for consent granted — update consent mode
+    const handler = () => {
+      if ((window as any).gtag) {
+        (window as any).gtag("consent", "update", {
+          analytics_storage: "granted",
+        });
+      }
+    };
+
+    // Check if already consented
     try {
       if (localStorage.getItem("ratio-cookie-consent") === "accepted") {
-        setConsentGranted(true);
+        handler();
       }
     } catch {
       // localStorage unavailable
     }
 
-    // Listen for real-time consent granted (no page reload needed)
-    const handler = () => setConsentGranted(true);
     window.addEventListener("ratio-consent-granted", handler);
     return () => window.removeEventListener("ratio-consent-granted", handler);
   }, []);
 
-  if (!GA_ID || !consentGranted) return null;
+  if (!GA_ID) return null;
 
   return (
     <>
+      {/* Consent Mode v2: default denied, gtag always loads so GA sees the tag */}
+      <Script
+        id="google-consent-default"
+        strategy="beforeInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('consent', 'default', {
+              analytics_storage: 'denied',
+              ad_storage: 'denied',
+              ad_user_data: 'denied',
+              ad_personalization: 'denied',
+            });
+          `,
+        }}
+      />
       <Script
         strategy="afterInteractive"
         src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}

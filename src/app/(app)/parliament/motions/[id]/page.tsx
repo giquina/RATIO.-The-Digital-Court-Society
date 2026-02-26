@@ -50,7 +50,7 @@ export default function MotionDetailPage() {
   if (motion === null) {
     return (
       <div className="px-4 py-20">
-        <EmptyState message="Motion not found." />
+        <EmptyState icon={<FileText size={28} />} title="Not Found" description="Motion not found." />
       </div>
     );
   }
@@ -239,7 +239,7 @@ export default function MotionDetailPage() {
           </h2>
 
           {debates.length === 0 ? (
-            <EmptyState message="No debate contributions yet." />
+            <EmptyState icon={<MessageCircle size={28} />} title="No Debate" description="No debate contributions yet." />
           ) : (
           <div className="space-y-2">
             {debates.map((entry: any) => (

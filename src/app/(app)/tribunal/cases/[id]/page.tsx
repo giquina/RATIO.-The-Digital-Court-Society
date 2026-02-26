@@ -43,7 +43,7 @@ export default function CaseDetailPage() {
   if (caseData === null) {
     return (
       <div className="px-4 py-20">
-        <EmptyState message="Case not found." />
+        <EmptyState icon={<Gavel size={28} />} title="Not Found" description="Case not found." />
       </div>
     );
   }
@@ -151,7 +151,7 @@ export default function CaseDetailPage() {
             Submissions ({submissions.length})
           </h2>
           {submissions.length === 0 ? (
-            <EmptyState message="No submissions yet." />
+            <EmptyState icon={<MessageCircle size={28} />} title="No Submissions" description="No submissions yet." />
           ) : (
           <div className="space-y-2">
             {submissions.map((sub: any) => (
