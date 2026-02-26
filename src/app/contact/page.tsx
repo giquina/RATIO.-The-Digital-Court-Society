@@ -71,13 +71,13 @@ export default function ContactPage() {
               Many common questions are answered in our help resources:
             </p>
             <div className="space-y-2">
-              <Link
-                href="/help"
-                className="flex items-center justify-between bg-navy-card border border-court-border-light rounded-court px-4 py-3 hover:border-gold/20 transition-colors"
-              >
-                <span className="text-court-sm text-court-text">Help Centre and FAQ</span>
-                <ArrowLeft size={14} className="text-court-text-ter rotate-180" />
-              </Link>
+              <p className="bg-navy-card border border-court-border-light rounded-court px-4 py-3 text-court-sm text-court-text-sec">
+                Members can visit the{" "}
+                <Link href="/help" className="text-gold hover:underline">
+                  Help Centre
+                </Link>{" "}
+                after signing in.
+              </p>
               <Link
                 href="/terms"
                 className="flex items-center justify-between bg-navy-card border border-court-border-light rounded-court px-4 py-3 hover:border-gold/20 transition-colors"

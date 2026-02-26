@@ -382,7 +382,11 @@ export default function CareersPage() {
               return (
                 <div
                   key={pos.title}
-                  className="bg-white/[0.04] border border-white/10 rounded-xl overflow-hidden transition-all"
+                  className={`rounded-xl overflow-hidden transition-all ${
+                    pos.status === "coming-soon"
+                      ? "bg-white/[0.02] border border-white/[0.06] opacity-75"
+                      : "bg-white/[0.04] border border-white/10"
+                  }`}
                 >
                   <button
                     onClick={() => setExpandedRole(isExpanded ? null : pos.title)}
@@ -392,7 +396,12 @@ export default function CareersPage() {
                       <div className="flex flex-wrap items-center gap-2 mb-1.5">
                         <h3 className="text-white font-bold text-court-base">{pos.title}</h3>
                         <Tag color={typeInfo.color} small>{typeInfo.label}</Tag>
-                        {pos.status !== "open" && (
+                        {pos.status === "coming-soon" && (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-court-xs font-semibold">
+                            <Clock size={10} /> Coming Soon
+                          </span>
+                        )}
+                        {pos.status === "expressions" && (
                           <span className="text-court-xs text-gray-500 italic">{STATUS_LABELS[pos.status]}</span>
                         )}
                       </div>
@@ -426,12 +435,21 @@ export default function CareersPage() {
                           <span className="text-gray-500 font-bold">Compensation:</span> {pos.compensation}
                         </span>
                       </div>
-                      <button
-                        onClick={() => setApplyingFor(pos)}
-                        className="inline-flex items-center gap-2 mt-4 px-5 py-2.5 bg-[#C9A84C] text-[#0B1120] font-bold rounded-xl hover:bg-[#C9A84C]/90 transition-colors text-court-sm"
-                      >
-                        <Mail size={14} /> Apply Now
-                      </button>
+                      {pos.status === "coming-soon" ? (
+                        <button
+                          disabled
+                          className="inline-flex items-center gap-2 mt-4 px-5 py-2.5 bg-white/[0.06] text-gray-500 font-bold rounded-xl cursor-not-allowed text-court-sm"
+                        >
+                          <Clock size={14} /> Applications Opening Soon
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => setApplyingFor(pos)}
+                          className="inline-flex items-center gap-2 mt-4 px-5 py-2.5 bg-[#C9A84C] text-[#0B1120] font-bold rounded-xl hover:bg-[#C9A84C]/90 transition-colors text-court-sm"
+                        >
+                          <Mail size={14} /> Apply Now
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>

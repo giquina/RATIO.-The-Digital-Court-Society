@@ -5,6 +5,7 @@ import { Tag, Card, Button, SectionHeader, DynamicIcon, Skeleton } from "@/compo
 import { Search, Download, Upload } from "lucide-react";
 import { anyApi } from "convex/server";
 import { useDemoQuery, useDemoMutation } from "@/hooks/useDemoSafe";
+import { courtToast } from "@/lib/utils/toast";
 
 const CONVEX_URL = process.env.NEXT_PUBLIC_CONVEX_URL;
 
@@ -111,12 +112,12 @@ export default function LibraryPage() {
     }
     setTimeout(() => {
       setDownloadingIdx(null);
-      alert(`Downloaded: ${title}`);
+      courtToast.success("Downloaded", title);
     }, 800);
   };
 
   const handleUpload = () => {
-    alert("Upload feature coming soon. This will allow you to contribute templates, notes, or guides.");
+    courtToast.info("Coming soon", "Upload will allow you to contribute templates, notes, or guides.");
   };
 
   if (isLoading) {

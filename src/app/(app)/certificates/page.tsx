@@ -1,10 +1,12 @@
 "use client";
 
-import { useQuery } from "convex/react";
+import { useQuery, useMutation } from "convex/react";
 import { anyApi } from "convex/server";
+import { useState } from "react";
 import { Card, Tag, Skeleton } from "@/components/ui";
 import { Award, CheckCircle2, Circle, Lock, ArrowRight, ShieldCheck, ExternalLink } from "lucide-react";
 import Link from "next/link";
+import { courtToast } from "@/lib/utils/toast";
 
 function ProgressRing({ percent, color, size = 48 }: { percent: number; color: string; size?: number }) {
   const radius = (size - 6) / 2;
@@ -23,7 +25,7 @@ function ProgressRing({ percent, color, size = 48 }: { percent: number; color: s
   );
 }
 
-function CertificateCard({ level }: { level: {
+function CertificateCard({ level, onClaim, claiming }: { level: {
   level: string;
   name: string;
   shortName: string;
@@ -37,7 +39,7 @@ function CertificateCard({ level }: { level: {
   allRequirementsMet: boolean;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   certificate: any;
-} }) {
+}; onClaim: (levelKey: string) => void; claiming: string | null }) {
   const isIssued = level.certificate?.status === "issued";
   const canClaim = level.allRequirementsMet && !isIssued;
 
@@ -106,8 +108,16 @@ function CertificateCard({ level }: { level: {
               </Link>
             </div>
           ) : canClaim ? (
-            <button className="flex items-center gap-1.5 px-4 py-2 bg-gold text-navy text-court-sm font-bold rounded-xl hover:bg-gold/90 transition-colors">
-              <Award size={14} /> Claim Certificate
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onClaim(level.level);
+              }}
+              disabled={claiming === level.level}
+              className="flex items-center gap-1.5 px-4 py-2 bg-gold text-navy text-court-sm font-bold rounded-xl hover:bg-gold/90 transition-colors disabled:opacity-60"
+            >
+              <Award size={14} /> {claiming === level.level ? "Claiming…" : "Claim Certificate"}
             </button>
           ) : (
             <div className="flex items-center gap-2 text-court-xs text-court-text-ter">
@@ -126,6 +136,25 @@ export default function CertificatesPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const data: any = useQuery(anyApi.certificates.getMyProgress);
   const isLoading = data === undefined;
+  const issueCertificate = useMutation(anyApi.certificates.issueCertificate);
+  const [claiming, setClaiming] = useState<string | null>(null);
+
+  const handleClaim = async (levelKey: string) => {
+    if (claiming) return;
+    setClaiming(levelKey);
+    try {
+      await issueCertificate({
+        level: levelKey,
+        paymentStatus: "included_in_subscription",
+      });
+      courtToast.success("Certificate claimed!");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Something went wrong";
+      courtToast.error("Could not claim certificate", message);
+    } finally {
+      setClaiming(null);
+    }
+  };
 
   return (
     <div className="pb-6 md:max-w-content-medium mx-auto">
@@ -178,7 +207,7 @@ export default function CertificatesPage() {
         ) : data?.progress ? (
           data.progress.map((level: Parameters<typeof CertificateCard>[0]["level"]) => (
             <Link key={level.level} href={`/certificates/${level.level}`}>
-              <CertificateCard level={level} />
+              <CertificateCard level={level} onClaim={handleClaim} claiming={claiming} />
             </Link>
           ))
         ) : (

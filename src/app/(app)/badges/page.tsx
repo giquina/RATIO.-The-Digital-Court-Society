@@ -9,21 +9,55 @@ import { useDemoQuery } from "@/hooks/useDemoSafe";
 
 const CONVEX_URL = process.env.NEXT_PUBLIC_CONVEX_URL;
 
-// ── Demo badge data (used when no backend) ──
-const DEMO_BADGES = [
-  { ...BADGE_DEFINITIONS[0], description: "Complete your first moot session", earned: true },
-  { ...BADGE_DEFINITIONS[1], description: "Complete 5 moot sessions", earned: true },
-  { ...BADGE_DEFINITIONS[2], description: "Complete 20 moot sessions", earned: false },
-  { ...BADGE_DEFINITIONS[3], description: "Maintain a 7-day practice streak", earned: true },
-  { ...BADGE_DEFINITIONS[4], description: "Maintain a 30-day practice streak", earned: false },
-  { ...BADGE_DEFINITIONS[5], description: "Maintain a 100-day practice streak", earned: false },
-  { ...BADGE_DEFINITIONS[6], description: "Receive your first commendation", earned: true },
-  { ...BADGE_DEFINITIONS[7], description: "Receive 50 commendations from peers", earned: false },
-  { ...BADGE_DEFINITIONS[8], description: "Complete 5 AI Judge practice sessions", earned: true },
-  { ...BADGE_DEFINITIONS[9], description: "Reach 50 followers on Ratio", earned: true },
-  { name: "First Decade", icon: "Landmark", category: "moots", description: "Complete 10 moot sessions", earned: false, requirement: { type: "moots_completed", threshold: 10 } },
-  { name: "Night Owl", icon: "BookOpen", category: "streak", description: "Log practice after midnight 3 times", earned: false, requirement: { type: "special", threshold: 3 } },
-];
+// ── Badge requirement descriptions ──
+const REQUIREMENT_DESCRIPTIONS: Record<string, (threshold: number) => string> = {
+  moots_completed: (t) => `Complete ${t} moot session${t !== 1 ? "s" : ""}`,
+  streak_days: (t) => `Maintain a ${t}-day practice streak`,
+  commendations_received: (t) => `Receive ${t} commendation${t !== 1 ? "s" : ""} from peers`,
+  ai_sessions: (t) => `Complete ${t} AI Judge practice session${t !== 1 ? "s" : ""}`,
+  followers: (t) => `Reach ${t} follower${t !== 1 ? "s" : ""} on Ratio`,
+};
+
+function getDescription(req: { type: string; threshold: number }): string {
+  const fn = REQUIREMENT_DESCRIPTIONS[req.type];
+  return fn ? fn(req.threshold) : `Reach ${req.threshold} for ${req.type}`;
+}
+
+// ── Map requirement types to profile fields ──
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getProgressFromProfile(requirementType: string, profile: any): number {
+  if (!profile) return 0;
+  switch (requirementType) {
+    case "moots_completed":
+      return profile.totalMoots ?? 0;
+    case "streak_days":
+      return profile.streakDays ?? 0;
+    case "commendations_received":
+      return profile.commendationCount ?? 0;
+    case "followers":
+      return profile.followerCount ?? 0;
+    default:
+      return 0;
+  }
+}
+
+// ── Requirement label for progress display ──
+function getRequirementLabel(requirementType: string): string {
+  switch (requirementType) {
+    case "moots_completed":
+      return "moots completed";
+    case "streak_days":
+      return "streak days";
+    case "commendations_received":
+      return "commendations received";
+    case "ai_sessions":
+      return "AI sessions completed";
+    case "followers":
+      return "followers";
+    default:
+      return "progress";
+  }
+}
 
 type BadgeItem = {
   name: string;
@@ -32,6 +66,7 @@ type BadgeItem = {
   description: string;
   earned: boolean;
   requirement: { type: string; threshold: number };
+  progress: number;
 };
 
 const CATEGORIES = ["All", "Moots", "Streaks", "Society", "Skill"];
@@ -49,21 +84,39 @@ export default function BadgesPage() {
   // Convex queries (skip in demo mode via useDemoQuery)
   const allBadges = useDemoQuery(anyApi.badges_queries.getAll);
   const myBadges = useDemoQuery(anyApi.badges_queries.getMyBadges);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const myProfile: any = useDemoQuery(anyApi.users.myProfile);
 
   const isLoading = CONVEX_URL && (allBadges === undefined || myBadges === undefined);
 
-  // Build unified badge list with earned status
+  // Build unified badge list with earned status and real progress
   const badges: BadgeItem[] = (() => {
-    if (!CONVEX_URL || !allBadges) return DEMO_BADGES;
+    if (!CONVEX_URL || !allBadges) {
+      // Demo/no-backend: use BADGE_DEFINITIONS with 0 progress (no fake data)
+      return BADGE_DEFINITIONS.map((def) => ({
+        name: def.name,
+        icon: def.icon,
+        category: def.category,
+        description: getDescription(def.requirement),
+        earned: false,
+        requirement: { type: def.requirement.type, threshold: def.requirement.threshold },
+        progress: 0,
+      }));
+    }
     const earnedSet = new Set((myBadges ?? []).map((b: { badgeId: string }) => b.badgeId));
-    return allBadges.map((b: { _id: string; name: string; icon: string; category: string; description?: string; requirement?: { type: string; threshold: number } }) => ({
-      name: b.name,
-      icon: b.icon,
-      category: b.category,
-      description: b.description ?? "",
-      earned: earnedSet.has(b._id),
-      requirement: b.requirement ?? { type: "unknown", threshold: 0 },
-    }));
+    return allBadges.map((b: { _id: string; name: string; icon: string; category: string; description?: string; requirement?: { type: string; threshold: number } }) => {
+      const req = b.requirement ?? { type: "unknown", threshold: 0 };
+      const progress = getProgressFromProfile(req.type, myProfile);
+      return {
+        name: b.name,
+        icon: b.icon,
+        category: b.category,
+        description: b.description ?? getDescription(req),
+        earned: earnedSet.has(b._id),
+        requirement: req,
+        progress,
+      };
+    });
   })();
 
   const earnedCount = badges.filter((b) => b.earned).length;
@@ -75,7 +128,7 @@ export default function BadgesPage() {
       : badges.filter((b) => b.category === CATEGORY_MAP[activeCategory]);
 
   const nextBadge = badges.find(
-    (b) => !b.earned && b.category === "moots"
+    (b) => !b.earned && b.requirement.threshold > 0
   );
 
   if (isLoading) {
@@ -210,30 +263,37 @@ export default function BadgesPage() {
       </section>
 
       {/* Progress Toward Next Badge */}
-      {nextBadge && (
-        <section className="px-4 md:px-6 lg:px-8 mt-6">
-          <Card className="p-4">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-court bg-gold-dim flex items-center justify-center">
-                <DynamicIcon name={nextBadge.icon} size={20} className="text-gold" />
+      {nextBadge && (() => {
+        const current = nextBadge.progress;
+        const threshold = nextBadge.requirement.threshold;
+        const pct = threshold > 0 ? Math.min(Math.round((current / threshold) * 100), 100) : 0;
+        const remaining = Math.max(threshold - current, 0);
+        const label = getRequirementLabel(nextBadge.requirement.type);
+        return (
+          <section className="px-4 md:px-6 lg:px-8 mt-6">
+            <Card className="p-4">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-court bg-gold-dim flex items-center justify-center">
+                  <DynamicIcon name={nextBadge.icon} size={20} className="text-gold" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-court-base font-bold text-court-text">
+                    Next: {nextBadge.name}
+                  </p>
+                  <p className="text-court-sm text-court-text-sec">
+                    {nextBadge.description}
+                  </p>
+                </div>
               </div>
-              <div className="flex-1">
-                <p className="text-court-base font-bold text-court-text">
-                  Next: {nextBadge.name}
-                </p>
-                <p className="text-court-sm text-court-text-sec">
-                  {nextBadge.description}
-                </p>
-              </div>
-            </div>
-            <ProgressBar pct={40} height={6} />
-            <p className="text-court-sm text-court-text-ter mt-2">
-              <span className="text-gold font-semibold">8 of {nextBadge.requirement.threshold}</span>{" "}
-              moots completed &mdash; {nextBadge.requirement.threshold - 8} more to earn &ldquo;{nextBadge.name}&rdquo;
-            </p>
-          </Card>
-        </section>
-      )}
+              <ProgressBar pct={pct} height={6} />
+              <p className="text-court-sm text-court-text-ter mt-2">
+                <span className="text-gold font-semibold">{current} of {threshold}</span>{" "}
+                {label} &mdash; {remaining} more to earn &ldquo;{nextBadge.name}&rdquo;
+              </p>
+            </Card>
+          </section>
+        );
+      })()}
     </div>
   );
 }

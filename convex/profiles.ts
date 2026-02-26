@@ -343,6 +343,26 @@ export const incrementMoots = mutation({
   },
 });
 
+// Soft-delete the authenticated user's account
+export const deleteAccount = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!profile) throw new Error("Profile not found");
+
+    await ctx.db.patch(profile._id, {
+      deletedAt: new Date().toISOString(),
+      isPublic: false,
+    });
+  },
+});
+
 // Update marketing consent (GDPR opt-in)
 export const updateMarketingConsent = mutation({
   args: { consent: v.boolean() },

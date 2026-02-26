@@ -105,7 +105,10 @@ export default function SettingsPage() {
   const subscription: any = useQuery(anyApi.subscriptions.getMySubscription);
   const updateSettings = useMutation(anyApi.users.updateSettings);
   const updateMarketingConsent = useMutation(anyApi.profiles.updateMarketingConsent);
+  const deleteAccountMutation = useMutation(anyApi.profiles.deleteAccount);
   const [signingOut, setSigningOut] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const [toggles, setToggles] = useState<Record<string, boolean>>({
     profileVisible: true,
@@ -156,6 +159,19 @@ export default function SettingsPage() {
     } catch {
       setSigningOut(false);
       courtToast.error("Failed to sign out");
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    setDeleting(true);
+    try {
+      await deleteAccountMutation();
+      await signOut?.();
+      router.push("/");
+    } catch {
+      setDeleting(false);
+      setConfirmingDelete(false);
+      courtToast.error("Failed to delete account");
     }
   };
 
@@ -379,10 +395,38 @@ export default function SettingsPage() {
                   {signingOut ? <Loader2 size={14} className="animate-spin" /> : <LogOut size={14} />}
                   {signingOut ? "Signing out..." : "Sign Out"}
                 </button>
-                <button className="text-court-sm text-red-400/60 hover:text-red-400 transition-colors flex items-center gap-1 px-3 py-2.5">
-                  <Trash2 size={12} />
-                  Delete Account
-                </button>
+                {!confirmingDelete ? (
+                  <button
+                    onClick={() => setConfirmingDelete(true)}
+                    className="text-court-sm text-red-400/60 hover:text-red-400 transition-colors flex items-center gap-1 px-3 py-2.5"
+                  >
+                    <Trash2 size={12} />
+                    Delete Account
+                  </button>
+                ) : (
+                  <div className="flex flex-col gap-2 w-full">
+                    <p className="text-court-sm text-red-400 font-medium">
+                      Are you sure? This action cannot be undone.
+                    </p>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={handleDeleteAccount}
+                        disabled={deleting}
+                        className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-red-500/20 border border-red-500/30 text-red-400 text-court-sm font-bold hover:bg-red-500/30 transition-colors disabled:opacity-50"
+                      >
+                        {deleting ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+                        {deleting ? "Deleting..." : "Yes, Delete"}
+                      </button>
+                      <button
+                        onClick={() => setConfirmingDelete(false)}
+                        disabled={deleting}
+                        className="px-4 py-2.5 rounded-xl border border-court-border text-court-sm text-court-text-sec hover:text-court-text hover:border-court-border-light transition-colors disabled:opacity-50"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </Card>

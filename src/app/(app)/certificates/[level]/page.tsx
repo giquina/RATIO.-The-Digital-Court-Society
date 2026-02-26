@@ -1,11 +1,13 @@
 "use client";
 
-import { useQuery } from "convex/react";
+import { useQuery, useMutation } from "convex/react";
 import { anyApi } from "convex/server";
 import { useParams, useRouter } from "next/navigation";
+import { useState } from "react";
 import Link from "next/link";
 import { Card, Tag, Skeleton, Button } from "@/components/ui";
 import { CheckCircle2, Circle, ArrowLeft, Award, Lock, ShieldCheck, ExternalLink, TrendingUp, Download } from "lucide-react";
+import { courtToast } from "@/lib/utils/toast";
 import { generateCertificatePDF, downloadCertificatePDF } from "@/lib/utils/certificate-pdf";
 import type { CertificateData } from "@/lib/utils/certificate-pdf";
 
@@ -44,6 +46,25 @@ export default function CertificateLevelPage() {
   const levelKey = params?.level as string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const data: any = useQuery(anyApi.certificates.getMyProgress);
+  const issueCertificate = useMutation(anyApi.certificates.issueCertificate);
+  const [claiming, setClaiming] = useState(false);
+
+  const handleClaim = async () => {
+    if (claiming) return;
+    setClaiming(true);
+    try {
+      await issueCertificate({
+        level: levelKey,
+        paymentStatus: "included_in_subscription",
+      });
+      courtToast.success("Certificate claimed!");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Something went wrong";
+      courtToast.error("Could not claim certificate", message);
+    } finally {
+      setClaiming(false);
+    }
+  };
 
   if (data === undefined) {
     return (
@@ -156,7 +177,9 @@ export default function CertificateLevelPage() {
                   £{(level.price / 100).toFixed(2)} one-time purchase · or included free with any subscription
                 </p>
               </div>
-              <Button size="sm">Claim Now</Button>
+              <Button size="sm" onClick={handleClaim} disabled={claiming}>
+                {claiming ? "Claiming…" : "Claim Now"}
+              </Button>
             </div>
           </Card>
         ) : (

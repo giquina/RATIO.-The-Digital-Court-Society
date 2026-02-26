@@ -273,14 +273,14 @@ export default function ProfilePage() {
       {/* ── Actions ── */}
       <section className="px-4 mt-4">
         {([
-          { Icon: FolderOpen, label: "Export Advocacy Portfolio", tag: "PDF" },
+          { Icon: FolderOpen, label: "Export Advocacy Portfolio", tag: "PDF", href: "/portfolio" },
           { Icon: LinkIcon, label: "Copy Profile Link" },
           { Icon: Landmark, label: profile.chamber ? `Your Chamber · ${profile.chamber}` : "Join a Chamber" },
           { Icon: Bookmark, label: "My Brief", href: "/bookmarks", tag: "SAVED" },
-          { Icon: FileText, label: "Digital Membership Card", tag: "WALLET" },
+          { Icon: FileText, label: "Digital Membership Card", tag: "WALLET", onClick: () => courtToast.info("Coming soon") },
           { Icon: Settings, label: "Settings", href: "/settings" },
-        ] as { Icon: LucideIcon; label: string; tag?: string; href?: string }[]).map((a) => (
-          <Link key={a.label} href={a.href ?? "#"}>
+        ] as { Icon: LucideIcon; label: string; tag?: string; href?: string; onClick?: () => void }[]).map((a) => {
+          const content = (
             <div className="flex justify-between items-center py-3.5 border-b border-court-border-light cursor-pointer">
               <div className="flex gap-3 items-center">
                 <a.Icon size={18} className="text-court-text-sec" />
@@ -291,8 +291,22 @@ export default function ProfilePage() {
                 <span className="text-court-text-ter text-court-base">&rsaquo;</span>
               </div>
             </div>
-          </Link>
-        ))}
+          );
+
+          if (a.onClick) {
+            return (
+              <button key={a.label} onClick={a.onClick} className="w-full text-left">
+                {content}
+              </button>
+            );
+          }
+
+          return (
+            <Link key={a.label} href={a.href ?? "#"}>
+              {content}
+            </Link>
+          );
+        })}
 
         {/* Sign Out — right here, no digging into Settings */}
         <button

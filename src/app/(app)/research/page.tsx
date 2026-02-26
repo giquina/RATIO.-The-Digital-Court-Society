@@ -18,7 +18,7 @@ import {
   Landmark,
   Clock,
 } from "lucide-react"
-import { cn } from "@/lib/utils/helpers"
+import { cn, formatRelativeTime } from "@/lib/utils/helpers"
 import type {
   UnifiedSearchResponse,
   UnifiedSearchResult,
@@ -27,6 +27,9 @@ import type {
 } from "@/lib/legal-api/types"
 import { COURTS } from "@/lib/legal-api/types"
 import { isNeutralCitation, isLegislationReference } from "@/lib/legal-api/oscola"
+import { useAuthStore } from "@/stores/authStore"
+import { useQuery, useMutation } from "convex/react"
+import { anyApi } from "convex/server"
 
 const SOURCE_TABS: { value: LegalSourceType; label: string; Icon: React.ElementType }[] = [
   { value: "all", label: "All Sources", Icon: Scale },
@@ -44,15 +47,6 @@ const POPULAR_SEARCHES = [
   "Salomon v Salomon",
 ]
 
-// Demo data for recent searches — replace with Convex query when auth is wired:
-// const recentSearches = useQuery(api.research.getRecentSearches)
-const RECENT_SEARCHES_DEMO = [
-  { query: "Entick v Carrington", resultCount: 3, searchedAt: "2 hours ago" },
-  { query: "Equality Act 2010", resultCount: 47, searchedAt: "Yesterday" },
-  { query: "R v Brown [1994]", resultCount: 12, searchedAt: "2 days ago" },
-  { query: "Occupiers Liability Act 1957", resultCount: 8, searchedAt: "3 days ago" },
-]
-
 const COURT_GROUPS = [
   { label: "Supreme Court & Privy Council", courts: COURTS.filter((c) => c.hierarchy === 1) },
   { label: "Court of Appeal", courts: COURTS.filter((c) => c.hierarchy === 2) },
@@ -62,6 +56,15 @@ const COURT_GROUPS = [
 ]
 
 export default function ResearchPage() {
+  const { profile } = useAuthStore()
+
+  // Convex: real search history
+  const searchHistory: any[] | undefined = useQuery(
+    anyApi.research.getSearchHistory,
+    profile?._id ? { profileId: profile._id as any, limit: 10 } : "skip"
+  )
+  const recordSearchMutation = useMutation(anyApi.research.recordSearch)
+
   const [query, setQuery] = useState("")
   const [source, setSource] = useState<LegalSourceType>("all")
   const [results, setResults] = useState<UnifiedSearchResponse | null>(null)
@@ -107,13 +110,26 @@ export default function ResearchPage() {
         setResults(data)
         if (resultsRef.current)
           resultsRef.current.scrollIntoView({ behavior: "smooth", block: "start" })
+
+        // Record search in Convex history
+        if (profile?._id) {
+          recordSearchMutation({
+            profileId: profile._id as any,
+            query: q,
+            source,
+            resultCount: data.totalResults,
+            queryTime: data.queryTime,
+          }).catch(() => {
+            // Silent fail — search history recording is non-critical
+          })
+        }
       } catch {
         setError("Search failed. Please check your connection and try again.")
       } finally {
         setIsLoading(false)
       }
     },
-    [query, source, page, selectedCourts, yearFrom, yearTo, judgeFilter, partyFilter]
+    [query, source, page, selectedCourts, yearFrom, yearTo, judgeFilter, partyFilter, profile?._id, recordSearchMutation]
   )
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -374,28 +390,38 @@ export default function ResearchPage() {
       )}
 
       {/* Recent Searches */}
-      {!results && !isLoading && (
+      {!results && !isLoading && profile?._id && (
         <div className="mb-6">
           <p className="text-court-xs font-bold tracking-[0.15em] text-court-text-ter mb-3 flex items-center gap-2">
             <Clock size={12} />
             RECENT SEARCHES
           </p>
-          <div className="space-y-2">
-            {RECENT_SEARCHES_DEMO.map((item) => (
-              <button
-                key={item.query}
-                onClick={() => handleQuickSearch(item.query)}
-                className="group/recent w-full flex items-center justify-between gap-3 px-4 py-3 min-h-[44px] bg-navy-card border border-court-border-light rounded-xl hover:bg-navy-mid hover:border-court-border transition-all active:scale-95"
-              >
-                <span className="text-court-sm text-court-text-sec group-hover/recent:text-court-text transition-colors truncate text-left">
-                  {item.query}
-                </span>
-                <span className="flex-shrink-0 text-court-xs text-court-text-ter group-hover/recent:text-court-text-sec transition-colors whitespace-nowrap">
-                  {item.resultCount} results · {item.searchedAt}
-                </span>
-              </button>
-            ))}
-          </div>
+          {searchHistory === undefined ? (
+            <div className="flex items-center justify-center py-4">
+              <Loader2 size={16} className="animate-spin text-court-text-ter" />
+            </div>
+          ) : searchHistory.length > 0 ? (
+            <div className="space-y-2">
+              {searchHistory.map((item: any) => (
+                <button
+                  key={item._id}
+                  onClick={() => handleQuickSearch(item.query)}
+                  className="group/recent w-full flex items-center justify-between gap-3 px-4 py-3 min-h-[44px] bg-navy-card border border-court-border-light rounded-xl hover:bg-navy-mid hover:border-court-border transition-all active:scale-95"
+                >
+                  <span className="text-court-sm text-court-text-sec group-hover/recent:text-court-text transition-colors truncate text-left">
+                    {item.query}
+                  </span>
+                  <span className="flex-shrink-0 text-court-xs text-court-text-ter group-hover/recent:text-court-text-sec transition-colors whitespace-nowrap">
+                    {item.resultCount} result{item.resultCount !== 1 ? "s" : ""} · {formatRelativeTime(item.searchedAt)}
+                  </span>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <p className="text-court-sm text-court-text-ter py-3">
+              No recent searches yet. Try searching for a case, statute, or citation above.
+            </p>
+          )}
         </div>
       )}
 

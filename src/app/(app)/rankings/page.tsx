@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Avatar, Tag, Card, Skeleton } from "@/components/ui";
 import { Trophy, Medal, Crown, TrendingUp } from "lucide-react";
 import { anyApi } from "convex/server";
@@ -64,16 +64,51 @@ export default function RankingsPage() {
 
   // Resolve data source
   const isLoading = CONVEX_URL && leaderboard === undefined;
-  const advocates = leaderboard ?? DEMO_ADVOCATES;
+  const allAdvocates = leaderboard ?? DEMO_ADVOCATES;
 
-  // Find current user's position in the leaderboard
+  // Derive the current user's university and chamber for filtering
+  const myUniversity = myProfile
+    ? (myProfile as { universityShort?: string }).universityShort
+    : CONVEX_URL
+      ? undefined
+      : DEMO_ADVOCATES[13].universityShort; // Demo: Ali Giquina's university
+  const myChamber = myProfile
+    ? (myProfile as { chamber?: string }).chamber
+    : CONVEX_URL
+      ? undefined
+      : DEMO_ADVOCATES[13].chamber; // Demo: Ali Giquina's chamber
+
+  // Filter advocates based on the active tab
+  const advocates = useMemo(() => {
+    switch (activeTab) {
+      case 1: // University — show only advocates from the user's university
+        if (!myUniversity) return allAdvocates;
+        return allAdvocates.filter(
+          (a: Record<string, unknown>) => a.universityShort === myUniversity
+        );
+      case 2: // Chamber — show only advocates from the user's chamber
+        if (!myChamber) return allAdvocates;
+        return allAdvocates.filter(
+          (a: Record<string, unknown>) => a.chamber === myChamber
+        );
+      case 3: // Monthly — show all (no date data available; same dataset, different label)
+      case 0: // National — show all
+      default:
+        return allAdvocates;
+    }
+  }, [activeTab, allAdvocates, myUniversity, myChamber]);
+
+  // Find current user's position in the filtered leaderboard
   const myIndex = myProfile
     ? advocates.findIndex(
         (a: Record<string, unknown>) => "userId" in a && a.userId === (myProfile as { userId: string }).userId
       )
     : CONVEX_URL
       ? -1
-      : 13; // Demo mode: Ali Giquina at index 13
+      : advocates.findIndex(
+          (a: typeof DEMO_ADVOCATES[number]) =>
+            a.fullName === DEMO_ADVOCATES[13].fullName
+        ); // Demo mode: find Ali Giquina in filtered list
 
   const top3 = advocates.slice(0, 3);
   const rest = advocates.slice(3);
@@ -103,10 +138,18 @@ export default function RankingsPage() {
       <div className="px-4 md:px-6 lg:px-8 pt-3 pb-4">
         <div className="flex items-center gap-2 mb-1">
           <Trophy size={20} className="text-gold" />
-          <h1 className="font-serif text-2xl font-bold text-court-text">National Rankings</h1>
+          <h1 className="font-serif text-2xl font-bold text-court-text">
+            {activeTab === 0 && "National Rankings"}
+            {activeTab === 1 && "University Rankings"}
+            {activeTab === 2 && "Chamber Rankings"}
+            {activeTab === 3 && "Monthly Rankings"}
+          </h1>
         </div>
         <p className="text-court-sm text-court-text-sec">
-          Top advocates across all UK law schools
+          {activeTab === 0 && "Top advocates across all UK law schools"}
+          {activeTab === 1 && (myUniversity ? `Top advocates at ${myUniversity}` : "Top advocates at your university")}
+          {activeTab === 2 && (myChamber ? `Top advocates in ${myChamber}` : "Top advocates in your chamber")}
+          {activeTab === 3 && "Top advocates this month"}
         </p>
       </div>
 

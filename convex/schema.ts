@@ -57,6 +57,8 @@ export default defineSchema({
     ambassadorSince: v.optional(v.string()), // ISO date
     // ── Marketing ──
     marketingConsent: v.optional(v.boolean()), // GDPR: explicit opt-in for marketing emails
+    // ── Soft delete ──
+    deletedAt: v.optional(v.string()), // ISO timestamp — set when user deletes their account
   })
     .index("by_user", ["userId"])
     .index("by_university", ["university"])
