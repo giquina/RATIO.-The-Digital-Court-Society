@@ -11,6 +11,8 @@ import { anyApi } from "convex/server";
 import { useSidebarStore } from "@/stores/sidebarStore";
 import { useSessionStore } from "@/stores/sessionStore";
 import { cn } from "@/lib/utils/helpers";
+import { RouteErrorBoundary } from "@/components/shared/RouteErrorBoundary";
+import { QuerySafeBoundary } from "@/components/shared/QuerySafeBoundary";
 import { TheClerk } from "@/components/shared/TheClerk";
 import { OnboardingTour } from "@/components/shared/OnboardingTour";
 import { SplashScreen } from "@/components/shared/SplashScreen";
@@ -31,14 +33,22 @@ function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen flex">
-      <Sidebar />
+      <QuerySafeBoundary fallback={null}>
+        <Sidebar />
+      </QuerySafeBoundary>
       <div className={cn(
         "flex-1 min-w-0 flex flex-col md:ml-[72px]",
         !collapsed && "lg:ml-[240px]"
       )}>
-        {!isSessionActive && <MobileHeader />}
+        {!isSessionActive && (
+          <QuerySafeBoundary fallback={null}>
+            <MobileHeader />
+          </QuerySafeBoundary>
+        )}
         <main className={cn("flex-1 min-w-0", !isSessionActive && "pb-24 md:pb-0")}>
-          {children}
+          <RouteErrorBoundary pathname={pathname}>
+            {children}
+          </RouteErrorBoundary>
         </main>
       </div>
       <BottomNav />
