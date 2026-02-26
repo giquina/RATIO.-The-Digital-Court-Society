@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useMutation } from "convex/react";
+import { anyApi } from "convex/server";
 import { Card, Button, Tag } from "@/components/ui";
 import {
   ArrowLeft,
@@ -14,6 +16,7 @@ import {
   Scale,
   Shield,
   Info,
+  Loader2,
 } from "lucide-react";
 
 // ── Module options ──
@@ -38,6 +41,8 @@ interface Citation {
 }
 
 export default function ContributePage() {
+  const submitTopic = useMutation(anyApi.lawBook.submitTopic);
+
   const [module, setModule] = useState("");
   const [title, setTitle] = useState("");
   const [issue, setIssue] = useState("");
@@ -48,6 +53,8 @@ export default function ContributePage() {
   const [newCitationType, setNewCitationType] = useState("Case");
   const [newCitationText, setNewCitationText] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const iracFilled =
     issue.trim().length > 0 &&
@@ -71,9 +78,26 @@ export default function ContributePage() {
     setCitations((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!canSubmit) return;
-    setSubmitted(true);
+    setSubmitting(true);
+    setError(null);
+    try {
+      await submitTopic({
+        module,
+        title: title.trim(),
+        issue: issue.trim(),
+        rule: rule.trim(),
+        application: application.trim(),
+        conclusion: conclusion.trim(),
+        citations,
+      });
+      setSubmitted(true);
+    } catch (err: any) {
+      setError(err.message || "Failed to submit. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (submitted) {
@@ -434,11 +458,24 @@ export default function ContributePage() {
           <Button
             fullWidth
             onClick={handleSubmit}
-            disabled={!canSubmit}
+            disabled={!canSubmit || submitting}
           >
-            Submit for Review
+            {submitting ? (
+              <span className="flex items-center gap-2 justify-center">
+                <Loader2 size={16} className="animate-spin" />
+                Submitting...
+              </span>
+            ) : (
+              "Submit for Review"
+            )}
           </Button>
-          {!canSubmit && (
+          {error && (
+            <div className="flex items-center gap-2 justify-center text-court-xs text-red-400">
+              <AlertCircle size={12} />
+              <span>{error}</span>
+            </div>
+          )}
+          {!canSubmit && !error && (
             <div className="flex items-center gap-2 justify-center text-court-xs text-court-text-ter">
               <Info size={12} />
               <span>

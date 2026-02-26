@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useQuery } from "convex/react";
 import { anyApi } from "convex/server";
-import { Card, Tag, ProgressBar, SectionHeader, Button } from "@/components/ui";
+import { Card, Tag, ProgressBar, SectionHeader, Button, EmptyState } from "@/components/ui";
 import {
   BarChart3, Flame, Trophy, Target, Calendar, Download, Filter, ArrowRight, Loader2,
 } from "lucide-react";
@@ -15,91 +15,15 @@ import {
 } from "@/lib/utils/pdf-export";
 import { courtToast } from "@/lib/utils/toast";
 
-// ── Demo sessions ──
-const SESSIONS = [
-  {
-    id: "s1",
-    date: "18 Feb 2026",
-    title: "Judicial Review of Executive Power",
-    role: "Leading Counsel (Appellant)",
-    score: 78,
-    module: "Public Law",
-    mode: "Moot",
-    modeColor: "gold" as const,
-  },
-  {
-    id: "s2",
-    date: "14 Feb 2026",
-    title: "AI Judge - Contract Formation",
-    role: "Counsel",
-    score: 72,
-    module: "Contract Law",
-    mode: "AI Judge",
-    modeColor: "blue" as const,
-  },
-  {
-    id: "s3",
-    date: "10 Feb 2026",
-    title: "R v Hughes - Self-Defence",
-    role: "Defence Counsel",
-    score: 65,
-    module: "Criminal Law",
-    mode: "Moot",
-    modeColor: "gold" as const,
-  },
-  {
-    id: "s4",
-    date: "6 Feb 2026",
-    title: "AI Judge - Duty of Care Analysis",
-    role: "Counsel",
-    score: 81,
-    module: "Tort Law",
-    mode: "AI Judge",
-    modeColor: "blue" as const,
-  },
-  {
-    id: "s5",
-    date: "1 Feb 2026",
-    title: "Land Registration Disputes",
-    role: "Junior Counsel (Respondent)",
-    score: 58,
-    module: "Land Law",
-    mode: "Moot",
-    modeColor: "gold" as const,
-  },
-  {
-    id: "s6",
-    date: "28 Jan 2026",
-    title: "AI Judge - EU Supremacy Principles",
-    role: "Counsel",
-    score: 69,
-    module: "EU Law",
-    mode: "AI Judge",
-    modeColor: "blue" as const,
-  },
-  {
-    id: "s7",
-    date: "23 Jan 2026",
-    title: "Breach of Fiduciary Duty",
-    role: "Leading Counsel (Appellant)",
-    score: 74,
-    module: "Equity & Trusts",
-    mode: "Moot",
-    modeColor: "gold" as const,
-  },
-  {
-    id: "s8",
-    date: "18 Jan 2026",
-    title: "AI Judge - Human Rights Act Application",
-    role: "Counsel",
-    score: 85,
-    module: "Human Rights",
-    mode: "AI Judge",
-    modeColor: "blue" as const,
-  },
-];
-
 const FILTERS = ["All", "AI Judge", "Moot Sessions"];
+
+function formatDate(ts: number): string {
+  const d = new Date(ts);
+  const day = String(d.getDate()).padStart(2, "0");
+  const mon = d.toLocaleString("en-GB", { month: "short" });
+  const year = d.getFullYear();
+  return `${day} ${mon} ${year}`;
+}
 
 function getScoreColor(score: number): string {
   if (score >= 70) return "green";
@@ -121,6 +45,12 @@ export default function PortfolioPage() {
   const profileQuery: any = useQuery(anyApi.users.myProfile);
   const isProfessional = profileQuery?.userType === "professional";
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sessions: any[] | undefined = useQuery(
+    anyApi.aiSessions.getByProfile,
+    profileQuery?._id ? { profileId: profileQuery._id } : "skip"
+  );
+
   // CPD data for professional PDF export
   const currentYear = new Date().getFullYear();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -134,27 +64,44 @@ export default function PortfolioPage() {
     isProfessional ? { year: currentYear } : "skip"
   );
 
-  const filteredSessions = SESSIONS.filter((s) => {
+  const completedSessions = (sessions ?? []).filter(
+    (s: any) => s.status === "completed"
+  );
+
+  const filteredSessions = completedSessions.filter((s: any) => {
     if (filter === 0) return true;
     if (filter === 1) return s.mode === "AI Judge";
     if (filter === 2) return s.mode === "Moot";
     return true;
   });
 
-  const avgScore = Math.round(
-    SESSIONS.reduce((sum, s) => sum + s.score, 0) / SESSIONS.length
-  );
+  const avgScore =
+    completedSessions.length > 0
+      ? Math.round(
+          completedSessions.reduce(
+            (sum: number, s: any) => sum + (s.overallScore ?? 0),
+            0
+          ) / completedSessions.length
+        )
+      : 0;
 
-  // Best module = module with highest average score
+  // Best module = module (areaOfLaw) with highest average score
   const moduleScores: Record<string, number[]> = {};
-  SESSIONS.forEach((s) => {
-    if (!moduleScores[s.module]) moduleScores[s.module] = [];
-    moduleScores[s.module].push(s.score);
+  completedSessions.forEach((s: any) => {
+    const mod = s.areaOfLaw ?? "Unknown";
+    if (!moduleScores[mod]) moduleScores[mod] = [];
+    moduleScores[mod].push(s.overallScore ?? 0);
   });
-  const bestModule = Object.entries(moduleScores).reduce((best, [mod, scores]) => {
-    const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
-    return avg > best.avg ? { mod, avg } : best;
-  }, { mod: "", avg: 0 }).mod;
+  const bestModule =
+    Object.keys(moduleScores).length > 0
+      ? Object.entries(moduleScores).reduce(
+          (best, [mod, scores]) => {
+            const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
+            return avg > best.avg ? { mod, avg } : best;
+          },
+          { mod: "", avg: 0 }
+        ).mod
+      : "N/A";
 
   // ── PDF Export (client-side with pdf-lib) ──
   const handleExport = async () => {
@@ -170,20 +117,20 @@ export default function PortfolioPage() {
           professionalRole: profileQuery.professionalRole,
           firmOrChambers: profileQuery.firmOrChambers,
           practiceAreas: profileQuery.practiceAreas,
-          totalSessions: SESSIONS.length,
+          totalSessions: completedSessions.length,
           averageScore: avgScore,
           bestModule,
           streakDays: profileQuery.streakDays ?? 0,
           rank: profileQuery.rank,
           chamber: profileQuery.chamber,
         },
-        sessions: SESSIONS.map((s) => ({
-          date: s.date,
-          title: s.title,
-          role: s.role,
-          score: s.score,
-          module: s.module,
-          mode: s.mode,
+        sessions: completedSessions.map((s: any) => ({
+          date: formatDate(s._creationTime),
+          title: s.caseTitle ?? "Untitled Session",
+          role: s.mode === "AI Judge" ? "Counsel" : "Moot Participant",
+          score: s.overallScore ?? 0,
+          module: s.areaOfLaw ?? "Unknown",
+          mode: s.mode ?? "Unknown",
         })),
         generatedAt: new Date().toLocaleDateString("en-GB", {
           day: "numeric", month: "long", year: "numeric",
@@ -255,10 +202,10 @@ export default function PortfolioPage() {
       <section className="px-4 md:px-6 lg:px-8 mb-5">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
           {[
-            { icon: <BarChart3 size={16} className="text-court-text-sec" />, value: SESSIONS.length.toString(), label: "Total Sessions" },
+            { icon: <BarChart3 size={16} className="text-court-text-sec" />, value: completedSessions.length.toString(), label: "Total Sessions" },
             { icon: <Target size={16} className="text-court-text-sec" />, value: `${avgScore}%`, label: "Average Score" },
             { icon: <Trophy size={16} className="text-court-text-sec" />, value: bestModule, label: "Best Module" },
-            { icon: <Flame size={16} className="text-court-text-sec" />, value: "12 days", label: "Current Streak" },
+            { icon: <Flame size={16} className="text-court-text-sec" />, value: `${profileQuery?.streakDays ?? 0} days`, label: "Current Streak" },
           ].map((stat) => (
             <Card key={stat.label} className="p-3.5">
               <div className="mb-2">{stat.icon}</div>
@@ -293,48 +240,67 @@ export default function PortfolioPage() {
         </div>
 
         {/* Session Cards */}
-        <div className="space-y-2.5">
-          {filteredSessions.map((session) => (
-            <Link key={session.id} href={`/feedback/${session.id}`}>
-              <Card className="p-4 hover:border-white/10 transition-all cursor-pointer">
-                <div className="flex justify-between items-start mb-2">
-                  <div className="flex items-center gap-2">
-                    <Calendar size={12} className="text-court-text-ter" />
-                    <span className="text-court-sm text-court-text-ter">{session.date}</span>
-                  </div>
-                  <Tag color={session.modeColor} small>
-                    {session.mode.toUpperCase()}
-                  </Tag>
-                </div>
-                <h3 className="text-court-md font-bold text-court-text mb-1 leading-tight">
-                  {session.title}
-                </h3>
-                <p className="text-court-sm text-court-text-sec mb-3">
-                  Role: {session.role}
-                </p>
-                <div className="flex items-center gap-3">
-                  <div className="flex-1">
-                    <ProgressBar pct={session.score} color={getScoreColor(session.score)} height={6} />
-                  </div>
-                  <span className={`text-court-base font-bold font-serif ${getScoreTextColor(session.score)}`}>
-                    {session.score}%
-                  </span>
-                  <Tag small>{session.module}</Tag>
-                </div>
-                <div className="flex items-center justify-end mt-2">
-                  <span className="text-court-sm text-gold font-semibold flex items-center gap-1">
-                    View Feedback <ArrowRight size={12} />
-                  </span>
-                </div>
-              </Card>
-            </Link>
-          ))}
-        </div>
-
-        {filteredSessions.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-court-base text-court-text-ter">No sessions match this filter.</p>
+        {sessions === undefined ? (
+          <div className="flex items-center justify-center py-16">
+            <Loader2 size={24} className="animate-spin text-court-text-ter" />
           </div>
+        ) : completedSessions.length === 0 ? (
+          <EmptyState
+            icon={<BarChart3 size={28} />}
+            title="No Sessions Yet"
+            description="Complete your first AI practice session to start building your portfolio."
+            action={
+              <Link href="/ai-practice">
+                <Button variant="outline" size="sm">Start Practice</Button>
+              </Link>
+            }
+          />
+        ) : (
+          <>
+            <div className="space-y-2.5">
+              {filteredSessions.map((session: any) => (
+                <Link key={session._id} href={`/feedback/${session._id}`}>
+                  <Card className="p-4 hover:border-white/10 transition-all cursor-pointer">
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="flex items-center gap-2">
+                        <Calendar size={12} className="text-court-text-ter" />
+                        <span className="text-court-sm text-court-text-ter">{formatDate(session._creationTime)}</span>
+                      </div>
+                      <Tag color={session.mode === "AI Judge" ? "blue" : "gold"} small>
+                        {(session.mode ?? "Unknown").toUpperCase()}
+                      </Tag>
+                    </div>
+                    <h3 className="text-court-md font-bold text-court-text mb-1 leading-tight">
+                      {session.caseTitle ?? "Untitled Session"}
+                    </h3>
+                    <p className="text-court-sm text-court-text-sec mb-3">
+                      {session.areaOfLaw ?? "Unknown"}
+                    </p>
+                    <div className="flex items-center gap-3">
+                      <div className="flex-1">
+                        <ProgressBar pct={session.overallScore ?? 0} color={getScoreColor(session.overallScore ?? 0)} height={6} />
+                      </div>
+                      <span className={`text-court-base font-bold font-serif ${getScoreTextColor(session.overallScore ?? 0)}`}>
+                        {session.overallScore ?? 0}%
+                      </span>
+                      <Tag small>{session.areaOfLaw ?? "Unknown"}</Tag>
+                    </div>
+                    <div className="flex items-center justify-end mt-2">
+                      <span className="text-court-sm text-gold font-semibold flex items-center gap-1">
+                        View Feedback <ArrowRight size={12} />
+                      </span>
+                    </div>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+
+            {filteredSessions.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-court-base text-court-text-ter">No sessions match this filter.</p>
+              </div>
+            )}
+          </>
         )}
       </section>
     </div>

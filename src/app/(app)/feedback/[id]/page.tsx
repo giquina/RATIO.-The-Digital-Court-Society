@@ -2,128 +2,14 @@
 
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { useQuery } from "convex/react";
+import { anyApi } from "convex/server";
 import { Card, Tag, ProgressBar, DynamicIcon } from "@/components/ui";
 import { FEEDBACK_DIMENSIONS } from "@/lib/constants/app";
 import {
-  ArrowLeft, Calendar, User, Mic, CheckCircle, AlertTriangle, Target,
+  ArrowLeft, Calendar, User, Mic, CheckCircle, Target, Loader2,
 } from "lucide-react";
 import { AIDisclaimer } from "@/components/shared/AIDisclaimer";
-
-// ── Demo feedback data keyed by session ID ──
-const FEEDBACK_DATA: Record<
-  string,
-  {
-    caseTitle: string;
-    date: string;
-    mode: string;
-    modeColor: "gold" | "blue";
-    role: string;
-    module: string;
-    overallScore: number;
-    dimensions: Record<string, number>;
-    writtenFeedback: string;
-    strengths: string[];
-    improvements: string[];
-  }
-> = {
-  s1: {
-    caseTitle: "Judicial Review of Executive Power",
-    date: "18 February 2026",
-    mode: "Moot",
-    modeColor: "gold",
-    role: "Leading Counsel (Appellant)",
-    module: "Public Law",
-    overallScore: 78,
-    dimensions: {
-      argumentStructure: 82,
-      useOfAuthorities: 75,
-      oralDelivery: 80,
-      judicialHandling: 68,
-      courtManner: 85,
-      persuasiveness: 76,
-      timeManagement: 80,
-    },
-    writtenFeedback:
-      "A strong submission that demonstrated a good understanding of the principles of judicial review. Your opening was well-structured using the IRAC method, and your citation of Council of Civil Service Unions v Minister for the Civil Service [1985] was effective. However, when the bench intervened on the proportionality point, there was a noticeable hesitation. Consider preparing more thoroughly for interventions on balancing tests. Your court manner was excellent throughout - appropriate forms of address and confident posture. Time management was also commendable, concluding with 30 seconds to spare.",
-    strengths: [
-      "Excellent IRAC structure in opening submissions",
-      "Strong citation of relevant authorities including CCSU and R (Miller) v Secretary of State",
-      "Confident court manner with appropriate forms of address",
-      "Good time management - concluded within allotted time",
-      "Clear and measured oral delivery with effective pauses",
-    ],
-    improvements: [
-      "Prepare more thoroughly for interventions on proportionality and Wednesbury unreasonableness",
-      "Strengthen the link between authorities and your specific argument on executive overreach",
-      "When challenged on the merits, avoid retreating to procedural arguments too quickly",
-      "Consider addressing the strongest counter-argument proactively before the bench raises it",
-    ],
-  },
-  s2: {
-    caseTitle: "AI Judge - Contract Formation",
-    date: "14 February 2026",
-    mode: "AI Judge",
-    modeColor: "blue",
-    role: "Counsel",
-    module: "Contract Law",
-    overallScore: 72,
-    dimensions: {
-      argumentStructure: 70,
-      useOfAuthorities: 78,
-      oralDelivery: 68,
-      judicialHandling: 65,
-      courtManner: 82,
-      persuasiveness: 70,
-      timeManagement: 71,
-    },
-    writtenFeedback:
-      "A competent submission on the principles of offer and acceptance. Your analysis of Carlill v Carbolic Smoke Ball Co was sound, though the application to the modern scenario could have been more precise. The AI Judge noted that your oral delivery was slightly rushed in the middle section, particularly when dealing with the postal rule versus instantaneous communication. Consider slowing down for emphasis on key points.",
-    strengths: [
-      "Good use of leading authorities on contract formation",
-      "Clear identification of the legal issues at stake",
-      "Appropriate court etiquette maintained throughout",
-    ],
-    improvements: [
-      "Slow down oral delivery during complex legal analysis",
-      "Strengthen application of authorities to the specific facts",
-      "Improve response to judicial interventions - answers were sometimes tangential",
-      "Work on signposting transitions between different heads of argument",
-    ],
-  },
-};
-
-// Default fallback data for unknown IDs
-const DEFAULT_FEEDBACK = {
-  caseTitle: "Practice Session",
-  date: "15 February 2026",
-  mode: "AI Judge",
-  modeColor: "blue" as const,
-  role: "Counsel",
-  module: "General Advocacy",
-  overallScore: 65,
-  dimensions: {
-    argumentStructure: 68,
-    useOfAuthorities: 60,
-    oralDelivery: 70,
-    judicialHandling: 55,
-    courtManner: 72,
-    persuasiveness: 62,
-    timeManagement: 68,
-  },
-  writtenFeedback:
-    "A solid effort that demonstrates developing advocacy skills. Continue to practise regularly and focus on the areas identified for improvement below.",
-  strengths: [
-    "Clear oral delivery with good projection",
-    "Showed awareness of relevant legal principles",
-    "Appropriate court manner throughout",
-  ],
-  improvements: [
-    "Develop more structured arguments using IRAC framework",
-    "Cite more specific authorities to support submissions",
-    "Practise handling judicial interventions with composure",
-    "Improve time management to allow for a strong conclusion",
-  ],
-};
 
 function getScoreColor(score: number): string {
   if (score >= 70) return "green";
@@ -151,10 +37,45 @@ function getScoreLabel(score: number): string {
   return "Needs Work";
 }
 
+function formatDate(timestamp: number): string {
+  const d = new Date(timestamp);
+  return d.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
 export default function FeedbackDetailPage() {
   const params = useParams();
   const id = params.id as string;
-  const feedback = FEEDBACK_DATA[id] ?? DEFAULT_FEEDBACK;
+  const session: any = useQuery(anyApi.aiSessions.getById, { sessionId: id as any });
+
+  // Loading state
+  if (session === undefined) {
+    return (
+      <div className="flex justify-center py-16">
+        <Loader2 size={24} className="animate-spin text-court-text-ter" />
+      </div>
+    );
+  }
+
+  // Not found state
+  if (session === null) {
+    return (
+      <div className="text-center py-16">
+        <h3 className="font-serif text-lg font-bold text-court-text mb-2">Session Not Found</h3>
+        <Link href="/portfolio" className="text-gold hover:underline">Back to Portfolio</Link>
+      </div>
+    );
+  }
+
+  // Map session data to feedback display values
+  const modeLabel = session.mode === "judge" ? "AI Judge" : "Moot";
+  const modeColor: "blue" | "gold" = session.mode === "judge" ? "blue" : "gold";
+  const date = formatDate(session._creationTime);
+  const overallScore = session.overallScore ?? 0;
+  const dimensions = session.scores ?? {};
 
   return (
     <div className="pb-6 md:max-w-content-medium mx-auto">
@@ -172,27 +93,27 @@ export default function FeedbackDetailPage() {
       <section className="px-4 md:px-6 lg:px-8 mt-3">
         <Card className="p-5">
           <div className="flex items-start justify-between mb-3">
-            <Tag color={feedback.modeColor}>
-              {feedback.mode.toUpperCase()}
+            <Tag color={modeColor}>
+              {modeLabel.toUpperCase()}
             </Tag>
             <div className="flex items-center gap-1.5 text-court-text-ter">
               <Calendar size={12} />
-              <span className="text-court-sm">{feedback.date}</span>
+              <span className="text-court-sm">{date}</span>
             </div>
           </div>
           <h1 className="font-serif text-xl font-bold text-court-text mb-2 leading-tight">
-            {feedback.caseTitle}
+            {session.caseTitle}
           </h1>
           <div className="flex flex-wrap gap-3 text-court-sm text-court-text-sec">
             <span className="flex items-center gap-1">
               <User size={12} className="text-court-text-ter" />
-              {feedback.role}
+              Counsel
             </span>
             <span className="flex items-center gap-1">
               <Mic size={12} className="text-court-text-ter" />
-              {feedback.mode}
+              {modeLabel}
             </span>
-            <Tag small>{feedback.module}</Tag>
+            <Tag small>{session.areaOfLaw}</Tag>
           </div>
         </Card>
       </section>
@@ -201,21 +122,21 @@ export default function FeedbackDetailPage() {
       <section className="px-4 md:px-6 lg:px-8 mt-4">
         <Card
           highlight
-          className={`p-6 text-center border ${getScoreBgColor(feedback.overallScore)}`}
+          className={`p-6 text-center border ${getScoreBgColor(overallScore)}`}
         >
           <p className="text-court-xs text-court-text-ter uppercase tracking-widest mb-2">
             Overall Score
           </p>
           <div className="flex items-center justify-center gap-3">
             <span
-              className={`font-serif text-5xl font-bold ${getScoreTextColor(feedback.overallScore)}`}
+              className={`font-serif text-5xl font-bold ${getScoreTextColor(overallScore)}`}
             >
-              {feedback.overallScore}
+              {overallScore}
             </span>
             <div className="text-left">
               <p className="text-court-base text-court-text-sec">/ 100</p>
-              <p className={`text-court-base font-bold ${getScoreTextColor(feedback.overallScore)}`}>
-                {getScoreLabel(feedback.overallScore)}
+              <p className={`text-court-base font-bold ${getScoreTextColor(overallScore)}`}>
+                {getScoreLabel(overallScore)}
               </p>
             </div>
           </div>
@@ -229,7 +150,7 @@ export default function FeedbackDetailPage() {
         </h2>
         <Card className="p-4 space-y-4">
           {FEEDBACK_DIMENSIONS.map((dim) => {
-            const score = feedback?.dimensions?.[dim.key] ?? 0;
+            const score = dimensions?.[dim.key] ?? 0;
             return (
               <div key={dim.key}>
                 <div className="flex items-center justify-between mb-1.5">
@@ -255,60 +176,38 @@ export default function FeedbackDetailPage() {
       </section>
 
       {/* Written Feedback */}
-      <section className="px-4 md:px-6 lg:px-8 mt-4">
-        <h2 className="font-serif text-lg font-bold text-court-text mb-3 px-1">
-          Written Feedback
-        </h2>
-        <Card className="p-5">
-          <p className="text-court-base text-court-text-sec leading-relaxed">
-            {feedback.writtenFeedback}
-          </p>
-        </Card>
-      </section>
+      {session.aiJudgment && (
+        <section className="px-4 md:px-6 lg:px-8 mt-4">
+          <h2 className="font-serif text-lg font-bold text-court-text mb-3 px-1">
+            Written Feedback
+          </h2>
+          <Card className="p-5">
+            <p className="text-court-base text-court-text-sec leading-relaxed whitespace-pre-line">
+              {session.aiJudgment}
+            </p>
+          </Card>
+        </section>
+      )}
 
-      {/* Strengths */}
-      <section className="px-4 md:px-6 lg:px-8 mt-4">
-        <h2 className="font-serif text-lg font-bold text-court-text mb-3 px-1">
-          Strengths
-        </h2>
-        <Card className="p-4">
-          <ul className="space-y-2.5">
-            {feedback.strengths.map((s, i) => (
-              <li key={i} className="flex gap-2.5 items-start">
-                <CheckCircle
-                  size={15}
-                  className="text-green-400 shrink-0 mt-0.5"
-                />
-                <span className="text-court-base text-court-text-sec leading-relaxed">
-                  {s}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </Card>
-      </section>
-
-      {/* Areas for Improvement */}
-      <section className="px-4 md:px-6 lg:px-8 mt-4">
-        <h2 className="font-serif text-lg font-bold text-court-text mb-3 px-1">
-          Areas for Improvement
-        </h2>
-        <Card className="p-4">
-          <ul className="space-y-2.5">
-            {feedback.improvements.map((imp, i) => (
-              <li key={i} className="flex gap-2.5 items-start">
-                <Target
-                  size={15}
-                  className="text-gold shrink-0 mt-0.5"
-                />
-                <span className="text-court-base text-court-text-sec leading-relaxed">
-                  {imp}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </Card>
-      </section>
+      {/* Key Improvement */}
+      {session.keyImprovement && (
+        <section className="px-4 md:px-6 lg:px-8 mt-4">
+          <h2 className="font-serif text-lg font-bold text-court-text mb-3 px-1">
+            Key Area for Improvement
+          </h2>
+          <Card className="p-4">
+            <div className="flex gap-2.5 items-start">
+              <Target
+                size={15}
+                className="text-gold shrink-0 mt-0.5"
+              />
+              <span className="text-court-base text-court-text-sec leading-relaxed">
+                {session.keyImprovement}
+              </span>
+            </div>
+          </Card>
+        </section>
+      )}
 
       {/* AI Disclaimer */}
       <section className="px-4 md:px-6 lg:px-8 mt-6">

@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useMutation, useQuery } from "convex/react";
+import { anyApi } from "convex/server";
 import { Card, Button, Tag } from "@/components/ui";
 import {
   Shield,
@@ -26,20 +28,53 @@ export default function VerifyPage() {
   const [emailSent, setEmailSent] = useState(false);
   const [university, setUniversity] = useState("");
   const [studentId, setStudentId] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+
+  const submitEmailVerification = useMutation(anyApi.verification.submitEmailVerification);
+  const submitManualVerification = useMutation(anyApi.verification.submitManualVerification);
+  const verificationStatus: any = useQuery(anyApi.verification.myVerificationStatus);
+
+  // If user already has a pending or approved verification, reflect that
+  const effectiveStep =
+    verificationStatus?.status === "approved"
+      ? "verified"
+      : verificationStatus?.status === "pending"
+        ? "pending"
+        : step;
 
   const isAcUk = email.endsWith(".ac.uk");
 
-  const handleEmailVerify = () => {
+  const handleEmailVerify = async () => {
     if (!email || !isAcUk) return;
-    // TODO: Call Convex mutation to send verification email
-    setEmailSent(true);
-    setTimeout(() => setStep("pending"), 1500);
+    setSubmitting(true);
+    setError("");
+    try {
+      await submitEmailVerification({ verificationEmail: email });
+      setEmailSent(true);
+      setTimeout(() => setStep("pending"), 1500);
+    } catch (err: any) {
+      setError(err?.message || "Failed to submit verification request");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const handleManualSubmit = () => {
+  const handleManualSubmit = async () => {
     if (!university || !studentId) return;
-    // TODO: Call Convex mutation to submit manual verification request
-    setStep("pending");
+    setSubmitting(true);
+    setError("");
+    try {
+      await submitManualVerification({
+        universityName: university,
+        studentId,
+      });
+      setStep("pending");
+    } catch (err: any) {
+      setError(err?.message || "Failed to submit verification request");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const benefits = [
@@ -65,7 +100,7 @@ export default function VerifyPage() {
       </div>
 
       {/* Step: Choose Method */}
-      {step === "method" && (
+      {effectiveStep === "method" && (
         <div className="space-y-3">
           {/* Benefits section */}
           <Card className="p-5 mb-4">
@@ -151,7 +186,7 @@ export default function VerifyPage() {
       )}
 
       {/* Step: Email Verification */}
-      {step === "email" && (
+      {effectiveStep === "email" && (
         <div className="space-y-4">
           <Card className="p-5">
             <h3 className="text-court-base font-bold text-court-text mb-3">
@@ -182,18 +217,25 @@ export default function VerifyPage() {
               )}
             </div>
 
+            {error && (
+              <p className="text-court-xs text-red-400 mt-2 flex items-center gap-1">
+                <AlertTriangle size={12} />
+                {error}
+              </p>
+            )}
+
             <Button
               onClick={handleEmailVerify}
-              disabled={!isAcUk || emailSent}
+              disabled={!isAcUk || emailSent || submitting}
               fullWidth
               className="mt-4"
             >
-              {emailSent ? "Verification Email Sent" : "Send Verification Email"}
+              {submitting ? "Submitting..." : emailSent ? "Verification Request Sent" : "Submit Verification Request"}
             </Button>
           </Card>
 
           <button
-            onClick={() => setStep("method")}
+            onClick={() => { setStep("method"); setError(""); }}
             className="w-full text-center text-court-xs text-court-text-ter hover:text-court-text"
           >
             Choose a different method
@@ -202,7 +244,7 @@ export default function VerifyPage() {
       )}
 
       {/* Step: Manual Verification */}
-      {step === "manual" && (
+      {effectiveStep === "manual" && (
         <div className="space-y-4">
           <Card className="p-5">
             <h3 className="text-court-base font-bold text-court-text mb-3">
@@ -244,18 +286,25 @@ export default function VerifyPage() {
               </div>
             </div>
 
+            {error && (
+              <p className="text-court-xs text-red-400 mt-2 flex items-center gap-1">
+                <AlertTriangle size={12} />
+                {error}
+              </p>
+            )}
+
             <Button
               onClick={handleManualSubmit}
-              disabled={!university || !studentId}
+              disabled={!university || !studentId || submitting}
               fullWidth
               className="mt-4"
             >
-              Submit for Review
+              {submitting ? "Submitting..." : "Submit for Review"}
             </Button>
           </Card>
 
           <button
-            onClick={() => setStep("method")}
+            onClick={() => { setStep("method"); setError(""); }}
             className="w-full text-center text-court-xs text-court-text-ter hover:text-court-text"
           >
             Choose a different method
@@ -264,7 +313,7 @@ export default function VerifyPage() {
       )}
 
       {/* Step: Pending */}
-      {step === "pending" && (
+      {effectiveStep === "pending" && (
         <div className="text-center space-y-4">
           <div className="w-16 h-16 rounded-full bg-orange-400/10 flex items-center justify-center mx-auto">
             <Clock size={28} className="text-orange-400" />
@@ -305,7 +354,7 @@ export default function VerifyPage() {
       )}
 
       {/* Step: Verified */}
-      {step === "verified" && (
+      {effectiveStep === "verified" && (
         <div className="text-center space-y-4">
           <div className="w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center mx-auto">
             <CheckCircle2 size={28} className="text-green-400" />

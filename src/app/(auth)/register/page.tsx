@@ -135,7 +135,8 @@ export default function RegisterPage() {
         </button>
 
         <p className="text-court-xs text-court-text-ter text-center mt-1">
-          By joining, you agree to the Ratio Code of Conduct.
+          By joining, you agree to the Ratio{" "}
+            <Link href="/code-of-conduct" target="_blank" className="text-gold hover:underline">Code of Conduct</Link>.
         </p>
 
         <p className="text-court-xs text-court-text-ter text-center">

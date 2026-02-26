@@ -67,6 +67,27 @@ export default defineSchema({
     .index("by_ambassador", ["isAmbassador"]),
 
   // ═══════════════════════════════════════════
+  // STUDENT VERIFICATION REQUESTS
+  // ═══════════════════════════════════════════
+  verificationRequests: defineTable({
+    profileId: v.id("profiles"),
+    method: v.string(), // "email" | "manual"
+    status: v.string(), // "pending" | "approved" | "rejected"
+    // Email verification fields
+    verificationEmail: v.optional(v.string()), // .ac.uk email
+    // Manual verification fields
+    universityName: v.optional(v.string()),
+    studentId: v.optional(v.string()),
+    // Review fields
+    reviewedAt: v.optional(v.string()), // ISO timestamp
+    reviewedBy: v.optional(v.id("users")), // admin who reviewed
+    reviewNotes: v.optional(v.string()),
+    submittedAt: v.string(), // ISO timestamp
+  })
+    .index("by_profile", ["profileId"])
+    .index("by_status", ["status"]),
+
+  // ═══════════════════════════════════════════
   // SOCIAL LAYER
   // ═══════════════════════════════════════════
   follows: defineTable({

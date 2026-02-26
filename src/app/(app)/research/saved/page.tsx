@@ -16,25 +16,13 @@ import {
   X,
   Tag,
   FolderOpen,
+  Loader2,
 } from "lucide-react"
 import { cn } from "@/lib/utils/helpers"
 import { useAuthStore } from "@/stores/authStore"
 import { EmptyState, Button } from "@/components/ui"
-
-// ═══════════════════════════════════════════
-// Convex Integration (commented out — no auth yet)
-// ═══════════════════════════════════════════
-// import { useQuery, useMutation } from "convex/react"
-// import { api } from "../../../../../convex/_generated/api"
-//
-// When auth is wired up, replace DEMO_AUTHORITIES with:
-//   const authorities = useQuery(api.research.getSavedAuthorities, {
-//     profileId: profile._id,
-//     type: activeTab !== "all" ? activeTab : undefined,
-//     folder: activeFolder || undefined,
-//   })
-//   const removeAuthority = useMutation(api.research.removeAuthority)
-//   const updateNotes = useMutation(api.research.updateAuthorityNotes)
+import { useQuery, useMutation } from "convex/react"
+import { anyApi } from "convex/server"
 
 // ═══════════════════════════════════════════
 // Types
@@ -57,88 +45,6 @@ interface SavedAuthority {
   folder?: string
   savedAt: string
 }
-
-// ═══════════════════════════════════════════
-// Demo Data
-// ═══════════════════════════════════════════
-
-const DEMO_AUTHORITIES: SavedAuthority[] = [
-  {
-    _id: "sa_001",
-    profileId: "demo_profile",
-    type: "case-law",
-    title: "Donoghue v Stevenson",
-    citation: "[1932] UKHL 100",
-    url: "https://caselaw.nationalarchives.gov.uk/ukhl/1932/100",
-    subtitle: "House of Lords",
-    date: "1932-05-26",
-    snippet:
-      "The rule that you are to love your neighbour becomes in law, you must not injure your neighbour.",
-    notes: "Key authority for duty of care. Use in negligence moot skeleton argument.",
-    tags: ["tort", "duty-of-care", "moot-prep"],
-    folder: "Tort Law Moot 2026",
-    savedAt: "2026-02-18T14:30:00Z",
-  },
-  {
-    _id: "sa_002",
-    profileId: "demo_profile",
-    type: "legislation",
-    title: "Consumer Rights Act 2015",
-    citation: "Consumer Rights Act 2015, c 15",
-    url: "https://www.legislation.gov.uk/ukpga/2015/15/contents",
-    subtitle: "UK Public General Acts",
-    date: "2015-03-26",
-    snippet: "An Act to amend the law relating to the rights of consumers and protection of their interests.",
-    notes: "Sections 9-11 on satisfactory quality, fitness for purpose, and as described.",
-    tags: ["consumer", "contract", "statutory-rights"],
-    folder: "Contract Law Moot 2026",
-    savedAt: "2026-02-17T10:15:00Z",
-  },
-  {
-    _id: "sa_003",
-    profileId: "demo_profile",
-    type: "case-law",
-    title: "R v Woollin",
-    citation: "[1999] 1 AC 82",
-    url: "https://caselaw.nationalarchives.gov.uk/ukhl/1998/28",
-    subtitle: "House of Lords",
-    date: "1998-07-22",
-    snippet:
-      "The jury should be directed that they are not entitled to find the necessary intention unless they feel sure that death or serious bodily harm was a virtual certainty.",
-    notes: "Oblique intent direction. Compare with R v Nedrick for evolution of the test.",
-    tags: ["criminal", "mens-rea", "intent"],
-    folder: "Criminal Law Revision",
-    savedAt: "2026-02-15T09:45:00Z",
-  },
-  {
-    _id: "sa_004",
-    profileId: "demo_profile",
-    type: "parliament-debate",
-    title: "Higher Education (Freedom of Speech) Act 2023 — Second Reading Debate",
-    url: "https://hansard.parliament.uk/commons/2023-02-13/debates/example",
-    subtitle: "House of Commons Debate",
-    date: "2023-02-13",
-    snippet:
-      "Debate on the principles of freedom of speech within higher education institutions and the duties placed upon providers.",
-    tags: ["public-law", "free-speech", "higher-ed"],
-    savedAt: "2026-02-12T16:00:00Z",
-  },
-  {
-    _id: "sa_005",
-    profileId: "demo_profile",
-    type: "legislation",
-    title: "Human Rights Act 1998",
-    citation: "Human Rights Act 1998, c 42",
-    url: "https://www.legislation.gov.uk/ukpga/1998/42/contents",
-    subtitle: "UK Public General Acts",
-    date: "1998-11-09",
-    snippet: "An Act to give further effect to rights and freedoms guaranteed under the European Convention.",
-    notes: "Section 3 interpretive obligation, s6 public authority duty. Central to public law module.",
-    tags: ["public-law", "human-rights", "echr"],
-    folder: "Public Law Revision",
-    savedAt: "2026-02-10T11:20:00Z",
-  },
-]
 
 // ═══════════════════════════════════════════
 // Filter Tabs
@@ -182,8 +88,14 @@ function typeDotColor(type: AuthorityType): string {
 export default function SavedAuthoritiesPage() {
   const { profile } = useAuthStore()
 
-  // Local state — replaces Convex queries while in demo mode
-  const [authorities, setAuthorities] = useState<SavedAuthority[]>(DEMO_AUTHORITIES)
+  // Convex queries & mutations
+  const authorities: any[] | undefined = useQuery(
+    anyApi.research.getSavedAuthorities,
+    profile?._id ? { profileId: profile._id } : "skip"
+  )
+  const removeAuthorityMutation = useMutation(anyApi.research.removeAuthority)
+  const updateNotesMutation = useMutation(anyApi.research.updateAuthorityNotes)
+
   const [activeTab, setActiveTab] = useState("all")
   const [searchQuery, setSearchQuery] = useState("")
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -196,7 +108,7 @@ export default function SavedAuthoritiesPage() {
   // Derived: unique folders for reference
   const allFolders = useMemo(() => {
     const folders = new Set<string>()
-    authorities.forEach((a) => {
+    ;(authorities ?? []).forEach((a: any) => {
       if (a.folder) folders.add(a.folder)
     })
     return Array.from(folders).sort()
@@ -204,7 +116,7 @@ export default function SavedAuthoritiesPage() {
 
   // Filtered list
   const filteredAuthorities = useMemo(() => {
-    let list = authorities
+    let list = authorities ?? []
 
     // Tab filter
     if (activeTab === "case-law") {
@@ -225,7 +137,7 @@ export default function SavedAuthoritiesPage() {
           a.title.toLowerCase().includes(q) ||
           a.citation?.toLowerCase().includes(q) ||
           a.notes?.toLowerCase().includes(q) ||
-          a.tags?.some((t) => t.toLowerCase().includes(q)) ||
+          a.tags?.some((t: string) => t.toLowerCase().includes(q)) ||
           a.folder?.toLowerCase().includes(q) ||
           a.subtitle?.toLowerCase().includes(q)
       )
@@ -244,9 +156,12 @@ export default function SavedAuthoritiesPage() {
     })
   }
 
-  const handleRemove = (authorityId: string) => {
-    // In production: await removeAuthority({ authorityId })
-    setAuthorities((prev) => prev.filter((a) => a._id !== authorityId))
+  const handleRemove = async (authorityId: string) => {
+    try {
+      await removeAuthorityMutation({ authorityId: authorityId as any })
+    } catch (e) {
+      // handle error
+    }
     setRemovingId(null)
   }
 
@@ -257,25 +172,18 @@ export default function SavedAuthoritiesPage() {
     setEditFolder(authority.folder || "")
   }
 
-  const handleSaveEdit = (authorityId: string) => {
-    // In production: await updateNotes({ authorityId, notes: editNotes, tags: parsedTags, folder: editFolder || undefined })
-    const parsedTags = editTags
-      .split(",")
-      .map((t) => t.trim().toLowerCase())
-      .filter(Boolean)
-
-    setAuthorities((prev) =>
-      prev.map((a) =>
-        a._id === authorityId
-          ? {
-              ...a,
-              notes: editNotes || undefined,
-              tags: parsedTags.length > 0 ? parsedTags : undefined,
-              folder: editFolder || undefined,
-            }
-          : a
-      )
-    )
+  const handleSaveEdit = async (authorityId: string) => {
+    const parsedTags = editTags.split(",").map((t) => t.trim().toLowerCase()).filter(Boolean)
+    try {
+      await updateNotesMutation({
+        authorityId: authorityId as any,
+        notes: editNotes || undefined,
+        tags: parsedTags.length > 0 ? parsedTags : undefined,
+        folder: editFolder || undefined,
+      })
+    } catch (e) {
+      // handle error
+    }
     setEditingId(null)
   }
 
@@ -302,6 +210,15 @@ export default function SavedAuthoritiesPage() {
             </Link>
           }
         />
+      </div>
+    )
+  }
+
+  // ── Loading state while Convex query is in flight ──
+  if (authorities === undefined) {
+    return (
+      <div className="min-h-screen px-4 sm:px-6 lg:px-8 py-6 max-w-4xl mx-auto flex items-center justify-center">
+        <Loader2 size={32} className="animate-spin text-gold" />
       </div>
     )
   }
@@ -539,7 +456,7 @@ export default function SavedAuthoritiesPage() {
                     authority.tags &&
                     authority.tags.length > 0 && (
                       <div className="flex flex-wrap gap-1.5 mt-2.5">
-                        {authority.tags.map((tag) => (
+                        {authority.tags.map((tag: string) => (
                           <span
                             key={tag}
                             className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-court-xs font-bold tracking-wider text-court-text-ter bg-white/[0.04] border border-court-border"
