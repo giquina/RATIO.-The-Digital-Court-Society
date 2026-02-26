@@ -41,6 +41,8 @@ export function useSpeechSynthesis(): UseSpeechSynthesisReturn {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   // Track any active Audio object URL for cleanup
   const objectUrlRef = useRef<string | null>(null);
+  // Track AudioContext buffer source for stop()
+  const bufferSourceRef = useRef<AudioBufferSourceNode | null>(null);
 
   const isSupported =
     typeof window !== "undefined" && "speechSynthesis" in window;
@@ -103,13 +105,35 @@ export function useSpeechSynthesis(): UseSpeechSynthesisReturn {
     }
   }, []);
 
+  // Track AudioContext for ElevenLabs playback
+  const audioContextRef = useRef<AudioContext | null>(null);
+
   // Unlock speech API — called from user gesture (tap) context
   const unlockAudio = useCallback(() => {
-    if (!isSupported || unlockedRef.current) return;
-    // Speak a silent/empty utterance to "warm up" the API on mobile
-    const silent = new SpeechSynthesisUtterance("");
-    silent.volume = 0;
-    window.speechSynthesis.speak(silent);
+    if (unlockedRef.current) return;
+
+    // 1. Unlock browser SpeechSynthesis (fallback voice)
+    if (isSupported) {
+      const silent = new SpeechSynthesisUtterance("");
+      silent.volume = 0;
+      window.speechSynthesis.speak(silent);
+    }
+
+    // 2. Unlock AudioContext for ElevenLabs playback
+    //    Once resumed inside a user gesture, AudioContext stays unlocked
+    //    for the entire page lifetime — so audio.play() works even after
+    //    async calls (like waiting for the AI response).
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (AudioCtx) {
+        const ctx = new AudioCtx();
+        ctx.resume();
+        audioContextRef.current = ctx;
+      }
+    } catch {
+      // AudioContext not available — ElevenLabs will still try
+    }
+
     unlockedRef.current = true;
   }, [isSupported]);
 
@@ -126,6 +150,10 @@ export function useSpeechSynthesis(): UseSpeechSynthesisReturn {
 
   // ── Cleanup helper for ElevenLabs audio ──
   const cleanupAudio = useCallback(() => {
+    if (bufferSourceRef.current) {
+      try { bufferSourceRef.current.stop(); } catch { /* already stopped */ }
+      bufferSourceRef.current = null;
+    }
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.removeAttribute("src");
@@ -156,7 +184,39 @@ export function useSpeechSynthesis(): UseSpeechSynthesisReturn {
           return false;
         }
 
-        const audioBlob = await res.blob();
+        // Read response body once (can only be consumed once)
+        const arrayBuffer = await res.arrayBuffer();
+
+        // Try AudioContext playback first (works after async calls because
+        // the context was resumed during the user gesture in unlockAudio).
+        // Falls back to Audio element if AudioContext isn't available.
+        const ctx = audioContextRef.current;
+        if (ctx && ctx.state !== "closed") {
+          try {
+            // Make sure context is running
+            if (ctx.state === "suspended") await ctx.resume();
+            const audioBuffer = await ctx.decodeAudioData(arrayBuffer.slice(0));
+            const source = ctx.createBufferSource();
+            source.buffer = audioBuffer;
+            source.connect(ctx.destination);
+
+            return new Promise<boolean>((resolve) => {
+              source.onended = () => {
+                setIsSpeaking(false);
+                bufferSourceRef.current = null;
+                resolve(true);
+              };
+              setIsSpeaking(true);
+              bufferSourceRef.current = source;
+              source.start();
+            });
+          } catch {
+            // AudioContext decode/play failed — fall through to Audio element
+          }
+        }
+
+        // Fallback: Audio element (may fail on desktop if gesture expired)
+        const audioBlob = new Blob([arrayBuffer], { type: "audio/mpeg" });
         const url = URL.createObjectURL(audioBlob);
         objectUrlRef.current = url;
 
@@ -173,7 +233,6 @@ export function useSpeechSynthesis(): UseSpeechSynthesisReturn {
           audio.onerror = () => {
             setIsSpeaking(false);
             cleanupAudio();
-            // Don't disable ElevenLabs on playback errors (might be device-specific)
             resolve(false);
           };
           audio.play().catch(() => {
