@@ -10,7 +10,11 @@
       "Bash(npm install:*)",
       "Bash(npx next build:*)",
       "Bash(npm ls:*)",
-      "mcp__Claude_Preview__preview_start"
+      "mcp__Claude_Preview__preview_start",
+      "Bash(edge-tts --voice en-GB-RyanNeural --pitch=-1Hz --text \"RATIO is more than practice.\" --write-media \"public/audio/voiceover/showcase-01-open.mp3\")",
+      "Bash(edge-tts --voice en-GB-RyanNeural --pitch=-1Hz --text \"Book a moot court with other advocates in minutes. Six roles. Real arguments. No waiting for university schedules.\" --write-media \"public/audio/voiceover/showcase-02-sessions.mp3\")",
+      "Bash(edge-tts --voice en-GB-RyanNeural --pitch=-1Hz --text \"Choose your chamber. Four historic Inns. One tradition.\" --write-media \"public/audio/voiceover/showcase-04-chambers.mp3\")",
+      "Bash(git add .gitignore .claude/settings.local.json CLAUDE.md LOGS.md PROMO-VIDEO-PLAN.md convex/schema.ts convex/http.ts convex/appFeedback.ts package.json package-lock.json remotion/Root.tsx remotion/RecruitmentPromo.tsx remotion/AIPracticeCinematic.tsx remotion/AIPracticePromo.tsx remotion/AIPracticeShort.tsx remotion/ConstitutionalLaw.tsx remotion/FeatureShowcase.tsx remotion/LiveSessionSnippet.tsx remotion/Thumbnail.tsx src/app/\\\\\\(app\\\\\\)/ai-practice/page.tsx src/app/\\\\\\(app\\\\\\)/layout-client.tsx src/app/careers/page.tsx src/components/shared/FeedbackButton.tsx src/hooks/useSpeechSynthesis.ts scripts/capture-ai-practice-screenshots.js scripts/capture-feedback-screenshots.js scripts/generate-charlie-clips.sh src/app/api/ai/tts/edge/ public/audio/ promo/)"
     ]
   }
 }

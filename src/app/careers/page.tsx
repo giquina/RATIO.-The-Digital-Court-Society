@@ -44,93 +44,93 @@ const STATUS_LABELS: Record<string, string> = {
 
 const POSITIONS: Position[] = [
   {
-    title: "Head of Growth & University Partnerships",
+    title: "Law Society Outreach & Partnerships",
     type: "part-time",
     category: "growth",
     status: "open",
     hours: "10-15 hrs/week",
     compensation: "\u00A312-15/hr + free Premium+",
-    description: "Build relationships with moot societies and law faculties across UK universities. Own the ambassador programme, coordinate launch events, and track sign-up funnels.",
+    description: "Build relationships with moot societies, law faculties, and student bar associations across UK universities. Coordinate advocacy events and bring RATIO into the places where law students already gather.",
     responsibilities: [
       "Build relationships with moot societies and law faculties at UK universities",
-      "Coordinate the Ambassador Programme — onboard, support, and track activity",
-      "Organise launch events, demo sessions, and moot society partnerships",
-      "Track sign-up funnels and conversion metrics",
+      "Coordinate advocacy events, moot demonstrations, and law society partnerships",
+      "Manage the Ambassador Programme — recruit, support, and track law student advocates",
+      "Represent RATIO at law fairs, mooting competitions, and student bar events",
     ],
   },
   {
-    title: "Content & Moot Scenario Lead",
+    title: "Case Research & Moot Scenario Writer",
     type: "part-time",
     category: "content",
     status: "open",
     hours: "10-15 hrs/week",
     compensation: "\u00A312-15/hr + free Premium+",
-    description: "Write moot problems, curate case summaries for the Law Book, and draft model skeleton arguments. Work with the AI system to ensure legally accurate judge responses.",
+    description: "Research and draft moot problems grounded in real case law. Curate case summaries for the Law Book, write model skeleton arguments, and ensure AI Judge responses are legally accurate.",
     responsibilities: [
-      "Write moot problems across all major law modules",
-      "Create and curate case summaries for the Law Book encyclopedia",
-      "Draft skeleton arguments and model answers for practice materials",
-      "Ensure AI Judge responses are legally accurate and pedagogically useful",
+      "Research case law and draft moot problems across constitutional, criminal, and commercial law",
+      "Write case summaries and legal commentary for the Law Book encyclopedia",
+      "Draft model skeleton arguments and authorities bundles for practice scenarios",
+      "Review AI Judge responses for legal accuracy and pedagogical quality",
     ],
   },
   {
-    title: "Community & Social Media Manager",
+    title: "Advocacy Community Lead",
     type: "apprenticeship",
     category: "growth",
     status: "open",
     hours: "Full-time (L3 Content Creator)",
     compensation: "\u00A311-13k/yr \u2014 training costs: \u00A30 (government-funded)",
-    description: "Manage RATIO\u2019s social presence across Instagram, TikTok, LinkedIn, and X. Create short-form content, engage with the in-app social feed, and coordinate ambassadors.",
+    description: "Lead RATIO\u2019s advocate community — coordinate mooting discussions, share legal content, highlight standout performances, and help law students get the most from the platform.",
     responsibilities: [
-      "Manage social media accounts — Instagram, TikTok, LinkedIn, X",
-      "Create short-form content: moot tips, legal humour, behind-the-scenes",
-      "Monitor and engage with the in-app social feed",
-      "Coordinate with ambassadors on content creation and sharing",
+      "Manage the advocate community across social channels and the in-app feed",
+      "Create content around mooting tips, case law highlights, and advocacy techniques",
+      "Coordinate with law society ambassadors on outreach and engagement",
+      "Surface standout advocate performances and foster competitive mooting culture",
     ],
   },
   {
-    title: "Junior Full-Stack Developer",
+    title: "Legal Tech Developer",
     type: "part-time",
     category: "engineering",
     status: "open",
     hours: "Placement year or L4 Apprenticeship",
     compensation: "\u00A318-22k/yr (placement) or \u00A312-15k/yr (apprenticeship)",
-    description: "Fix bugs, implement features, and write tests for RATIO\u2019s Next.js + Convex codebase. Eventually take ownership of specific features like tournaments or the research engine.",
+    description: "Build and maintain the technology behind RATIO\u2019s AI courtroom, moot scoring, case law search engine, and legal research tools. Legal tech experience that stands out on any training contract or pupillage application.",
     responsibilities: [
-      "Fix bugs and implement features from the feedback queue",
-      "Write and maintain tests for critical flows",
-      "Help with Vercel deployments and monitoring",
-      "Build out mobile responsiveness improvements",
+      "Implement features for AI practice sessions, moot scoring, and legal research tools",
+      "Build and improve the case law search engine and Law Book interface",
+      "Write tests for critical advocacy and courtroom session flows",
+      "Work on the legal research API integrations (case law, legislation, parliament)",
     ],
   },
   {
-    title: "UX Researcher & Product Tester",
+    title: "Legal UX Researcher",
     type: "part-time",
     category: "design",
     status: "coming-soon",
     hours: "8-12 hrs/week",
     compensation: "\u00A312-15/hr + free Premium+",
-    description: "Run user testing sessions with law students. Create journey maps, analyse session data, and write monthly UX reports with prioritised improvement recommendations.",
+    description: "Test how law students interact with AI courtroom sessions, moot preparation tools, and legal research features. Identify where the advocacy experience breaks down and recommend improvements.",
     responsibilities: [
-      "Run user testing sessions with law students (screen + audio)",
-      "Create user journey maps for key flows",
-      "Analyse session data to spot drop-off points",
-      "Write monthly UX reports with prioritised recommendations",
+      "Run user testing sessions with law students during AI practice and moot preparation",
+      "Map the advocate journey from case brief to oral submission to written feedback",
+      "Analyse session data to identify where advocacy preparation breaks down",
+      "Write UX reports with recommendations grounded in how law students actually work",
     ],
   },
   {
-    title: "Marketing & Design Apprentice",
+    title: "Legal Communications & Design",
     type: "apprenticeship",
     category: "design",
     status: "coming-soon",
     hours: "Full-time (L3 Multi-Channel Marketer)",
     compensation: "\u00A311-13k/yr \u2014 training costs: \u00A30 (government-funded)",
-    description: "Create marketing materials, social media graphics, email templates, event posters, and ambassador welcome packs. Maintain brand consistency across all touchpoints.",
+    description: "Design materials that communicate RATIO\u2019s legal mission — moot event graphics, case law visual summaries, law society pitch decks, and ambassador resources. Maintain the institutional tone across all touchpoints.",
     responsibilities: [
-      "Create marketing materials and social media graphics",
-      "Help design pitch decks for university partnerships",
-      "Maintain brand consistency across all touchpoints",
-      "Support the Community Manager with visual content",
+      "Design moot event graphics, case law visual summaries, and advocacy guides",
+      "Create law society pitch decks and partnership materials",
+      "Maintain RATIO\u2019s institutional brand across all legal communications",
+      "Produce visual content for mooting tips, legal explainers, and advocate spotlights",
     ],
   },
   {
@@ -143,7 +143,7 @@ const POSITIONS: Position[] = [
     responsibilities: [
       "Review moot scenarios for pedagogical quality and legal accuracy",
       "Advise on SQE2 alignment and Bar course compatibility",
-      "Provide testimonial/endorsement for university outreach",
+      "Provide testimonial/endorsement for university and chambers outreach",
       "Attend 1-2 advisory board meetings per term",
     ],
   },
@@ -153,12 +153,12 @@ const POSITIONS: Position[] = [
     category: "strategic",
     status: "expressions",
     compensation: "5-15% equity (vesting 3-4 years)",
-    description: "Own the product roadmap and feature prioritisation. Run sprint planning, manage the feedback pipeline, and represent RATIO at startup events and demo days.",
+    description: "Own the product roadmap for a legal education platform used across 142 UK universities. Prioritise features that improve advocacy training, moot preparation, and legal research.",
     responsibilities: [
-      "Own the product roadmap and feature prioritisation",
-      "Run sprint planning and coordinate across team members",
-      "Manage the feedback pipeline into a prioritised backlog",
-      "Handle investor/accelerator applications and pitch preparation",
+      "Own the product roadmap and feature prioritisation for advocacy tools",
+      "Run sprint planning and coordinate across legal content, engineering, and design",
+      "Manage advocate feedback into a prioritised backlog of improvements",
+      "Represent RATIO at legal tech events, demo days, and accelerator programmes",
     ],
   },
 ];
@@ -174,34 +174,34 @@ interface FellowshipTrack {
 
 const FELLOWSHIP_TRACKS: FellowshipTrack[] = [
   {
-    title: "Advocacy Content",
+    title: "Case Research & Legal Writing",
     Icon: BookOpen,
     audience: "Law students",
-    description: "Write moot problems, case summaries, and educational materials.",
+    description: "Draft moot problems, research case law, write legal commentary for the Law Book.",
   },
   {
-    title: "Growth & Outreach",
+    title: "Law Society Outreach",
     Icon: TrendingUp,
-    audience: "Business / Marketing students",
-    description: "University partnerships, ambassador coordination, event planning.",
+    audience: "Law / Business students",
+    description: "Build partnerships with moot societies, coordinate advocacy events, run law fair demos.",
   },
   {
-    title: "Product & Engineering",
+    title: "Legal Tech Engineering",
     Icon: Code2,
     audience: "CS / Engineering students",
-    description: "Bug fixes, feature development, testing on a real production codebase.",
+    description: "Build courtroom simulation features, legal research tools, and moot scoring systems.",
   },
   {
-    title: "Design & UX",
+    title: "Legal UX & Design",
     Icon: Palette,
     audience: "Design / HCI students",
-    description: "User research, interface improvements, marketing design.",
+    description: "Research how law students prepare for advocacy and design better legal tools.",
   },
   {
-    title: "Community & Media",
+    title: "Advocacy Community",
     Icon: Megaphone,
-    audience: "Media / Marketing students",
-    description: "Social media, content creation, community management.",
+    audience: "Law / Media students",
+    description: "Lead the advocate community, share mooting content, spotlight standout performers.",
   },
 ];
 
@@ -209,24 +209,24 @@ const FELLOWSHIP_TRACKS: FellowshipTrack[] = [
 
 const WHY_RATIO = [
   {
-    Icon: Rocket,
-    title: "Real Impact",
-    description: "Your work ships to thousands of law students across 142 UK universities. No hypothetical projects.",
+    Icon: Scale,
+    title: "Real Legal Work",
+    description: "Draft moot problems, research case law, build courtroom tools. Work that matters on a pupillage or training contract application.",
   },
   {
     Icon: GraduationCap,
-    title: "Student-Friendly",
-    description: "Part-time, flexible, built around your studies. No 9-to-5 commitment required.",
+    title: "Built Around Your Degree",
+    description: "Part-time, flexible, remote. Designed for law students with lectures, moots, and exams to manage.",
   },
   {
-    Icon: Scale,
-    title: "Legal Tech Experience",
-    description: "Gold dust for pupillage, training contracts, and graduate scheme applications.",
+    Icon: Landmark,
+    title: "Legal Tech on Your CV",
+    description: "Experience building advocacy tools used across 142 UK universities. Stands out at every interview.",
   },
   {
-    Icon: Sparkles,
-    title: "Startup Energy",
-    description: "No bureaucracy, no pointless meetings. Just building something that matters.",
+    Icon: Rocket,
+    title: "Substantive From Day One",
+    description: "No coffee runs. No filing. You work on case scenarios, legal research tools, and courtroom simulations.",
   },
 ];
 
@@ -235,7 +235,7 @@ const WHY_RATIO = [
 const FAQ = [
   {
     q: "Do I need to be a law student?",
-    a: "Not for every role. Engineering, design, marketing, and community roles are open to students from any discipline. Content and advisory roles benefit from legal knowledge.",
+    a: "For most roles, yes. Case research, moot writing, law society outreach, and advocacy community roles require legal knowledge. Legal tech and legal UX roles are open to students from other disciplines, but an interest in law is expected.",
   },
   {
     q: "Are the apprenticeships really free to train?",
@@ -259,10 +259,10 @@ const FAQ = [
 
 const CATEGORIES = [
   { key: "all", label: "All Roles" },
-  { key: "growth", label: "Growth" },
-  { key: "content", label: "Content" },
-  { key: "engineering", label: "Engineering" },
-  { key: "design", label: "Design" },
+  { key: "growth", label: "Outreach" },
+  { key: "content", label: "Legal Content" },
+  { key: "engineering", label: "Legal Tech" },
+  { key: "design", label: "Legal UX & Design" },
   { key: "strategic", label: "Strategic" },
 ];
 
@@ -311,12 +311,12 @@ export default function CareersPage() {
             <span className="text-[#C9A84C] text-xs font-bold tracking-[0.1em] uppercase">Careers at RATIO</span>
           </div>
           <h1 className="font-serif text-3xl md:text-4xl font-bold text-white leading-tight mb-4">
-            Build the Future of<br />Legal Education
+            Work on the Future of<br />Advocacy Training
           </h1>
           <p className="text-gray-400 text-base md:text-lg max-w-xl mx-auto leading-relaxed">
-            RATIO is a student-built legal tech platform used across 142 UK universities.
-            We are looking for ambitious people to help us grow. No corporate speak,
-            no impossible requirements — just real work on a real product.
+            RATIO is a constitutional advocacy platform used across 142 UK universities —
+            AI judges, moot courts, national rankings, and a legal research engine.
+            We are hiring law students for roles where the work is substantive and legal.
           </p>
           <p className="text-[#C9A84C] text-sm font-semibold mt-4">
             13 opportunities across 8 roles and 5 fellowship tracks
@@ -524,9 +524,9 @@ export default function CareersPage() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {[
-                { standard: "L3 Content Creator", duration: "12-18 months", role: "Community & Social" },
-                { standard: "L3 Multi-Channel Marketer", duration: "15-18 months", role: "Marketing & Design" },
-                { standard: "L4 Software Developer", duration: "24 months", role: "Junior Developer" },
+                { standard: "L3 Content Creator", duration: "12-18 months", role: "Advocacy Community Lead" },
+                { standard: "L3 Multi-Channel Marketer", duration: "15-18 months", role: "Legal Communications & Design" },
+                { standard: "L4 Software Developer", duration: "24 months", role: "Legal Tech Developer" },
               ].map((item) => (
                 <div key={item.standard} className="bg-white/[0.04] border border-white/10 rounded-lg p-3.5 text-center">
                   <p className="text-[#C9A84C] text-court-xs font-bold mb-0.5">{item.standard}</p>

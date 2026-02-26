@@ -953,4 +953,21 @@ export default defineSchema({
   })
     .index("by_user", ["userId"])
     .index("by_campaign", ["utmCampaign"]),
+
+  // ═══════════════════════════════════════════
+  // APP FEEDBACK (bugs, features, general)
+  // ═══════════════════════════════════════════
+  appFeedback: defineTable({
+    profileId: v.optional(v.id("profiles")),
+    category: v.string(), // "bug" | "feature" | "general"
+    description: v.string(),
+    screenshotStorageId: v.optional(v.id("_storage")),
+    pageUrl: v.optional(v.string()),
+    userAgent: v.optional(v.string()),
+    status: v.string(), // "new" | "reviewed" | "resolved" | "dismissed"
+    adminNotes: v.optional(v.string()),
+  })
+    .index("by_profile", ["profileId"])
+    .index("by_status", ["status"])
+    .index("by_category", ["category"]),
 });

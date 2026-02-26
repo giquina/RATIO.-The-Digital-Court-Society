@@ -10,3 +10,8 @@ ratio-project.zip
 
 # Remotion working files (screenshots served via staticFile)
 public/screenshots/
+# Sensitive / temp files
+.env.local.backup
+API-KEYS.md
+test_voice.mp3
+nul

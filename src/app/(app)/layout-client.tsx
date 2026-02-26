@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils/helpers";
 import { RouteErrorBoundary } from "@/components/shared/RouteErrorBoundary";
 import { QuerySafeBoundary } from "@/components/shared/QuerySafeBoundary";
 import { TheClerk } from "@/components/shared/TheClerk";
+import { FeedbackButton } from "@/components/shared/FeedbackButton";
 import { OnboardingTour } from "@/components/shared/OnboardingTour";
 import { SplashScreen } from "@/components/shared/SplashScreen";
 
@@ -53,6 +54,7 @@ function AppShell({ children }: { children: React.ReactNode }) {
       </div>
       <BottomNav />
       <TheClerk />
+      <FeedbackButton />
       <OnboardingTour />
       {!isSessionActive && <InstallBanner />}
     </div>

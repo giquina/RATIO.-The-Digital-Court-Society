@@ -100,6 +100,40 @@ Sentry wrapping in `next.config.js` is conditional on `SENTRY_AUTH_TOKEN` being 
 - **Icons**: Lucide React only — never emoji in UI
 - **Tone**: Institutional, serious, calm. No exclamation marks. No hype. Premium = restraint.
 
+## Positioning & Copy
+
+RATIO is a **legal institution**, not a startup. All copy, roles, features, and marketing must be law-focused by default unless explicitly told otherwise.
+
+### Law-First Principle
+- Lead with law, not tech. "Constitutional advocacy platform" not "student-built legal tech platform."
+- Every feature should be described in terms of what it does for legal training — moot courts, case research, oral advocacy, courtroom simulation.
+- Avoid startup language: "growth hacking", "funnels", "conversion", "engagement metrics." Use legal language: "advocacy", "moot preparation", "case law", "courtroom practice."
+- When describing the platform: "AI judges, moot courts, national rankings, legal research" — that order.
+
+### Careers & Roles
+Job titles and descriptions must sound like legal work, not generic startup gigs. A law student reading a role should immediately see career relevance to pupillage, training contracts, or legal practice.
+
+| Never use | Use instead |
+|---|---|
+| Head of Growth & University Partnerships | Law Society Outreach & Partnerships |
+| Content & Moot Scenario Lead | Case Research & Moot Scenario Writer |
+| Community & Social Media Manager | Advocacy Community Lead |
+| Junior Full-Stack Developer | Legal Tech Developer |
+| UX Researcher & Product Tester | Legal UX Researcher |
+| Marketing & Design Apprentice | Legal Communications & Design |
+
+Role descriptions should reference: case law research, moot problems, skeleton arguments, authorities bundles, courtroom sessions, advocacy techniques, law society partnerships, legal research tools. Not: social media, funnels, bug fixes, marketing materials.
+
+### Marketing & Promo Copy
+- WhatsApp/social copy should lead with "RATIO is hiring law students" or "constitutional advocacy platform" — not "we're a startup."
+- Always mention the legal substance of the work: "case research, moot writing, legal tech" — not just "paid roles."
+- "Not coffee runs" is the benchmark — every role must pass the test of being genuinely substantive legal work.
+
+### Voice & Tone (Promo Videos)
+- Narrator: **Charlie** voice (articulate, barrister-like). Never Daniel (sounds like a nature documentary).
+- Judge: **George** voice (authoritative).
+- Full video production details in `PROMO-VIDEO-PLAN.md`.
+
 ## Terminology
 
 - Users are "Advocates" (not users, members, or subscribers)

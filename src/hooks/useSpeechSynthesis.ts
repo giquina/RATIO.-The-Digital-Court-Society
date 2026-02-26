@@ -14,112 +14,48 @@ interface UseSpeechSynthesisReturn {
 }
 
 /**
- * Hybrid TTS hook — ElevenLabs primary, browser SpeechSynthesis fallback.
+ * Hybrid TTS hook — three-tier voice quality:
  *
- * 1. Tries ElevenLabs first via POST /api/ai/tts (high-quality British voice).
- * 2. If ElevenLabs fails (no API key, quota exceeded, network error),
- *    automatically disables it for the rest of the session and falls back
- *    to the free browser SpeechSynthesis API.
+ * 1. ElevenLabs (primary) — highest quality, British "Daniel" voice.
+ *    Requires API key + has monthly character quota.
  *
- * Mobile fix: iOS/Android require the first speak() call to happen
- * inside a user gesture (tap). We "unlock" the API by speaking a
- * silent utterance when the user toggles TTS on.
+ * 2. Edge TTS (fallback) — free, high-quality Microsoft neural voice.
+ *    Uses en-GB-RyanNeural via /api/ai/tts/edge. No API key needed.
+ *    Same voice as our promo video voiceovers.
  *
- * Also works around the iOS bug where speech pauses after ~15s
- * by running a resume interval while speaking.
+ * 3. Silent fallback — if both services fail, no audio plays.
+ *    (We skip browser SpeechSynthesis entirely as it sounds too robotic.)
+ *
+ * Mobile fix: iOS/Android require the first audio play to happen
+ * inside a user gesture (tap). We "unlock" by creating a silent Audio
+ * element when the user toggles TTS on.
  */
 export function useSpeechSynthesis(): UseSpeechSynthesisReturn {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [enabled, setEnabledState] = useState(true); // On by default — judge should speak
-  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
-  const voiceRef = useRef<SpeechSynthesisVoice | null>(null);
-  const resumeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const unlockedRef = useRef(false);
 
   // ElevenLabs state — starts true, set to false after first failure
   const elevenLabsAvailableRef = useRef(true);
+  // Edge TTS state — starts true, set to false after first failure
+  const edgeTtsAvailableRef = useRef(true);
+
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  // Track any active Audio object URL for cleanup
   const objectUrlRef = useRef<string | null>(null);
   // Track AudioContext buffer source for stop()
   const bufferSourceRef = useRef<AudioBufferSourceNode | null>(null);
 
-  const isSupported =
-    typeof window !== "undefined" && "speechSynthesis" in window;
-
-  // Find the best British English voice (for browser fallback)
-  useEffect(() => {
-    if (!isSupported) return;
-
-    const findVoice = () => {
-      const voices = window.speechSynthesis.getVoices();
-      // Priority: British English male voices — best available on each platform
-      const priorities = [
-        (v: SpeechSynthesisVoice) => v.lang === "en-GB" && /google uk english male/i.test(v.name),
-        (v: SpeechSynthesisVoice) => v.lang === "en-GB" && v.name.toLowerCase().includes("male"),
-        (v: SpeechSynthesisVoice) => v.lang === "en-GB" && v.name.toLowerCase().includes("daniel"),
-        (v: SpeechSynthesisVoice) => v.lang === "en-GB" && v.name.toLowerCase().includes("james"),
-        (v: SpeechSynthesisVoice) => v.lang === "en-GB" && !/samantha/i.test(v.name),
-        (v: SpeechSynthesisVoice) => v.lang === "en-GB",
-        (v: SpeechSynthesisVoice) => v.lang.startsWith("en") && !/samantha/i.test(v.name),
-        (v: SpeechSynthesisVoice) => v.lang.startsWith("en"),
-      ];
-
-      for (const test of priorities) {
-        const match = voices.find(test);
-        if (match) {
-          voiceRef.current = match;
-          return;
-        }
-      }
-
-      // Last resort: any voice
-      if (voices.length > 0) {
-        voiceRef.current = voices[0];
-      }
-    };
-
-    findVoice();
-    window.speechSynthesis.onvoiceschanged = findVoice;
-
-    return () => {
-      window.speechSynthesis.onvoiceschanged = null;
-    };
-  }, [isSupported]);
-
-  // iOS resume workaround — speech pauses after ~15s
-  const startResumeInterval = useCallback(() => {
-    if (resumeIntervalRef.current) return;
-    resumeIntervalRef.current = setInterval(() => {
-      if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
-        window.speechSynthesis.pause();
-        window.speechSynthesis.resume();
-      }
-    }, 10000);
-  }, []);
-
-  const clearResumeInterval = useCallback(() => {
-    if (resumeIntervalRef.current) {
-      clearInterval(resumeIntervalRef.current);
-      resumeIntervalRef.current = null;
-    }
-  }, []);
+  // Audio is always supported (we use HTML5 Audio, not SpeechSynthesis)
+  const isSupported = typeof window !== "undefined";
 
   // Track AudioContext for ElevenLabs playback
   const audioContextRef = useRef<AudioContext | null>(null);
 
-  // Unlock speech API — called from user gesture (tap) context
+  // Unlock audio API — called from user gesture (tap) context
   const unlockAudio = useCallback(() => {
     if (unlockedRef.current) return;
 
-    // 1. Unlock browser SpeechSynthesis (fallback voice)
-    if (isSupported) {
-      const silent = new SpeechSynthesisUtterance("");
-      silent.volume = 0;
-      window.speechSynthesis.speak(silent);
-    }
-
-    // 2. Unlock AudioContext for ElevenLabs playback
+    // Unlock AudioContext for ElevenLabs/Edge TTS playback
     //    Once resumed inside a user gesture, AudioContext stays unlocked
     //    for the entire page lifetime — so audio.play() works even after
     //    async calls (like waiting for the AI response).
@@ -133,9 +69,8 @@ export function useSpeechSynthesis(): UseSpeechSynthesisReturn {
     } catch {
       // AudioContext not available — ElevenLabs will still try
     }
-
     unlockedRef.current = true;
-  }, [isSupported]);
+  }, []);
 
   // setEnabled wrapper — unlocks audio on user gesture when enabling
   const setEnabled = useCallback(
@@ -148,7 +83,7 @@ export function useSpeechSynthesis(): UseSpeechSynthesisReturn {
     [isSupported, unlockAudio],
   );
 
-  // ── Cleanup helper for ElevenLabs audio ──
+  // ── Cleanup helper ──
   const cleanupAudio = useCallback(() => {
     if (bufferSourceRef.current) {
       try { bufferSourceRef.current.stop(); } catch { /* already stopped */ }
@@ -165,24 +100,17 @@ export function useSpeechSynthesis(): UseSpeechSynthesisReturn {
     }
   }, []);
 
-  // ── ElevenLabs TTS — returns true if audio is playing, false on failure ──
-  const speakViaElevenLabs = useCallback(
-    async (text: string): Promise<boolean> => {
+  // ── Generic audio TTS — fetches from an endpoint, plays the result ──
+  const speakViaEndpoint = useCallback(
+    async (endpoint: string, text: string): Promise<boolean> => {
       try {
-        const res = await fetch("/api/ai/tts", {
+        const res = await fetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ text }),
         });
 
-        if (!res.ok) {
-          // Disable ElevenLabs for the rest of the session on permanent errors
-          const isTransient = res.status >= 500 && res.status !== 503;
-          if (!isTransient) {
-            elevenLabsAvailableRef.current = false;
-          }
-          return false;
-        }
+        if (!res.ok) return false;
 
         // Read response body once (can only be consumed once)
         const arrayBuffer = await res.arrayBuffer();
@@ -241,136 +169,67 @@ export function useSpeechSynthesis(): UseSpeechSynthesisReturn {
           });
         });
       } catch {
-        // Network error — disable ElevenLabs for this session
-        elevenLabsAvailableRef.current = false;
         return false;
       }
     },
     [cleanupAudio],
   );
 
-  // ── Browser SpeechSynthesis fallback ──
-  // Android Chrome silently stops speaking after ~15s on long text.
-  // Fix: split text into sentences and queue them one-by-one.
-  const speakViaBrowser = useCallback(
-    (text: string) => {
-      if (!isSupported) return;
-
-      window.speechSynthesis.cancel();
-      clearResumeInterval();
-
-      // Split into sentences — keeps punctuation attached
-      const sentences = text.match(/[^.!?]+[.!?]+[\s]*/g) || [text];
-
-      let index = 0;
-
-      const speakNext = () => {
-        if (index >= sentences.length) {
-          setIsSpeaking(false);
-          clearResumeInterval();
-          return;
-        }
-
-        const chunk = sentences[index].trim();
-        index++;
-
-        if (!chunk) {
-          speakNext();
-          return;
-        }
-
-        const utterance = new SpeechSynthesisUtterance(chunk);
-        utteranceRef.current = utterance;
-
-        if (voiceRef.current) {
-          utterance.voice = voiceRef.current;
-        }
-
-        utterance.rate = 0.9;
-        utterance.pitch = 0.85;
-        utterance.volume = 0.8;
-
-        utterance.onstart = () => {
-          setIsSpeaking(true);
-          startResumeInterval();
-        };
-        utterance.onend = () => {
-          speakNext(); // Chain to next sentence
-        };
-        utterance.onerror = () => {
-          setIsSpeaking(false);
-          clearResumeInterval();
-        };
-
-        window.speechSynthesis.speak(utterance);
-      };
-
-      speakNext();
-    },
-    [isSupported, startResumeInterval, clearResumeInterval],
-  );
-
-  // ── Main speak function — tries ElevenLabs first, then browser ──
+  // ── Main speak function — tries ElevenLabs → Edge TTS → silent ──
   const speak = useCallback(
     (text: string) => {
       if (!enabled) return;
 
-      // Stop any ongoing speech
+      // Stop any ongoing audio
       cleanupAudio();
-      if (isSupported) {
-        window.speechSynthesis.cancel();
-        clearResumeInterval();
-      }
 
       // Strip any remaining emotes/asterisks
       const cleanText = text.replace(/\*[^*]+\*/g, "").trim();
       if (!cleanText) return;
 
-      if (elevenLabsAvailableRef.current) {
-        // Try ElevenLabs first — fall back to browser on failure
-        speakViaElevenLabs(cleanText).then((success) => {
-          if (!success && isSupported) {
-            speakViaBrowser(cleanText);
-          }
-        });
-      } else {
-        // ElevenLabs disabled for this session — use browser directly
-        speakViaBrowser(cleanText);
-      }
+      const trySpeak = async () => {
+        // Tier 1: ElevenLabs (highest quality)
+        if (elevenLabsAvailableRef.current) {
+          const success = await speakViaEndpoint("/api/ai/tts", cleanText);
+          if (success) return;
+          // Disable for rest of session on failure
+          elevenLabsAvailableRef.current = false;
+        }
+
+        // Tier 2: Edge TTS (free, high quality)
+        if (edgeTtsAvailableRef.current) {
+          const success = await speakViaEndpoint("/api/ai/tts/edge", cleanText);
+          if (success) return;
+          // Disable for rest of session on failure
+          edgeTtsAvailableRef.current = false;
+        }
+
+        // Tier 3: Silent — both services unavailable
+        // We intentionally skip browser SpeechSynthesis as it sounds robotic
+      };
+
+      trySpeak();
     },
-    [
-      enabled,
-      isSupported,
-      cleanupAudio,
-      clearResumeInterval,
-      speakViaElevenLabs,
-      speakViaBrowser,
-    ],
+    [enabled, cleanupAudio, speakViaEndpoint],
   );
 
   const stop = useCallback(() => {
     cleanupAudio();
-    if (isSupported) {
-      window.speechSynthesis.cancel();
-      clearResumeInterval();
-    }
     setIsSpeaking(false);
-  }, [isSupported, clearResumeInterval, cleanupAudio]);
+  }, [cleanupAudio]);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
       cleanupAudio();
-      if (isSupported) window.speechSynthesis.cancel();
-      clearResumeInterval();
     };
-  }, [isSupported, clearResumeInterval, cleanupAudio]);
+  }, [cleanupAudio]);
 
   return {
     speak,
     stop,
     isSpeaking,
-    isSupported: isSupported || elevenLabsAvailableRef.current,
+    isSupported: true, // Always supported — we use Audio API
     setEnabled,
     enabled,
     unlockAudio,

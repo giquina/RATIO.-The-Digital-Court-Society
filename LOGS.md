@@ -202,3 +202,60 @@
 - Create demo account seed function
 - Begin Stripe payment infrastructure (Phase 2.0)
 - PWA install prompt and icons
+
+---
+
+## Session 7 — 2026-02-26
+**Phase**: Promo Videos + Voice Switch + Recruitment + Feedback Feature + Nav Bug Fix
+
+### What Was Done
+
+**WS5 — AI Practice Navigation Bug Fix (completed):**
+- Added AbortController + mountedRef to `ai-practice/page.tsx` to prevent state updates after unmount
+- Stabilised Zustand function references in useEffect dependencies
+- Added local error boundary for AI practice page
+- Audited all navigation paths from post-session/feedback state
+
+**WS3 — App Feedback Feature (completed):**
+- Created `appFeedback` table in `convex/schema.ts`
+- Created `convex/appFeedback.ts` with submit/generateUploadUrl/listForAdmin/updateStatus
+- Created `src/components/shared/FeedbackButton.tsx` — floating button + modal with category pills, screenshot upload, auto-captured pageUrl/userAgent
+- Integrated into `layout-client.tsx`
+
+**WS1 — Voice Switch Daniel → Charlie (completed):**
+- Backed up 30 Daniel clips to `public/audio/voiceover/backup-daniel/`
+- Regenerated 30 narrator clips with Charlie voice (IKne3meq5aSn9XLyUdCD)
+- Applied 150ms fade-out to all clips
+- Retimed all 5 compositions: AIPracticeCinematic (75s→73s), AIPracticeShort (900→950 frames), FeatureShowcase (minor), LiveSessionSnippet (shifted), ConstitutionalLaw (retimed)
+- Updated Root.tsx durations
+
+**WS2 — Recruitment Promo Video (completed):**
+- Generated 6 Charlie voice clips (`recruit-01` through `recruit-06`)
+- Created `remotion/RecruitmentPromo.tsx` — 48s, 6 scenes, 1440 frames
+- New components: RoleCard, UniversityPill, FeatureBadge, AnimatedCounter
+- Birkbeck highlighted with gold border + glow
+- Registered in Root.tsx, rendered to `promo/videos/recruitment-promo.mp4` (4.4 MB)
+- Added 4 thumbnails: ThumbnailGeneral, ThumbnailAIPractice, ThumbnailConstitutionalLaw, ThumbnailLiveSession
+
+**WS4 — Documentation (completed):**
+- Updated `PROMO-VIDEO-PLAN.md` with Charlie voice settings, new video entry, audio assets, render commands, workflow improvements
+
+**Law-First Positioning Overhaul:**
+- Reframed all 6 role titles in recruitment video to be law-focused (e.g., "Community & Social Media Manager" → "Advocacy Community Lead")
+- Updated entire careers page (`src/app/careers/page.tsx`): all 8 role titles, descriptions, responsibilities, fellowship tracks, Why RATIO cards, hero copy, category filters, apprenticeship labels, FAQ
+- Added "Positioning & Copy" section to CLAUDE.md with law-first principle, careers role naming conventions, marketing guidelines, voice/tone rules
+
+### Decisions Made
+- **Charlie over Daniel**: Daniel sounded like a nature documentary narrator. Charlie is more articulate and barrister-like.
+- **Law-first positioning**: All role titles, descriptions, and marketing copy must lead with legal substance. "Not coffee runs" is the benchmark.
+- **Role naming convention**: Every role title should reference law/advocacy/legal — never generic startup language. Table of never-use/use-instead added to CLAUDE.md.
+- **CLAUDE.md as persistent memory**: Added Positioning & Copy section so future sessions automatically know the law-first rule without re-explaining.
+
+### Issues Encountered
+- ElevenLabs em-dash encoding error on Windows/Git Bash (use ASCII hyphens in curl payloads)
+- AIPracticeShort needed manual frame count (950) not FPS * duration due to Charlie timing differences
+
+### Next Session Should
+- Render the other 5 retimed videos with Charlie voice (optional — not yet requested)
+- Update the actual /careers page content if it exists on the live site
+- Consider 16:9 landscape video variants for LinkedIn/YouTube

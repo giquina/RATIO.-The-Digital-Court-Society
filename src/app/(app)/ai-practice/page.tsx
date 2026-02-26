@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { Tag, Card, Button, ProgressBar, DynamicIcon } from "@/components/ui";
 import { AI_PERSONAS, FEEDBACK_DIMENSIONS } from "@/lib/constants/app";
 import { courtToast } from "@/lib/utils/toast";
@@ -71,10 +71,72 @@ function stripEmotes(text: string): string {
   return text.replace(/\*[^*]+\*/g, "").replace(/\s{2,}/g, " ").trim();
 }
 
-export default function AIPracticePage() {
+// ── Local error boundary — catches runtime errors within the AI Practice page
+//    so that the app shell (sidebar, nav) stays intact and navigable ──
+class AIPracticeErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex flex-col items-center justify-center h-[calc(100dvh-140px)] md:h-[calc(100dvh-80px)] px-6">
+          <div className="w-16 h-16 rounded-full bg-burgundy/10 border border-burgundy/20 flex items-center justify-center mb-4">
+            <AlertCircle size={28} className="text-burgundy" />
+          </div>
+          <h2 className="font-serif text-xl font-bold text-court-text mb-2 text-center">
+            Session Interrupted
+          </h2>
+          <p className="text-court-sm text-court-text-sec text-center max-w-sm mb-6">
+            An unexpected error occurred. Your session data has been preserved where possible.
+          </p>
+          <button
+            onClick={() => {
+              this.setState({ hasError: false });
+            }}
+            className="px-5 py-2.5 rounded-xl bg-gold text-navy font-bold text-court-sm hover:bg-gold/90 transition-colors"
+          >
+            Return to Mode Selection
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+export default function AIPracticePageWrapper() {
+  return (
+    <AIPracticeErrorBoundary>
+      <AIPracticePageInner />
+    </AIPracticeErrorBoundary>
+  );
+}
+
+function AIPracticePageInner() {
   const [screen, setScreen] = useState<Screen>("select");
   const aiUserContext = useAIUserContext();
-  const { enterSession, exitSession } = useSessionStore();
+  // Select stable Zustand function references (won't re-create on render)
+  const enterSession = useSessionStore((s) => s.enterSession);
+  const exitSession = useSessionStore((s) => s.exitSession);
+
+  // Mounted guard — prevents state updates after unmount (navigation away)
+  const mountedRef = useRef(true);
+  const abortRef = useRef<AbortController>(new AbortController());
+
+  useEffect(() => {
+    return () => {
+      mountedRef.current = false;
+      abortRef.current.abort();
+    };
+  }, []);
 
   // Tell the layout to hide header/nav when in active session
   useEffect(() => {
@@ -261,7 +323,10 @@ export default function AIPracticePage() {
           temperament: mode === "judge" ? temperament : "standard",
           userContext: aiUserContext,
         }),
+        signal: abortRef.current.signal,
       });
+
+      if (!mountedRef.current) return;
 
       if (res.ok) {
         const data = await res.json();
@@ -274,7 +339,8 @@ export default function AIPracticePage() {
         }
       }
     } catch {
-      // API unavailable — use fallback
+      // API unavailable or aborted — use fallback
+      if (!mountedRef.current) return;
     }
 
     setApiMessages((prev) => {
@@ -298,7 +364,9 @@ export default function AIPracticePage() {
     // TTS: speak the opening
     tts.speak(openingText);
 
-    setTimeout(() => setAiSpeaking(false), 3000);
+    setTimeout(() => {
+      if (mountedRef.current) setAiSpeaking(false);
+    }, 3000);
   };
 
   // ── Send message ──
@@ -356,7 +424,10 @@ export default function AIPracticePage() {
           temperament: mode === "judge" ? temperament : "standard",
           userContext: aiUserContext,
         }),
+        signal: abortRef.current.signal,
       });
+
+      if (!mountedRef.current) return;
 
       if (res.status === 429) {
         setRateLimited(true);
@@ -397,6 +468,7 @@ export default function AIPracticePage() {
       setAiSpeaking(false);
       setIsLoading(false);
     } catch {
+      if (!mountedRef.current) return;
       const responseIdx = Math.min(exchangeCount, AI_RESPONSES.length - 1);
       const fallbackText = AI_RESPONSES[responseIdx];
 
@@ -437,7 +509,10 @@ export default function AIPracticePage() {
           sessionDuration,
           userContext: aiUserContext,
         }),
+        signal: abortRef.current.signal,
       });
+
+      if (!mountedRef.current) return;
 
       if (res.ok) {
         const data = await res.json();
@@ -453,6 +528,7 @@ export default function AIPracticePage() {
         throw new Error('Feedback API error');
       }
     } catch {
+      if (!mountedRef.current) return;
       setFeedbackData({
         scores: FALLBACK_SCORES,
         overall: parseFloat((Object.values(FALLBACK_SCORES).reduce((a, b) => a + b, 0) / 7).toFixed(1)),
@@ -463,7 +539,10 @@ export default function AIPracticePage() {
       setFeedbackFallback(true);
     }
 
-    setTimeout(() => setScreen("feedback"), 4000);
+    if (!mountedRef.current) return;
+    setTimeout(() => {
+      if (mountedRef.current) setScreen("feedback");
+    }, 4000);
   };
 
   // ── Generate Case Note ──
@@ -484,18 +563,24 @@ export default function AIPracticePage() {
           overallScore: feedbackData?.overall,
           judgment: feedbackData?.judgment,
         }),
+        signal: abortRef.current.signal,
       });
+
+      if (!mountedRef.current) return;
 
       if (res.ok) {
         const data = await res.json();
+        if (!mountedRef.current) return;
         setCaseNote(data.caseNote);
       } else {
         throw new Error("Case note API error");
       }
     } catch {
+      if (!mountedRef.current) return;
       setCaseNoteError("Unable to generate case note. Please try again.");
     }
 
+    if (!mountedRef.current) return;
     setCaseNoteGenerating(false);
   };
 

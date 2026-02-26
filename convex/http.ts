@@ -1,5 +1,6 @@
 import { httpRouter } from "convex/server";
 import { httpAction } from "./_generated/server";
+// @ts-expect-error — "Type instantiation excessively deep" with ~40+ table schema
 import { internal } from "./_generated/api";
 import { auth } from "./auth";
 import { Id } from "./_generated/dataModel";
