@@ -9,11 +9,15 @@ export function CookieConsent() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const consent = localStorage.getItem(CONSENT_KEY);
-    if (!consent) {
-      // Small delay so it doesn't flash on page load
-      const timer = setTimeout(() => setVisible(true), 1500);
-      return () => clearTimeout(timer);
+    try {
+      const consent = localStorage.getItem(CONSENT_KEY);
+      if (!consent) {
+        // Small delay so it doesn't flash on page load
+        const timer = setTimeout(() => setVisible(true), 1500);
+        return () => clearTimeout(timer);
+      }
+    } catch {
+      // localStorage unavailable — don't show banner
     }
   }, []);
 

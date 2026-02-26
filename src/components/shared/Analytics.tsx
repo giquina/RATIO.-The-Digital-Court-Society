@@ -26,8 +26,12 @@ export function Analytics() {
 
   useEffect(() => {
     // Check existing consent on mount
-    if (localStorage.getItem("ratio-cookie-consent") === "accepted") {
-      setConsentGranted(true);
+    try {
+      if (localStorage.getItem("ratio-cookie-consent") === "accepted") {
+        setConsentGranted(true);
+      }
+    } catch {
+      // localStorage unavailable
     }
 
     // Listen for real-time consent granted (no page reload needed)

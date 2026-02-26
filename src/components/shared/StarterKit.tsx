@@ -35,8 +35,12 @@ export function StarterKit({ profile, onDismiss }: StarterKitProps) {
 
   // Check localStorage on mount to determine visibility
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    setDismissed(stored === "true");
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      setDismissed(stored === "true");
+    } catch {
+      setDismissed(true);
+    }
   }, []);
 
   const handleDismiss = () => {

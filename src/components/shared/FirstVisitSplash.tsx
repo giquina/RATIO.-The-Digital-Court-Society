@@ -13,11 +13,15 @@ export function FirstVisitSplash({ children }: { children: React.ReactNode }) {
 
   // Check on mount whether to show splash
   useEffect(() => {
-    const alreadySeen = localStorage.getItem(STORAGE_KEY);
-    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (!alreadySeen && !prefersReduced) {
-      setShowSplash(true);
-    } else {
+    try {
+      const alreadySeen = localStorage.getItem(STORAGE_KEY);
+      const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (!alreadySeen && !prefersReduced) {
+        setShowSplash(true);
+      } else {
+        setShowSplash(false);
+      }
+    } catch {
       setShowSplash(false);
     }
   }, []);

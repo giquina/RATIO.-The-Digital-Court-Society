@@ -20,8 +20,12 @@ export default function InstallBanner() {
     if (isInstalled) return;
 
     // Don't show if user dismissed recently (24h cooldown)
-    const lastDismissed = localStorage.getItem("ratio-install-dismissed");
-    if (lastDismissed && Date.now() - parseInt(lastDismissed) < 86400000) return;
+    try {
+      const lastDismissed = localStorage.getItem("ratio-install-dismissed");
+      if (lastDismissed && Date.now() - parseInt(lastDismissed) < 86400000) return;
+    } catch {
+      return;
+    }
 
     // Show after 5 seconds so it doesn't compete with page load
     const timer = setTimeout(() => setDismissed(false), 5000);
