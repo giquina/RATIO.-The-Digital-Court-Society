@@ -875,6 +875,7 @@ export default defineSchema({
     positionCategory: v.string(),
     coverMessage: v.string(),
     relevantExperience: v.optional(v.string()),
+    linkedinUrl: v.optional(v.string()),
     portfolioUrl: v.optional(v.string()),
     cvStorageId: v.optional(v.id("_storage")),
     cvFileName: v.optional(v.string()),

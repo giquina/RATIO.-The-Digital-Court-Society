@@ -5,7 +5,6 @@ import { useQuery, useMutation } from "convex/react";
 import { anyApi } from "convex/server";
 import {
   Briefcase,
-  FileText,
   Download,
   ChevronDown,
   ChevronUp,
@@ -14,11 +13,15 @@ import {
   Mail,
   GraduationCap,
   Link as LinkIcon,
-  Clock,
   CheckCircle2,
   XCircle,
   Eye,
   Star,
+  Search,
+  Linkedin,
+  Globe,
+  FileText,
+  Clock,
 } from "lucide-react";
 
 const STATUS_TABS = [
@@ -55,8 +58,20 @@ const NEXT_STATUS: Record<string, { label: string; status: string; icon: any }[]
   rejected: [],
 };
 
+function timeAgo(dateStr: string) {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  if (days < 30) return `${days}d ago`;
+  return new Date(dateStr).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+}
+
 export default function ApplicationsPage() {
   const [statusFilter, setStatusFilter] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [notesMap, setNotesMap] = useState<Record<string, string>>({});
 
@@ -66,6 +81,18 @@ export default function ApplicationsPage() {
     statusFilter ? { status: statusFilter } : {}
   );
   const updateStatus = useMutation(anyApi.careers.updateApplicationStatus);
+
+  // Client-side search filtering
+  const filtered = applications?.filter((app: any) => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      app.fullName?.toLowerCase().includes(q) ||
+      app.email?.toLowerCase().includes(q) ||
+      app.positionTitle?.toLowerCase().includes(q) ||
+      app.university?.toLowerCase().includes(q)
+    );
+  });
 
   const handleStatusChange = async (appId: any, newStatus: string) => {
     try {
@@ -90,56 +117,84 @@ export default function ApplicationsPage() {
         <p className="text-court-sm text-court-text-sec">
           Review and manage applications from the careers page.
         </p>
+
+        {/* Stats bar */}
         {counts && (
-          <div className="flex gap-4 mt-3 text-court-xs text-court-text-ter">
-            <span>{counts.total} total</span>
-            <span className="text-yellow-400">{counts.pending ?? 0} pending</span>
-            <span className="text-blue-400">{counts.reviewing ?? 0} reviewing</span>
-            <span className="text-purple-400">{counts.shortlisted ?? 0} shortlisted</span>
-            <span className="text-green-400">{counts.accepted ?? 0} accepted</span>
+          <div className="flex flex-wrap gap-3 mt-4">
+            {[
+              { label: "Total", value: counts.total, color: "text-court-text" },
+              { label: "Pending", value: counts.pending ?? 0, color: "text-yellow-400" },
+              { label: "Reviewing", value: counts.reviewing ?? 0, color: "text-blue-400" },
+              { label: "Shortlisted", value: counts.shortlisted ?? 0, color: "text-purple-400" },
+              { label: "Accepted", value: counts.accepted ?? 0, color: "text-green-400" },
+              { label: "Rejected", value: counts.rejected ?? 0, color: "text-red-400" },
+            ].map((s) => (
+              <div key={s.label} className="bg-white/[0.03] border border-court-border rounded-lg px-3 py-2 min-w-[80px]">
+                <p className={`text-lg font-bold ${s.color}`}>{s.value}</p>
+                <p className="text-court-xs text-court-text-ter">{s.label}</p>
+              </div>
+            ))}
           </div>
         )}
       </div>
 
-      {/* Status Tabs */}
-      <div className="flex gap-1.5 mb-5 overflow-x-auto no-scrollbar">
-        {STATUS_TABS.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setStatusFilter(tab.key)}
-            className={`px-3 py-1.5 rounded-lg text-court-xs font-bold whitespace-nowrap transition-all ${
-              statusFilter === tab.key
-                ? "bg-gold/10 text-gold border border-gold/20"
-                : "text-court-text-sec hover:bg-white/[0.04]"
-            }`}
-          >
-            {tab.label}
-            {counts && tab.key && counts[tab.key] ? (
-              <span className="ml-1.5 opacity-60">({counts[tab.key]})</span>
-            ) : null}
-          </button>
-        ))}
+      {/* Search + Filters */}
+      <div className="flex flex-col sm:flex-row gap-3 mb-5">
+        <div className="relative flex-1">
+          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-court-text-ter" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search by name, email, position, university..."
+            className="w-full bg-white/[0.03] border border-court-border rounded-lg pl-9 pr-3 py-2 text-court-sm text-court-text outline-none focus:border-gold/40 placeholder:text-court-text-ter"
+          />
+        </div>
+        <div className="flex gap-1.5 overflow-x-auto no-scrollbar">
+          {STATUS_TABS.map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setStatusFilter(tab.key)}
+              className={`px-3 py-2 rounded-lg text-court-xs font-bold whitespace-nowrap transition-all ${
+                statusFilter === tab.key
+                  ? "bg-gold/10 text-gold border border-gold/20"
+                  : "text-court-text-sec hover:bg-white/[0.04] border border-transparent"
+              }`}
+            >
+              {tab.label}
+              {counts && tab.key && counts[tab.key] ? (
+                <span className="ml-1 opacity-60">({counts[tab.key]})</span>
+              ) : null}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Applications List */}
-      {applications === undefined ? (
+      {filtered === undefined ? (
         <div className="flex justify-center py-12">
           <Loader2 size={24} className="animate-spin text-court-text-ter" />
         </div>
-      ) : applications.length === 0 ? (
-        <div className="text-center py-12">
+      ) : filtered.length === 0 ? (
+        <div className="text-center py-12 bg-white/[0.02] border border-court-border rounded-xl">
           <Briefcase size={32} className="text-court-text-ter mx-auto mb-3" />
-          <p className="text-court-text-sec text-court-sm">No applications found.</p>
+          <p className="text-court-text-sec text-court-sm">
+            {searchQuery ? "No applications match your search." : "No applications found."}
+          </p>
         </div>
       ) : (
         <div className="space-y-2">
-          {applications.map((app: any) => {
+          {filtered.map((app: any) => {
             const isExpanded = expandedId === app._id;
             const actions = NEXT_STATUS[app.status] ?? [];
             return (
               <div
                 key={app._id}
-                className="bg-white/[0.03] border border-court-border rounded-xl overflow-hidden"
+                className={`border rounded-xl overflow-hidden transition-all ${
+                  isExpanded
+                    ? "bg-white/[0.04] border-gold/20"
+                    : "bg-white/[0.02] border-court-border hover:border-white/15"
+                }`}
               >
                 {/* Summary Row */}
                 <button
@@ -155,24 +210,40 @@ export default function ApplicationsPage() {
                         {app.fullName}
                       </span>
                       <span
-                        className={`text-court-xs font-bold px-2 py-0.5 rounded-full border ${
+                        className={`text-court-xs font-bold px-2 py-0.5 rounded-full border capitalize ${
                           STATUS_COLORS[app.status] ?? "text-court-text-ter"
                         }`}
                       >
                         {app.status}
                       </span>
+                      {app.linkedinUrl && (
+                        <Linkedin size={13} className="text-[#0A66C2]" />
+                      )}
+                      {app.cvStorageId && (
+                        <FileText size={13} className="text-court-text-ter" />
+                      )}
                     </div>
                     <p className="text-court-sm text-court-text-sec truncate">
                       {app.positionTitle}
                     </p>
-                    <p className="text-court-xs text-court-text-ter mt-0.5">
-                      {new Date(app.appliedAt).toLocaleDateString("en-GB", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                      })}
-                      {app.university && ` · ${app.university}`}
-                    </p>
+                    <div className="flex items-center gap-2 mt-0.5 text-court-xs text-court-text-ter">
+                      <span className="flex items-center gap-1">
+                        <Clock size={10} />
+                        {timeAgo(app.appliedAt)}
+                      </span>
+                      {app.university && (
+                        <>
+                          <span>·</span>
+                          <span>{app.university}</span>
+                        </>
+                      )}
+                      {app.yearOfStudy && (
+                        <>
+                          <span>·</span>
+                          <span>{app.yearOfStudy}</span>
+                        </>
+                      )}
+                    </div>
                   </div>
                   {isExpanded ? (
                     <ChevronUp size={16} className="text-court-text-ter shrink-0" />
@@ -184,66 +255,68 @@ export default function ApplicationsPage() {
                 {/* Expanded Details */}
                 {isExpanded && (
                   <div className="px-4 pb-4 border-t border-court-border pt-4 space-y-4">
-                    {/* Contact Info */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div className="flex items-center gap-2 text-court-sm">
-                        <Mail size={14} className="text-court-text-ter" />
-                        <a href={`mailto:${app.email}`} className="text-gold hover:underline">
-                          {app.email}
+                    {/* Quick Links Row */}
+                    <div className="flex flex-wrap gap-2">
+                      <a
+                        href={`mailto:${app.email}`}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/[0.04] border border-court-border rounded-lg text-court-xs text-court-text-sec hover:text-gold hover:border-gold/20 transition-colors"
+                      >
+                        <Mail size={12} /> {app.email}
+                      </a>
+                      {app.linkedinUrl && (
+                        <a
+                          href={app.linkedinUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#0A66C2]/8 border border-[#0A66C2]/20 rounded-lg text-court-xs text-[#0A66C2] hover:bg-[#0A66C2]/15 transition-colors"
+                        >
+                          <Linkedin size={12} /> LinkedIn Profile
                         </a>
-                      </div>
-                      {app.university && (
-                        <div className="flex items-center gap-2 text-court-sm text-court-text-sec">
-                          <GraduationCap size={14} className="text-court-text-ter" />
-                          {app.university}
-                          {app.yearOfStudy && ` — ${app.yearOfStudy}`}
-                        </div>
                       )}
                       {app.portfolioUrl && (
-                        <div className="flex items-center gap-2 text-court-sm">
-                          <LinkIcon size={14} className="text-court-text-ter" />
-                          <a
-                            href={app.portfolioUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-gold hover:underline truncate"
-                          >
-                            {app.portfolioUrl}
-                          </a>
-                        </div>
+                        <a
+                          href={app.portfolioUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/[0.04] border border-court-border rounded-lg text-court-xs text-court-text-sec hover:text-gold hover:border-gold/20 transition-colors"
+                        >
+                          <Globe size={12} /> Portfolio
+                        </a>
+                      )}
+                      {app.cvStorageId && (
+                        <CvDownloadButton storageId={app.cvStorageId} fileName={app.cvFileName} />
                       )}
                     </div>
 
                     {/* Cover Message */}
                     <div>
-                      <p className="text-court-xs font-bold text-court-text-ter uppercase tracking-wider mb-1">
+                      <p className="text-court-xs font-bold text-court-text-ter uppercase tracking-wider mb-1.5">
                         Cover Message
                       </p>
-                      <p className="text-court-sm text-court-text-sec leading-relaxed whitespace-pre-wrap">
-                        {app.coverMessage}
-                      </p>
+                      <div className="bg-white/[0.03] border border-court-border rounded-lg p-3">
+                        <p className="text-court-sm text-court-text-sec leading-relaxed whitespace-pre-wrap">
+                          {app.coverMessage}
+                        </p>
+                      </div>
                     </div>
 
                     {/* Relevant Experience */}
                     {app.relevantExperience && (
                       <div>
-                        <p className="text-court-xs font-bold text-court-text-ter uppercase tracking-wider mb-1">
+                        <p className="text-court-xs font-bold text-court-text-ter uppercase tracking-wider mb-1.5">
                           Relevant Experience
                         </p>
-                        <p className="text-court-sm text-court-text-sec leading-relaxed whitespace-pre-wrap">
-                          {app.relevantExperience}
-                        </p>
+                        <div className="bg-white/[0.03] border border-court-border rounded-lg p-3">
+                          <p className="text-court-sm text-court-text-sec leading-relaxed whitespace-pre-wrap">
+                            {app.relevantExperience}
+                          </p>
+                        </div>
                       </div>
-                    )}
-
-                    {/* CV Download */}
-                    {app.cvStorageId && (
-                      <CvDownloadButton storageId={app.cvStorageId} fileName={app.cvFileName} />
                     )}
 
                     {/* Internal Notes */}
                     <div>
-                      <p className="text-court-xs font-bold text-court-text-ter uppercase tracking-wider mb-1">
+                      <p className="text-court-xs font-bold text-court-text-ter uppercase tracking-wider mb-1.5">
                         Internal Notes
                       </p>
                       <textarea
@@ -253,40 +326,42 @@ export default function ApplicationsPage() {
                         }
                         placeholder="Add review notes..."
                         rows={2}
-                        className="w-full bg-white/[0.04] border border-court-border rounded-lg px-3 py-2 text-court-sm text-court-text outline-none focus:border-gold/40 placeholder:text-court-text-ter resize-none"
+                        className="w-full bg-white/[0.03] border border-court-border rounded-lg px-3 py-2 text-court-sm text-court-text outline-none focus:border-gold/40 placeholder:text-court-text-ter resize-none"
                       />
                     </div>
 
                     {/* Actions */}
-                    {actions.length > 0 && (
-                      <div className="flex gap-2">
-                        {actions.map((action) => {
-                          const Icon = action.icon;
-                          const isReject = action.status === "rejected";
-                          return (
-                            <button
-                              key={action.status}
-                              onClick={() => handleStatusChange(app._id, action.status)}
-                              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-court-sm font-semibold transition-all ${
-                                isReject
-                                  ? "text-red-400 bg-red-400/10 hover:bg-red-400/20 border border-red-400/20"
-                                  : "text-gold bg-gold/10 hover:bg-gold/20 border border-gold/20"
-                              }`}
-                            >
-                              <Icon size={14} />
-                              {action.label}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    )}
-
-                    {/* Review info */}
-                    {app.reviewedAt && (
-                      <p className="text-court-xs text-court-text-ter">
-                        Last reviewed: {new Date(app.reviewedAt).toLocaleDateString("en-GB")}
-                      </p>
-                    )}
+                    <div className="flex items-center justify-between">
+                      {actions.length > 0 ? (
+                        <div className="flex gap-2">
+                          {actions.map((action) => {
+                            const Icon = action.icon;
+                            const isReject = action.status === "rejected";
+                            return (
+                              <button
+                                key={action.status}
+                                onClick={() => handleStatusChange(app._id, action.status)}
+                                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-court-sm font-semibold transition-all ${
+                                  isReject
+                                    ? "text-red-400 bg-red-400/10 hover:bg-red-400/20 border border-red-400/20"
+                                    : "text-gold bg-gold/10 hover:bg-gold/20 border border-gold/20"
+                                }`}
+                              >
+                                <Icon size={14} />
+                                {action.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <span />
+                      )}
+                      {app.reviewedAt && (
+                        <p className="text-court-xs text-court-text-ter">
+                          Reviewed {timeAgo(app.reviewedAt)}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
@@ -298,26 +373,21 @@ export default function ApplicationsPage() {
   );
 }
 
-/** Separate component for CV download to isolate the query */
+/** CV download as inline button */
 function CvDownloadButton({ storageId, fileName }: { storageId: any; fileName?: string }) {
   const url: string | null | undefined = useQuery(anyApi.careers.getCvDownloadUrl, { storageId });
 
   if (!url) return null;
 
   return (
-    <div>
-      <p className="text-court-xs font-bold text-court-text-ter uppercase tracking-wider mb-1">
-        CV / Resume
-      </p>
-      <a
-        href={url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex items-center gap-2 px-3.5 py-2 bg-white/[0.06] border border-court-border rounded-lg text-court-sm text-gold hover:bg-white/[0.08] transition-colors"
-      >
-        <Download size={14} />
-        {fileName ?? "Download CV"}
-      </a>
-    </div>
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/[0.04] border border-court-border rounded-lg text-court-xs text-court-text-sec hover:text-gold hover:border-gold/20 transition-colors"
+    >
+      <Download size={12} />
+      {fileName ?? "Download CV"}
+    </a>
   );
 }
