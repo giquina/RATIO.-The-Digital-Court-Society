@@ -19,9 +19,9 @@ export function trackEvent(
   params?: Record<string, string | number | undefined>
 ) {
   if (typeof window === "undefined") return;
-  if (!(window as any).gtag) return;
+  if (!window.gtag) return;
 
-  (window as any).gtag("event", eventName, params);
+  window.gtag("event", eventName, params);
 }
 
 // Pre-defined events for Ratio

@@ -121,6 +121,32 @@ export default function RootLayout({
       <head>
         {/* Prevent FOUC: critical background color before CSS loads */}
         <style dangerouslySetInnerHTML={{ __html: `html,body{background:#0C1220;color:#F2EDE6}` }} />
+
+        {/* GA4 Consent Mode v2: set default denied, then upgrade for returning
+            users who already accepted cookies. This MUST run synchronously in
+            <head> before gtag.js loads so the page_view fires with correct
+            consent state. See: RATIO GA audit 2026-02-26. */}
+        {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                window.dataLayer=window.dataLayer||[];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('consent','default',{
+                  analytics_storage:'denied',
+                  ad_storage:'denied',
+                  ad_user_data:'denied',
+                  ad_personalization:'denied'
+                });
+                try{
+                  if(localStorage.getItem('ratio-cookie-consent')==='accepted'){
+                    gtag('consent','update',{analytics_storage:'granted'});
+                  }
+                }catch(e){}
+              `,
+            }}
+          />
+        )}
       </head>
       <body className="bg-navy text-court-text font-sans antialiased min-h-screen">
         <ConvexClientProvider>
