@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useMutation, useQuery } from "convex/react";
+import { anyApi } from "convex/server";
 import { Card, Button } from "@/components/ui";
 import { VerifiedOnly } from "@/components/guards/VerifiedOnly";
 import { ArrowLeft, Gavel, Info, AlertTriangle } from "lucide-react";
@@ -23,6 +25,8 @@ const REMEDIES = [
 
 export default function FileCasePage() {
   const router = useRouter();
+  const profile: any = useQuery(anyApi.users.myProfile);
+  const fileCase = useMutation(anyApi.governance.judicial.fileCase);
   const [title, setTitle] = useState("");
   const [caseType, setCaseType] = useState("");
   const [respondent, setRespondent] = useState("");
@@ -33,14 +37,26 @@ export default function FileCasePage() {
   const [remedy, setRemedy] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  const canSubmit = title && caseType && respondent && issue && rule && application && conclusion && remedy;
+  const canSubmit = title && caseType && respondent && issue && rule && application && conclusion && remedy && profile?._id;
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
     setSubmitting(true);
-    // TODO: Replace with useMutation(api.governance.judicial.fileCase)
-    await new Promise((r) => setTimeout(r, 1000));
-    router.push("/tribunal");
+    try {
+      await fileCase({
+        filedById: profile._id,
+        respondentId: respondent as any,
+        title,
+        issue,
+        rule,
+        application,
+        conclusion,
+        remedySought: remedy,
+      });
+      router.push("/tribunal");
+    } catch {
+      setSubmitting(false);
+    }
   };
 
   return (

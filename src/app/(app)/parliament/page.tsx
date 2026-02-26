@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { useQuery } from "convex/react";
+import { anyApi } from "convex/server";
 import { Card, Tag, Button, EmptyState } from "@/components/ui";
 import { VerifiedOnly } from "@/components/guards/VerifiedOnly";
 import {
@@ -15,44 +17,8 @@ import {
   BookOpen,
   Scale,
   Plus,
+  Loader2,
 } from "lucide-react";
-
-// Demo data — TODO: Replace with useQuery(api.governance.legislative.*)
-const RECENT_MOTIONS = [
-  {
-    id: "1",
-    title: "Motion to Establish a Formal Mentorship Programme",
-    proposer: "Sarah K.",
-    category: "policy",
-    status: "voting",
-    votesAye: 24,
-    votesNo: 8,
-    votesAbstain: 3,
-    deadline: "2026-02-22T18:00:00Z",
-  },
-  {
-    id: "2",
-    title: "Amendment to Standing Order 7 — Debate Time Limits",
-    proposer: "James M.",
-    category: "procedural",
-    status: "debating",
-    votesAye: 0,
-    votesNo: 0,
-    votesAbstain: 0,
-    deadline: null,
-  },
-  {
-    id: "3",
-    title: "Resolution on Cross-University Moot Partnerships",
-    proposer: "Amara O.",
-    category: "policy",
-    status: "passed",
-    votesAye: 42,
-    votesNo: 11,
-    votesAbstain: 5,
-    deadline: null,
-  },
-];
 
 const QUICK_LINKS = [
   { href: "/parliament/motions", label: "All Motions", icon: FileText, count: 12 },
@@ -73,6 +39,8 @@ const STATUS_MAP: Record<string, { color: string; label: string }> = {
 };
 
 export default function ParliamentPage() {
+  const motions: any[] | undefined = useQuery(anyApi.governance.legislative.listMotions, { limit: 5 });
+
   return (
     <VerifiedOnly fallbackMessage="Parliamentary features require verified student status to maintain institutional integrity.">
       <div className="pb-6 md:max-w-content-medium mx-auto">
@@ -101,11 +69,6 @@ export default function ParliamentPage() {
                         {link.label}
                       </span>
                     </div>
-                    {link.count !== null && (
-                      <span className="text-court-xs text-court-text-ter">
-                        {link.count} active
-                      </span>
-                    )}
                   </Card>
                 </Link>
               );
@@ -122,12 +85,19 @@ export default function ParliamentPage() {
             </Link>
           </div>
 
+          {motions === undefined ? (
+            <div className="flex justify-center py-8">
+              <Loader2 size={20} className="animate-spin text-court-text-ter" />
+            </div>
+          ) : motions.length === 0 ? (
+            <EmptyState message="No motions have been proposed yet." />
+          ) : (
           <div className="space-y-2">
-            {RECENT_MOTIONS.map((motion) => {
+            {motions.map((motion: any) => {
               const statusInfo = STATUS_MAP[motion.status] || STATUS_MAP.draft;
-              const totalVotes = motion.votesAye + motion.votesNo + motion.votesAbstain;
+              const totalVotes = (motion.votesAye ?? 0) + (motion.votesNo ?? 0) + (motion.votesAbstain ?? 0);
               return (
-                <Link key={motion.id} href={`/parliament/motions/${motion.id}`}>
+                <Link key={motion._id} href={`/parliament/motions/${motion._id}`}>
                   <Card className="p-4 hover:border-white/10 transition-all mb-2">
                     <div className="flex justify-between items-start mb-2">
                       <h3 className="text-court-base font-bold text-court-text flex-1 pr-3">
@@ -150,7 +120,7 @@ export default function ParliamentPage() {
                     </div>
 
                     <div className="flex items-center gap-3 text-court-xs text-court-text-ter">
-                      <span>Proposed by {motion.proposer}</span>
+                      <span>Proposed by {motion.proposer?.fullName ?? "Unknown"}</span>
                       <span className="capitalize">{motion.category}</span>
                     </div>
 
@@ -178,10 +148,10 @@ export default function ParliamentPage() {
                       </div>
                     )}
 
-                    {motion.deadline && (
+                    {motion.votingDeadline && (
                       <div className="flex items-center gap-1 mt-2 text-court-xs text-orange-400">
                         <Clock size={12} />
-                        Voting closes {new Date(motion.deadline).toLocaleDateString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+                        Voting closes {new Date(motion.votingDeadline).toLocaleDateString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
                       </div>
                     )}
                   </Card>
@@ -189,6 +159,7 @@ export default function ParliamentPage() {
               );
             })}
           </div>
+          )}
         </section>
 
         {/* Governance Overview */}

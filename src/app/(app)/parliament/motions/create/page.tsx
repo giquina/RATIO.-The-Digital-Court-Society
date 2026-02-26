@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useMutation, useQuery } from "convex/react";
+import { anyApi } from "convex/server";
 import { Card, Button, Tag } from "@/components/ui";
 import { VerifiedOnly } from "@/components/guards/VerifiedOnly";
 import { ArrowLeft, FileText, AlertTriangle, Info } from "lucide-react";
@@ -16,6 +18,8 @@ const CATEGORIES = [
 
 export default function CreateMotionPage() {
   const router = useRouter();
+  const profile: any = useQuery(anyApi.users.myProfile);
+  const proposeMotion = useMutation(anyApi.governance.legislative.proposeMotion);
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
   const [issue, setIssue] = useState("");
@@ -24,16 +28,26 @@ export default function CreateMotionPage() {
   const [conclusion, setConclusion] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  const canSubmit = title && category && issue && rule && application && conclusion;
+  const canSubmit = title && category && issue && rule && application && conclusion && profile?._id;
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
     setSubmitting(true);
 
-    // TODO: Replace with useMutation(api.governance.legislative.proposeMotion)
-    await new Promise((r) => setTimeout(r, 1000));
-
-    router.push("/parliament/motions");
+    try {
+      await proposeMotion({
+        proposerId: profile._id,
+        title,
+        category,
+        issue,
+        rule,
+        application,
+        conclusion,
+      });
+      router.push("/parliament/motions");
+    } catch {
+      setSubmitting(false);
+    }
   };
 
   return (

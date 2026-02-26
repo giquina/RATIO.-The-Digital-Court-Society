@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useAction } from "convex/react";
+import { anyApi } from "convex/server";
 import { Card, Button, Tag } from "@/components/ui";
 import {
   FileText,
@@ -40,46 +42,25 @@ export default function CaseBriefPage() {
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  // TODO: Replace with useAction(api.ai.caseBrief.generate) when Convex is wired
+  const generateAction = useAction(anyApi.ai.caseBrief.generate);
+
   const handleGenerate = async () => {
     if (!caseName.trim()) return;
     setLoading(true);
     setBrief(null);
 
-    // Simulated delay for demo — replace with actual Convex action call
-    await new Promise((r) => setTimeout(r, 2000));
-
-    setBrief({
-      caseName: caseName,
-      citation: citation || "[Year] UKSC / EWCA Civ",
-      court: "Supreme Court / Court of Appeal",
-      year: "20XX",
-      facts:
-        "The key material facts of the case involve a dispute regarding the interpretation and application of established legal principles. The claimant brought an action seeking declaratory relief and damages arising from the defendant's alleged breach of duty.",
-      issue:
-        "Whether the established common law principle extends to cover the specific factual circumstances presented, and if so, what remedies are available to the injured party.",
-      held:
-        "The court held that the principle does extend to cover these circumstances. The appeal was allowed and the matter remitted for further consideration of quantum.",
-      ratioDecidendi:
-        "The binding principle established is that the duty of care extends to foreseeable consequences arising from the defendant's conduct, provided there exists sufficient proximity between the parties and it is fair, just, and reasonable to impose such a duty.",
-      obiterDicta:
-        "Lord/Lady Justice remarked that in different factual circumstances, such as where the harm was purely economic, the analysis might differ. This observation was not necessary for the decision but may influence future cases.",
-      application:
-        "This case has been applied in subsequent decisions to extend the scope of liability in analogous situations. It has been distinguished where the factual matrix differs materially.",
-      significance:
-        "This case is significant for UK law students as it clarifies the test applicable in this area of law and provides authoritative guidance on the scope of the relevant duty. It is frequently cited in mooting and examination contexts.",
-      keyQuotes: [
-        '"The law must develop incrementally, by analogy with established categories."',
-        '"It is not enough to show that harm was foreseeable; the claimant must also demonstrate proximity and that it is fair, just and reasonable to impose a duty."',
-      ],
-      relatedCases: [
-        "Donoghue v Stevenson [1932] AC 562 — foundational duty of care",
-        "Caparo Industries plc v Dickman [1990] 2 AC 605 — three-stage test",
-        "Robinson v Chief Constable [2018] UKSC 4 — incremental approach",
-      ],
-    });
-
-    setLoading(false);
+    try {
+      const result: any = await generateAction({
+        caseName,
+        citation: citation || undefined,
+        caseText: caseText || undefined,
+      });
+      setBrief(result.brief);
+    } catch {
+      // Convex action failed
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCopy = () => {

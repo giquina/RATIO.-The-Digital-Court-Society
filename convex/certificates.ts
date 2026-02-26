@@ -523,21 +523,20 @@ export const getPendingApplications = query({
 export const getAmbassadors = query({
   args: {},
   handler: async (ctx) => {
-    const profiles = await ctx.db
+    const ambassadors = await ctx.db
       .query("profiles")
+      .withIndex("by_ambassador", (q) => q.eq("isAmbassador", true))
       .collect();
 
-    return profiles
-      .filter((p) => p.isAmbassador === true)
-      .map((p) => ({
-        fullName: p.fullName,
-        university: p.university ?? "Independent",
-        universityShort: p.universityShort ?? "",
-        chamber: p.chamber,
-        ambassadorTier: p.ambassadorTier ?? "ambassador",
-        ambassadorSince: p.ambassadorSince,
-        rank: p.rank,
-        totalMoots: p.totalMoots,
-      }));
+    return ambassadors.map((p) => ({
+      fullName: p.fullName,
+      university: p.university ?? "Independent",
+      universityShort: p.universityShort ?? "",
+      chamber: p.chamber ?? "",
+      ambassadorTier: p.ambassadorTier ?? "ambassador",
+      ambassadorSince: p.ambassadorSince,
+      rank: p.rank,
+      totalMoots: p.totalMoots,
+    }));
   },
 });

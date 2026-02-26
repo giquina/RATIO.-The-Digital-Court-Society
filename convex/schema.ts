@@ -63,7 +63,8 @@ export default defineSchema({
     .index("by_chamber", ["chamber"])
     .index("by_points", ["totalPoints"])
     .index("by_rank", ["rank"])
-    .index("by_handle", ["handle"]),
+    .index("by_handle", ["handle"])
+    .index("by_ambassador", ["isAmbassador"]),
 
   // ═══════════════════════════════════════════
   // SOCIAL LAYER

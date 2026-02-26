@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { useQuery } from "convex/react";
+import { anyApi } from "convex/server";
 import { Card, Tag, Button, EmptyState } from "@/components/ui";
 import { VerifiedOnly } from "@/components/guards/VerifiedOnly";
 import {
@@ -14,38 +16,8 @@ import {
   Scale,
   Shield,
   BookOpen,
+  Loader2,
 } from "lucide-react";
-
-// Demo data — TODO: Replace with useQuery(api.governance.judicial.listCases)
-const CASES = [
-  {
-    id: "1",
-    title: "Application for Review of Moderation Decision",
-    filer: "James M.",
-    respondent: "Moderation Team",
-    status: "hearing",
-    filedAt: "2026-02-16",
-    category: "moderation_review",
-  },
-  {
-    id: "2",
-    title: "Dispute Regarding Chamber Allocation",
-    filer: "Priya S.",
-    respondent: "Daniel R.",
-    status: "submissions",
-    filedAt: "2026-02-14",
-    category: "dispute",
-  },
-  {
-    id: "3",
-    title: "Challenge to Motion Procedural Validity",
-    filer: "Amara O.",
-    respondent: "Speaker's Office",
-    status: "judgment",
-    filedAt: "2026-02-10",
-    category: "procedural",
-  },
-];
 
 const STATUS_CONFIG: Record<string, { label: string; color: "gold" | "blue" | "green" | "red" | "orange" }> = {
   filed: { label: "Filed", color: "blue" },
@@ -59,6 +31,8 @@ const STATUS_CONFIG: Record<string, { label: string; color: "gold" | "blue" | "g
 };
 
 export default function TribunalPage() {
+  const cases: any[] | undefined = useQuery(anyApi.governance.judicial.listCases, { limit: 10 });
+
   return (
     <VerifiedOnly fallbackMessage="The Digital Review Tribunal requires verified student status.">
       <div className="pb-6 md:max-w-content-medium mx-auto">
@@ -117,11 +91,18 @@ export default function TribunalPage() {
         {/* Active Cases */}
         <section id="active-cases" className="px-4 md:px-6 lg:px-8 mb-5">
           <h2 className="font-serif text-lg font-bold text-court-text mb-3">Active Cases</h2>
+          {cases === undefined ? (
+            <div className="flex justify-center py-8">
+              <Loader2 size={20} className="animate-spin text-court-text-ter" />
+            </div>
+          ) : cases.length === 0 ? (
+            <EmptyState message="No cases have been filed yet." />
+          ) : (
           <div className="space-y-2">
-            {CASES.map((c) => {
+            {cases.map((c: any) => {
               const config = STATUS_CONFIG[c.status] || STATUS_CONFIG.filed;
               return (
-                <Link key={c.id} href={`/tribunal/cases/${c.id}`}>
+                <Link key={c._id} href={`/tribunal/cases/${c._id}`}>
                   <Card className="p-4 hover:border-white/10 transition-all mb-2">
                     <div className="flex justify-between items-start mb-2">
                       <h3 className="text-court-base font-bold text-court-text flex-1 pr-3">
@@ -132,15 +113,16 @@ export default function TribunalPage() {
                       </Tag>
                     </div>
                     <div className="flex items-center gap-3 text-court-xs text-court-text-ter">
-                      <span>Filed by {c.filer}</span>
-                      <span>v. {c.respondent}</span>
-                      <span>{c.filedAt}</span>
+                      <span>Filed by {c.filer?.fullName ?? "Unknown"}</span>
+                      <span>v. {c.respondent?.fullName ?? "Unknown"}</span>
+                      <span>{c._creationTime ? new Date(c._creationTime).toLocaleDateString("en-GB") : ""}</span>
                     </div>
                   </Card>
                 </Link>
               );
             })}
           </div>
+          )}
         </section>
 
         {/* Tribunal Info */}

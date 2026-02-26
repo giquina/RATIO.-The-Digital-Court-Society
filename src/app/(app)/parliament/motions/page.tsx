@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useQuery } from "convex/react";
+import { anyApi } from "convex/server";
 import { Card, Tag, Button, EmptyState } from "@/components/ui";
 import { VerifiedOnly } from "@/components/guards/VerifiedOnly";
 import {
@@ -13,66 +15,8 @@ import {
   CheckCircle2,
   XCircle,
   Vote,
+  Loader2,
 } from "lucide-react";
-
-// Demo data — TODO: Replace with useQuery(api.governance.legislative.listMotions)
-const MOTIONS = [
-  {
-    id: "1",
-    title: "Motion to Establish a Formal Mentorship Programme",
-    proposer: "Sarah K.",
-    category: "policy",
-    status: "voting",
-    votesAye: 24,
-    votesNo: 8,
-    votesAbstain: 3,
-    createdAt: "2026-02-18",
-  },
-  {
-    id: "2",
-    title: "Amendment to Standing Order 7 — Debate Time Limits",
-    proposer: "James M.",
-    category: "procedural",
-    status: "debating",
-    votesAye: 0,
-    votesNo: 0,
-    votesAbstain: 0,
-    createdAt: "2026-02-17",
-  },
-  {
-    id: "3",
-    title: "Resolution on Cross-University Moot Partnerships",
-    proposer: "Amara O.",
-    category: "policy",
-    status: "passed",
-    votesAye: 42,
-    votesNo: 11,
-    votesAbstain: 5,
-    createdAt: "2026-02-15",
-  },
-  {
-    id: "4",
-    title: "Motion to Create Digital Review Tribunal Standing Panel",
-    proposer: "Daniel R.",
-    category: "constitutional",
-    status: "tabled",
-    votesAye: 0,
-    votesNo: 0,
-    votesAbstain: 0,
-    createdAt: "2026-02-14",
-  },
-  {
-    id: "5",
-    title: "Motion to Prohibit Anonymous Debate Contributions",
-    proposer: "Emily W.",
-    category: "conduct",
-    status: "defeated",
-    votesAye: 15,
-    votesNo: 31,
-    votesAbstain: 7,
-    createdAt: "2026-02-12",
-  },
-];
 
 const FILTERS = ["all", "voting", "debating", "tabled", "passed", "defeated"] as const;
 
@@ -89,10 +33,13 @@ const STATUS_CONFIG: Record<string, { label: string; color: "gold" | "blue" | "g
 
 export default function MotionsListPage() {
   const [activeFilter, setActiveFilter] = useState<string>("all");
+  const motions: any[] | undefined = useQuery(anyApi.governance.legislative.listMotions, {});
 
-  const filtered = activeFilter === "all"
-    ? MOTIONS
-    : MOTIONS.filter((m) => m.status === activeFilter);
+  const filtered = motions
+    ? activeFilter === "all"
+      ? motions
+      : motions.filter((m: any) => m.status === activeFilter)
+    : undefined;
 
   return (
     <VerifiedOnly>
@@ -110,7 +57,7 @@ export default function MotionsListPage() {
             <div>
               <h1 className="font-serif text-2xl font-bold text-court-text">Motions</h1>
               <p className="text-court-sm text-court-text-sec mt-1">
-                {MOTIONS.length} motions · {MOTIONS.filter((m) => m.status === "voting").length} open for voting
+                {motions ? `${motions.length} motions · ${motions.filter((m: any) => m.status === "voting").length} open for voting` : "Loading..."}
               </p>
             </div>
             <Link href="/parliament/motions/create">
@@ -144,7 +91,11 @@ export default function MotionsListPage() {
 
         {/* Motions List */}
         <section className="px-4 md:px-6 lg:px-8">
-          {filtered.length === 0 ? (
+          {filtered === undefined ? (
+            <div className="flex justify-center py-8">
+              <Loader2 size={20} className="animate-spin text-court-text-ter" />
+            </div>
+          ) : filtered.length === 0 ? (
             <EmptyState
               icon={<FileText size={28} />}
               title="No Motions Found"
@@ -152,11 +103,11 @@ export default function MotionsListPage() {
             />
           ) : (
             <div className="space-y-2">
-              {filtered.map((motion) => {
+              {filtered.map((motion: any) => {
                 const config = STATUS_CONFIG[motion.status] || STATUS_CONFIG.draft;
-                const totalVotes = motion.votesAye + motion.votesNo + motion.votesAbstain;
+                const totalVotes = (motion.votesAye ?? 0) + (motion.votesNo ?? 0) + (motion.votesAbstain ?? 0);
                 return (
-                  <Link key={motion.id} href={`/parliament/motions/${motion.id}`}>
+                  <Link key={motion._id} href={`/parliament/motions/${motion._id}`}>
                     <Card className="p-4 hover:border-white/10 transition-all mb-2">
                       <div className="flex justify-between items-start mb-2">
                         <h3 className="text-court-base font-bold text-court-text flex-1 pr-3">
@@ -167,9 +118,9 @@ export default function MotionsListPage() {
                         </Tag>
                       </div>
                       <div className="flex items-center gap-3 text-court-xs text-court-text-ter mb-2">
-                        <span>By {motion.proposer}</span>
+                        <span>By {motion.proposer?.fullName ?? "Unknown"}</span>
                         <span className="capitalize">{motion.category}</span>
-                        <span>{motion.createdAt}</span>
+                        <span>{motion._creationTime ? new Date(motion._creationTime).toLocaleDateString("en-GB") : ""}</span>
                       </div>
                       {totalVotes > 0 && (
                         <div className="flex gap-3 text-court-xs">

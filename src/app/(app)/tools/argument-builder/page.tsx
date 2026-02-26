@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useAction } from "convex/react";
+import { anyApi } from "convex/server";
 import { Card, Button, Tag, ProgressBar } from "@/components/ui";
 import {
   Scale,
@@ -67,103 +69,26 @@ export default function ArgumentBuilderPage() {
   const toggleSection = (key: string) =>
     setExpandedSections((prev) => ({ ...prev, [key]: !prev[key] }));
 
-  // TODO: Replace with useAction(api.ai.argumentBuilder.analyse)
+  const analyseAction = useAction(anyApi.ai.argumentBuilder.analyse);
+
   const handleAnalyse = async () => {
     if (!argument.trim() || !areaOfLaw) return;
     setLoading(true);
     setAnalysis(null);
 
-    // Simulated delay — replace with actual Convex action call
-    await new Promise((r) => setTimeout(r, 2500));
-
-    setAnalysis({
-      overallAssessment:
-        "The skeleton argument demonstrates a solid understanding of the legal principles at play. The IRAC structure is present but could be strengthened, particularly in the application section which requires more detailed factual analysis. The argument would benefit from addressing the opposing position more directly.",
-      strengths: [
-        {
-          point: "Clear issue identification",
-          detail:
-            "The legal question is framed precisely and demonstrates understanding of the jurisdictional scope.",
-        },
-        {
-          point: "Appropriate authority selection",
-          detail:
-            "The cases cited are relevant and from the correct level of court hierarchy for binding precedent.",
-        },
-      ],
-      weaknesses: [
-        {
-          point: "Insufficient factual application",
-          detail:
-            "The argument moves from rule statement to conclusion too quickly. Apply each element of the test to the specific facts, showing how each is satisfied (or not).",
-        },
-        {
-          point: "Missing policy considerations",
-          detail:
-            "Modern UK courts often consider policy implications. Consider whether your argument creates a principled limit or risks opening the floodgates.",
-        },
-      ],
-      missingAuthorities: [
-        {
-          case: "Caparo Industries plc v Dickman [1990] 2 AC 605",
-          relevance:
-            "Establishes the three-stage test for duty of care — your argument should engage with all three stages.",
-        },
-        {
-          case: "Robinson v Chief Constable [2018] UKSC 4",
-          relevance:
-            "The Supreme Court clarified the incremental approach — relevant to novel duty situations.",
-        },
-      ],
-      counterArguments: [
-        {
-          point:
-            "The opposing side will argue that the factual matrix is distinguishable from the authorities you cite.",
-          response:
-            "Prepare to demonstrate the ratio decidendi of your authorities covers the present facts, emphasising the common underlying principle rather than surface-level facts.",
-        },
-        {
-          point:
-            "Policy argument: extending liability in this way may create indeterminate liability.",
-          response:
-            'Address the "floodgates" concern directly by articulating a clear limiting principle.',
-        },
-      ],
-      logicalGaps: [
-        {
-          gap: "The link between the rule statement and its application to facts is underdeveloped.",
-          suggestion:
-            "Break the rule into its constituent elements and address each one separately with specific factual references.",
-        },
-      ],
-      iracCompliance: {
-        issue: {
-          score: 4,
-          feedback:
-            "Well-framed legal question that identifies the specific point of law in dispute.",
-        },
-        rule: {
-          score: 3.5,
-          feedback:
-            "Relevant authorities cited but the rule could be stated more precisely. Consider articulating the legal test as a numbered series of elements.",
-        },
-        application: {
-          score: 2.5,
-          feedback:
-            "This is the weakest section. Each element of the rule must be methodically applied to the facts. Currently too conclusory.",
-        },
-        conclusion: {
-          score: 3.5,
-          feedback:
-            "Logically follows from the argument but would be stronger with a statement of the remedy sought.",
-        },
-      },
-      revisedOutline:
-        "1. Open with the precise legal question\n2. State the governing test (cite authority)\n3. Break the test into elements\n4. Apply element 1 to facts (with evidence)\n5. Apply element 2 to facts (with evidence)\n6. Apply element 3 to facts (with evidence)\n7. Address the strongest counter-argument\n8. Conclude with remedy sought",
-      overallScore: 6.5,
-    });
-
-    setLoading(false);
+    try {
+      const result: any = await analyseAction({
+        argument,
+        side,
+        areaOfLaw,
+        authorities: authorities ? authorities.split(",").map((a: string) => a.trim()).filter(Boolean) : undefined,
+      });
+      setAnalysis(result.analysis);
+    } catch {
+      // Convex action failed — show nothing
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
