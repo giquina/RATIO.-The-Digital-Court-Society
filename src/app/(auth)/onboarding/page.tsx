@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import { useMutation } from "convex/react";
 import { anyApi } from "convex/server";
 import { UK_UNIVERSITIES, UK_UNIVERSITIES_BY_REGION, UK_REGIONS } from "@/lib/constants/uk-universities";
@@ -31,7 +30,6 @@ const STUDENT_STEPS = ["University", "Year", "Modules", "Chamber"];
 const PROFESSIONAL_STEPS = ["Role", "Firm", "Practice Areas", "Chamber"];
 
 export default function OnboardingPage() {
-  const router = useRouter();
   const createProfile = useMutation(anyApi.users.createProfile);
   const claimMyReferral = useMutation(anyApi.referrals.claimMyReferral);
   const linkProfileToReferral = useMutation(anyApi.referrals.linkProfileToReferral);
@@ -204,7 +202,8 @@ export default function OnboardingPage() {
 
       localStorage.removeItem(STORAGE_KEY);
       localStorage.removeItem("ratio_pending_name");
-      router.push("/home");
+      // Full reload to avoid Next.js parallelRoutes crash when crossing (auth)→(app) layout boundary
+      window.location.href = "/home";
     } catch (err) {
       courtToast.error("Failed to create profile. Please try again.");
       setSaving(false);
@@ -214,7 +213,8 @@ export default function OnboardingPage() {
   const handleSkip = () => {
     localStorage.removeItem(STORAGE_KEY);
     skipOnboarding();
-    router.push("/home");
+    // Full reload to avoid Next.js parallelRoutes crash when crossing (auth)→(app) layout boundary
+    window.location.href = "/home";
   };
 
   // ── Render helpers ──

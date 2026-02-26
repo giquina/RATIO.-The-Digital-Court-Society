@@ -8,6 +8,8 @@ import { FeatureShowcase } from "./FeatureShowcase";
 import { LiveSessionSnippet } from "./LiveSessionSnippet";
 import { ConstitutionalLaw } from "./ConstitutionalLaw";
 import { RecruitmentPromo } from "./RecruitmentPromo";
+import { AIJudgeVideo } from "./AIJudgeVideo";
+import { AnalyticsFeedbackVideo } from "./AnalyticsFeedbackVideo";
 import {
   ThumbnailGeneral,
   ThumbnailAIPractice,
@@ -92,6 +94,26 @@ export const RemotionRoot: React.FC = () => {
         id="ConstitutionalLaw"
         component={ConstitutionalLaw}
         durationInFrames={FPS * 55}
+        fps={FPS}
+        width={393}
+        height={852}
+      />
+
+      {/* 55-second AI Judge promo — features walkthrough */}
+      <Composition
+        id="AIJudgeVideo"
+        component={AIJudgeVideo}
+        durationInFrames={FPS * 55}
+        fps={FPS}
+        width={393}
+        height={852}
+      />
+
+      {/* 50-second analytics & feedback showcase — performance tracking promo */}
+      <Composition
+        id="AnalyticsFeedbackVideo"
+        component={AnalyticsFeedbackVideo}
+        durationInFrames={FPS * 50}
         fps={FPS}
         width={393}
         height={852}

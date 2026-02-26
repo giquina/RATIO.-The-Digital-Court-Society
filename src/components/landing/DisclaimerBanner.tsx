@@ -11,6 +11,12 @@ const VERIFICATION_POINTS = [
   "Use OSCOLA citation format for all academic and professional work",
 ];
 
+const AI_DATA_SOURCES = [
+  { label: "Case Law", detail: "Find Case Law — UK National Archives" },
+  { label: "Legislation", detail: "legislation.gov.uk (The National Archives)" },
+  { label: "Parliamentary Data", detail: "UK Parliament Open Data API" },
+];
+
 export function DisclaimerBanner() {
   const [expanded, setExpanded] = useState(false);
 
@@ -54,7 +60,25 @@ export function DisclaimerBanner() {
                 not constitute legal advice. AI-generated analysis should always be
                 verified against primary legislation and official law reports.
               </p>
-              <div className="space-y-2">
+
+              {/* AI Data Sources */}
+              <p className="text-court-xs text-court-text-sec font-semibold uppercase tracking-widest mb-2">
+                Where the AI gets its data
+              </p>
+              <div className="space-y-1.5 mb-4">
+                {AI_DATA_SOURCES.map((source) => (
+                  <p key={source.label} className="text-court-xs text-court-text-ter leading-relaxed flex items-start gap-2">
+                    <span className="text-gold mt-px shrink-0">·</span>
+                    <span><span className="text-court-text-sec font-medium">{source.label}:</span> {source.detail}</span>
+                  </p>
+                ))}
+              </div>
+
+              {/* Verification Points */}
+              <p className="text-court-xs text-court-text-sec font-semibold uppercase tracking-widest mb-2">
+                Always verify
+              </p>
+              <div className="space-y-1.5">
                 {VERIFICATION_POINTS.map((point) => (
                   <p key={point} className="text-court-xs text-court-text-ter leading-relaxed flex items-start gap-2">
                     <span className="text-court-text-ter mt-px shrink-0">·</span>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useConvexAuth } from "convex/react";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { Loader2 } from "lucide-react";
 
@@ -12,7 +12,6 @@ const AUTH_FLOW_ROUTES = ["/onboarding", "/register"];
 
 function AuthLayoutWithConvex({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useConvexAuth();
-  const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
@@ -20,9 +19,10 @@ function AuthLayoutWithConvex({ children }: { children: React.ReactNode }) {
     if (AUTH_FLOW_ROUTES.includes(pathname)) return;
     // If user is already authenticated, redirect to home
     if (!isLoading && isAuthenticated) {
-      router.replace("/home");
+      // Full reload to avoid Next.js parallelRoutes crash when crossing (auth)→(app) layout boundary
+      window.location.href = "/home";
     }
-  }, [isAuthenticated, isLoading, router, pathname]);
+  }, [isAuthenticated, isLoading, pathname]);
 
   // While auth is hydrating, show a loading state to prevent
   // the login form from flashing before a redirect fires.

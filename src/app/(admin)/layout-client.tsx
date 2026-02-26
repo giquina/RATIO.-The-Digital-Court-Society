@@ -1,7 +1,7 @@
 "use client";
 
 import { useConvexAuth, useQuery } from "convex/react";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Loader2, Shield, BarChart3, Users, PoundSterling, Activity, ChevronLeft, Brain, Briefcase } from "lucide-react";
 import { anyApi } from "convex/server";
@@ -90,7 +90,6 @@ function AdminShell({ children }: { children: React.ReactNode }) {
 
 function AdminLayoutWithConvex({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useConvexAuth();
-  const router = useRouter();
   const adminRole = useQuery(
     anyApi.admin.getMyAdminRole,
     isAuthenticated ? {} : "skip"
@@ -100,19 +99,21 @@ function AdminLayoutWithConvex({ children }: { children: React.ReactNode }) {
   // Redirect unauthenticated users
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      router.push("/login");
+      // Full reload to avoid Next.js parallelRoutes crash when crossing (admin)→(auth) layout boundary
+      window.location.href = "/login";
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [isAuthenticated, isLoading]);
 
   // Redirect non-admins
   useEffect(() => {
     if (isAuthenticated && adminRole !== undefined) {
       setCheckedAuth(true);
       if (adminRole === null) {
-        router.push("/home");
+        // Full reload to avoid Next.js parallelRoutes crash when crossing (admin)→(app) layout boundary
+        window.location.href = "/home";
       }
     }
-  }, [isAuthenticated, adminRole, router]);
+  }, [isAuthenticated, adminRole]);
 
   // Loading state
   if (isLoading || !checkedAuth) {

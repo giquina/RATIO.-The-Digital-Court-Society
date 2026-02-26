@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { Lock, ArrowRight } from "lucide-react";
 import { useAuthStore, getProfileCompletion } from "@/stores/authStore";
 
@@ -9,7 +8,6 @@ import { useAuthStore, getProfileCompletion } from "@/stores/authStore";
  * Shows a locked overlay when the profile is incomplete.
  */
 export function ProfileGate({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
   const profile = useAuthStore((s) => s.profile);
   const { isComplete } = getProfileCompletion(profile);
 
@@ -35,7 +33,7 @@ export function ProfileGate({ children }: { children: React.ReactNode }) {
             Complete your Advocate profile to unlock this feature. It only takes a moment.
           </p>
           <button
-            onClick={() => router.push("/onboarding")}
+            onClick={() => { window.location.href = "/onboarding"; }}
             className="w-full bg-gold text-navy font-bold rounded-xl py-3 text-court-base flex items-center justify-center gap-2 hover:bg-gold/90 transition-colors"
           >
             Complete Profile
@@ -52,7 +50,6 @@ export function ProfileGate({ children }: { children: React.ReactNode }) {
  * Dismissible per session.
  */
 export function ProfileCompletionBanner() {
-  const router = useRouter();
   const profile = useAuthStore((s) => s.profile);
   const profileSkipped = useAuthStore((s) => s.profileSkipped);
   const { percentage, isComplete } = getProfileCompletion(profile);
@@ -71,7 +68,7 @@ export function ProfileCompletionBanner() {
         <p className="text-court-sm text-court-text-sec">Complete your profile to unlock all features.</p>
       </div>
       <button
-        onClick={() => router.push("/onboarding")}
+        onClick={() => { window.location.href = "/onboarding"; }}
         className="flex-shrink-0 text-court-sm font-bold text-gold px-3 py-1.5 border border-gold/30 rounded-lg hover:bg-gold/10 transition-colors"
       >
         Finish

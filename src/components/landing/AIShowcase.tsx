@@ -119,6 +119,13 @@ export function AIShowcase({ id }: { id?: string }) {
             </div>
           </div>
         </div>
+
+        {/* AI Disclaimer */}
+        <p className="text-[10px] text-court-text-ter leading-relaxed mt-4 pt-3 border-t border-court-border-light">
+          AI Judge uses case law sourced from the UK National Archives.
+          Educational tool only — feedback is not reviewed by qualified lawyers
+          and should not be treated as legal advice.
+        </p>
       </div>
     </motion.section>
   );

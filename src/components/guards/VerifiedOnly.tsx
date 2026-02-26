@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/authStore";
 import { Card, Button } from "@/components/ui";
 import { Shield, AlertTriangle, ArrowRight } from "lucide-react";
@@ -11,7 +10,6 @@ interface VerifiedOnlyProps {
 }
 
 export function VerifiedOnly({ children, fallbackMessage }: VerifiedOnlyProps) {
-  const router = useRouter();
   const profile = useAuthStore((s) => s.profile);
 
   const isVerified = profile?.isVerified ?? false;
@@ -30,7 +28,7 @@ export function VerifiedOnly({ children, fallbackMessage }: VerifiedOnlyProps) {
           Your student verification has expired. Please re-verify to continue
           accessing institutional features.
         </p>
-        <Button onClick={() => router.push("/verify")}>
+        <Button onClick={() => { window.location.href = "/verify"; }}>
           <span className="flex items-center gap-2">
             Re-verify Now <ArrowRight size={14} />
           </span>
@@ -59,7 +57,7 @@ export function VerifiedOnly({ children, fallbackMessage }: VerifiedOnlyProps) {
             email to confirm your university status.
           </p>
         </Card>
-        <Button onClick={() => router.push("/verify")}>
+        <Button onClick={() => { window.location.href = "/verify"; }}>
           <span className="flex items-center gap-2">
             Verify Your Status <ArrowRight size={14} />
           </span>

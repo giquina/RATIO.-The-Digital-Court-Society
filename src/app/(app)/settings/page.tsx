@@ -155,7 +155,8 @@ export default function SettingsPage() {
     setSigningOut(true);
     try {
       await signOut();
-      router.push("/login");
+      // Full reload to avoid Next.js parallelRoutes crash when crossing (app)→(auth) layout boundary
+      window.location.href = "/login";
     } catch {
       setSigningOut(false);
       courtToast.error("Failed to sign out");

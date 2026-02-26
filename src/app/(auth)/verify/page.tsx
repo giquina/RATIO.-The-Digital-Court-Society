@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { useMutation, useQuery } from "convex/react";
 import { anyApi } from "convex/server";
 import { Card, Button, Tag } from "@/components/ui";
@@ -22,7 +21,6 @@ import {
 type VerifyStep = "method" | "email" | "manual" | "pending" | "verified";
 
 export default function VerifyPage() {
-  const router = useRouter();
   const [step, setStep] = useState<VerifyStep>("method");
   const [email, setEmail] = useState("");
   const [emailSent, setEmailSent] = useState(false);
@@ -33,6 +31,7 @@ export default function VerifyPage() {
 
   const submitEmailVerification = useMutation(anyApi.verification.submitEmailVerification);
   const submitManualVerification = useMutation(anyApi.verification.submitManualVerification);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const verificationStatus: any = useQuery(anyApi.verification.myVerificationStatus);
 
   // If user already has a pending or approved verification, reflect that
@@ -177,7 +176,7 @@ export default function VerifyPage() {
 
           {/* Skip for now */}
           <button
-            onClick={() => router.push("/home")}
+            onClick={() => window.location.href = "/home"}
             className="w-full text-center text-court-sm text-court-text-ter hover:text-gold transition-colors mt-6"
           >
             Skip for now — you can verify later in Settings
@@ -347,7 +346,7 @@ export default function VerifyPage() {
               </div>
             </div>
           </Card>
-          <Button onClick={() => router.push("/home")} variant="secondary" fullWidth>
+          <Button onClick={() => window.location.href = "/home"} variant="secondary" fullWidth>
             Continue to Ratio
           </Button>
         </div>
@@ -366,7 +365,7 @@ export default function VerifyPage() {
             Your student status has been verified. You now have full access to
             all governance and institutional features.
           </p>
-          <Button onClick={() => router.push("/home")} fullWidth>
+          <Button onClick={() => window.location.href = "/home"} fullWidth>
             Enter Ratio
           </Button>
         </div>

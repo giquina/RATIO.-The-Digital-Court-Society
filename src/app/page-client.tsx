@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useConvexAuth } from "convex/react";
 import { captureUTMParams } from "@/lib/utils/utm";
+import { PromoBanner } from "@/components/shared/PromoBanner";
 
 const CONVEX_URL = process.env.NEXT_PUBLIC_CONVEX_URL;
 
@@ -166,6 +167,7 @@ function LandingShell({ isAuthenticated }: { isAuthenticated: boolean }) {
 
       {/* Floating "Join Free" pill + Back to Top button */}
       <FloatingActions isAuthenticated={isAuthenticated} />
+      <PromoBanner />
     </div>
     </FirstVisitSplash>
   );

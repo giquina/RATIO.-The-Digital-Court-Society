@@ -73,14 +73,16 @@ function AppLayoutWithConvex({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
+      // Full reload to avoid Next.js parallelRoutes crash when crossing (app)→(auth) layout boundary
+      window.location.href = `/login?redirect=${encodeURIComponent(pathname)}`;
     }
   }, [isAuthenticated, isLoading, router]);
 
   // Redirect to onboarding if authenticated but no profile
   useEffect(() => {
     if (isAuthenticated && hasProfile === false) {
-      router.push("/onboarding");
+      // Full reload to avoid Next.js parallelRoutes crash when crossing (app)→(auth) layout boundary
+      window.location.href = "/onboarding";
     }
   }, [isAuthenticated, hasProfile, router]);
 

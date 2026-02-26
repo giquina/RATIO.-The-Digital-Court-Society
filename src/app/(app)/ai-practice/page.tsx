@@ -721,6 +721,24 @@ function AIPracticePageInner() {
         </div>
         </div>
 
+        {/* AI Disclaimer */}
+        <div className="px-4 mt-3">
+          <div className="px-3 py-2.5 rounded-lg bg-white/[0.02] border border-court-border-light">
+            <div className="flex items-start gap-2">
+              <AlertCircle size={13} className="text-court-text-ter shrink-0 mt-0.5" />
+              <div>
+                <p className="text-court-xs text-court-text-ter leading-relaxed">
+                  <span className="font-semibold text-court-text-sec">AI Simulation.</span>{" "}
+                  The AI Judge uses case law sourced from the UK National Archives.
+                  Feedback is educational only, may contain inaccuracies, and has not been
+                  reviewed by a qualified lawyer. Always verify against primary sources and
+                  seek guidance from your tutors.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Sticky CTA buttons — always visible */}
         <div className="shrink-0 px-4 pt-3 pb-1 border-t border-court-border-light/20 bg-navy">
           {aiUserContext?.userType === "professional" && (
@@ -1121,9 +1139,20 @@ function AIPracticePageInner() {
         </div>
       </div>
 
-      <p className="text-court-xs text-court-text-ter text-center px-4 mt-4 mb-2">
-        AI-generated for educational purposes. Verify against primary sources.
-      </p>
+      {/* AI Disclaimer */}
+      <div className="px-4 mt-4 mb-2">
+        <div className="px-3 py-2.5 rounded-lg bg-white/[0.02] border border-court-border-light max-w-xl mx-auto">
+          <div className="flex items-start gap-2">
+            <AlertCircle size={12} className="text-court-text-ter shrink-0 mt-0.5" />
+            <p className="text-court-xs text-court-text-ter leading-relaxed">
+              <span className="font-semibold text-court-text-sec">AI-generated feedback.</span>{" "}
+              Scores and written judgment produced by AI using case law from the
+              UK National Archives. Not reviewed by a qualified legal professional.
+              Use as a learning guide alongside guidance from your tutors.
+            </p>
+          </div>
+        </div>
+      </div>
       </div>
 
       {/* Sticky CTAs */}
