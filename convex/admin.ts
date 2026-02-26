@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { query, mutation } from "./_generated/server";
+import { internal } from "./_generated/api";
 import { auth } from "./auth";
 
 // ── Price mapping (pence per month) ──
@@ -472,5 +473,217 @@ export const seedOwnerRole = mutation({
       role: "owner",
       grantedAt: new Date().toISOString(),
     });
+  },
+});
+
+// ════════════════════════════════════════════
+// ADVOCATE DETAIL (single profile deep-dive)
+// ════════════════════════════════════════════
+
+export const getAdvocateDetail = query({
+  args: { profileId: v.id("profiles") },
+  handler: async (ctx, args) => {
+    const userId = await auth.getUserId(ctx);
+    const admin = await requireAdmin(ctx, userId);
+    if (!admin) return null;
+
+    const profile = await ctx.db.get(args.profileId);
+    if (!profile) return null;
+
+    // User email
+    const user = await ctx.db.get(profile.userId);
+    const email = user?.email ?? "—";
+
+    // Subscription
+    const subscription = await ctx.db
+      .query("subscriptions")
+      .withIndex("by_user", (q: any) => q.eq("userId", profile.userId))
+      .first();
+
+    // Recent AI sessions (last 10)
+    const allAiSessions = await ctx.db
+      .query("aiSessions")
+      .withIndex("by_profile", (q: any) => q.eq("profileId", args.profileId))
+      .order("desc")
+      .take(10);
+
+    const recentAiSessions = allAiSessions.map((s) => ({
+      _id: s._id,
+      mode: s.mode,
+      areaOfLaw: s.areaOfLaw,
+      caseTitle: s.caseTitle,
+      status: s.status,
+      durationSeconds: s.durationSeconds,
+      overallScore: s.overallScore,
+      messageCount: s.transcript.length,
+      createdAt: new Date(s._creationTime).toISOString(),
+    }));
+
+    // Activity count
+    const activities = await ctx.db
+      .query("activities")
+      .withIndex("by_profile", (q: any) => q.eq("profileId", args.profileId))
+      .collect();
+    const activityCount = activities.length;
+
+    return {
+      profile: {
+        ...profile,
+        joinedAt: new Date(profile._creationTime).toISOString(),
+      },
+      email,
+      subscription: subscription
+        ? {
+            plan: subscription.plan,
+            status: subscription.status,
+            currentPeriodEnd: subscription.currentPeriodEnd,
+            cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
+          }
+        : { plan: "free", status: "none", currentPeriodEnd: null, cancelAtPeriodEnd: null },
+      recentAiSessions,
+      activityCount,
+    };
+  },
+});
+
+// ════════════════════════════════════════════
+// UPDATE ADVOCATE PROFILE (admin edit)
+// ════════════════════════════════════════════
+
+export const updateAdvocateProfile = mutation({
+  args: {
+    profileId: v.id("profiles"),
+    rank: v.optional(v.string()),
+    isAmbassador: v.optional(v.boolean()),
+    ambassadorTier: v.optional(v.string()),
+    bio: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const userId = await auth.getUserId(ctx);
+    const admin = await requireAdmin(ctx, userId);
+    if (!admin) return null;
+
+    const profile = await ctx.db.get(args.profileId);
+    if (!profile) throw new Error("Profile not found");
+
+    const updates: Record<string, any> = {};
+    if (args.rank !== undefined) updates.rank = args.rank;
+    if (args.isAmbassador !== undefined) updates.isAmbassador = args.isAmbassador;
+    if (args.ambassadorTier !== undefined) updates.ambassadorTier = args.ambassadorTier;
+    if (args.bio !== undefined) updates.bio = args.bio;
+
+    // If promoting to ambassador, set ambassadorSince if not already set
+    if (args.isAmbassador === true && !profile.isAmbassador) {
+      updates.ambassadorSince = new Date().toISOString();
+    }
+
+    await ctx.db.patch(args.profileId, updates);
+    return { success: true };
+  },
+});
+
+// ════════════════════════════════════════════
+// SEND ADMIN EMAIL (to a specific advocate)
+// ════════════════════════════════════════════
+
+export const sendAdminEmail = mutation({
+  args: {
+    profileId: v.id("profiles"),
+    subject: v.string(),
+    message: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const userId = await auth.getUserId(ctx);
+    const admin = await requireAdmin(ctx, userId);
+    if (!admin) return null;
+
+    const profile = await ctx.db.get(args.profileId);
+    if (!profile) throw new Error("Profile not found");
+
+    const user = await ctx.db.get(profile.userId);
+    if (!user?.email) throw new Error("User has no email address");
+
+    // Wrap the message in a simple branded HTML template
+    const html = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width"></head>
+<body style="background-color:#0C1220;font-family:'DM Sans',-apple-system,sans-serif;margin:0;padding:0">
+<div style="max-width:560px;margin:0 auto;padding:32px 24px">
+  <div style="text-align:center;padding-bottom:24px">
+    <p style="font-family:'Cormorant Garamond',Georgia,serif;font-size:24px;font-weight:700;color:#F2EDE6;letter-spacing:0.12em;margin:0">RATIO<span style="color:#C9A84C">.</span></p>
+  </div>
+  <p style="font-family:'Cormorant Garamond',Georgia,serif;font-size:20px;font-weight:700;color:#F2EDE6;line-height:26px;margin:0 0 16px">${args.subject}</p>
+  <p style="color:rgba(242,237,230,0.6);font-size:14px;line-height:22px;margin:0 0 12px">Dear ${profile.fullName},</p>
+  <div style="color:rgba(242,237,230,0.6);font-size:14px;line-height:22px;margin:0 0 24px;white-space:pre-wrap">${args.message}</div>
+  <hr style="border-color:rgba(255,255,255,0.06);margin:32px 0 16px">
+  <div style="text-align:center">
+    <p style="color:rgba(242,237,230,0.3);font-size:11px;line-height:16px;margin:0">Ratio — The Digital Court Society</p>
+  </div>
+</div>
+</body>
+</html>`.trim();
+
+    // Schedule the email action (mutations can't call actions directly)
+    await ctx.scheduler.runAfter(0, internal.email.send, {
+      to: user.email,
+      subject: args.subject,
+      html,
+    });
+
+    return { success: true, sentTo: user.email };
+  },
+});
+
+// ════════════════════════════════════════════
+// EXPORT ADVOCATES CSV (flat array for export)
+// ════════════════════════════════════════════
+
+export const exportAdvocatesCsv = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await auth.getUserId(ctx);
+    const admin = await requireAdmin(ctx, userId);
+    if (!admin) return null;
+
+    const profiles = await ctx.db.query("profiles").order("desc").collect();
+
+    const rows = [];
+    for (const p of profiles) {
+      // Look up user email
+      const user = await ctx.db.get(p.userId);
+      const email = user?.email ?? "—";
+
+      // Look up subscription
+      const sub = await ctx.db
+        .query("subscriptions")
+        .withIndex("by_user", (q: any) => q.eq("userId", p.userId))
+        .first();
+
+      // Look up last activity for "last active"
+      const lastActivity = await ctx.db
+        .query("activities")
+        .withIndex("by_profile", (q: any) => q.eq("profileId", p._id))
+        .order("desc")
+        .first();
+
+      rows.push({
+        name: p.fullName,
+        email,
+        university: p.universityShort ?? p.university ?? "—",
+        rank: p.rank,
+        plan: sub?.plan ?? "free",
+        totalMoots: p.totalMoots,
+        totalPoints: p.totalPoints,
+        totalHours: p.totalHours,
+        joinedDate: new Date(p._creationTime).toISOString(),
+        lastActive: lastActivity
+          ? new Date(lastActivity._creationTime).toISOString()
+          : "—",
+        userType: p.userType ?? "student",
+      });
+    }
+
+    return rows;
   },
 });

@@ -15,9 +15,11 @@ import {
   GraduationCap,
   Loader2,
   UserX,
+  Download,
 } from "lucide-react";
 import { cn } from "@/lib/utils/helpers";
 import { PLAN_LABELS, PLAN_ORDER } from "@/lib/constants/stripe";
+import AdvocateDetailDrawer from "./AdvocateDetailDrawer";
 
 // ── Constants ──
 
@@ -154,6 +156,35 @@ export default function AdvocatesPage() {
   const [rankFilter, setRankFilter] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [offset, setOffset] = useState(0);
+  const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null);
+  const [exporting, setExporting] = useState(false);
+
+  // CSV export data (lazy — only fetched when needed)
+  const csvData: any[] | null | undefined = useQuery(anyApi.admin.exportAdvocatesCsv, exporting ? {} : "skip");
+
+  // Trigger CSV download when data arrives
+  const handleExportCsv = useCallback(() => {
+    setExporting(true);
+  }, []);
+
+  // Download when data arrives
+  if (exporting && csvData && csvData.length > 0) {
+    const headers = ["Name", "Email", "University", "Rank", "Plan", "Moots", "Points", "Hours", "Joined", "Last Active", "Type"];
+    const rows = csvData.map((r: any) => [
+      r.name, r.email, r.university, r.rank, r.plan,
+      r.totalMoots, r.totalPoints, r.totalHours,
+      r.joinedDate?.slice(0, 10) ?? "", r.lastActive?.slice(0, 10) ?? "", r.userType,
+    ]);
+    const csv = [headers, ...rows].map((r) => r.map((c: any) => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `ratio-advocates-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    setExporting(false);
+  }
 
   // Build query args — only include defined filters
   const queryArgs = useMemo(() => {
@@ -249,13 +280,23 @@ export default function AdvocatesPage() {
     <div className="p-6 md:p-8">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="font-serif text-court-xl text-court-text font-bold">
-            Advocates
-          </h1>
-          <p className="text-court-text-sec text-court-sm mt-1">
-            {total} advocate{total !== 1 ? "s" : ""} registered
-          </p>
+        <div className="flex items-start justify-between mb-8">
+          <div>
+            <h1 className="font-serif text-court-xl text-court-text font-bold">
+              Advocates
+            </h1>
+            <p className="text-court-text-sec text-court-sm mt-1">
+              {total} advocate{total !== 1 ? "s" : ""} registered
+            </p>
+          </div>
+          <button
+            onClick={handleExportCsv}
+            disabled={exporting}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-court-xs font-medium bg-white/5 text-court-text-sec border border-court-border hover:bg-white/10 hover:text-court-text transition-colors"
+          >
+            <Download size={14} />
+            {exporting ? "Exporting..." : "Export CSV"}
+          </button>
         </div>
 
         {/* Search + Filter Controls */}
@@ -406,7 +447,8 @@ export default function AdvocatesPage() {
                 {advocates.map((adv: any) => (
                   <div
                     key={adv.id}
-                    className="group hover:bg-white/[0.02] transition-colors"
+                    onClick={() => setSelectedProfileId(adv.id)}
+                    className="group hover:bg-white/[0.02] transition-colors cursor-pointer"
                   >
                     {/* Desktop row */}
                     <div className="hidden lg:grid grid-cols-[1fr_160px_100px_100px_80px_80px_80px] gap-3 items-center px-4 py-3">
@@ -515,6 +557,12 @@ export default function AdvocatesPage() {
           )}
         </div>
       </div>
+
+      {/* Detail Drawer */}
+      <AdvocateDetailDrawer
+        profileId={selectedProfileId}
+        onClose={() => setSelectedProfileId(null)}
+      />
     </div>
   );
 }
