@@ -862,6 +862,33 @@ export default defineSchema({
     .index("by_email", ["email"]),
 
   // ═══════════════════════════════════════════
+  // CAREER APPLICATIONS
+  // ═══════════════════════════════════════════
+  careerApplications: defineTable({
+    profileId: v.optional(v.id("profiles")),
+    fullName: v.string(),
+    email: v.string(),
+    university: v.optional(v.string()),
+    yearOfStudy: v.optional(v.string()),
+    positionTitle: v.string(),
+    positionType: v.string(),
+    positionCategory: v.string(),
+    coverMessage: v.string(),
+    relevantExperience: v.optional(v.string()),
+    portfolioUrl: v.optional(v.string()),
+    cvStorageId: v.optional(v.id("_storage")),
+    cvFileName: v.optional(v.string()),
+    status: v.string(), // "pending" | "reviewing" | "shortlisted" | "rejected" | "accepted"
+    appliedAt: v.string(),
+    reviewedAt: v.optional(v.string()),
+    reviewedBy: v.optional(v.id("users")),
+    reviewNotes: v.optional(v.string()),
+  })
+    .index("by_status", ["status"])
+    .index("by_email", ["email"])
+    .index("by_position", ["positionTitle"]),
+
+  // ═══════════════════════════════════════════
   // ADMIN & ANALYTICS
   // ═══════════════════════════════════════════
   adminRoles: defineTable({

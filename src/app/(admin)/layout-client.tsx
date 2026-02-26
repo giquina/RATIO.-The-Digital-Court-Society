@@ -3,7 +3,7 @@
 import { useConvexAuth, useQuery } from "convex/react";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Loader2, Shield, BarChart3, Users, PoundSterling, Activity, ChevronLeft, Brain } from "lucide-react";
+import { Loader2, Shield, BarChart3, Users, PoundSterling, Activity, ChevronLeft, Brain, Briefcase } from "lucide-react";
 import { anyApi } from "convex/server";
 import { cn } from "@/lib/utils/helpers";
 import Link from "next/link";
@@ -15,6 +15,7 @@ const ADMIN_NAV = [
   { href: "/revenue", label: "Revenue", icon: PoundSterling },
   { href: "/advocates", label: "Advocates", icon: Users },
   { href: "/ai-usage", label: "AI Usage", icon: Brain },
+  { href: "/applications", label: "Applications", icon: Briefcase },
   { href: "/system", label: "System", icon: Activity },
 ];
 

@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Tag } from "@/components/ui";
+import { CareerApplicationForm } from "./CareerApplicationForm";
 
 // ── Position data ──
 
@@ -270,6 +271,7 @@ const CATEGORIES = [
 export default function CareersPage() {
   const [activeCategory, setActiveCategory] = useState("all");
   const [expandedRole, setExpandedRole] = useState<string | null>(null);
+  const [applyingFor, setApplyingFor] = useState<Position | null>(null);
 
   const filtered = activeCategory === "all"
     ? POSITIONS
@@ -424,12 +426,12 @@ export default function CareersPage() {
                           <span className="text-gray-500 font-bold">Compensation:</span> {pos.compensation}
                         </span>
                       </div>
-                      <a
-                        href="mailto:careers@ratiothedigitalcourtsociety.com?subject=Application: {pos.title}"
+                      <button
+                        onClick={() => setApplyingFor(pos)}
                         className="inline-flex items-center gap-2 mt-4 px-5 py-2.5 bg-[#C9A84C] text-[#0B1120] font-bold rounded-xl hover:bg-[#C9A84C]/90 transition-colors text-court-sm"
                       >
                         <Mail size={14} /> Apply Now
-                      </a>
+                      </button>
                     </div>
                   )}
                 </div>
@@ -546,7 +548,7 @@ export default function CareersPage() {
           <h2 className="font-serif text-xl font-bold text-white mb-5 text-center">How to Apply</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {[
-              { step: "1", Icon: Mail, title: "Apply", desc: "Send us an email with your name, university, which role interests you, and why." },
+              { step: "1", Icon: Mail, title: "Apply", desc: "Click Apply Now on any role, fill in the form, and upload your CV." },
               { step: "2", Icon: Users, title: "Chat", desc: "A casual video call — no formal interview pressure. Tell us what excites you." },
               { step: "3", Icon: Rocket, title: "Start", desc: "Begin contributing within a week. Real work from day one." },
             ].map((item) => (
@@ -594,12 +596,20 @@ export default function CareersPage() {
           <p className="text-gray-400 text-court-sm mb-4">
             Do not see a role that fits? Tell us what you would bring.
           </p>
-          <a
-            href="mailto:careers@ratiothedigitalcourtsociety.com"
+          <button
+            onClick={() => setApplyingFor({
+              title: "General Application",
+              type: "part-time",
+              category: "growth",
+              status: "open",
+              compensation: "",
+              description: "",
+              responsibilities: [],
+            } as any)}
             className="inline-flex items-center gap-2 px-6 py-3 bg-[#C9A84C] text-[#0B1120] font-bold rounded-xl hover:bg-[#C9A84C]/90 transition-colors text-court-sm"
           >
-            <Mail size={16} /> careers@ratiothedigitalcourtsociety.com
-          </a>
+            <Mail size={16} /> Send a General Application
+          </button>
         </motion.section>
 
         {/* Footer */}
@@ -612,6 +622,14 @@ export default function CareersPage() {
           </p>
         </div>
       </div>
+
+      {/* Application Modal */}
+      {applyingFor && (
+        <CareerApplicationForm
+          position={applyingFor}
+          onClose={() => setApplyingFor(null)}
+        />
+      )}
     </div>
   );
 }
