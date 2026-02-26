@@ -953,8 +953,9 @@ export default function AIPracticePage() {
   const keyImprovement = feedbackData?.keyImprovement || FALLBACK_KEY_IMPROVEMENT;
 
   return (
-    <div className="flex flex-col h-[calc(100dvh-140px)] md:h-[calc(100dvh-80px)]">
+    <div className="flex flex-col min-h-[calc(100dvh-140px)] md:min-h-[calc(100dvh-80px)]">
       <div className="flex-1 overflow-y-auto pb-4">
+      {/* Header — full width */}
       <div className="px-4 pt-3 pb-4">
         <h1 className="font-serif text-2xl font-bold text-court-text mb-1">Session Feedback</h1>
         <p className="text-court-sm text-court-text-sec">{displayPersonaName} · {brief.area}</p>
@@ -968,64 +969,76 @@ export default function AIPracticePage() {
         </div>
       )}
 
-      <section className="px-4 mb-4">
-        <Card highlight className="p-6 text-center">
-          <p className="text-court-xs text-court-text-ter uppercase tracking-widest mb-2">Overall Score</p>
-          <div className="relative w-24 h-24 mx-auto">
-            <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
-              <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="6" />
-              <circle cx="50" cy="50" r="42" fill="none" stroke="#C9A84C" strokeWidth="6"
-                strokeDasharray={`${(parseFloat(overall) / 5) * 264} 264`} strokeLinecap="round" />
-            </svg>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="font-serif text-3xl font-bold text-gold">{overall}</span>
-            </div>
-          </div>
-          <p className="text-court-sm text-court-text-sec mt-2">out of 5.0</p>
-        </Card>
-      </section>
-      <section className="px-4 mb-4">
-        <Card className="p-4">
-          <h3 className="font-serif text-court-base font-bold text-court-text mb-3">Assessment Breakdown</h3>
-          {FEEDBACK_DIMENSIONS.map((dim) => {
-            const score = scores[dim.key as keyof typeof scores] as number | undefined;
-            const safeScore = score ?? 0;
-            return (
-              <div key={dim.key} className="mb-3 last:mb-0">
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-court-sm text-court-text-sec flex items-center gap-1"><DynamicIcon name={dim.icon} size={12} className="text-court-text-sec" /> {dim.label}</span>
-                  <span className="text-court-sm font-bold text-court-text">{safeScore.toFixed(1)}</span>
+      {/* Two-column grid on desktop, single column on mobile */}
+      <div className="px-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* LEFT COLUMN — Scores */}
+        <div className="flex flex-col gap-4">
+          {/* Overall Score — compact on desktop */}
+          <Card highlight className="p-4 md:p-5 text-center">
+            <div className="md:flex md:items-center md:gap-4 md:text-left">
+              <div className="relative w-20 h-20 md:w-16 md:h-16 mx-auto md:mx-0 shrink-0">
+                <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
+                  <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="6" />
+                  <circle cx="50" cy="50" r="42" fill="none" stroke="#C9A84C" strokeWidth="6"
+                    strokeDasharray={`${(parseFloat(overall) / 5) * 264} 264`} strokeLinecap="round" />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="font-serif text-2xl md:text-xl font-bold text-gold">{overall}</span>
                 </div>
-                <ProgressBar pct={(safeScore / 5) * 100} color={safeScore >= 4 ? "green" : safeScore >= 3 ? "gold" : "red"} />
               </div>
-            );
-          })}
-        </Card>
-      </section>
-      <section className="px-4 mb-4">
-        <Card className="p-4">
-          <h3 className="font-serif text-court-base font-bold text-court-text mb-2">Judgment</h3>
-          <p className="text-court-base text-court-text-sec leading-relaxed">{judgment}</p>
-        </Card>
-      </section>
-      <section className="px-4 mb-4">
-        <Card className="p-4 bg-gold-dim border-gold/25">
-          <h3 className="text-court-xs text-gold uppercase tracking-widest font-bold mb-2">Key Improvement</h3>
-          <p className="text-court-base text-court-text leading-relaxed">{keyImprovement}</p>
-        </Card>
-      </section>
-      <p className="text-court-xs text-court-text-ter text-center px-4 mb-4">
+              <div>
+                <p className="text-court-xs text-court-text-ter uppercase tracking-widest mt-2 md:mt-0">Overall Score</p>
+                <p className="text-court-sm text-court-text-sec">out of 5.0</p>
+              </div>
+            </div>
+          </Card>
+
+          {/* Assessment Breakdown */}
+          <Card className="p-4">
+            <h3 className="font-serif text-court-base font-bold text-court-text mb-3">Assessment Breakdown</h3>
+            {FEEDBACK_DIMENSIONS.map((dim) => {
+              const score = scores[dim.key as keyof typeof scores] as number | undefined;
+              const safeScore = score ?? 0;
+              return (
+                <div key={dim.key} className="mb-2.5 last:mb-0">
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-court-sm text-court-text-sec flex items-center gap-1"><DynamicIcon name={dim.icon} size={12} className="text-court-text-sec" /> {dim.label}</span>
+                    <span className="text-court-sm font-bold text-court-text">{safeScore.toFixed(1)}</span>
+                  </div>
+                  <ProgressBar pct={(safeScore / 5) * 100} color={safeScore >= 4 ? "green" : safeScore >= 3 ? "gold" : "red"} />
+                </div>
+              );
+            })}
+          </Card>
+        </div>
+
+        {/* RIGHT COLUMN — Written feedback */}
+        <div className="flex flex-col gap-4">
+          {/* Judgment */}
+          <Card className="p-4">
+            <h3 className="font-serif text-court-base font-bold text-court-text mb-2">Judgment</h3>
+            <p className="text-court-sm md:text-court-base text-court-text-sec leading-relaxed">{judgment}</p>
+          </Card>
+
+          {/* Key Improvement */}
+          <Card className="p-4 bg-gold-dim border-gold/25">
+            <h3 className="text-court-xs text-gold uppercase tracking-widest font-bold mb-2">Key Improvement</h3>
+            <p className="text-court-sm md:text-court-base text-court-text leading-relaxed">{keyImprovement}</p>
+          </Card>
+
+          {/* Case Note Generator */}
+          <CaseNotePanel
+            caseNote={caseNote as any}
+            isGenerating={caseNoteGenerating}
+            onGenerate={generateCaseNote}
+            error={caseNoteError}
+          />
+        </div>
+      </div>
+
+      <p className="text-court-xs text-court-text-ter text-center px-4 mt-4 mb-2">
         AI-generated for educational purposes. Verify against primary sources.
       </p>
-      {/* Case Note Generator */}
-      <section className="px-4 mb-4">
-        <CaseNotePanel
-          caseNote={caseNote as any}
-          isGenerating={caseNoteGenerating}
-          onGenerate={generateCaseNote}
-          error={caseNoteError}
-        />
-      </section>
       </div>
 
       {/* Sticky CTAs */}
