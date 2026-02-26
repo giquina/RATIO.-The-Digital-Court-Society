@@ -61,6 +61,10 @@ const FAQ_SECTIONS = [
         q: "Is the AI Judge a replacement for real mooting?",
         a: "No. The AI Judge is designed to complement traditional mooting, not replace it. It is ideal for practice between moot sessions, for students who want to build confidence before their first moot, or for focused skills development on specific advocacy dimensions.",
       },
+      {
+        q: "How accurate is the AI feedback? Is it checked by qualified lawyers?",
+        a: "AI-generated feedback is designed to be a helpful educational practice tool, but it is not reviewed by a qualified legal professional before being shown to you. The AI is trained on advocacy best practices and UK legal conventions, and we continuously refine its accuracy based on user feedback and expert input. However, it should not be treated as authoritative legal advice. Always consult your tutors, supervisors, or qualified lawyers for definitive guidance on legal arguments and technique.",
+      },
     ],
   },
   {

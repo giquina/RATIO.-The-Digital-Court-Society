@@ -36,25 +36,42 @@ export default function OnboardingPage() {
   const claimMyReferral = useMutation(anyApi.referrals.claimMyReferral);
   const linkProfileToReferral = useMutation(anyApi.referrals.linkProfileToReferral);
   const skipOnboarding = useAuthStore((s) => s.skipOnboarding);
-  const saved = loadSaved();
 
-  // ── Shared state ──
-  const [step, setStep] = useState<Step>(saved?.step ?? 0);
-  const [userType, setUserType] = useState<UserType>(saved?.userType ?? null);
-  const [chamber, setChamber] = useState(saved?.chamber ?? "");
+  // ── Shared state (initialise with safe defaults — restored from localStorage below) ──
+  const [step, setStep] = useState<Step>(0);
+  const [userType, setUserType] = useState<UserType>(null);
+  const [chamber, setChamber] = useState("");
   const [saving, setSaving] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
 
   // ── Student state ──
-  const [university, setUniversity] = useState(saved?.university ?? "");
-  const [year, setYear] = useState<number | null>(saved?.year ?? null);
-  const [modules, setModules] = useState<string[]>(saved?.modules ?? []);
+  const [university, setUniversity] = useState("");
+  const [year, setYear] = useState<number | null>(null);
+  const [modules, setModules] = useState<string[]>([]);
   const [search, setSearch] = useState("");
   const [showRegions, setShowRegions] = useState(false);
 
   // ── Professional state ──
-  const [professionalRole, setProfessionalRole] = useState(saved?.professionalRole ?? "");
-  const [firmOrChambers, setFirmOrChambers] = useState(saved?.firmOrChambers ?? "");
-  const [practiceAreas, setPracticeAreas] = useState<string[]>(saved?.practiceAreas ?? []);
+  const [professionalRole, setProfessionalRole] = useState("");
+  const [firmOrChambers, setFirmOrChambers] = useState("");
+  const [practiceAreas, setPracticeAreas] = useState<string[]>([]);
+
+  // ── Restore saved progress AFTER mount (avoids server/client hydration mismatch) ──
+  useEffect(() => {
+    const saved = loadSaved();
+    if (saved) {
+      if (saved.step != null) setStep(saved.step);
+      if (saved.userType) setUserType(saved.userType);
+      if (saved.chamber) setChamber(saved.chamber);
+      if (saved.university) setUniversity(saved.university);
+      if (saved.year != null) setYear(saved.year);
+      if (saved.modules) setModules(saved.modules);
+      if (saved.professionalRole) setProfessionalRole(saved.professionalRole);
+      if (saved.firmOrChambers) setFirmOrChambers(saved.firmOrChambers);
+      if (saved.practiceAreas) setPracticeAreas(saved.practiceAreas);
+    }
+    setHydrated(true);
+  }, []);
 
   // ── Persist progress ──
   const persist = useCallback(() => {
@@ -226,6 +243,14 @@ export default function OnboardingPage() {
 
   return (
     <div className="h-dvh flex flex-col px-4 md:px-6 lg:px-8 pt-8">
+      {/* Brief loader while restoring saved progress */}
+      {!hydrated && (
+        <div className="flex-1 flex items-center justify-center">
+          <Loader2 size={28} className="text-gold animate-spin" />
+        </div>
+      )}
+
+      {hydrated && <>
       {/* ── Progress + Skip (hidden on Step 0) ── */}
       {step > 0 && (
         <div className="mb-8 shrink-0">
@@ -615,6 +640,7 @@ export default function OnboardingPage() {
           </button>
         </div>
       )}
+      </>}
     </div>
   );
 }

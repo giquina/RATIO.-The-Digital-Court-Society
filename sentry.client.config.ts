@@ -21,5 +21,7 @@ Sentry.init({
     "Non-Error exception captured",
     "Non-Error promise rejection captured",
     /Loading chunk \d+ failed/,
+    // Browser extensions injecting scripts that conflict with React hydration
+    "Failed to execute 'appendChild' on 'Node'",
   ],
 });

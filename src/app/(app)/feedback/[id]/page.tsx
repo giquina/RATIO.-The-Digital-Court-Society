@@ -7,6 +7,7 @@ import { FEEDBACK_DIMENSIONS } from "@/lib/constants/app";
 import {
   ArrowLeft, Calendar, User, Mic, CheckCircle, AlertTriangle, Target,
 } from "lucide-react";
+import { AIDisclaimer } from "@/components/shared/AIDisclaimer";
 
 // ── Demo feedback data keyed by session ID ──
 const FEEDBACK_DATA: Record<
@@ -307,6 +308,11 @@ export default function FeedbackDetailPage() {
             ))}
           </ul>
         </Card>
+      </section>
+
+      {/* AI Disclaimer */}
+      <section className="px-4 md:px-6 lg:px-8 mt-6">
+        <AIDisclaimer variant="full" />
       </section>
 
       {/* Back Link (bottom) */}

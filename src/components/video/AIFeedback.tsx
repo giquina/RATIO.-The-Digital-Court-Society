@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronUp } from "lucide-react";
 import { Card, Button, ProgressBar, Tag } from "@/components/ui";
+import { AIDisclaimer } from "@/components/shared/AIDisclaimer";
 
 interface AIFeedbackProps {
   sessionTitle: string;
@@ -313,6 +314,9 @@ export function AIFeedback({ sessionTitle, module, duration, onClose }: AIFeedba
             </div>
           </Card>
         </motion.div>
+
+        {/* AI Disclaimer */}
+        <AIDisclaimer variant="compact" className="justify-center mb-1" />
 
         {/* Actions */}
         <div className="flex flex-col gap-2.5">
