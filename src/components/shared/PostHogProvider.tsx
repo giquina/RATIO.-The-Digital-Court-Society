@@ -24,7 +24,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import posthog from "posthog-js";
 
 const POSTHOG_KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY;
-const POSTHOG_HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com";
+const POSTHOG_HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://eu.i.posthog.com";
 const CONSENT_KEY = "ratio-cookie-consent";
 
 export function PostHogProvider() {
