@@ -183,6 +183,7 @@ export async function POST(request: Request): Promise<Response> {
           content: m.content,
         })),
       }),
+      signal: AbortSignal.timeout(40_000), // 40s server-side timeout
     });
 
     const latencyMs = Date.now() - startTime;

@@ -138,6 +138,25 @@ function AIPracticePageInner() {
     };
   }, []);
 
+  /** Fetch with a 45-second timeout so AI calls don't hang indefinitely. */
+  const fetchWithTimeout = useCallback(
+    (url: string, init: RequestInit, timeoutMs = 45_000) => {
+      const controller = new AbortController();
+      const parentSignal = abortRef.current.signal;
+
+      // Abort on unmount OR on timeout
+      const timeout = setTimeout(() => controller.abort(), timeoutMs);
+      const onParentAbort = () => controller.abort();
+      parentSignal.addEventListener("abort", onParentAbort);
+
+      return fetch(url, { ...init, signal: controller.signal }).finally(() => {
+        clearTimeout(timeout);
+        parentSignal.removeEventListener("abort", onParentAbort);
+      });
+    },
+    []
+  );
+
   // Tell the layout to hide header/nav when in active session
   useEffect(() => {
     if (screen === "session") enterSession();
@@ -313,7 +332,7 @@ function AIPracticePageInner() {
         { role: 'user', content: 'Begin the session. Provide your opening statement in character.' }
       ];
 
-      const res = await fetch('/api/ai/chat', {
+      const res = await fetchWithTimeout('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -323,7 +342,6 @@ function AIPracticePageInner() {
           temperament: mode === "judge" ? temperament : "standard",
           userContext: aiUserContext,
         }),
-        signal: abortRef.current.signal,
       });
 
       if (!mountedRef.current) return;
@@ -338,9 +356,11 @@ function AIPracticePageInner() {
           ]);
         }
       }
-    } catch {
-      // API unavailable or aborted — use fallback
+    } catch (err) {
+      // Abort (unmount/timeout) — exit silently; network error — use fallback
       if (!mountedRef.current) return;
+      if (err instanceof DOMException && err.name === "AbortError") return;
+      console.warn("[AI Opening] Fetch failed, using fallback:", err instanceof Error ? err.message : err);
     }
 
     setApiMessages((prev) => {
@@ -414,7 +434,7 @@ function AIPracticePageInner() {
     ];
 
     try {
-      const res = await fetch('/api/ai/chat', {
+      const res = await fetchWithTimeout('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -424,7 +444,6 @@ function AIPracticePageInner() {
           temperament: mode === "judge" ? temperament : "standard",
           userContext: aiUserContext,
         }),
-        signal: abortRef.current.signal,
       });
 
       if (!mountedRef.current) return;
@@ -467,8 +486,12 @@ function AIPracticePageInner() {
 
       setAiSpeaking(false);
       setIsLoading(false);
-    } catch {
+    } catch (err) {
       if (!mountedRef.current) return;
+      if (err instanceof DOMException && err.name === "AbortError") return;
+
+      console.warn("[AI Chat] Fetch failed, using fallback:", err instanceof Error ? err.message : err);
+
       const responseIdx = Math.min(exchangeCount, AI_RESPONSES.length - 1);
       const fallbackText = AI_RESPONSES[responseIdx];
 
@@ -499,7 +522,7 @@ function AIPracticePageInner() {
     const sessionDuration = 900 - timer;
 
     try {
-      const res = await fetch('/api/ai/feedback', {
+      const res = await fetchWithTimeout('/api/ai/feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -509,8 +532,7 @@ function AIPracticePageInner() {
           sessionDuration,
           userContext: aiUserContext,
         }),
-        signal: abortRef.current.signal,
-      });
+      }, 60_000); // feedback generation can take longer
 
       if (!mountedRef.current) return;
 
@@ -527,8 +549,12 @@ function AIPracticePageInner() {
       } else {
         throw new Error('Feedback API error');
       }
-    } catch {
+    } catch (err) {
       if (!mountedRef.current) return;
+      if (err instanceof DOMException && err.name === "AbortError") return;
+
+      console.warn("[AI Feedback] Fetch failed, using fallback:", err instanceof Error ? err.message : err);
+
       setFeedbackData({
         scores: FALLBACK_SCORES,
         overall: parseFloat((Object.values(FALLBACK_SCORES).reduce((a, b) => a + b, 0) / 7).toFixed(1)),
@@ -551,7 +577,7 @@ function AIPracticePageInner() {
     setCaseNoteError(null);
 
     try {
-      const res = await fetch("/api/ai/case-note", {
+      const res = await fetchWithTimeout("/api/ai/case-note", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -563,8 +589,7 @@ function AIPracticePageInner() {
           overallScore: feedbackData?.overall,
           judgment: feedbackData?.judgment,
         }),
-        signal: abortRef.current.signal,
-      });
+      }, 60_000);
 
       if (!mountedRef.current) return;
 
@@ -575,8 +600,11 @@ function AIPracticePageInner() {
       } else {
         throw new Error("Case note API error");
       }
-    } catch {
+    } catch (err) {
       if (!mountedRef.current) return;
+      if (err instanceof DOMException && err.name === "AbortError") return;
+
+      console.warn("[AI CaseNote] Fetch failed:", err instanceof Error ? err.message : err);
       setCaseNoteError("Unable to generate case note. Please try again.");
     }
 

@@ -248,6 +248,7 @@ export async function POST(request: Request): Promise<Response> {
           },
         ],
       }),
+      signal: AbortSignal.timeout(55_000), // 55s — feedback generation takes longer
     });
 
     const latencyMs = Date.now() - startTime;
