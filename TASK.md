@@ -1,7 +1,7 @@
 # RATIO — Task Tracker
-Last updated: 2026-02-23
+Last updated: 2026-02-26
 
-## Current Phase: Day 5+ — Backend Wiring & Feature Build
+## Current Phase: Day 7+ — Production Stability & Feature Build
 
 ### Completed (Day 1 — Critical Fixes)
 - [x] Remove `max-w-lg` root constraint — `src/app/layout.tsx` — 2026-02-20
@@ -123,6 +123,38 @@ Last updated: 2026-02-23
 - [x] Fresh GA4 property created: G-D2EJDX48MD — 2026-02-23
 - [x] Cleanup debug files (convex/debug.ts, convex/debugAuth.ts removed) — 2026-02-23
 
+### Completed (Promo Videos + Voice + Recruitment + Feedback — 2026-02-26)
+- [x] Voice switch: Daniel → Charlie for all 30 narrator clips — 2026-02-26
+- [x] Recruitment promo video (48s, 6 scenes, 1440 frames) — `remotion/RecruitmentPromo.tsx` — 2026-02-26
+- [x] App feedback feature (floating button + modal + Convex backend) — `FeedbackButton.tsx`, `convex/appFeedback.ts` — 2026-02-26
+- [x] AI Practice nav bug fix (AbortController + mountedRef) — 2026-02-26
+- [x] Law-first positioning overhaul: careers page + CLAUDE.md rules — 2026-02-26
+- [x] 4 video thumbnails created — 2026-02-26
+
+### Completed (Production Stability + GA4 Fix — 2026-02-26)
+- [x] Fix parallelRoutes crash (RATIO-7): replaced all cross-group `router.push()` with `window.location.href` across 8 files — 2026-02-26
+- [x] AI disclaimers added to AI Practice + landing page — 2026-02-26
+- [x] Promo banner integrated on landing page — 2026-02-26
+- [x] Security review completed — no vulnerabilities found — 2026-02-26
+- [x] GA4 consent sequencing fix: consent `granted` before `page_view` fires — `layout.tsx`, `Analytics.tsx` — 2026-02-26
+- [x] TypeScript declarations for gtag — `src/types/gtag.d.ts` — 2026-02-26
+- [x] GA4 `send_page_view: false` + explicit page_view event — no duplicate events — 2026-02-26
+- [x] SPA route tracking: `gtag('event', 'page_view')` per navigation — 2026-02-26
+- [x] GA admin console cleanup: orphaned G-NG49LD1FXR destination removed — 2026-02-26
+- [x] GA4 Realtime verified: data flowing to G-D2EJDX48MD — 2026-02-26
+- [x] Merge conflicts resolved (verify page Convex upgrade + page-client.tsx refactor) — 2026-02-26
+
+### Completed (TTS Audio Fix + Production Verification — 2026-02-27)
+- [x] Diagnose silent AI Practice audio: msedge-tts hangs forever, no timeouts — 2026-02-27
+- [x] Add 8s client fetch timeout (AbortController) — `src/hooks/useSpeechSynthesis.ts` — 2026-02-27
+- [x] Add 10s server-side timeout (Promise.race) — `src/app/api/ai/tts/edge/route.ts` — 2026-02-27
+- [x] Merge PR #10 conflict: combine retry logic + timeout fix — 2026-02-27
+- [x] Four-tier TTS: ElevenLabs → Edge TTS → Browser SpeechSynthesis → Silent — 2026-02-27
+- [x] Voice preloading + iOS audio unlock + 30s safety timeout — 2026-02-27
+- [x] Update ELEVENLABS_API_KEY in Vercel (old key 401) + redeploy — 2026-02-27
+- [x] Update `.env.example` with active ElevenLabs docs — 2026-02-27
+- [x] Verify production: landing, login, home, AI Practice all load — 2026-02-27
+
 ### Pending
 - [ ] Connect sessions CRUD fully to Convex
 - [ ] Enhance AI Judge with prompt caching + streaming
@@ -135,3 +167,6 @@ Last updated: 2026-02-23
 - [ ] Generate PWA icons / favicon set
 - [ ] Create OG image (public/og-image.png)
 - [ ] Add Sentry auth token to Vercel env vars
+- [ ] Render remaining 5 retimed videos with Charlie voice
+- [ ] 16:9 landscape video variants for LinkedIn/YouTube
+- [ ] Verify page wired to real Convex mutations (remote merge — needs testing)

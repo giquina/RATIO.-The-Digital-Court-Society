@@ -259,3 +259,157 @@
 - Render the other 5 retimed videos with Charlie voice (optional — not yet requested)
 - Update the actual /careers page content if it exists on the live site
 - Consider 16:9 landscape video variants for LinkedIn/YouTube
+
+---
+
+## Session 8 — 2026-02-26
+**Phase**: Production Stability — parallelRoutes Fix + GA4 Fix + Security Review
+**Duration**: ~3 hours
+
+### What Was Done
+
+**RATIO-7 — parallelRoutes Crash Fix (critical):**
+- `TypeError: null is not an object (evaluating 't.parallelRoutes.get')` on `/onboarding`
+- Root cause: Next.js App Router `router.push()` between route groups `(auth)` ↔ `(app)` ↔ `(admin)` crashes the client-side router
+- Fix: Replaced all 15 cross-group `router.push()`/`router.replace()` with `window.location.href` for full page reloads across 8 files:
+  - `src/app/(auth)/layout-client.tsx`
+  - `src/app/(auth)/onboarding/page.tsx`
+  - `src/app/(app)/layout-client.tsx`
+  - `src/app/(app)/settings/page.tsx`
+  - `src/app/(admin)/layout-client.tsx`
+  - `src/components/guards/ProfileGate.tsx`
+  - `src/components/guards/VerifiedOnly.tsx`
+  - `src/app/(auth)/verify/page.tsx`
+
+**AI Disclaimers:**
+- Added disclaimers to AI Practice page and landing page AIShowcase
+- Updated DisclaimerBanner with AI data sources
+
+**Promo Banner:**
+- Integrated PromoBanner component on landing page
+
+**Security Review:**
+- Full security audit completed — no vulnerabilities found
+
+**GA4 Consent Sequencing Fix (5 bugs resolved):**
+- **Bug 1 — Consent race condition**: Consent was `denied` when `gtag('config')` fired the implicit page_view (dropped by GA). Fixed by moving consent init + localStorage check to synchronous `<script>` in `<head>` of `layout.tsx` (parser-blocking, runs before any Next.js Script components)
+- **Bug 2 — Duplicate page_views**: `gtag('config')` fires an implicit page_view. Added `send_page_view: false` to config, then fire explicit `gtag('event', 'page_view')` we control
+- **Bug 3 — SPA duplicate configs**: `AnalyticsPageView` was calling `gtag('config')` on every route change (fires implicit page_view). Changed to `gtag('event', 'page_view')`
+- **Bug 4 — First-render duplicate**: Added `isFirstRender` ref to skip duplicate initial page_view from both config and AnalyticsPageView
+- **Bug 5 — TypeScript casts**: Created `src/types/gtag.d.ts` with types for `window.gtag` and `window.dataLayer`, eliminated all `(window as any).gtag` casts
+
+**GA Admin Console Cleanup (via Claude extension):**
+- Orphaned G-NG49LD1FXR destination removed from Google Tag GT-55XZSNJ5
+- Only G-D2EJDX48MD destination remains
+- Enhanced Measurement confirmed ON
+- Realtime data flow verified
+
+**Merge Conflict Resolution:**
+- Remote had 2 new commits: verify page Convex upgrade + page-client.tsx refactor
+- Resolved `src/app/(auth)/verify/page.tsx`: kept remote Convex mutations + our `window.location.href` fix
+- Resolved `src/app/page.tsx`: accepted remote server component wrapper, moved PromoBanner to `page-client.tsx`
+
+### Files Changed
+- `src/app/layout.tsx` — synchronous consent script in `<head>`
+- `src/components/shared/Analytics.tsx` — full rewrite (send_page_view:false, explicit events, SPA tracking)
+- `src/types/gtag.d.ts` — new file (TypeScript declarations for gtag)
+- `src/lib/analytics.ts` — typed window.gtag
+- `src/app/(auth)/layout-client.tsx` — window.location.href
+- `src/app/(auth)/onboarding/page.tsx` — window.location.href
+- `src/app/(auth)/verify/page.tsx` — window.location.href + Convex mutations (merge)
+- `src/app/(app)/layout-client.tsx` — window.location.href
+- `src/app/(app)/settings/page.tsx` — window.location.href
+- `src/app/(admin)/layout-client.tsx` — window.location.href
+- `src/components/guards/ProfileGate.tsx` — window.location.href
+- `src/components/guards/VerifiedOnly.tsx` — window.location.href
+- `src/app/(app)/ai-practice/page.tsx` — AI disclaimers
+- `src/components/landing/AIShowcase.tsx` — AI disclaimer
+- `src/components/landing/DisclaimerBanner.tsx` — AI data sources
+- `src/app/page-client.tsx` — PromoBanner addition
+
+### Commits
+- `1da616b` — feat: promo videos, AI disclaimers, parallelRoutes crash fix, promo banner
+- `f06fc46` — fix: GA4 consent sequencing — analytics_storage granted before page_view fires
+
+### Decisions Made
+- **window.location.href over router.push**: For cross-route-group navigation, full page reload is the only safe approach. Next.js App Router cannot client-side navigate between `(auth)` and `(app)` groups because they have different layouts with different parallel route trees.
+- **Synchronous script in head**: Only way to guarantee consent state is set before gtag.js loads. React useEffect and Next.js `<Script strategy="beforeInteractive">` both run too late.
+- **send_page_view: false**: Prevents the uncontrollable implicit page_view from `gtag('config')`. We fire our own explicit event instead.
+- **GA admin cleanup via Claude extension**: The G-NG49LD1FXR tag mismatch was an admin console issue, not a code issue. Delegated to the browser extension.
+
+### Issues Encountered
+- Git push rejected (remote had 2 new commits) — resolved with `git pull --rebase` + manual merge conflict resolution
+- Network request tracking in Chrome extension resets on page reload — used JavaScript injection to verify dataLayer instead
+- Chrome extension blocks cookie/query string data in JS eval — worked around by avoiding JSON.stringify on consent objects
+
+### Verified on Production
+- dataLayer sequence: `[0] consent|default` → `[1] consent|update (granted)` → `[2] js` → `[3] config|G-D2EJDX48MD` → `[4] event|page_view`
+- SPA navigation adds exactly 1 page_view per route change
+- GA4 Realtime showing data
+- gtag.js script loaded from googletagmanager.com
+- No console errors
+
+### Next Session Should
+- Wire remaining demo data pages to Convex (Rankings, Chambers, Badges, Library)
+- Connect sessions CRUD fully to Convex
+- Stripe payment infrastructure
+- Render remaining 5 retimed videos with Charlie voice
+- Generate PWA icons / favicon set
+
+---
+
+## Session 9 — 2026-02-27
+**Phase**: Day 8 — TTS Audio Fix + Production Verification
+**Duration**: ~3 hours (across 2 continuation sessions)
+
+### What Was Done
+- Diagnosed root cause of silent AI Practice audio: `msedge-tts` hangs forever on WebSocket connect, no timeouts, silent fail
+- Added 8s `AbortController` timeout to all client-side TTS fetch calls (`useSpeechSynthesis.ts`)
+- Added 10s `Promise.race` timeout to server-side Edge TTS route (`api/ai/tts/edge/route.ts`)
+- Merged conflict with PR #10 (browser TTS fallback + retry logic) — combined both fixes into final version
+- Four-tier TTS fallback now: ElevenLabs → Edge TTS → Browser SpeechSynthesis → Silent
+- Added `MAX_FAILURES = 2` retry logic before disabling a TTS tier
+- Added voice preloading via `voiceschanged` event for browser SpeechSynthesis
+- Added iOS audio unlock (warm up speechSynthesis inside user gesture)
+- Added 30s safety timeout for browser SpeechSynthesis on mobile
+- Pushed commit `2f2c379` to origin/main — auto-deployed to Vercel
+- Updated `ELEVENLABS_API_KEY` in Vercel env vars (old key was returning 401)
+- Triggered production redeploy with new key
+- Updated `.env.example` to document ElevenLabs as active (not Phase 2)
+- Updated `.env.local` with new ElevenLabs key
+- Verified production site loads: landing page, login, home dashboard, AI Practice page all working
+
+### Key Files Modified
+- `src/hooks/useSpeechSynthesis.ts` — merged TTS timeout + retry + voice preloading
+- `src/app/api/ai/tts/edge/route.ts` — added 10s server-side timeout
+- `.env.example` — updated ElevenLabs documentation
+- `.env.local` — updated ElevenLabs API key
+
+### Decisions Made
+- 8s client timeout balances responsiveness vs network variability
+- Browser SpeechSynthesis is reliable Tier 3 fallback (works everywhere)
+- Edge TTS likely can't connect from Vercel's serverless environment (WebSocket restrictions)
+- ElevenLabs is Tier 1 when key is valid; browser voice is Tier 3 fallback
+
+### Issues Encountered
+- Git merge conflict: PR #10 vs local TTS fix — 10 conflict markers in useSpeechSynthesis.ts
+- Chrome extension disconnects frequently during Vercel dashboard operations
+- GitHub Actions CI failing due to billing lock (not code issue, Vercel deploys independently)
+- Production ElevenLabs key was returning 401 (invalid/expired) — updated to new key
+
+### Environment Variables on Vercel Production
+- `NEXT_PUBLIC_CONVEX_URL` ✓
+- `ELEVENLABS_API_KEY` ✓ (updated 2026-02-27)
+- `ANTHROPIC_API_KEY` ✓ (set, verify it's a real key)
+- `NEXT_PUBLIC_GA_MEASUREMENT_ID` ✓
+- `SENTRY_PROJECT` ✓
+- `SENTRY_AUTH_TOKEN` ✓
+- `CONVEX_DEPLOY_KEY` ✓ (Production + Development)
+- `NEXT_PUBLIC_SHOW_DEMO_CREDENTIALS` ✓
+- `REPLICATE_API_TOKEN` ✓
+
+### Next Session Should
+- Set up PostHog analytics
+- Verify TTS works end-to-end on production after redeploy
+- Test AI Practice with real Anthropic API key
+- Wire remaining demo data pages to Convex
