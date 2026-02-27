@@ -2,6 +2,11 @@
 
 import { useCallback, useRef, useState, useEffect } from "react";
 
+interface UseSpeechSynthesisOptions {
+  /** Called once when all TTS tiers have failed */
+  onAllTiersFailed?: () => void;
+}
+
 interface UseSpeechSynthesisReturn {
   speak: (text: string) => void;
   stop: () => void;
@@ -21,24 +26,33 @@ interface UseSpeechSynthesisReturn {
  *
  * 2. Edge TTS (fallback) — free, high-quality Microsoft neural voice.
  *    Uses en-GB-RyanNeural via /api/ai/tts/edge. No API key needed.
- *    Same voice as our promo video voiceovers.
  *
- * 3. Silent fallback — if both services fail, no audio plays.
- *    (We skip browser SpeechSynthesis entirely as it sounds too robotic.)
+ * 3. Browser SpeechSynthesis (last resort) — built-in browser voice.
+ *    Lower quality but guarantees audible output. Prefers en-GB voice.
  *
  * Mobile fix: iOS/Android require the first audio play to happen
  * inside a user gesture (tap). We "unlock" by creating a silent Audio
  * element when the user toggles TTS on.
  */
-export function useSpeechSynthesis(): UseSpeechSynthesisReturn {
+
+// Max consecutive failures before a tier is skipped for the session
+const MAX_FAILURES = 2;
+
+export function useSpeechSynthesis(
+  options?: UseSpeechSynthesisOptions,
+): UseSpeechSynthesisReturn {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [enabled, setEnabledState] = useState(true); // On by default — judge should speak
   const unlockedRef = useRef(false);
 
-  // ElevenLabs state — starts true, set to false after first failure
-  const elevenLabsAvailableRef = useRef(true);
-  // Edge TTS state — starts true, set to false after first failure
-  const edgeTtsAvailableRef = useRef(true);
+  // Failure counters per tier — allow MAX_FAILURES consecutive failures before disabling
+  const elevenLabsFailuresRef = useRef(0);
+  const edgeTtsFailuresRef = useRef(0);
+  const browserTtsFailuresRef = useRef(0);
+
+  // One-shot notification when all tiers fail
+  const ttsFailureNotifiedRef = useRef(false);
+  const onAllTiersFailed = options?.onAllTiersFailed;
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const objectUrlRef = useRef<string | null>(null);
@@ -48,26 +62,27 @@ export function useSpeechSynthesis(): UseSpeechSynthesisReturn {
   // Audio is always supported (we use HTML5 Audio, not SpeechSynthesis)
   const isSupported = typeof window !== "undefined";
 
-  // Track AudioContext for ElevenLabs playback
+  // Track AudioContext for TTS playback
   const audioContextRef = useRef<AudioContext | null>(null);
 
   // Unlock audio API — called from user gesture (tap) context
   const unlockAudio = useCallback(() => {
     if (unlockedRef.current) return;
 
-    // Unlock AudioContext for ElevenLabs/Edge TTS playback
+    // Unlock AudioContext for TTS playback
     //    Once resumed inside a user gesture, AudioContext stays unlocked
     //    for the entire page lifetime — so audio.play() works even after
     //    async calls (like waiting for the AI response).
     try {
-      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      const AudioCtx =
+        window.AudioContext || (window as any).webkitAudioContext;
       if (AudioCtx) {
         const ctx = new AudioCtx();
-        ctx.resume();
+        ctx.resume().catch(() => {});
         audioContextRef.current = ctx;
       }
     } catch {
-      // AudioContext not available — ElevenLabs will still try
+      // AudioContext not available
     }
     unlockedRef.current = true;
   }, []);
@@ -86,7 +101,11 @@ export function useSpeechSynthesis(): UseSpeechSynthesisReturn {
   // ── Cleanup helper ──
   const cleanupAudio = useCallback(() => {
     if (bufferSourceRef.current) {
-      try { bufferSourceRef.current.stop(); } catch { /* already stopped */ }
+      try {
+        bufferSourceRef.current.stop();
+      } catch {
+        /* already stopped */
+      }
       bufferSourceRef.current = null;
     }
     if (audioRef.current) {
@@ -110,10 +129,21 @@ export function useSpeechSynthesis(): UseSpeechSynthesisReturn {
           body: JSON.stringify({ text }),
         });
 
-        if (!res.ok) return false;
+        if (!res.ok) {
+          console.warn(`[TTS] ${endpoint} failed: HTTP ${res.status}`);
+          return false;
+        }
 
         // Read response body once (can only be consumed once)
         const arrayBuffer = await res.arrayBuffer();
+
+        // Guard against empty/tiny responses that can't be valid audio
+        if (arrayBuffer.byteLength < 100) {
+          console.warn(
+            `[TTS] ${endpoint} returned empty audio (${arrayBuffer.byteLength} bytes)`,
+          );
+          return false;
+        }
 
         // Try AudioContext playback first (works after async calls because
         // the context was resumed during the user gesture in unlockAudio).
@@ -138,8 +168,11 @@ export function useSpeechSynthesis(): UseSpeechSynthesisReturn {
               bufferSourceRef.current = source;
               source.start();
             });
-          } catch {
-            // AudioContext decode/play failed — fall through to Audio element
+          } catch (decodeErr) {
+            console.warn(
+              `[TTS] AudioContext decode/play failed for ${endpoint}:`,
+              decodeErr,
+            );
           }
         }
 
@@ -163,25 +196,76 @@ export function useSpeechSynthesis(): UseSpeechSynthesisReturn {
             cleanupAudio();
             resolve(false);
           };
-          audio.play().catch(() => {
+          audio.play().catch((playErr) => {
+            console.warn(
+              `[TTS] Audio element play failed for ${endpoint}:`,
+              playErr,
+            );
             cleanupAudio();
             resolve(false);
           });
         });
-      } catch {
+      } catch (fetchErr) {
+        console.warn(`[TTS] Fetch failed for ${endpoint}:`, fetchErr);
         return false;
       }
     },
     [cleanupAudio],
   );
 
-  // ── Main speak function — tries ElevenLabs → Edge TTS → silent ──
+  // ── Browser SpeechSynthesis (Tier 3 — lower quality but functional) ──
+  const speakViaBrowser = useCallback(
+    (text: string): Promise<boolean> => {
+      return new Promise((resolve) => {
+        if (typeof window === "undefined" || !window.speechSynthesis) {
+          console.warn("[TTS] Browser SpeechSynthesis not available");
+          resolve(false);
+          return;
+        }
+
+        window.speechSynthesis.cancel();
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = "en-GB";
+        utterance.rate = 0.95;
+        utterance.pitch = 0.9;
+
+        // Prefer a British English voice
+        const voices = window.speechSynthesis.getVoices();
+        const britishVoice =
+          voices.find(
+            (v) =>
+              v.lang === "en-GB" && v.name.toLowerCase().includes("male"),
+          ) || voices.find((v) => v.lang === "en-GB");
+        if (britishVoice) utterance.voice = britishVoice;
+
+        utterance.onstart = () => setIsSpeaking(true);
+        utterance.onend = () => {
+          setIsSpeaking(false);
+          resolve(true);
+        };
+        utterance.onerror = (e) => {
+          console.warn("[TTS] Browser SpeechSynthesis error:", e.error);
+          setIsSpeaking(false);
+          resolve(false);
+        };
+
+        window.speechSynthesis.speak(utterance);
+      });
+    },
+    [],
+  );
+
+  // ── Main speak function — tries ElevenLabs → Edge TTS → Browser ──
   const speak = useCallback(
     (text: string) => {
       if (!enabled) return;
 
       // Stop any ongoing audio
       cleanupAudio();
+      if (typeof window !== "undefined" && window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
 
       // Strip any remaining emotes/asterisks
       const cleanText = text.replace(/\*[^*]+\*/g, "").trim();
@@ -189,32 +273,62 @@ export function useSpeechSynthesis(): UseSpeechSynthesisReturn {
 
       const trySpeak = async () => {
         // Tier 1: ElevenLabs (highest quality)
-        if (elevenLabsAvailableRef.current) {
+        if (elevenLabsFailuresRef.current < MAX_FAILURES) {
           const success = await speakViaEndpoint("/api/ai/tts", cleanText);
-          if (success) return;
-          // Disable for rest of session on failure
-          elevenLabsAvailableRef.current = false;
+          if (success) {
+            elevenLabsFailuresRef.current = 0;
+            return;
+          }
+          elevenLabsFailuresRef.current++;
+          console.warn(
+            `[TTS] ElevenLabs failure ${elevenLabsFailuresRef.current}/${MAX_FAILURES}`,
+          );
         }
 
         // Tier 2: Edge TTS (free, high quality)
-        if (edgeTtsAvailableRef.current) {
+        if (edgeTtsFailuresRef.current < MAX_FAILURES) {
           const success = await speakViaEndpoint("/api/ai/tts/edge", cleanText);
-          if (success) return;
-          // Disable for rest of session on failure
-          edgeTtsAvailableRef.current = false;
+          if (success) {
+            edgeTtsFailuresRef.current = 0;
+            return;
+          }
+          edgeTtsFailuresRef.current++;
+          console.warn(
+            `[TTS] Edge TTS failure ${edgeTtsFailuresRef.current}/${MAX_FAILURES}`,
+          );
         }
 
-        // Tier 3: Silent — both services unavailable
-        // We intentionally skip browser SpeechSynthesis as it sounds robotic
+        // Tier 3: Browser SpeechSynthesis (last resort)
+        if (browserTtsFailuresRef.current < MAX_FAILURES) {
+          const success = await speakViaBrowser(cleanText);
+          if (success) {
+            browserTtsFailuresRef.current = 0;
+            return;
+          }
+          browserTtsFailuresRef.current++;
+          console.warn(
+            `[TTS] Browser TTS failure ${browserTtsFailuresRef.current}/${MAX_FAILURES}`,
+          );
+        }
+
+        // All tiers exhausted — notify once per session
+        if (!ttsFailureNotifiedRef.current) {
+          ttsFailureNotifiedRef.current = true;
+          console.warn("[TTS] All tiers exhausted — judge is now silent");
+          onAllTiersFailed?.();
+        }
       };
 
       trySpeak();
     },
-    [enabled, cleanupAudio, speakViaEndpoint],
+    [enabled, cleanupAudio, speakViaEndpoint, speakViaBrowser, onAllTiersFailed],
   );
 
   const stop = useCallback(() => {
     cleanupAudio();
+    if (typeof window !== "undefined" && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
     setIsSpeaking(false);
   }, [cleanupAudio]);
 
@@ -222,6 +336,9 @@ export function useSpeechSynthesis(): UseSpeechSynthesisReturn {
   useEffect(() => {
     return () => {
       cleanupAudio();
+      if (typeof window !== "undefined" && window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
     };
   }, [cleanupAudio]);
 

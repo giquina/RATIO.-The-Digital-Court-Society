@@ -44,6 +44,14 @@ export async function POST(request: Request): Promise<Response> {
     }
     const audioBuffer = Buffer.concat(chunks);
 
+    if (audioBuffer.length === 0) {
+      console.error("[Edge TTS] Audio stream produced zero chunks");
+      return new Response(
+        JSON.stringify({ error: "empty_audio" }),
+        { status: 502, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
     return new Response(audioBuffer, {
       status: 200,
       headers: {
