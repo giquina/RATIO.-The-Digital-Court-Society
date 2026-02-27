@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { query, mutation } from "./_generated/server";
+import { internal } from "./_generated/api";
 import { auth } from "./auth";
 import { validateStringLength, validateOptionalStringLength, validateArrayLength, LIMITS } from "./lib/validation";
 
@@ -152,6 +153,17 @@ export const create = mutation({
         commendationCount: 0,
       });
     }
+
+    // Notify Discord
+    await ctx.scheduler.runAfter(0, internal.discord.notifyNewSession, {
+      title: args.title,
+      creatorName: profile?.fullName ?? "Unknown",
+      module: args.module,
+      type: args.type,
+      date: args.date,
+      university: args.university,
+      isCrossUniversity: args.isCrossUniversity,
+    });
 
     return sessionId;
   },

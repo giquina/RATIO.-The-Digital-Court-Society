@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { query, mutation, action } from "./_generated/server";
+import { internal } from "./_generated/api";
 import { auth } from "./auth";
 import { validateStringLength, LIMITS } from "./lib/validation";
 
@@ -29,7 +30,7 @@ export const create = mutation({
     validateStringLength(args.areaOfLaw, "Area of law", LIMITS.NAME);
     validateStringLength(args.caseTitle, "Case title", LIMITS.TITLE);
 
-    return ctx.db.insert("aiSessions", {
+    const sessionId = await ctx.db.insert("aiSessions", {
       profileId: args.profileId,
       mode: args.mode,
       areaOfLaw: args.areaOfLaw,
@@ -44,6 +45,16 @@ export const create = mutation({
       savedToPortfolio: false,
       status: "in_progress",
     });
+
+    // Notify Discord
+    await ctx.scheduler.runAfter(0, internal.discord.notifyAiSessionStarted, {
+      advocateName: callerProfile.fullName,
+      mode: args.mode,
+      areaOfLaw: args.areaOfLaw,
+      caseTitle: args.caseTitle,
+    });
+
+    return sessionId;
   },
 });
 
@@ -125,6 +136,14 @@ export const complete = mutation({
     // Update profile stats
     await ctx.db.patch(session.profileId, {
       totalPoints: callerProfile.totalPoints + 25, // 25 points per AI session
+    });
+
+    // Notify Discord
+    await ctx.scheduler.runAfter(0, internal.discord.notifyAiSessionCompleted, {
+      advocateName: callerProfile.fullName,
+      mode: session.mode,
+      areaOfLaw: session.areaOfLaw,
+      overallScore: args.overallScore,
     });
 
     // Auto-log CPD entry for professional users

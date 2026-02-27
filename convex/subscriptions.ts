@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { query, mutation, internalMutation, internalQuery } from "./_generated/server";
+import { internal } from "./_generated/api";
 import { auth } from "./auth";
 
 // Get the current user's subscription
@@ -83,6 +84,14 @@ export const upsertFromStripe = mutation({
         currentPeriodEnd: args.currentPeriodEnd,
         cancelAtPeriodEnd: args.cancelAtPeriodEnd,
       });
+
+      // Notify Discord
+      await ctx.scheduler.runAfter(0, internal.discord.notifySubscription, {
+        event,
+        plan: args.plan,
+        previousPlan: fromPlan,
+      });
+
       return existing._id;
     }
 
@@ -95,7 +104,15 @@ export const upsertFromStripe = mutation({
       stripeSubscriptionId: args.stripeSubscriptionId,
     });
 
-    return ctx.db.insert("subscriptions", args);
+    const subId = await ctx.db.insert("subscriptions", args);
+
+    // Notify Discord
+    await ctx.scheduler.runAfter(0, internal.discord.notifySubscription, {
+      event: "created",
+      plan: args.plan,
+    });
+
+    return subId;
   },
 });
 
@@ -123,6 +140,12 @@ export const markCanceled = mutation({
       await ctx.db.patch(sub._id, {
         status: "canceled",
         cancelAtPeriodEnd: true,
+      });
+
+      // Notify Discord
+      await ctx.scheduler.runAfter(0, internal.discord.notifySubscription, {
+        event: "canceled",
+        plan: sub.plan,
       });
     }
   },

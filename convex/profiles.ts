@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { query, mutation } from "./_generated/server";
+import { internal } from "./_generated/api";
 import { auth } from "./auth";
 import { validateStringLength, validateOptionalStringLength, validateArrayLength, LIMITS } from "./lib/validation";
 
@@ -155,6 +156,13 @@ export const create = mutation({
       followingCount: 0,
       commendationCount: 0,
       isPublic: true,
+    });
+
+    // Notify Discord
+    await ctx.scheduler.runAfter(0, internal.discord.notifyNewUser, {
+      name: args.fullName,
+      userType: args.userType,
+      university: args.university,
     });
 
     // Initialize skills
