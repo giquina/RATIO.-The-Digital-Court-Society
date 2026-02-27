@@ -38,6 +38,12 @@ interface UseSpeechSynthesisReturn {
 // Max consecutive failures before a tier is skipped for the session
 const MAX_FAILURES = 2;
 
+// Timeout for API-based TTS fetch calls (prevents infinite hang)
+const TTS_FETCH_TIMEOUT_MS = 12_000;
+
+// Timeout for browser SpeechSynthesis — if nothing fires, give up
+const BROWSER_TTS_TIMEOUT_MS = 8_000;
+
 export function useSpeechSynthesis(
   options?: UseSpeechSynthesisOptions,
 ): UseSpeechSynthesisReturn {
@@ -65,6 +71,26 @@ export function useSpeechSynthesis(
   // Track AudioContext for TTS playback
   const audioContextRef = useRef<AudioContext | null>(null);
 
+  // Pre-loaded voices for browser SpeechSynthesis
+  const voicesRef = useRef<SpeechSynthesisVoice[]>([]);
+
+  // Pre-load browser voices — Chrome loads them asynchronously via voiceschanged
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.speechSynthesis) return;
+
+    const loadVoices = () => {
+      const v = window.speechSynthesis.getVoices();
+      if (v.length > 0) voicesRef.current = v;
+    };
+
+    loadVoices(); // Try immediately (may return empty on Chrome)
+    window.speechSynthesis.addEventListener("voiceschanged", loadVoices);
+
+    return () => {
+      window.speechSynthesis.removeEventListener("voiceschanged", loadVoices);
+    };
+  }, []);
+
   // Unlock audio API — called from user gesture (tap) context
   const unlockAudio = useCallback(() => {
     if (unlockedRef.current) return;
@@ -84,6 +110,22 @@ export function useSpeechSynthesis(
     } catch {
       // AudioContext not available
     }
+
+    // Also "warm up" browser SpeechSynthesis by speaking empty text
+    // This is a workaround for iOS/Chrome where the first speech call
+    // after page load gets swallowed silently.
+    try {
+      if (window.speechSynthesis) {
+        const warmup = new SpeechSynthesisUtterance("");
+        warmup.volume = 0;
+        window.speechSynthesis.speak(warmup);
+        // Cancel immediately — the point is just to unlock the audio pipeline
+        setTimeout(() => window.speechSynthesis.cancel(), 100);
+      }
+    } catch {
+      // Not critical
+    }
+
     unlockedRef.current = true;
   }, []);
 
@@ -122,12 +164,19 @@ export function useSpeechSynthesis(
   // ── Generic audio TTS — fetches from an endpoint, plays the result ──
   const speakViaEndpoint = useCallback(
     async (endpoint: string, text: string): Promise<boolean> => {
+      // Add a timeout so TTS API calls don't hang indefinitely
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), TTS_FETCH_TIMEOUT_MS);
+
       try {
         const res = await fetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ text }),
+          signal: controller.signal,
         });
+
+        clearTimeout(timeout);
 
         if (!res.ok) {
           console.warn(`[TTS] ${endpoint} failed: HTTP ${res.status}`);
@@ -206,7 +255,13 @@ export function useSpeechSynthesis(
           });
         });
       } catch (fetchErr) {
-        console.warn(`[TTS] Fetch failed for ${endpoint}:`, fetchErr);
+        clearTimeout(timeout);
+        // Distinguish timeout from other errors for debugging
+        if (fetchErr instanceof DOMException && fetchErr.name === "AbortError") {
+          console.warn(`[TTS] ${endpoint} timed out after ${TTS_FETCH_TIMEOUT_MS}ms`);
+        } else {
+          console.warn(`[TTS] Fetch failed for ${endpoint}:`, fetchErr);
+        }
         return false;
       }
     },
@@ -223,6 +278,20 @@ export function useSpeechSynthesis(
           return;
         }
 
+        // Safety timeout — if speechSynthesis never fires onstart/onend/onerror,
+        // resolve false so we don't hang the fallback chain indefinitely.
+        // This is a known issue on mobile Chrome and iOS Safari.
+        let settled = false;
+        const safetyTimeout = setTimeout(() => {
+          if (!settled) {
+            settled = true;
+            console.warn("[TTS] Browser SpeechSynthesis timed out — no events fired");
+            try { window.speechSynthesis.cancel(); } catch { /* */ }
+            setIsSpeaking(false);
+            resolve(false);
+          }
+        }, BROWSER_TTS_TIMEOUT_MS);
+
         window.speechSynthesis.cancel();
 
         const utterance = new SpeechSynthesisUtterance(text);
@@ -230,27 +299,52 @@ export function useSpeechSynthesis(
         utterance.rate = 0.95;
         utterance.pitch = 0.9;
 
-        // Prefer a British English voice
-        const voices = window.speechSynthesis.getVoices();
+        // Use pre-loaded voices (handles Chrome's async voice loading)
+        const voices = voicesRef.current.length > 0
+          ? voicesRef.current
+          : window.speechSynthesis.getVoices();
+
         const britishVoice =
           voices.find(
             (v) =>
               v.lang === "en-GB" && v.name.toLowerCase().includes("male"),
-          ) || voices.find((v) => v.lang === "en-GB");
+          ) || voices.find((v) => v.lang === "en-GB")
+            || voices.find((v) => v.lang.startsWith("en"));
         if (britishVoice) utterance.voice = britishVoice;
 
         utterance.onstart = () => setIsSpeaking(true);
         utterance.onend = () => {
-          setIsSpeaking(false);
-          resolve(true);
+          if (!settled) {
+            settled = true;
+            clearTimeout(safetyTimeout);
+            setIsSpeaking(false);
+            resolve(true);
+          }
         };
         utterance.onerror = (e) => {
-          console.warn("[TTS] Browser SpeechSynthesis error:", e.error);
-          setIsSpeaking(false);
-          resolve(false);
+          if (!settled) {
+            settled = true;
+            clearTimeout(safetyTimeout);
+            console.warn("[TTS] Browser SpeechSynthesis error:", e.error);
+            setIsSpeaking(false);
+            resolve(false);
+          }
         };
 
         window.speechSynthesis.speak(utterance);
+
+        // Chrome mobile workaround: speechSynthesis can pause itself after ~15s.
+        // Poke it every 10s to keep it alive during long utterances.
+        const keepAlive = setInterval(() => {
+          if (settled) {
+            clearInterval(keepAlive);
+            return;
+          }
+          if (window.speechSynthesis.speaking) {
+            window.speechSynthesis.pause();
+            window.speechSynthesis.resume();
+          }
+        }, 10_000);
       });
     },
     [],

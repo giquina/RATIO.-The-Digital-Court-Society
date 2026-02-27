@@ -682,100 +682,102 @@ function AIPracticePageInner() {
     return (
       <div className="flex flex-col h-[calc(100dvh-140px)] md:h-[calc(100dvh-80px)]">
         {/* Scrollable content */}
-        <div className="flex-1 overflow-y-auto pb-4">
-        <div className="px-4 pt-3 pb-4">
-          <button onClick={() => setScreen("select")} className="text-court-sm text-court-text-ter mb-3">&larr; Back to modes</button>
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 rounded-court flex items-center justify-center"
-              style={{ background: `linear-gradient(135deg, ${persona.gradient[0]}, ${persona.gradient[1]})` }}>
-              <DynamicIcon name={persona.icon} size={20} className="text-court-text" />
-            </div>
-            <div>
-              <h1 className="font-serif text-xl font-bold text-court-text">{displayPersonaName}</h1>
-              <p className="text-court-sm text-court-text-ter">{persona.subtitle}</p>
+        <div className="flex-1 overflow-y-auto">
+          {/* Header: back + avatar */}
+          <div className="px-4 pt-3 pb-2">
+            <button onClick={() => setScreen("select")} className="text-court-sm text-court-text-ter mb-3">&larr; Back to modes</button>
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-court flex items-center justify-center shrink-0"
+                style={{ background: `linear-gradient(135deg, ${persona.gradient[0]}, ${persona.gradient[1]})` }}>
+                <DynamicIcon name={persona.icon} size={20} className="text-court-text" />
+              </div>
+              <div className="min-w-0">
+                <h1 className="font-serif text-xl font-bold text-court-text truncate">{displayPersonaName}</h1>
+                <p className="text-court-sm text-court-text-ter truncate">{persona.subtitle}</p>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Judge Temperament Selector (only for judge mode) */}
-        {mode === "judge" && (
-          <div className="px-4 mb-4">
-            <p className="text-court-xs text-court-text-ter uppercase tracking-widest mb-2">Judicial Temperament</p>
-            <div className="grid grid-cols-2 gap-2">
-              {(Object.entries(JUDGE_TEMPERAMENTS) as [JudgeTemperament, typeof JUDGE_TEMPERAMENTS[JudgeTemperament]][]).map(([key, temp]) => (
-                <button
-                  key={key}
-                  onClick={() => setTemperament(key)}
-                  className={cn(
-                    "p-3 rounded-lg border text-left transition-all",
-                    temperament === key
-                      ? "border-gold/40 bg-gold/8"
-                      : "border-court-border bg-navy-card hover:border-white/10"
-                  )}
-                >
-                  <p className={cn(
-                    "text-court-sm font-bold mb-0.5",
-                    temperament === key ? "text-gold" : "text-court-text"
-                  )}>
-                    {temp.subtitle}
-                  </p>
-                  <p className="text-court-xs text-court-text-ter leading-snug">{temp.description}</p>
-                </button>
+          {/* Judge Temperament Selector (only for judge mode) */}
+          {mode === "judge" && (
+            <div className="px-4 pt-2 pb-1">
+              <p className="text-court-xs text-court-text-ter uppercase tracking-widest mb-2">Judicial Temperament</p>
+              <div className="grid grid-cols-2 gap-2">
+                {(Object.entries(JUDGE_TEMPERAMENTS) as [JudgeTemperament, typeof JUDGE_TEMPERAMENTS[JudgeTemperament]][]).map(([key, temp]) => (
+                  <button
+                    key={key}
+                    onClick={() => setTemperament(key)}
+                    className={cn(
+                      "p-3 rounded-lg border text-left transition-all",
+                      temperament === key
+                        ? "border-gold/40 bg-gold/8"
+                        : "border-court-border bg-navy-card hover:border-white/10"
+                    )}
+                  >
+                    <p className={cn(
+                      "text-court-sm font-bold mb-0.5",
+                      temperament === key ? "text-gold" : "text-court-text"
+                    )}>
+                      {temp.subtitle}
+                    </p>
+                    <p className="text-court-xs text-court-text-ter leading-snug">{temp.description}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Briefing cards */}
+          <div className="px-4 pt-3 space-y-3">
+            <Card className="p-4">
+              <h2 className="font-serif text-court-base font-bold text-gold mb-3 uppercase tracking-wider">Session Briefing</h2>
+              {[
+                { label: "Area of Law", value: brief.area },
+                { label: "Matter", value: brief.matter },
+                { label: "Your Role", value: brief.yourRole },
+              ].map((item) => (
+                <div key={item.label} className="mb-3 last:mb-0">
+                  <p className="text-court-xs text-court-text-ter uppercase tracking-widest mb-0.5">{item.label}</p>
+                  <p className="text-court-base text-court-text leading-relaxed">{item.value}</p>
+                </div>
               ))}
-            </div>
-          </div>
-        )}
+            </Card>
+            <Card className="p-4">
+              <p className="text-court-xs text-court-text-ter uppercase tracking-widest mb-2">Instructions</p>
+              <p className="text-court-base text-court-text-sec leading-relaxed">{brief.instructions}</p>
+            </Card>
+            <Card className="p-4">
+              <p className="text-court-xs text-court-text-ter uppercase tracking-widest mb-2">Key Authorities</p>
+              {brief.authorities.map((a) => (
+                <div key={a} className="flex items-start gap-2 mb-1.5 last:mb-0">
+                  <Book size={12} className="text-gold mt-0.5 shrink-0" />
+                  <p className="text-court-base text-court-text font-medium">{a}</p>
+                </div>
+              ))}
+            </Card>
 
-        <div className="px-4">
-          <Card className="p-4 mb-3">
-            <h2 className="font-serif text-court-base font-bold text-gold mb-3 uppercase tracking-wider">Session Briefing</h2>
-            {[
-              { label: "Area of Law", value: brief.area },
-              { label: "Matter", value: brief.matter },
-              { label: "Your Role", value: brief.yourRole },
-            ].map((item) => (
-              <div key={item.label} className="mb-3 last:mb-0">
-                <p className="text-court-xs text-court-text-ter uppercase tracking-widest mb-0.5">{item.label}</p>
-                <p className="text-court-base text-court-text leading-relaxed">{item.value}</p>
-              </div>
-            ))}
-          </Card>
-          <Card className="p-4 mb-3">
-            <p className="text-court-xs text-court-text-ter uppercase tracking-widest mb-2">Instructions</p>
-            <p className="text-court-base text-court-text-sec leading-relaxed">{brief.instructions}</p>
-          </Card>
-          <Card className="p-4">
-            <p className="text-court-xs text-court-text-ter uppercase tracking-widest mb-2">Key Authorities</p>
-            {brief.authorities.map((a) => (
-              <div key={a} className="flex items-start gap-2 mb-1.5 last:mb-0">
-                <Book size={12} className="text-gold mt-0.5 shrink-0" />
-                <p className="text-court-base text-court-text font-medium">{a}</p>
-              </div>
-            ))}
-          </Card>
-        </div>
-        </div>
-
-        {/* AI Disclaimer */}
-        <div className="px-4 mt-3">
-          <div className="px-3 py-2.5 rounded-lg bg-white/[0.02] border border-court-border-light">
-            <div className="flex items-start gap-2">
-              <AlertCircle size={13} className="text-court-text-ter shrink-0 mt-0.5" />
-              <div>
-                <p className="text-court-xs text-court-text-ter leading-relaxed">
-                  <span className="font-semibold text-court-text-sec">AI Simulation.</span>{" "}
-                  The AI Judge uses case law sourced from the UK National Archives.
-                  Feedback is educational only, may contain inaccuracies, and has not been
-                  reviewed by a qualified lawyer. Always verify against primary sources and
-                  seek guidance from your tutors.
-                </p>
+            {/* AI Disclaimer — inside scroll area so it doesn't eat mobile space */}
+            <div className="pb-3">
+              <div className="px-3 py-2.5 rounded-lg bg-white/[0.02] border border-court-border-light">
+                <div className="flex items-start gap-2">
+                  <AlertCircle size={13} className="text-court-text-ter shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-court-xs text-court-text-ter leading-relaxed">
+                      <span className="font-semibold text-court-text-sec">AI Simulation.</span>{" "}
+                      The AI Judge uses case law sourced from the UK National Archives.
+                      Feedback is educational only, may contain inaccuracies, and has not been
+                      reviewed by a qualified lawyer. Always verify against primary sources and
+                      seek guidance from your tutors.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Sticky CTA buttons — always visible */}
-        <div className="shrink-0 px-4 pt-3 pb-1 border-t border-court-border-light/20 bg-navy">
+        <div className="shrink-0 px-4 pt-3 pb-2 border-t border-court-border-light/20 bg-navy">
           {aiUserContext?.userType === "professional" && (
             <button
               onClick={() => setBrief(selectScenario(mode, aiUserContext?.practiceAreas, aiUserContext?.userType))}
