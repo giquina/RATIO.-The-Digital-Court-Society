@@ -31,6 +31,8 @@ export function CookieConsent() {
   const handleDecline = () => {
     localStorage.setItem(CONSENT_KEY, "declined");
     setVisible(false);
+    // Signal analytics tools to respect decline
+    window.dispatchEvent(new Event("ratio-consent-declined"));
   };
 
   if (!visible) return null;

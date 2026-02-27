@@ -5,8 +5,9 @@ import { Analytics as GAAnalytics } from "@/components/shared/Analytics";
 import { Analytics as VercelAnalytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { CookieConsent } from "@/components/shared/CookieConsent";
-import { PostHogAnalytics } from "@/components/shared/PostHogProvider";
+import { PostHogProvider } from "@/components/shared/PostHogProvider";
 import { Toaster } from "sonner";
+import { Suspense } from "react";
 import "./globals.css";
 
 const cormorant = Cormorant_Garamond({
@@ -171,7 +172,9 @@ export default function RootLayout({
         <VercelAnalytics />
         <SpeedInsights />
         <GAAnalytics />
-        <PostHogAnalytics />
+        <Suspense fallback={null}>
+          <PostHogProvider />
+        </Suspense>
         <CookieConsent />
       </body>
     </html>
