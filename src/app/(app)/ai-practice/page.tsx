@@ -198,7 +198,14 @@ function AIPracticePageInner() {
   const browserSpeech = useSpeechRecognition();
   const [useWhisper, setUseWhisper] = useState(true);
   // Text-to-speech
-  const tts = useSpeechSynthesis();
+  const tts = useSpeechSynthesis({
+    onAllTiersFailed: () => {
+      courtToast.info(
+        "Judge voice unavailable",
+        "Audio output is not available. The judge's responses will be text only."
+      );
+    },
+  });
 
   // Case Note Generator
   const [caseNote, setCaseNote] = useState<Record<string, unknown> | null>(null);
