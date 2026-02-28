@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { REFERRAL } from "@/lib/constants/app";
 import { courtToast } from "@/lib/utils/toast";
+import { analytics } from "@/lib/analytics";
 
 export function ReferralDashboard() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -55,6 +56,7 @@ export function ReferralDashboard() {
       await navigator.clipboard.writeText(referralUrl);
       setCopied(true);
       courtToast.success("Link copied to clipboard");
+      analytics.referralLinkCopied();
       setTimeout(() => setCopied(false), 3000);
     } catch {
       courtToast.error("Could not copy link");
@@ -65,6 +67,7 @@ export function ReferralDashboard() {
     if (!info.handle) return;
     try {
       await createReferral();
+      analytics.referralLinkShared("whatsapp");
       const message = REFERRAL.WHATSAPP_MESSAGE(info.handle);
       window.open(
         `https://wa.me/?text=${encodeURIComponent(message)}`,

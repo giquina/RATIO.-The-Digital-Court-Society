@@ -6,6 +6,7 @@ import { Search, Download, Upload } from "lucide-react";
 import { anyApi } from "convex/server";
 import { useDemoQuery, useDemoMutation } from "@/hooks/useDemoSafe";
 import { courtToast } from "@/lib/utils/toast";
+import { analytics } from "@/lib/analytics";
 
 const CONVEX_URL = process.env.NEXT_PUBLIC_CONVEX_URL;
 
@@ -113,6 +114,7 @@ export default function LibraryPage() {
     setTimeout(() => {
       setDownloadingIdx(null);
       courtToast.success("Downloaded", title);
+      analytics.resourceDownloaded(title, id ? "convex" : "demo");
     }, 800);
   };
 

@@ -28,6 +28,7 @@ import type {
 import { COURTS } from "@/lib/legal-api/types"
 import { isNeutralCitation, isLegislationReference } from "@/lib/legal-api/oscola"
 import { useAuthStore } from "@/stores/authStore"
+import { analytics } from "@/lib/analytics"
 import { useQuery, useMutation } from "convex/react"
 import { anyApi } from "convex/server"
 
@@ -108,6 +109,7 @@ export default function ResearchPage() {
         if (!response.ok) throw new Error("Search failed")
         const data: UnifiedSearchResponse = await response.json()
         setResults(data)
+        analytics.searchPerformed(q, source, data.totalResults)
         if (resultsRef.current)
           resultsRef.current.scrollIntoView({ behavior: "smooth", block: "start" })
 

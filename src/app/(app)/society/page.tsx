@@ -8,6 +8,7 @@ import { useIsDemoAccount } from "@/hooks/useIsDemoAccount";
 import { DEMO_ADVOCATES, DEMO_LEADERBOARD } from "@/lib/constants/demo-data";
 import { Search, Scale, Medal, Trophy, Users } from "lucide-react";
 import { courtToast } from "@/lib/utils/toast";
+import { analytics } from "@/lib/analytics";
 import type { Id } from "../../../../convex/_generated/dataModel";
 
 function getInitials(name: string) {
@@ -69,8 +70,14 @@ export default function SocietyPage() {
     if (!profile) return;
     // Skip Convex mutation for demo mock profiles (IDs start with "demo_")
     if (typeof targetProfileId === "string" && targetProfileId.startsWith("demo_")) return;
+    const wasFollowing = isFollowingUser(targetProfileId as string);
     try {
       await toggleFollow({ followerId: profile._id, followingId: targetProfileId });
+      if (wasFollowing) {
+        analytics.userUnfollowed(targetProfileId as string);
+      } else {
+        analytics.userFollowed(targetProfileId as string);
+      }
     } catch {
       courtToast.error("Failed to update follow");
     }

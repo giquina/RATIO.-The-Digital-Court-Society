@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { BookOpen, Search, X, FileText, Hash } from "lucide-react";
 import { cn } from "@/lib/utils/helpers";
+import { analytics } from "@/lib/analytics";
 import { Card, Tag, DynamicIcon } from "@/components/ui";
 import {
   MODULE_REGISTRY,
@@ -58,6 +59,17 @@ export default function LawBookIndexPage() {
 
     return modules;
   }, [search, category]);
+
+  // Track law book searches (debounced — fires 800ms after user stops typing)
+  const searchTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  useEffect(() => {
+    if (!search.trim()) return;
+    clearTimeout(searchTimerRef.current);
+    searchTimerRef.current = setTimeout(() => {
+      analytics.lawBookSearched(search.trim(), filtered.length);
+    }, 800);
+    return () => clearTimeout(searchTimerRef.current);
+  }, [search, filtered.length]);
 
   return (
     <div className="pb-6">

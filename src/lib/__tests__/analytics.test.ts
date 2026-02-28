@@ -1,6 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { trackEvent, analytics } from "../analytics";
 
+// Mock posthog-js to prevent real initialization
+vi.mock("posthog-js", () => ({
+  default: { __loaded: false, capture: vi.fn() },
+}));
+
 describe("trackEvent", () => {
   beforeEach(() => {
     vi.stubGlobal("window", { gtag: vi.fn() });
@@ -66,6 +71,59 @@ describe("analytics helpers", () => {
     analytics.votecast("motion123");
     expect(window.gtag).toHaveBeenCalledWith("event", "vote_cast", {
       motion_id: "motion123",
+    });
+  });
+
+  // ── New events ──
+
+  it("resourceDownloaded fires with title and category", () => {
+    analytics.resourceDownloaded("IRAC Template", "irac_guide");
+    expect(window.gtag).toHaveBeenCalledWith("event", "resource_downloaded", {
+      title: "IRAC Template",
+      category: "irac_guide",
+    });
+  });
+
+  it("searchPerformed fires with query, source, and count", () => {
+    analytics.searchPerformed("donoghue", "case-law", 42);
+    expect(window.gtag).toHaveBeenCalledWith("event", "search_performed", {
+      query: "donoghue",
+      source: "case-law",
+      result_count: 42,
+    });
+  });
+
+  it("userFollowed fires with target_profile_id", () => {
+    analytics.userFollowed("profile_abc123");
+    expect(window.gtag).toHaveBeenCalledWith("event", "user_followed", {
+      target_profile_id: "profile_abc123",
+    });
+  });
+
+  it("referralLinkCopied fires without params", () => {
+    analytics.referralLinkCopied();
+    expect(window.gtag).toHaveBeenCalledWith("event", "referral_link_copied", undefined);
+  });
+
+  it("referralLinkShared fires with platform", () => {
+    analytics.referralLinkShared("whatsapp");
+    expect(window.gtag).toHaveBeenCalledWith("event", "referral_link_shared", {
+      platform: "whatsapp",
+    });
+  });
+
+  it("lawBookSearched fires with query and result_count", () => {
+    analytics.lawBookSearched("contract", 12);
+    expect(window.gtag).toHaveBeenCalledWith("event", "law_book_searched", {
+      query: "contract",
+      result_count: 12,
+    });
+  });
+
+  it("activityCommended fires with activity_id", () => {
+    analytics.activityCommended("activity_xyz");
+    expect(window.gtag).toHaveBeenCalledWith("event", "activity_commended", {
+      activity_id: "activity_xyz",
     });
   });
 });

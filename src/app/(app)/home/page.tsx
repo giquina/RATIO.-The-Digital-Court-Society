@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useQuery, useMutation } from "convex/react";
 import { anyApi } from "convex/server";
 import { courtToast } from "@/lib/utils/toast";
+import { analytics } from "@/lib/analytics";
 import {
   Avatar,
   Tag,
@@ -195,6 +196,7 @@ export default function HomePage() {
         fromProfileId: profile._id,
         activityId: activityId as any,
       });
+      analytics.activityCommended(activityId);
     } catch {
       setOptimisticCommends((p) => ({ ...p, [activityId]: !p[activityId] }));
       courtToast.error("Could not commend");
