@@ -52,10 +52,10 @@ export function FloatingActions({ isAuthenticated = false }: FloatingActionsProp
         </Link>
       </div>
 
-      {/* Back to Top button */}
+      {/* Back to Top button — offset right to avoid overlap with Usher bubble */}
       <button
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        className={`fixed bottom-6 right-4 z-50 w-10 h-10 rounded-full bg-navy-card border border-court-border-light flex items-center justify-center text-court-text-sec hover:text-gold hover:border-gold/30 transition-all duration-300 ${
+        className={`fixed bottom-6 right-[4.5rem] z-50 w-10 h-10 rounded-full bg-navy-card border border-court-border-light flex items-center justify-center text-court-text-sec hover:text-gold hover:border-gold/30 transition-all duration-300 ${
           showTop ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
         }`}
         aria-label="Back to top"

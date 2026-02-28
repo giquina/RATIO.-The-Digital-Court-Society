@@ -94,6 +94,14 @@ const config: Config = {
           "50%": { height: "12px" },
           "100%": { height: "4px" },
         },
+        "usher-bounce": {
+          "0%, 80%, 100%": { transform: "translateY(0)" },
+          "40%": { transform: "translateY(-4px)" },
+        },
+        "gradient-shift": {
+          "0%, 100%": { backgroundPosition: "50% 50%" },
+          "50%": { backgroundPosition: "60% 40%" },
+        },
       },
       animation: {
         "pulse-ring": "pulse-ring 2.4s ease-out infinite",
@@ -105,6 +113,8 @@ const config: Config = {
         "glow-pulse": "glow-pulse 1.5s ease-in-out infinite",
         "spin-slow": "spin-slow 8s linear infinite",
         "recording-pulse": "recording-pulse 2s ease-in-out infinite",
+        "usher-bounce": "usher-bounce 1.2s ease-in-out infinite",
+        "gradient-shift": "gradient-shift 10s ease-in-out infinite",
       },
     },
   },

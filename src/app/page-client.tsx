@@ -81,6 +81,12 @@ const FloatingActions = dynamic(
   { ssr: false }
 );
 
+// ── The Usher visitor chat (lazy — client-only) ──
+const UsherChat = dynamic(
+  () => import("@/components/visitor-chat/UsherChat").then((m) => ({ default: m.UsherChat })),
+  { ssr: false }
+);
+
 /* ────────────────────────────────────────────────────────────
    Shared landing shell — receives `isAuthenticated` as a prop
    so that the hook call is isolated to the wrapper below.
@@ -167,6 +173,8 @@ function LandingShell({ isAuthenticated }: { isAuthenticated: boolean }) {
 
       {/* Floating "Join Free" pill + Back to Top button */}
       <FloatingActions isAuthenticated={isAuthenticated} />
+      {/* The Usher — visitor chat widget */}
+      <UsherChat />
       {/* <PromoBanner /> — hidden for now, uncomment to re-enable recruitment popup */}
     </div>
     </FirstVisitSplash>

@@ -8,6 +8,7 @@ import { anyApi } from "convex/server";
 import Link from "next/link";
 import { Scale, Loader2, ArrowLeft } from "lucide-react";
 import { DemoCredentialsBanner } from "@/components/shared/DemoCredentialsBanner";
+import { AuthTransition } from "@/components/shared/AuthTransition";
 import { getStoredUTM, clearUTM } from "@/lib/utils/utm";
 import { analytics } from "@/lib/analytics";
 
@@ -37,6 +38,7 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showTransition, setShowTransition] = useState(false);
 
   const canSubmit = name && email && password.length >= 8 && password === confirmPassword;
 
@@ -66,7 +68,8 @@ export default function RegisterPage() {
         // Attribution is non-critical — don't block signup
       }
       analytics.signUp("password");
-      router.push("/onboarding");
+      setLoading(false);
+      setShowTransition(true);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "";
       if (message.includes("AccountAlreadyExists") || message.includes("already exists")) {
@@ -74,7 +77,6 @@ export default function RegisterPage() {
       } else {
         setError("Registration failed. Please try again.");
       }
-    } finally {
       setLoading(false);
     }
   };
@@ -82,6 +84,13 @@ export default function RegisterPage() {
   const inputClass = "w-full bg-white/[0.06] border border-white/[0.12] rounded-xl px-3.5 py-3 text-court-base text-court-text outline-none focus:border-gold/60 focus:ring-1 focus:ring-gold/20 transition-colors placeholder:text-court-text-sec";
 
   return (
+    <>
+    <AuthTransition
+      variant="sign-up"
+      isActive={showTransition}
+      userName={name.split(" ")[0]}
+      onComplete={() => router.push("/onboarding")}
+    />
     <div className="min-h-screen flex flex-col justify-center px-4 md:px-6 lg:px-8">
       <Suspense><ReferralCapture /></Suspense>
       <div className="text-center mb-12">
@@ -156,5 +165,6 @@ export default function RegisterPage() {
         </Link>
       </form>
     </div>
+    </>
   );
 }

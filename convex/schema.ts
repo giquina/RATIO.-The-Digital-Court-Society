@@ -1002,6 +1002,30 @@ export default defineSchema({
     .index("by_created", ["createdAt"]),
 
   // ═══════════════════════════════════════════
+  // VISITOR CHAT ("The Usher")
+  // ═══════════════════════════════════════════
+  visitorChats: defineTable({
+    sessionId: v.string(),
+    messages: v.array(
+      v.object({
+        role: v.string(),
+        content: v.string(),
+        timestamp: v.number(),
+        type: v.string(),
+        source: v.optional(v.string()),
+      })
+    ),
+    visitorEmail: v.optional(v.string()),
+    startPageUrl: v.string(),
+    lastPageUrl: v.string(),
+    resolved: v.boolean(),
+    createdAt: v.number(),
+  })
+    .index("by_session", ["sessionId"])
+    .index("by_email", ["visitorEmail"])
+    .index("by_created", ["createdAt"]),
+
+  // ═══════════════════════════════════════════
   // APP FEEDBACK (bugs, features, general)
   // ═══════════════════════════════════════════
   appFeedback: defineTable({

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Copy, Check, FlaskConical } from "lucide-react";
 
 const DEMO_EMAIL = process.env.NEXT_PUBLIC_DEMO_EMAIL || "demo@ratio.law";
@@ -78,7 +78,11 @@ export function DemoCredentialsBanner({
   onUseDemo,
   variant = "login",
 }: DemoCredentialsBannerProps) {
-  if (!shouldShow()) return null;
+  // Defer visibility check to useEffect to avoid SSR/client hydration mismatch
+  // (shouldShow() checks window.location which doesn't exist on the server)
+  const [visible, setVisible] = useState(false);
+  useEffect(() => { setVisible(shouldShow()); }, []);
+  if (!visible) return null;
 
   return (
     <div className="w-full max-w-sm mx-auto mb-6">

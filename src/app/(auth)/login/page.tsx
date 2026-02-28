@@ -6,6 +6,7 @@ import { useAuthActions } from "@convex-dev/auth/react";
 import Link from "next/link";
 import { Scale, Loader2, ArrowLeft } from "lucide-react";
 import { DemoCredentialsBanner } from "@/components/shared/DemoCredentialsBanner";
+import { AuthTransition } from "@/components/shared/AuthTransition";
 import { analytics } from "@/lib/analytics";
 
 const CONVEX_URL = process.env.NEXT_PUBLIC_CONVEX_URL;
@@ -24,6 +25,7 @@ function LoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showTransition, setShowTransition] = useState(false);
 
   const handleSignIn = async () => {
     setError("");
@@ -38,10 +40,10 @@ function LoginForm() {
     try {
       await signIn("password", { email: email.toLowerCase().trim(), password, flow: "signIn" });
       analytics.login("password");
-      router.push(redirect);
+      setLoading(false);
+      setShowTransition(true);
     } catch {
       setError("Invalid email or password. Please try again.");
-    } finally {
       setLoading(false);
     }
   };
@@ -49,6 +51,13 @@ function LoginForm() {
   const inputClass = "w-full bg-white/[0.06] border border-white/[0.12] rounded-xl px-3.5 py-3 text-court-base text-court-text outline-none focus:border-gold/60 focus:ring-1 focus:ring-gold/20 transition-colors placeholder:text-court-text-sec";
 
   return (
+    <>
+    <AuthTransition
+      variant="sign-in"
+      isActive={showTransition}
+      userName={email.split("@")[0]}
+      onComplete={() => router.push(redirect)}
+    />
     <div className="min-h-screen flex flex-col justify-center px-4 md:px-6 lg:px-8">
       <div className="text-center mb-12">
         <div className="flex justify-center mb-4"><Scale size={44} className="text-gold" /></div>
@@ -112,6 +121,7 @@ function LoginForm() {
         </Link>
       </form>
     </div>
+    </>
   );
 }
 
