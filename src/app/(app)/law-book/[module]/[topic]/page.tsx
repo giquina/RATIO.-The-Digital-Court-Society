@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Card, Tag, Button } from "@/components/ui";
@@ -23,6 +23,7 @@ import {
   Shield,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { analytics } from "@/lib/analytics";
 
 // ── Module icons ──
 const MODULE_ICONS: Record<string, LucideIcon> = {
@@ -240,6 +241,10 @@ export default function TopicReadingPage() {
   const moduleSlug = params.module as string;
   const topicSlug = params.topic as string;
   const [citeCopied, setCiteCopied] = useState(false);
+
+  useEffect(() => {
+    analytics.lawBookViewed(moduleSlug, topicSlug);
+  }, [moduleSlug, topicSlug]);
 
   const isDemo =
     moduleSlug === "contract" && topicSlug === "offer-and-acceptance";

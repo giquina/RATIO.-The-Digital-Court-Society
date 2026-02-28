@@ -8,6 +8,7 @@ import { CHAMBERS, CHAMBER_COLORS } from "@/lib/constants/app";
 import { Users, Trophy, TrendingUp, Activity, ArrowLeft, Crown, Loader2 } from "lucide-react";
 import { useQuery } from "convex/react";
 import { anyApi } from "convex/server";
+import { analytics } from "@/lib/analytics";
 
 export default function ChamberDetailPage() {
   const params = useParams();
@@ -131,7 +132,10 @@ export default function ChamberDetailPage() {
           <Button
             fullWidth
             variant={joined ? "secondary" : "primary"}
-            onClick={() => setJoined(!joined)}
+            onClick={() => {
+              if (!joined) analytics.chamberJoined(chamberName);
+              setJoined(!joined);
+            }}
           >
             {joined ? "Leave Chamber" : "Join Chamber"}
           </Button>

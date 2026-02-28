@@ -17,6 +17,7 @@ import { downloadICS, getGoogleCalendarUrl } from "@/lib/utils/calendar";
 import { courtToast } from "@/lib/utils/toast";
 import { getInitials } from "@/lib/utils/helpers";
 import { Calendar, Clock, Video, Timer, Check } from "lucide-react";
+import { analytics } from "@/lib/analytics";
 
 type Phase = "details" | "lobby" | "entrance" | "live" | "rating" | "ai_feedback" | "done";
 
@@ -149,6 +150,7 @@ export default function SessionDetailPage() {
         profileId: profile._id,
         sessionId,
       });
+      analytics.sessionJoined(sessionId as string);
       courtToast.success("Role claimed");
     } catch {
       courtToast.error("Failed to claim role");

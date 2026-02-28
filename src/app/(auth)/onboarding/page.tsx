@@ -8,6 +8,7 @@ import { LAW_MODULES, CHAMBERS, PROFESSIONAL_ROLES, PRACTICE_AREAS } from "@/lib
 import { useAuthStore } from "@/stores/authStore";
 import { Loader2, SkipForward, GraduationCap, Scale } from "lucide-react";
 import { courtToast } from "@/lib/utils/toast";
+import { analytics } from "@/lib/analytics";
 
 // ── Types ──
 type UserType = "student" | "professional" | null;
@@ -200,6 +201,7 @@ export default function OnboardingPage() {
         localStorage.removeItem("ratio_referral_handle");
       }
 
+      if (chamber) analytics.chamberJoined(chamber);
       localStorage.removeItem(STORAGE_KEY);
       localStorage.removeItem("ratio_pending_name");
       // Full reload to avoid Next.js parallelRoutes crash when crossing (auth)→(app) layout boundary
