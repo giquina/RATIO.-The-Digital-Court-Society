@@ -151,6 +151,11 @@ export default function RegisterPage() {
         </p>
 
         <p className="text-court-xs text-court-text-ter text-center">
+          Your data stays private. Practice sessions are never shared.{" "}
+          <Link href="/privacy" className="text-gold hover:underline">Privacy Policy</Link>
+        </p>
+
+        <p className="text-court-xs text-court-text-ter text-center">
           Open to all. Verify with .ac.uk for full access.
         </p>
 

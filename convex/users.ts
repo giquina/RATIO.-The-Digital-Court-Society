@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { query, mutation } from "./_generated/server";
+import { internal } from "./_generated/api";
 import { auth } from "./auth";
 
 // Get the currently authenticated user
@@ -132,6 +133,21 @@ export const createProfile = mutation({
         score: 0,
       });
     }
+
+    // ── Notifications (fire-and-forget) ──
+    // Discord webhook
+    await ctx.scheduler.runAfter(0, internal.discord.notifyNewUser, {
+      name: fullName,
+      userType: args.userType,
+      university: args.university,
+    });
+    // Admin email notification
+    await ctx.scheduler.runAfter(0, internal.email.notifyAdminNewSignup, {
+      name: fullName,
+      userType: args.userType,
+      university: args.university,
+      chamber: args.chamber,
+    });
 
     return profileId;
   },

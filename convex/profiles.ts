@@ -164,6 +164,13 @@ export const create = mutation({
       userType: args.userType,
       university: args.university,
     });
+    // Admin email notification
+    await ctx.scheduler.runAfter(0, internal.email.notifyAdminNewSignup, {
+      name: args.fullName,
+      userType: args.userType,
+      university: args.university,
+      chamber: args.chamber,
+    });
 
     // Initialize skills
     const skills = [

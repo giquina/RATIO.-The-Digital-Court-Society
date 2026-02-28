@@ -19,6 +19,7 @@ import type * as appFeedback from "../appFeedback.js";
 import type * as attribution from "../attribution.js";
 import type * as auditLog from "../auditLog.js";
 import type * as auth from "../auth.js";
+import type * as backup from "../backup.js";
 import type * as badges_queries from "../badges_queries.js";
 import type * as bookmarks from "../bookmarks.js";
 import type * as careers from "../careers.js";
@@ -48,10 +49,12 @@ import type * as seedDemo from "../seedDemo.js";
 import type * as sessions from "../sessions.js";
 import type * as sidebar from "../sidebar.js";
 import type * as social from "../social.js";
+import type * as stripeWebhooks from "../stripeWebhooks.js";
 import type * as subscriptions from "../subscriptions.js";
 import type * as users from "../users.js";
 import type * as verification from "../verification.js";
 import type * as videoSessions from "../videoSessions.js";
+import type * as visitorChat from "../visitorChat.js";
 
 import type {
   ApiFromModules,
@@ -71,6 +74,7 @@ declare const fullApi: ApiFromModules<{
   attribution: typeof attribution;
   auditLog: typeof auditLog;
   auth: typeof auth;
+  backup: typeof backup;
   badges_queries: typeof badges_queries;
   bookmarks: typeof bookmarks;
   careers: typeof careers;
@@ -100,10 +104,12 @@ declare const fullApi: ApiFromModules<{
   sessions: typeof sessions;
   sidebar: typeof sidebar;
   social: typeof social;
+  stripeWebhooks: typeof stripeWebhooks;
   subscriptions: typeof subscriptions;
   users: typeof users;
   verification: typeof verification;
   videoSessions: typeof videoSessions;
+  visitorChat: typeof visitorChat;
 }>;
 
 /**

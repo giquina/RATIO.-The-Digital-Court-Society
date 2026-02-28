@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShieldCheck, ChevronDown } from "lucide-react";
 
@@ -19,6 +19,16 @@ const AI_DATA_SOURCES = [
 
 export function DisclaimerBanner() {
   const [expanded, setExpanded] = useState(false);
+
+  // Auto-expand for first-time visitors
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const seen = localStorage.getItem("ratio_disclaimer_seen");
+    if (!seen) {
+      setExpanded(true);
+      localStorage.setItem("ratio_disclaimer_seen", "1");
+    }
+  }, []);
 
   return (
     <motion.section
@@ -55,10 +65,14 @@ export function DisclaimerBanner() {
             className="overflow-hidden"
           >
             <div className="pt-4 pb-2 max-w-xl mx-auto">
-              <p className="text-court-xs text-court-text-ter leading-relaxed text-center mb-4">
+              <p className="text-court-xs text-court-text-ter leading-relaxed text-center mb-3">
                 Ratio is an educational training tool for UK law students. It does
                 not constitute legal advice. AI-generated analysis should always be
                 verified against primary legislation and official law reports.
+              </p>
+              <p className="text-court-xs text-court-text-sec leading-relaxed text-center mb-4 font-medium">
+                Your practice sessions are private by default. We never share your
+                data with employers or universities.
               </p>
 
               {/* AI Data Sources */}

@@ -87,6 +87,9 @@ export function HeroSection({ isAuthenticated = false }: { isAuthenticated?: boo
       <p className="text-court-xs text-court-text-ter mt-4">
         Free for students. Professional plans from £14.99/mo.
       </p>
+      <p className="text-court-xs text-court-text-ter mt-1.5 opacity-60">
+        No real cases. No legal advice. Just practice.
+      </p>
     </motion.section>
   );
 }

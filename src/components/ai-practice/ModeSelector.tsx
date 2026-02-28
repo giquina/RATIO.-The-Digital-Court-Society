@@ -1,9 +1,11 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Tag, Card, Button, DynamicIcon } from "@/components/ui";
 import { AI_PERSONAS } from "@/lib/constants/app";
-import { Lightbulb, Scale, Lock, Clock } from "lucide-react";
-import { motion } from "framer-motion";
+import { Lightbulb, Scale, Lock, Clock, ShieldCheck, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 import { cn } from "@/lib/utils/helpers";
 
 // ── Types ──
@@ -70,6 +72,18 @@ export default function ModeSelector({
     (typeof AI_PERSONAS)[Mode],
   ][];
 
+  // Show AI data disclosure once per device
+  const [showDisclosure, setShowDisclosure] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const dismissed = localStorage.getItem("ratio_ai_disclosure_seen");
+    if (!dismissed) setShowDisclosure(true);
+  }, []);
+  const dismissDisclosure = () => {
+    setShowDisclosure(false);
+    localStorage.setItem("ratio_ai_disclosure_seen", "1");
+  };
+
   return (
     <div className="pb-6">
       {/* Header */}
@@ -86,6 +100,42 @@ export default function ModeSelector({
           Train with expert legal personas. Select a mode to begin.
         </p>
       </motion.div>
+
+      {/* AI data processing disclosure — shown once */}
+      <AnimatePresence>
+        {showDisclosure && (
+          <motion.div
+            className="px-4 mb-3"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.25 }}
+          >
+            <Card className="p-3.5 border-court-border-light bg-white/[0.02]">
+              <div className="flex gap-2.5 items-start">
+                <ShieldCheck size={16} className="text-gold shrink-0 mt-0.5" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-court-xs text-court-text-sec leading-relaxed">
+                    Sessions are powered by AI. Your arguments are processed for
+                    real-time feedback only and are not used to train AI models.
+                    Transcripts are stored privately in your portfolio.{" "}
+                    <Link href="/privacy" className="text-gold hover:underline">
+                      Privacy Policy
+                    </Link>
+                  </p>
+                </div>
+                <button
+                  onClick={dismissDisclosure}
+                  className="text-court-text-ter hover:text-court-text-sec transition-colors shrink-0"
+                  aria-label="Dismiss"
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Session limit reached banner */}
       {sessionLimitReached && (

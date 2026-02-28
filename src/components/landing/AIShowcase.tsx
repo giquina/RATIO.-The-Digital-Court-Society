@@ -28,10 +28,10 @@ export function AIShowcase({ id }: { id?: string }) {
               AI-Powered Advocacy Training
             </h2>
             <p className="text-court-base text-court-text-sec leading-relaxed mb-4">
-              Our AI High Court judge listens to your submissions in real time,
+              Our AI moot court judge listens to your submissions in real time,
               identifies weaknesses in your argument structure, and intervenes
-              with the kind of probing questions you would face in a real
-              courtroom. Each session is scored across 7 dimensions of advocacy
+              with the kind of probing questions modelled on real courtroom
+              practice. Each session is scored across 7 dimensions of advocacy
               competence.
             </p>
             <p className="text-court-base text-court-text-sec leading-relaxed mb-6">
@@ -122,9 +122,9 @@ export function AIShowcase({ id }: { id?: string }) {
 
         {/* AI Disclaimer */}
         <p className="text-[10px] text-court-text-ter leading-relaxed mt-4 pt-3 border-t border-court-border-light">
-          AI Judge uses case law sourced from the UK National Archives.
-          Educational tool only — feedback is not reviewed by qualified lawyers
-          and should not be treated as legal advice.
+          Simulated moot court powered by AI. Case law sourced from the UK
+          National Archives. Educational tool only — not legal advice. Your
+          practice sessions are private and never shared with third parties.
         </p>
       </div>
     </motion.section>
