@@ -192,6 +192,8 @@ function AIPracticePageInner() {
   const [inputError, setInputError] = useState<string | null>(null);
   const [isTyping, setIsTyping] = useState(false);
   const [feedbackFallback, setFeedbackFallback] = useState(false);
+  const [sessionStarting, setSessionStarting] = useState(false);
+  const [feedbackStep, setFeedbackStep] = useState(0);
 
   // Voice input (Whisper)
   const voiceInput = useVoiceInput();
@@ -315,11 +317,13 @@ function AIPracticePageInner() {
   const startSession = async () => {
     analytics.aiPracticeStarted(mode);
     setScreen("session");
+    setSessionStarting(true);
     setTimerActive(true);
     setExchangeCount(0);
     setError(null);
     setFeedbackData(null);
     setFeedbackFallback(false);
+    setFeedbackStep(0);
     setLastAiResponse("");
 
     // Unlock speech API inside user gesture — required by iOS/Safari/Android
@@ -382,6 +386,7 @@ function AIPracticePageInner() {
       return prev;
     });
 
+    setSessionStarting(false);
     setMessages([{
       role: "ai",
       text: openingText,
@@ -578,7 +583,7 @@ function AIPracticePageInner() {
     if (!mountedRef.current) return;
     setTimeout(() => {
       if (mountedRef.current) setScreen("feedback");
-    }, 4000);
+    }, 1500);
   };
 
   // ── Generate Case Note ──
@@ -645,25 +650,100 @@ function AIPracticePageInner() {
   };
 
   // ── LOADING FEEDBACK INTERSTITIAL ──
+  // Rotating status messages while feedback generates (15-45 seconds)
+  const FEEDBACK_MESSAGES = [
+    "The court is retiring to consider its judgment...",
+    "Reviewing your submissions against the authorities cited...",
+    "Assessing argument structure and legal reasoning...",
+    "Evaluating courtroom manner and judicial handling...",
+    "Preparing the court's written judgment...",
+  ];
+
+  // Cycle through messages every 3.5 seconds
+  useEffect(() => {
+    if (screen !== "loading-feedback") return;
+    const interval = setInterval(() => {
+      setFeedbackStep((prev) => {
+        // If feedbackData is ready, hold on the final message
+        if (feedbackData) return FEEDBACK_MESSAGES.length - 1;
+        return (prev + 1) % FEEDBACK_MESSAGES.length;
+      });
+    }, 3500);
+    return () => clearInterval(interval);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [screen, feedbackData]);
+
   if (screen === "loading-feedback") {
+    const sessionDuration = 900 - timer;
+    const mins = Math.floor(sessionDuration / 60);
+    const secs = sessionDuration % 60;
+    const displayMsg = feedbackData
+      ? "Judgment ready. The court will now deliver its findings..."
+      : FEEDBACK_MESSAGES[feedbackStep % FEEDBACK_MESSAGES.length];
+
     return (
-      <div className="flex flex-col items-center justify-center h-[calc(100dvh-80px)]">
-        <div className="flex flex-col items-center gap-6">
+      <div className="flex flex-col items-center justify-center h-[calc(100dvh-80px)] px-4">
+        <div className="flex flex-col items-center gap-6 max-w-md w-full">
+          {/* Pulsing icon */}
           <div className="relative">
             <div className="w-20 h-20 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center animate-pulse">
               <Scale size={32} className="text-gold" />
             </div>
           </div>
-          <div className="text-center">
-            <p className="font-serif text-lg font-bold text-court-text mb-2">
-              The court is retiring to consider its judgment...
-            </p>
-            <div className="flex items-center justify-center gap-1.5 mt-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-gold/60 animate-bounce" style={{ animationDelay: '0ms' }} />
-              <span className="w-1.5 h-1.5 rounded-full bg-gold/60 animate-bounce" style={{ animationDelay: '200ms' }} />
-              <span className="w-1.5 h-1.5 rounded-full bg-gold/60 animate-bounce" style={{ animationDelay: '400ms' }} />
-            </div>
+
+          {/* Rotating status message */}
+          <div className="text-center min-h-[52px] flex items-center justify-center">
+            <motion.p
+              key={displayMsg}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.3 }}
+              className="font-serif text-lg font-bold text-court-text"
+            >
+              {displayMsg}
+            </motion.p>
           </div>
+
+          {/* Bouncing dots */}
+          <div className="flex items-center justify-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-gold/60 animate-bounce" style={{ animationDelay: '0ms' }} />
+            <span className="w-1.5 h-1.5 rounded-full bg-gold/60 animate-bounce" style={{ animationDelay: '200ms' }} />
+            <span className="w-1.5 h-1.5 rounded-full bg-gold/60 animate-bounce" style={{ animationDelay: '400ms' }} />
+          </div>
+
+          {/* Session summary stats (available locally) */}
+          <div className="flex items-center justify-center gap-4 text-court-xs text-court-text-ter mt-2">
+            <span>{mins}m {secs.toString().padStart(2, "0")}s</span>
+            <span className="w-px h-3 bg-court-border" />
+            <span>{exchangeCount} exchanges</span>
+            <span className="w-px h-3 bg-court-border" />
+            <span className="capitalize">{brief.area}</span>
+          </div>
+
+          {/* Skeleton feedback preview */}
+          <Card className="w-full p-4 mt-2 border-court-border-light">
+            <div className="space-y-3">
+              {FEEDBACK_DIMENSIONS.slice(0, 5).map((dim) => (
+                <div key={dim.key} className="flex items-center gap-3">
+                  <span className="text-court-xs text-court-text-ter w-28 truncate">{dim.label.split("(")[0].trim()}</span>
+                  <div className="flex-1 h-2 bg-white/[0.04] rounded-full overflow-hidden">
+                    <motion.div
+                      className="h-full bg-gold/15 rounded-full"
+                      initial={{ width: "0%" }}
+                      animate={{ width: `${30 + Math.random() * 50}%` }}
+                      transition={{ duration: 1.5, ease: "easeOut", delay: 0.2 }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-4 space-y-2">
+              <div className="h-3 w-[90%] bg-white/[0.04] rounded animate-pulse" />
+              <div className="h-3 w-[75%] bg-white/[0.04] rounded animate-pulse" style={{ animationDelay: "150ms" }} />
+              <div className="h-3 w-[60%] bg-white/[0.04] rounded animate-pulse" style={{ animationDelay: "300ms" }} />
+            </div>
+          </Card>
         </div>
       </div>
     );
@@ -894,6 +974,36 @@ function AIPracticePageInner() {
         {/* Chat messages */}
         <div className="flex-1 overflow-y-auto px-3 md:px-6 no-scrollbar flex flex-col">
           <div className="max-w-3xl mx-auto w-full">
+          {/* Session opening skeleton — shown while AI generates first message */}
+          {sessionStarting && messages.length === 0 && (
+            <motion.div
+              className="mb-3 flex justify-start mt-4"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="max-w-[90%] md:max-w-[80%] flex gap-0">
+                <div className="w-[3px] rounded-full bg-gold/20 shrink-0 my-1 animate-pulse" />
+                <div className="pl-3 py-1">
+                  <p className="text-[10px] font-medium text-gold/40 mb-1">{displayPersonaName}</p>
+                  <div className="flex items-center gap-2 mb-3">
+                    <motion.div
+                      animate={{ rotate: [0, -10, 0, 10, 0] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
+                      <Scale size={14} className="text-gold/40" />
+                    </motion.div>
+                    <span className="text-court-base text-court-text-sec italic">The court is now in session...</span>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="h-3.5 w-[85%] bg-white/[0.06] rounded animate-pulse" />
+                    <div className="h-3.5 w-[70%] bg-white/[0.06] rounded animate-pulse" style={{ animationDelay: '150ms' }} />
+                    <div className="h-3.5 w-[60%] bg-white/[0.06] rounded animate-pulse" style={{ animationDelay: '300ms' }} />
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
           {messages.map((msg, i) => (
             <div key={i} className={`mb-3 md:mb-4 flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
               {msg.role === "user" ? (

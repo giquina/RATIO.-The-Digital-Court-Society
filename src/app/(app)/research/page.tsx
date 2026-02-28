@@ -399,8 +399,15 @@ export default function ResearchPage() {
             RECENT SEARCHES
           </p>
           {searchHistory === undefined ? (
-            <div className="flex items-center justify-center py-4">
-              <Loader2 size={16} className="animate-spin text-court-text-ter" />
+            <div className="space-y-2">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="px-4 py-3 bg-navy-card border border-court-border-light rounded-xl">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="h-3.5 w-[60%] bg-white/[0.06] rounded animate-pulse" style={{ animationDelay: `${i * 100}ms` }} />
+                    <div className="h-3 w-20 bg-white/[0.04] rounded animate-pulse" style={{ animationDelay: `${i * 150}ms` }} />
+                  </div>
+                </div>
+              ))}
             </div>
           ) : searchHistory.length > 0 ? (
             <div className="space-y-2">
