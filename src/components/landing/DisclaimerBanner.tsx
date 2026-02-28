@@ -81,8 +81,9 @@ export function DisclaimerBanner() {
                   Educational Purpose &amp; Scope
                 </p>
                 <p className="text-court-xs text-court-text-sec leading-relaxed">
-                  RATIO is a professional-standard training environment for law
-                  students in England &amp; Wales. Every AI-powered session is
+                  RATIO is a professional-standard training environment built
+                  primarily for law students in England &amp; Wales, and open to
+                  anyone developing their legal skills. Every AI-powered session is
                   designed to develop your advocacy, analysis, and research skills
                   using recognised legal frameworks. As with any training tool,
                   RATIO supports your legal education — it does not replace

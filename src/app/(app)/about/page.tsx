@@ -98,7 +98,7 @@ export default function AboutPage() {
           </h2>
           <div className="space-y-3 text-court-base text-court-text-sec leading-relaxed">
             <p>
-              Ratio is the digital court society for UK law students. Inspired by the
+              Ratio is the digital court society built primarily for UK law students. Inspired by the
               historic Inns of Court, Ratio creates a structured environment where students
               can practise oral advocacy, receive AI-powered feedback, and build a
               professional portfolio of their mooting and advocacy experience.

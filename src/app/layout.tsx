@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     "The digital court society for the UK legal community. Organise moots, practise with an AI Judge, track your advocacy, and build your portfolio. Free for students, professional plans available.",
   keywords: [
     "moot court",
-    "UK law students",
+    "UK legal education",
     "advocacy training",
     "AI judge",
     "legal practice",

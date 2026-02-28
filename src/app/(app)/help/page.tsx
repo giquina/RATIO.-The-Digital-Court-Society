@@ -15,7 +15,7 @@ const FAQ_SECTIONS = [
     items: [
       {
         q: "What is Ratio?",
-        a: "Ratio is a digital court society for UK law students. It provides a structured platform for practising oral advocacy through mooting, AI-powered practice sessions, and peer feedback. Think of it as a modern version of the Inns of Court experience, accessible to all law students.",
+        a: "Ratio is a digital court society built primarily for UK law students, and open to anyone developing legal skills. It provides a structured platform for practising oral advocacy through mooting, AI-powered practice sessions, and peer feedback. Think of it as a modern version of the Inns of Court experience, accessible to all.",
       },
       {
         q: "How do I create an account?",

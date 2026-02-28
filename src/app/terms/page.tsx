@@ -74,7 +74,7 @@ export default function TermsPage() {
               2. Eligibility
             </h2>
             <p className="text-court-base text-court-text-sec leading-relaxed mb-4">
-              Ratio. is designed for law students, legal academics, and aspiring
+              Ratio. is designed primarily for law students, legal academics, and aspiring
               legal professionals. To use the platform, you must:
             </p>
             <ul className="list-disc list-inside space-y-1.5 text-court-base text-court-text-sec mb-4">

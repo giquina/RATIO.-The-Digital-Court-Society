@@ -102,7 +102,7 @@ export async function GET() {
             lineHeight: 1.5,
           }}
         >
-          The constitutional training ground for UK law students
+          The constitutional training ground for UK legal education
         </div>
       </div>
     ),
