@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { Tag, Card, Button, ProgressBar, DynamicIcon } from "@/components/ui";
+import { Tag, Card, Button, ProgressBar, DynamicIcon, ConfirmDialog, MicWarningBanner } from "@/components/ui";
 import { AI_PERSONAS, FEEDBACK_DIMENSIONS } from "@/lib/constants/app";
 import { courtToast } from "@/lib/utils/toast";
 import { Lightbulb, Book, Mic, MicOff, Pause, ArrowUp, Scale, AlertCircle, Volume2, VolumeX } from "lucide-react";
@@ -88,7 +88,7 @@ class MootCourtErrorBoundary extends React.Component<
   render() {
     if (this.state.hasError) {
       return (
-        <div className="flex flex-col items-center justify-center h-[calc(100dvh-140px)] md:h-[calc(100dvh-80px)] px-6">
+        <div className="flex flex-col items-center justify-center h-[calc(100dvh-128px)] md:h-dvh px-6">
           <div className="w-16 h-16 rounded-full bg-burgundy/10 border border-burgundy/20 flex items-center justify-center mb-4">
             <AlertCircle size={28} className="text-burgundy" />
           </div>
@@ -274,6 +274,22 @@ function MootCourtPageInner() {
   const [spectatorCode, setSpectatorCode] = useState<string | null>(null);
   const [spectatorCount, setSpectatorCount] = useState(0);
 
+  // End session confirmation dialog
+  const [showEndConfirm, setShowEndConfirm] = useState(false);
+
+  // Microphone readiness check
+  const [micStatus, setMicStatus] = useState<"unchecked" | "available" | "unavailable" | "dismissed">("unchecked");
+  const checkMicAvailability = useCallback(async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      // Permission granted — stop the stream immediately (we just needed to check)
+      stream.getTracks().forEach((t) => t.stop());
+      setMicStatus("available");
+    } catch {
+      setMicStatus("unavailable");
+    }
+  }, []);
+
   const persona = AI_PERSONAS[mode];
   // Select a scenario matching the user's practice areas (professional) or default (student).
   // We store it in state so it doesn't re-randomise on every render.
@@ -285,6 +301,13 @@ function MootCourtPageInner() {
       selectScenario(mode, aiUserContext?.practiceAreas, aiUserContext?.userType)
     );
   }, [mode, aiUserContext?.practiceAreas, aiUserContext?.userType]);
+
+  // Check mic availability when entering briefing screen
+  useEffect(() => {
+    if (screen === "briefing" && micStatus === "unchecked" && typeof navigator !== "undefined" && navigator.mediaDevices) {
+      checkMicAvailability();
+    }
+  }, [screen, micStatus, checkMicAvailability]);
 
   // Get the display name for judge (may vary by temperament)
   const displayPersonaName = mode === "judge"
@@ -854,7 +877,7 @@ function MootCourtPageInner() {
   // ── BRIEFING ──
   if (screen === "briefing") {
     return (
-      <div className="flex flex-col h-[calc(100dvh-140px)] md:h-[calc(100dvh-80px)]">
+      <div className="flex flex-col h-[calc(100dvh-128px)] md:h-dvh">
         {/* Scrollable content */}
         <div className="flex-1 overflow-y-auto pb-4">
         <div className="px-4 pt-3 pb-4">
@@ -948,8 +971,18 @@ function MootCourtPageInner() {
           </div>
         </div>
 
+        {/* Mic warning — shown if mic not available */}
+        {micStatus === "unavailable" && (
+          <div className="pt-3">
+            <MicWarningBanner
+              onDismiss={() => setMicStatus("dismissed")}
+              onCheckAgain={checkMicAvailability}
+            />
+          </div>
+        )}
+
         {/* Sticky CTA buttons — always visible */}
-        <div className="shrink-0 px-4 pt-3 pb-1 border-t border-court-border-light/20 bg-navy">
+        <div className="shrink-0 px-4 pt-3 pb-safe border-t border-court-border-light/20 bg-navy">
           {aiUserContext?.userType === "professional" && (
             <button
               onClick={() => setBrief(selectScenario(mode, aiUserContext?.practiceAreas, aiUserContext?.userType))}
@@ -986,9 +1019,7 @@ function MootCourtPageInner() {
             {/* Row 1: End Session | LIVE | Timer */}
             <div className="px-3 md:px-6 pt-2 md:pt-3 pb-1 flex justify-between items-center">
               <button
-                onClick={() => {
-                  if (confirm("End this session? You will receive your assessment.")) endSession();
-                }}
+                onClick={() => setShowEndConfirm(true)}
                 className="flex items-center gap-1 text-court-text-ter hover:text-court-text transition-colors"
               >
                 <span className="text-court-sm md:text-court-base">←</span>
@@ -1284,6 +1315,18 @@ function MootCourtPageInner() {
             />
           }
         />
+
+        {/* End Session confirmation dialog */}
+        <ConfirmDialog
+          open={showEndConfirm}
+          onConfirm={() => { setShowEndConfirm(false); endSession(); }}
+          onCancel={() => setShowEndConfirm(false)}
+          title="End this session?"
+          description="The court will adjourn and you will receive your assessment. This action cannot be undone."
+          confirmLabel="End Session"
+          cancelLabel="Continue"
+          variant="danger"
+        />
       </div>
     );
   }
@@ -1295,7 +1338,7 @@ function MootCourtPageInner() {
   const keyImprovement = feedbackData?.keyImprovement || FALLBACK_KEY_IMPROVEMENT;
 
   return (
-    <div className="flex flex-col min-h-[calc(100dvh-140px)] md:min-h-[calc(100dvh-80px)]">
+    <div className="flex flex-col h-[calc(100dvh-128px)] md:h-dvh">
       <div className="flex-1 overflow-y-auto pb-4">
       {/* Header — full width */}
       <div className="px-4 pt-3 pb-4">

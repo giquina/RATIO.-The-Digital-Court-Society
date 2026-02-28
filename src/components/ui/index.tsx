@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { cn, getInitials } from "@/lib/utils/helpers";
 import { CHAMBER_COLORS } from "@/lib/constants/app";
@@ -526,6 +526,149 @@ export function ErrorState({
       {onRetry && (
         <Button variant="outline" size="sm" onClick={onRetry}>Try Again</Button>
       )}
+    </div>
+  );
+}
+
+// ── ConfirmDialog ──
+// Replaces native window.confirm() with a styled modal that matches the app design.
+export function ConfirmDialog({
+  open,
+  onConfirm,
+  onCancel,
+  title = "Are you sure?",
+  description,
+  confirmLabel = "Confirm",
+  cancelLabel = "Cancel",
+  variant = "danger",
+  icon,
+}: {
+  open: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
+  title?: string;
+  description?: string;
+  confirmLabel?: string;
+  cancelLabel?: string;
+  variant?: "danger" | "gold";
+  icon?: React.ReactNode;
+}) {
+  // Close on Escape key
+  useEffect(() => {
+    if (!open) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onCancel();
+    };
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [open, onCancel]);
+
+  // Prevent body scroll when open
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+      return () => { document.body.style.overflow = ""; };
+    }
+  }, [open]);
+
+  if (!open) return null;
+
+  const isDanger = variant === "danger";
+
+  return createPortal(
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        onClick={onCancel}
+      />
+
+      {/* Dialog */}
+      <div className="relative bg-navy-card border border-court-border rounded-court shadow-2xl max-w-sm w-full p-6 animate-in fade-in zoom-in-95 duration-200">
+        {/* Icon */}
+        {icon && (
+          <div className="flex justify-center mb-4">
+            {icon}
+          </div>
+        )}
+
+        {/* Title */}
+        <h3 className="font-serif text-lg font-bold text-court-text text-center mb-2">
+          {title}
+        </h3>
+
+        {/* Description */}
+        {description && (
+          <p className="text-court-sm text-court-text-sec text-center mb-6 leading-relaxed">
+            {description}
+          </p>
+        )}
+
+        {/* Actions */}
+        <div className="flex gap-3">
+          <button
+            onClick={onCancel}
+            className="flex-1 py-2.5 rounded-xl border border-court-border bg-navy-mid text-court-text font-medium text-court-sm hover:bg-navy-light transition-colors"
+          >
+            {cancelLabel}
+          </button>
+          <button
+            onClick={onConfirm}
+            className={cn(
+              "flex-1 py-2.5 rounded-xl font-bold text-court-sm transition-colors",
+              isDanger
+                ? "bg-red-500/15 border border-red-500/30 text-red-400 hover:bg-red-500/25"
+                : "bg-gold text-navy hover:bg-gold/90"
+            )}
+          >
+            {confirmLabel}
+          </button>
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+}
+
+// ── MicWarningBanner ──
+// Shown before session starts if microphone permission is not granted.
+export function MicWarningBanner({
+  onDismiss,
+  onCheckAgain,
+}: {
+  onDismiss: () => void;
+  onCheckAgain: () => void;
+}) {
+  return (
+    <div className="mx-4 mb-3 px-3 py-2.5 rounded-lg bg-amber-500/8 border border-amber-500/20">
+      <div className="flex items-start gap-2.5">
+        <div className="w-8 h-8 rounded-full bg-amber-500/15 flex items-center justify-center shrink-0 mt-0.5">
+          <Mic size={14} className="text-amber-400" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-court-sm font-semibold text-amber-400 mb-0.5">
+            Microphone not detected
+          </p>
+          <p className="text-court-xs text-court-text-ter leading-relaxed">
+            Voice input requires microphone access. You can still type your submissions, but speaking to the court will be unavailable.
+          </p>
+          <div className="flex gap-2 mt-2">
+            <button
+              onClick={onCheckAgain}
+              className="text-court-xs font-semibold text-amber-400 hover:text-amber-300 transition-colors"
+            >
+              Check again
+            </button>
+            <span className="text-court-text-ter">·</span>
+            <button
+              onClick={onDismiss}
+              className="text-court-xs text-court-text-ter hover:text-court-text-sec transition-colors"
+            >
+              Continue without mic
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

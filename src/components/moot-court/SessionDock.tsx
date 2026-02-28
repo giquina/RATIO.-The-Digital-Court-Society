@@ -19,6 +19,7 @@ import {
   LayoutGrid,
 } from "lucide-react";
 import { cn } from "@/lib/utils/helpers";
+import { ConfirmDialog } from "@/components/ui";
 
 // ── Types ──
 
@@ -222,6 +223,7 @@ function generateHints(
 // ── Component ──
 
 export default function SessionDock(props: SessionDockProps) {
+  const [showEndConfirm, setShowEndConfirm] = useState(false);
   const [activeTab, setActiveTab] = useState<DockTab>(null);
 
   // Default to Brief tab on desktop — shows case details immediately
@@ -485,11 +487,7 @@ export default function SessionDock(props: SessionDockProps) {
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: "spring", stiffness: 400, damping: 20, delay: 0.06 }}
-          onClick={() => {
-            if (confirm("End this session? You will receive your assessment.")) {
-              props.onEndSession();
-            }
-          }}
+          onClick={() => setShowEndConfirm(true)}
           className={cn(
             "w-[52px] h-[52px] rounded-full flex flex-col items-center justify-center",
             "backdrop-blur-xl",
@@ -581,11 +579,7 @@ export default function SessionDock(props: SessionDockProps) {
 
           {/* End Session — desktop sidebar */}
           <button
-            onClick={() => {
-              if (confirm("End this session? You will receive your assessment.")) {
-                props.onEndSession();
-              }
-            }}
+            onClick={() => setShowEndConfirm(true)}
             className="flex-1 flex flex-col items-center gap-1 py-3 transition-colors text-red-400 hover:text-red-300"
           >
             <LogOut size={16} strokeWidth={2} />
@@ -605,6 +599,18 @@ export default function SessionDock(props: SessionDockProps) {
           )}
         </div>
       </aside>
+
+      {/* End Session confirmation dialog */}
+      <ConfirmDialog
+        open={showEndConfirm}
+        onConfirm={() => { setShowEndConfirm(false); props.onEndSession(); }}
+        onCancel={() => setShowEndConfirm(false)}
+        title="End this session?"
+        description="The court will adjourn and you will receive your assessment. This action cannot be undone."
+        confirmLabel="End Session"
+        cancelLabel="Continue"
+        variant="danger"
+      />
     </>
   );
 }
