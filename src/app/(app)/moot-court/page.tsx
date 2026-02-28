@@ -953,27 +953,9 @@ function MootCourtPageInner() {
         </div>
         </div>
 
-        {/* AI Disclaimer */}
-        <div className="px-4 mt-3">
-          <div className="px-3 py-2.5 rounded-lg bg-white/[0.02] border border-court-border-light">
-            <div className="flex items-start gap-2">
-              <AlertCircle size={13} className="text-court-text-ter shrink-0 mt-0.5" />
-              <div>
-                <p className="text-court-xs text-court-text-ter leading-relaxed">
-                  <span className="font-semibold text-court-text-sec">AI Simulation.</span>{" "}
-                  The AI Judge uses case law sourced from the UK National Archives.
-                  Feedback is educational only, may contain inaccuracies, and has not been
-                  reviewed by a qualified lawyer. Always verify against primary sources and
-                  seek guidance from your tutors.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Mic warning — shown if mic not available */}
         {micStatus === "unavailable" && (
-          <div className="pt-3">
+          <div className="px-4 pt-3">
             <MicWarningBanner
               onDismiss={() => setMicStatus("dismissed")}
               onCheckAgain={checkMicAvailability}
@@ -981,7 +963,7 @@ function MootCourtPageInner() {
           </div>
         )}
 
-        {/* Sticky CTA buttons — always visible */}
+        {/* Sticky CTA buttons + disclaimer — always visible */}
         <div className="shrink-0 px-4 pt-3 pb-safe border-t border-court-border-light/20 bg-navy">
           {aiUserContext?.userType === "professional" && (
             <button
@@ -994,6 +976,15 @@ function MootCourtPageInner() {
           <div className="flex gap-2.5">
             <Button variant="secondary" fullWidth onClick={() => setScreen("select")}>Cancel</Button>
             <Button fullWidth onClick={startSession}>Begin Session</Button>
+          </div>
+
+          {/* AI Disclaimer — below CTAs */}
+          <div className="mt-3 px-1 py-2 flex items-start gap-2">
+            <AlertCircle size={12} className="text-court-text-ter shrink-0 mt-0.5" />
+            <p className="text-court-xs text-court-text-ter/60 leading-relaxed">
+              <span className="font-medium text-court-text-ter">AI Simulation.</span>{" "}
+              Feedback is educational only and has not been reviewed by a qualified lawyer.
+            </p>
           </div>
         </div>
       </div>
