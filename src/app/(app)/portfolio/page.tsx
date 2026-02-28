@@ -257,7 +257,7 @@ export default function PortfolioPage() {
           />
         ) : (
           <>
-            <div className="space-y-2.5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
               {filteredSessions.map((session: any) => (
                 <Link key={session._id} href={`/feedback/${session._id}`}>
                   <Card className="p-4 hover:border-white/10 transition-all cursor-pointer">

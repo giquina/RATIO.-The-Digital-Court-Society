@@ -119,7 +119,7 @@ export default function ModeSelector({
 
       {/* Persona cards */}
       <motion.div
-        className="px-4 flex flex-col gap-3"
+        className="px-4 grid grid-cols-1 md:grid-cols-2 gap-3"
         variants={containerVariants}
         initial="hidden"
         animate="visible"

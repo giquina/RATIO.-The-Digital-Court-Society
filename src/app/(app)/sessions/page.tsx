@@ -272,7 +272,7 @@ export default function SessionsPage() {
         </div>
       </div>
 
-      <div className="px-4 flex flex-col gap-3 md:gap-4">
+      <div className="px-4 grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
         {tab === 0 && (
           <>
             {upcomingSessions === undefined ? (

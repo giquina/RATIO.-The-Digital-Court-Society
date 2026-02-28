@@ -49,7 +49,7 @@ export default function InstallBanner() {
   };
 
   return (
-    <div className="fixed bottom-[68px] left-3 right-3 z-[60] animate-in slide-in-from-bottom-4 duration-300">
+    <div className="fixed top-[56px] left-3 right-3 z-[60] animate-in slide-in-from-top-4 duration-300 md:top-auto md:bottom-6 md:left-auto md:right-6 md:max-w-sm md:slide-in-from-bottom-4">
       <div className="bg-navy-card/95 backdrop-blur-xl border border-gold/20 rounded-2xl px-4 py-3 shadow-2xl shadow-black/40">
         {showIOSTip ? (
           /* iOS instructions */
