@@ -1,7 +1,17 @@
 import { v } from "convex/values";
-import { query, mutation } from "./_generated/server";
+import { query, mutation, internalMutation } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { auth } from "./auth";
+
+// ── HTML escaping for email templates ──
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
 
 // ── Price mapping (pence per month) ──
 const PLAN_MRR_PENCE: Record<string, number> = {
@@ -447,7 +457,7 @@ export const getAiUsageStats = query({
 // SEED ADMIN ROLE (one-time setup)
 // ════════════════════════════════════════════
 
-export const seedOwnerRole = mutation({
+export const seedOwnerRole = internalMutation({
   args: { email: v.string() },
   handler: async (ctx, args) => {
     // Only works if no owner exists yet
@@ -613,9 +623,9 @@ export const sendAdminEmail = mutation({
   <div style="text-align:center;padding-bottom:24px">
     <p style="font-family:'Cormorant Garamond',Georgia,serif;font-size:24px;font-weight:700;color:#F2EDE6;letter-spacing:0.12em;margin:0">RATIO<span style="color:#C9A84C">.</span></p>
   </div>
-  <p style="font-family:'Cormorant Garamond',Georgia,serif;font-size:20px;font-weight:700;color:#F2EDE6;line-height:26px;margin:0 0 16px">${args.subject}</p>
-  <p style="color:rgba(242,237,230,0.6);font-size:14px;line-height:22px;margin:0 0 12px">Dear ${profile.fullName},</p>
-  <div style="color:rgba(242,237,230,0.6);font-size:14px;line-height:22px;margin:0 0 24px;white-space:pre-wrap">${args.message}</div>
+  <p style="font-family:'Cormorant Garamond',Georgia,serif;font-size:20px;font-weight:700;color:#F2EDE6;line-height:26px;margin:0 0 16px">${escapeHtml(args.subject)}</p>
+  <p style="color:rgba(242,237,230,0.6);font-size:14px;line-height:22px;margin:0 0 12px">Dear ${escapeHtml(profile.fullName)},</p>
+  <div style="color:rgba(242,237,230,0.6);font-size:14px;line-height:22px;margin:0 0 24px;white-space:pre-wrap">${escapeHtml(args.message)}</div>
   <hr style="border-color:rgba(255,255,255,0.06);margin:32px 0 16px">
   <div style="text-align:center">
     <p style="color:rgba(242,237,230,0.3);font-size:11px;line-height:16px;margin:0">Ratio — The Digital Court Society</p>

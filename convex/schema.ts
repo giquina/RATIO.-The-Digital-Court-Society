@@ -978,6 +978,16 @@ export default defineSchema({
     .index("by_campaign", ["utmCampaign"]),
 
   // ═══════════════════════════════════════════
+  // STRIPE WEBHOOK EVENTS (idempotency)
+  // ═══════════════════════════════════════════
+  stripeWebhookEvents: defineTable({
+    eventId: v.string(), // Stripe event ID (evt_...)
+    eventType: v.string(), // e.g. "checkout.session.completed"
+    processedAt: v.number(), // timestamp
+  })
+    .index("by_event_id", ["eventId"]),
+
+  // ═══════════════════════════════════════════
   // APP FEEDBACK (bugs, features, general)
   // ═══════════════════════════════════════════
   appFeedback: defineTable({

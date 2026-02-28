@@ -12,28 +12,43 @@ auth.addHttpRoutes(http);
 // ADMIN HTTP API — authenticated via X-Admin-Key header
 // ════════════════════════════════════════════════════════════════
 
-const CORS_HEADERS = {
-  "Content-Type": "application/json",
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "X-Admin-Key, Content-Type",
-};
+// Allowed origins for admin API CORS
+const ALLOWED_ORIGINS = [
+  "https://ratiothedigitalcourtsociety.com",
+  "https://www.ratiothedigitalcourtsociety.com",
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
+];
+
+/** Build CORS headers with origin validation. */
+function getCorsHeaders(request?: Request): Record<string, string> {
+  const origin = request?.headers.get("Origin") ?? "";
+  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": allowedOrigin,
+    "Access-Control-Allow-Headers": "X-Admin-Key, Content-Type",
+    "Vary": "Origin",
+  };
+}
 
 /** Validate the X-Admin-Key header against ADMIN_API_KEY env var. */
 function validateAdminKey(request: Request): Response | true {
   const key = request.headers.get("X-Admin-Key");
   const expected = process.env.ADMIN_API_KEY;
+  const headers = getCorsHeaders(request);
 
   if (!expected) {
     return new Response(
       JSON.stringify({ error: "ADMIN_API_KEY not configured on server" }),
-      { status: 500, headers: CORS_HEADERS }
+      { status: 500, headers }
     );
   }
 
   if (!key || key !== expected) {
     return new Response(
       JSON.stringify({ error: "Unauthorized: invalid or missing X-Admin-Key" }),
-      { status: 401, headers: CORS_HEADERS }
+      { status: 401, headers }
     );
   }
 
@@ -41,15 +56,15 @@ function validateAdminKey(request: Request): Response | true {
 }
 
 /** Helper to build a JSON success response. */
-function jsonResponse(data: unknown, status = 200): Response {
-  return new Response(JSON.stringify(data), { status, headers: CORS_HEADERS });
+function jsonResponse(data: unknown, request: Request, status = 200): Response {
+  return new Response(JSON.stringify(data), { status, headers: getCorsHeaders(request) });
 }
 
 /** Helper to build a JSON error response. */
-function errorResponse(message: string, status = 400): Response {
+function errorResponse(message: string, request: Request, status = 400): Response {
   return new Response(JSON.stringify({ error: message }), {
     status,
-    headers: CORS_HEADERS,
+    headers: getCorsHeaders(request),
   });
 }
 
@@ -57,52 +72,52 @@ function errorResponse(message: string, status = 400): Response {
 http.route({
   path: "/api/admin/kpis",
   method: "OPTIONS",
-  handler: httpAction(async () => new Response(null, { status: 204, headers: CORS_HEADERS })),
+  handler: httpAction(async (_ctx, request) => new Response(null, { status: 204, headers: getCorsHeaders(request) })),
 });
 http.route({
   path: "/api/admin/revenue",
   method: "OPTIONS",
-  handler: httpAction(async () => new Response(null, { status: 204, headers: CORS_HEADERS })),
+  handler: httpAction(async (_ctx, request) => new Response(null, { status: 204, headers: getCorsHeaders(request) })),
 });
 http.route({
   path: "/api/admin/cohorts",
   method: "OPTIONS",
-  handler: httpAction(async () => new Response(null, { status: 204, headers: CORS_HEADERS })),
+  handler: httpAction(async (_ctx, request) => new Response(null, { status: 204, headers: getCorsHeaders(request) })),
 });
 http.route({
   path: "/api/admin/advocates",
   method: "OPTIONS",
-  handler: httpAction(async () => new Response(null, { status: 204, headers: CORS_HEADERS })),
+  handler: httpAction(async (_ctx, request) => new Response(null, { status: 204, headers: getCorsHeaders(request) })),
 });
 http.route({
   pathPrefix: "/api/admin/advocate/",
   method: "OPTIONS",
-  handler: httpAction(async () => new Response(null, { status: 204, headers: CORS_HEADERS })),
+  handler: httpAction(async (_ctx, request) => new Response(null, { status: 204, headers: getCorsHeaders(request) })),
 });
 http.route({
   path: "/api/admin/churn-risk",
   method: "OPTIONS",
-  handler: httpAction(async () => new Response(null, { status: 204, headers: CORS_HEADERS })),
+  handler: httpAction(async (_ctx, request) => new Response(null, { status: 204, headers: getCorsHeaders(request) })),
 });
 http.route({
   path: "/api/admin/ai-usage",
   method: "OPTIONS",
-  handler: httpAction(async () => new Response(null, { status: 204, headers: CORS_HEADERS })),
+  handler: httpAction(async (_ctx, request) => new Response(null, { status: 204, headers: getCorsHeaders(request) })),
 });
 http.route({
   path: "/api/admin/referral-stats",
   method: "OPTIONS",
-  handler: httpAction(async () => new Response(null, { status: 204, headers: CORS_HEADERS })),
+  handler: httpAction(async (_ctx, request) => new Response(null, { status: 204, headers: getCorsHeaders(request) })),
 });
 http.route({
   path: "/api/admin/snapshots",
   method: "OPTIONS",
-  handler: httpAction(async () => new Response(null, { status: 204, headers: CORS_HEADERS })),
+  handler: httpAction(async (_ctx, request) => new Response(null, { status: 204, headers: getCorsHeaders(request) })),
 });
 http.route({
   path: "/api/admin/search",
   method: "OPTIONS",
-  handler: httpAction(async () => new Response(null, { status: 204, headers: CORS_HEADERS })),
+  handler: httpAction(async (_ctx, request) => new Response(null, { status: 204, headers: getCorsHeaders(request) })),
 });
 
 // ────────────────────────────────────────────
@@ -116,7 +131,7 @@ http.route({
     if (authResult !== true) return authResult;
 
     const data = await ctx.runQuery(internal.adminApi.getKPIsInternal);
-    return jsonResponse(data);
+    return jsonResponse(data, request);
   }),
 });
 
@@ -131,7 +146,7 @@ http.route({
     if (authResult !== true) return authResult;
 
     const data = await ctx.runQuery(internal.adminApi.getRevenueInternal);
-    return jsonResponse(data);
+    return jsonResponse(data, request);
   }),
 });
 
@@ -151,7 +166,7 @@ http.route({
     const data = await ctx.runQuery(internal.adminApi.getCohortsInternal, {
       weeks: isNaN(weeks) ? 12 : weeks,
     });
-    return jsonResponse(data);
+    return jsonResponse(data, request);
   }),
 });
 
@@ -179,7 +194,7 @@ http.route({
       plan,
       rank,
     });
-    return jsonResponse(data);
+    return jsonResponse(data, request);
   }),
 });
 
@@ -199,7 +214,7 @@ http.route({
     const id = pathParts[pathParts.length - 1];
 
     if (!id) {
-      return errorResponse("Missing profile ID in URL path", 400);
+      return errorResponse("Missing profile ID in URL path", request, 400);
     }
 
     try {
@@ -209,11 +224,11 @@ http.route({
       );
 
       if (!data) {
-        return errorResponse("Advocate not found", 404);
+        return errorResponse("Advocate not found", request, 404);
       }
-      return jsonResponse(data);
+      return jsonResponse(data, request);
     } catch (e: any) {
-      return errorResponse(`Invalid profile ID: ${e.message}`, 400);
+      return errorResponse(`Invalid profile ID: ${e.message}`, request, 400);
     }
   }),
 });
@@ -229,7 +244,7 @@ http.route({
     if (authResult !== true) return authResult;
 
     const data = await ctx.runQuery(internal.adminApi.getChurnRiskInternal);
-    return jsonResponse(data);
+    return jsonResponse(data, request);
   }),
 });
 
@@ -244,7 +259,7 @@ http.route({
     if (authResult !== true) return authResult;
 
     const data = await ctx.runQuery(internal.adminApi.getAiUsageInternal);
-    return jsonResponse(data);
+    return jsonResponse(data, request);
   }),
 });
 
@@ -259,7 +274,7 @@ http.route({
     if (authResult !== true) return authResult;
 
     const data = await ctx.runQuery(internal.adminApi.getReferralStatsInternal);
-    return jsonResponse(data);
+    return jsonResponse(data, request);
   }),
 });
 
@@ -279,7 +294,7 @@ http.route({
     const data = await ctx.runQuery(internal.adminApi.getSnapshotsInternal, {
       days: isNaN(days) ? 30 : days,
     });
-    return jsonResponse(data);
+    return jsonResponse(data, request);
   }),
 });
 
@@ -297,14 +312,14 @@ http.route({
     const q = url.searchParams.get("q") ?? "";
 
     if (q.length < 2) {
-      return errorResponse("Search query must be at least 2 characters", 400);
+      return errorResponse("Search query must be at least 2 characters", request, 400);
     }
 
     const data = await ctx.runQuery(
       internal.adminApi.searchAdvocatesInternal,
       { q }
     );
-    return jsonResponse(data);
+    return jsonResponse(data, request);
   }),
 });
 

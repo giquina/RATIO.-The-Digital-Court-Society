@@ -47,6 +47,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
+  // Idempotency check — skip if we already processed this event
+  const alreadyProcessed = await convex.query(
+    anyApi.stripeWebhooks.isEventProcessed,
+    { eventId: event.id }
+  );
+  if (alreadyProcessed) {
+    return NextResponse.json({ received: true, skipped: true });
+  }
+
   try {
     switch (event.type) {
       case "checkout.session.completed": {
@@ -126,6 +135,12 @@ export async function POST(req: NextRequest) {
         break;
       }
     }
+
+    // Record event as processed
+    await convex.mutation(anyApi.stripeWebhooks.recordProcessedEvent, {
+      eventId: event.id,
+      eventType: event.type,
+    });
 
     return NextResponse.json({ received: true });
   } catch (err) {

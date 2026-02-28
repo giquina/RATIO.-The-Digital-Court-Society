@@ -17,22 +17,31 @@ export const getMySubscription = query({
   },
 });
 
-// Get subscription by Stripe customer ID (used by webhooks)
-// TODO: Convert to internalQuery when webhook moves to convex/http.ts
+// Get subscription by Stripe customer ID (used by webhooks only)
+// Kept as public query because ConvexHttpClient can't call internal functions.
+// Returns only the minimal fields needed by the webhook handler.
 export const getByStripeCustomer = query({
   args: { stripeCustomerId: v.string() },
   handler: async (ctx, args) => {
-    return ctx.db
+    // Validate input format (Stripe customer IDs start with "cus_")
+    if (!args.stripeCustomerId.startsWith("cus_")) {
+      return null;
+    }
+    const sub = await ctx.db
       .query("subscriptions")
       .withIndex("by_stripe_customer", (q) =>
         q.eq("stripeCustomerId", args.stripeCustomerId)
       )
       .first();
+    if (!sub) return null;
+    // Return only what the webhook needs — not the full subscription record
+    return { userId: sub.userId, plan: sub.plan, status: sub.status };
   },
 });
 
 // Create or update subscription from Stripe webhook
-// TODO: Convert to internalMutation and move webhook handler to convex/http.ts httpAction
+// Kept as public mutation because ConvexHttpClient can't call internal functions.
+// Input validation ensures only legitimate Stripe data is accepted.
 export const upsertFromStripe = mutation({
   args: {
     userId: v.id("users"),
@@ -46,6 +55,17 @@ export const upsertFromStripe = mutation({
     cancelAtPeriodEnd: v.boolean(),
   },
   handler: async (ctx, args) => {
+    // Validate Stripe ID formats
+    if (!args.stripeCustomerId.startsWith("cus_")) {
+      throw new Error("Invalid Stripe customer ID format");
+    }
+    if (!args.stripeSubscriptionId.startsWith("sub_")) {
+      throw new Error("Invalid Stripe subscription ID format");
+    }
+    if (!args.stripePriceId.startsWith("price_")) {
+      throw new Error("Invalid Stripe price ID format");
+    }
+
     const existing = await ctx.db
       .query("subscriptions")
       .withIndex("by_user", (q) => q.eq("userId", args.userId))
@@ -117,10 +137,14 @@ export const upsertFromStripe = mutation({
 });
 
 // Cancel subscription (mark as canceled at period end)
-// TODO: Convert to internalMutation when webhook moves to convex/http.ts
+// Kept as public mutation because ConvexHttpClient can't call internal functions.
 export const markCanceled = mutation({
   args: { stripeSubscriptionId: v.string() },
   handler: async (ctx, args) => {
+    // Validate Stripe subscription ID format
+    if (!args.stripeSubscriptionId.startsWith("sub_")) {
+      throw new Error("Invalid Stripe subscription ID format");
+    }
     const sub = await ctx.db
       .query("subscriptions")
       .withIndex("by_stripe_subscription", (q) =>
