@@ -113,7 +113,7 @@ export function FeedbackButton() {
       {!isOpen && (
         <button
           onClick={handleOpen}
-          className="fixed bottom-[7.5rem] right-4 md:bottom-[4.5rem] md:right-6 z-[69] h-10 w-10 rounded-full bg-navy-card border border-court-border hover:border-gold/30 flex items-center justify-center transition-colors duration-200 shadow-lg"
+          className="fixed bottom-[9.75rem] right-4 md:bottom-[5.5rem] md:right-6 z-[69] h-10 w-10 rounded-full bg-navy-card border border-court-border hover:border-gold/30 flex items-center justify-center transition-colors duration-200 shadow-lg"
           aria-label="Send feedback"
         >
           <MessageSquarePlus size={16} className="text-court-text-sec" />
