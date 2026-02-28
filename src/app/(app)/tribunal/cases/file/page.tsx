@@ -8,6 +8,7 @@ import { anyApi } from "convex/server";
 import { Card, Button } from "@/components/ui";
 import { VerifiedOnly } from "@/components/guards/VerifiedOnly";
 import { ArrowLeft, Gavel, Info, AlertTriangle } from "lucide-react";
+import { analytics } from "@/lib/analytics";
 
 const CASE_TYPES = [
   { value: "moderation_review", label: "Review of Moderation Decision" },
@@ -53,6 +54,7 @@ export default function FileCasePage() {
         conclusion,
         remedySought: remedy,
       });
+      analytics.caseSubmitted();
       router.push("/tribunal");
     } catch {
       setSubmitting(false);

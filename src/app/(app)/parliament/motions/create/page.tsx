@@ -8,6 +8,7 @@ import { anyApi } from "convex/server";
 import { Card, Button, Tag } from "@/components/ui";
 import { VerifiedOnly } from "@/components/guards/VerifiedOnly";
 import { ArrowLeft, FileText, AlertTriangle, Info } from "lucide-react";
+import { analytics } from "@/lib/analytics";
 
 const CATEGORIES = [
   { value: "policy", label: "Policy", description: "Changes to platform policies and procedures" },
@@ -44,6 +45,7 @@ export default function CreateMotionPage() {
         application,
         conclusion,
       });
+      analytics.motionCreated();
       router.push("/parliament/motions");
     } catch {
       setSubmitting(false);

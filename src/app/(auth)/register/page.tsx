@@ -9,6 +9,7 @@ import Link from "next/link";
 import { Scale, Loader2, ArrowLeft } from "lucide-react";
 import { DemoCredentialsBanner } from "@/components/shared/DemoCredentialsBanner";
 import { getStoredUTM, clearUTM } from "@/lib/utils/utm";
+import { analytics } from "@/lib/analytics";
 
 /** Captures ?ref= param from referral links and stores in localStorage */
 function ReferralCapture() {
@@ -64,6 +65,7 @@ export default function RegisterPage() {
       } catch {
         // Attribution is non-critical — don't block signup
       }
+      analytics.signUp("password");
       router.push("/onboarding");
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "";

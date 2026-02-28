@@ -7,6 +7,7 @@ import { useQuery, useMutation } from "convex/react";
 import { anyApi } from "convex/server";
 import { Card, Tag, Button, Avatar, EmptyState } from "@/components/ui";
 import { VerifiedOnly } from "@/components/guards/VerifiedOnly";
+import { analytics } from "@/lib/analytics";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -66,6 +67,7 @@ export default function MotionDetailPage() {
     setVoting(true);
     try {
       await castVote({ motionId: id as any, profileId: profile._id, vote });
+      analytics.votecast(id as string);
       setUserVote(vote);
     } catch {
       // Already voted or other error

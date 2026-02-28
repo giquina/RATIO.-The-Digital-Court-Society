@@ -6,6 +6,7 @@ import { AI_PERSONAS, FEEDBACK_DIMENSIONS } from "@/lib/constants/app";
 import { courtToast } from "@/lib/utils/toast";
 import { Lightbulb, Book, Mic, MicOff, Pause, ArrowUp, Scale, AlertCircle, Volume2, VolumeX } from "lucide-react";
 import { motion } from "framer-motion";
+import { analytics } from "@/lib/analytics";
 import ModeSelector from "@/components/ai-practice/ModeSelector";
 import JudgeAvatar from "@/components/ai-practice/JudgeAvatar";
 import ObjectionButtons from "@/components/ai-practice/ObjectionButtons";
@@ -312,6 +313,7 @@ function AIPracticePageInner() {
 
   // ── Start session ──
   const startSession = async () => {
+    analytics.aiPracticeStarted(mode);
     setScreen("session");
     setTimerActive(true);
     setExchangeCount(0);
@@ -527,6 +529,7 @@ function AIPracticePageInner() {
     setScreen("loading-feedback");
 
     const sessionDuration = 900 - timer;
+    analytics.aiPracticeCompleted(mode, sessionDuration);
 
     try {
       const res = await fetchWithTimeout('/api/ai/feedback', {

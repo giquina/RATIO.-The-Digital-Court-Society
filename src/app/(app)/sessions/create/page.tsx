@@ -8,6 +8,7 @@ import { Card, Button, Tag, DynamicIcon } from "@/components/ui";
 import { SESSION_TYPES, LAW_MODULES, MOOT_ROLES, MOCK_TRIAL_ROLES } from "@/lib/constants/app";
 import { courtToast } from "@/lib/utils/toast";
 import { BookOpen, FileText } from "lucide-react";
+import { analytics } from "@/lib/analytics";
 
 export default function CreateSessionPage() {
   const router = useRouter();
@@ -82,6 +83,7 @@ export default function CreateSessionPage() {
         isCrossUniversity: crossUni,
         roles,
       });
+      analytics.sessionCreated(sessionType);
       courtToast.success("Session created");
       router.push("/sessions");
     } catch (err) {

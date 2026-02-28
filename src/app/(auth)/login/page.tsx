@@ -6,6 +6,7 @@ import { useAuthActions } from "@convex-dev/auth/react";
 import Link from "next/link";
 import { Scale, Loader2, ArrowLeft } from "lucide-react";
 import { DemoCredentialsBanner } from "@/components/shared/DemoCredentialsBanner";
+import { analytics } from "@/lib/analytics";
 
 const CONVEX_URL = process.env.NEXT_PUBLIC_CONVEX_URL;
 
@@ -36,6 +37,7 @@ function LoginForm() {
 
     try {
       await signIn("password", { email: email.toLowerCase().trim(), password, flow: "signIn" });
+      analytics.login("password");
       router.push(redirect);
     } catch {
       setError("Invalid email or password. Please try again.");

@@ -24,4 +24,11 @@ crons.weekly(
   internal.digest.sendWeeklyDigest
 );
 
+// ── Weekly backup at 03:00 UTC every Sunday ──
+crons.weekly(
+  "weekly-backup",
+  { dayOfWeek: "sunday", hourUTC: 3, minuteUTC: 0 },
+  internal.backup.weeklyBackup
+);
+
 export default crons;

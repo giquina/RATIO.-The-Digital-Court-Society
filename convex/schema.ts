@@ -988,6 +988,20 @@ export default defineSchema({
     .index("by_event_id", ["eventId"]),
 
   // ═══════════════════════════════════════════
+  // BACKUPS
+  // ═══════════════════════════════════════════
+  backups: defineTable({
+    type: v.string(), // "weekly_snapshot"
+    tables: v.array(v.string()), // which tables were exported
+    storageId: v.id("_storage"), // file storage reference
+    sizeBytes: v.number(),
+    recordCount: v.number(),
+    createdAt: v.string(), // ISO timestamp
+  })
+    .index("by_type", ["type"])
+    .index("by_created", ["createdAt"]),
+
+  // ═══════════════════════════════════════════
   // APP FEEDBACK (bugs, features, general)
   // ═══════════════════════════════════════════
   appFeedback: defineTable({
