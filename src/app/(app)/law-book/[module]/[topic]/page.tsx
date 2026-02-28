@@ -604,14 +604,13 @@ export default function TopicReadingPage() {
               className="text-orange-400 shrink-0 mt-0.5"
             />
             <div>
-              <p className="text-court-sm text-orange-400 font-bold mb-1">
-                Disclaimer
+              <p className="text-court-sm text-gold font-bold mb-1">
+                Peer-Reviewed Content
               </p>
               <p className="text-court-xs text-court-text-sec leading-relaxed">
-                Student-generated analysis. Not legal advice. Always verify
-                against primary sources. This content has been peer-reviewed
-                but may contain errors or omissions. Consult authoritative
-                legal texts and practitioners for definitive guidance.
+                Student-authored analysis, peer-reviewed for accuracy. As with
+                all academic work, we recommend verifying against primary sources
+                and authoritative legal texts before citing.
               </p>
             </div>
           </div>

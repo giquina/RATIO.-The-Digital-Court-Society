@@ -291,7 +291,7 @@ export default function CertificateLevelPage() {
       <div className="px-4 md:px-6 lg:px-8 mt-6">
         <p className="text-court-xs text-court-text-ter leading-relaxed">
           This certificate recognises structured advocacy practice assessed through AI and peer evaluation.
-          It is not an academic qualification and does not constitute professional accreditation by the SRA, BSB, or any regulatory body.
+          It demonstrates commitment to professional development and is designed to complement — not replace — formal academic qualifications or regulatory accreditation by the SRA, BSB, or other bodies.
         </p>
       </div>
     </div>

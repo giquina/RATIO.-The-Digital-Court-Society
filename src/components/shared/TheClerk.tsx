@@ -122,7 +122,7 @@ export function TheClerk() {
             {/* Footer */}
             <div className="px-4 py-2.5 border-t border-court-border shrink-0 flex items-start gap-1.5">
               <Info size={11} className="text-court-text-ter shrink-0 mt-0.5" />
-              <p className="text-court-xs leading-tight text-court-text-ter">Educational platform guidance only. Not legal advice.</p>
+              <p className="text-court-xs leading-tight text-court-text-ter">Platform guidance powered by UK legal sources. Verify with primary authorities.</p>
             </div>
           </motion.div>
         )}

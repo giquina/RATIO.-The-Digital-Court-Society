@@ -31,7 +31,7 @@ const SECTIONS: PolicySection[] = [
     content: [
       "The RATIO Law Book is a student-built, peer-reviewed legal knowledge base designed to support law students in their academic studies and professional development. It serves as a collaborative reference work, drawing on the collective knowledge and analysis of law students from universities across the United Kingdom.",
       "The Law Book covers the core areas of English and Welsh law as taught at undergraduate level, including but not limited to: Contract Law, Criminal Law, Tort Law, Public Law, Equity and Trusts, EU and International Law, Property Law, and Constitutional Law.",
-      "The Law Book is not a substitute for authoritative legal texts, primary sources, or professional legal advice. It is a supplementary resource intended to aid understanding and provide a structured framework for legal analysis.",
+      "The Law Book is a supplementary academic resource designed to aid understanding and provide a structured framework for legal analysis. For definitive authority, students should consult primary sources, authoritative legal texts, and professional guidance.",
     ],
   },
   {
