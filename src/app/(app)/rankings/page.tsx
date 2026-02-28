@@ -5,6 +5,7 @@ import { Avatar, Tag, Card, Skeleton } from "@/components/ui";
 import { Trophy, Medal, Crown, TrendingUp } from "lucide-react";
 import { anyApi } from "convex/server";
 import { useDemoQuery } from "@/hooks/useDemoSafe";
+import PageWithPanel from "@/components/shared/PageWithPanel";
 
 const CONVEX_URL = process.env.NEXT_PUBLIC_CONVEX_URL;
 
@@ -115,7 +116,8 @@ export default function RankingsPage() {
 
   if (isLoading) {
     return (
-      <div className="pb-6 md:max-w-content-medium mx-auto">
+      <PageWithPanel panelPosition="right" heading="National Rankings" subheading="The finest advocates across all UK law schools">
+      <div className="pb-6 lg:max-w-none md:max-w-content-medium mx-auto">
         <div className="px-4 md:px-6 lg:px-8 pt-3 pb-4">
           <div className="flex items-center gap-2 mb-1">
             <Trophy size={20} className="text-gold" />
@@ -129,11 +131,13 @@ export default function RankingsPage() {
           ))}
         </div>
       </div>
+      </PageWithPanel>
     );
   }
 
   return (
-    <div className="pb-6 md:max-w-content-medium mx-auto">
+    <PageWithPanel panelPosition="right" heading="National Rankings" subheading="The finest advocates across all UK law schools">
+    <div className="pb-6 lg:max-w-none md:max-w-content-medium mx-auto">
       {/* Header */}
       <div className="px-4 md:px-6 lg:px-8 pt-3 pb-4">
         <div className="flex items-center gap-2 mb-1">
@@ -304,5 +308,6 @@ export default function RankingsPage() {
         </section>
       )}
     </div>
+    </PageWithPanel>
   );
 }

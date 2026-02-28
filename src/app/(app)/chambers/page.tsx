@@ -6,6 +6,7 @@ import { CHAMBERS } from "@/lib/constants/app";
 import { Users, Trophy, ChevronRight, Star, Crown } from "lucide-react";
 import { anyApi } from "convex/server";
 import { useDemoQuery } from "@/hooks/useDemoSafe";
+import PageWithPanel from "@/components/shared/PageWithPanel";
 
 const CONVEX_URL = process.env.NEXT_PUBLIC_CONVEX_URL;
 
@@ -55,22 +56,25 @@ export default function ChambersPage() {
 
   if (isLoading) {
     return (
-      <div className="pb-6 md:max-w-content-medium mx-auto">
+      <PageWithPanel panelPosition="left" heading="The Chambers" subheading="Four Inns of Court, one standard of excellence">
+      <div className="pb-6 lg:max-w-none md:max-w-content-medium mx-auto">
         <div className="px-4 md:px-6 lg:px-8 pt-3 pb-4">
           <h1 className="font-serif text-2xl font-bold text-court-text">Chambers</h1>
           <p className="text-court-sm text-court-text-sec mt-1">Four chambers. One standard of excellence.</p>
         </div>
-        <div className="px-4 md:px-6 lg:px-8 grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="px-4 md:px-6 lg:px-8 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-2 xl:grid-cols-2 gap-3">
           {Array.from({ length: 4 }).map((_, i) => (
             <Skeleton key={i} className="h-48 w-full rounded-court" />
           ))}
         </div>
       </div>
+      </PageWithPanel>
     );
   }
 
   return (
-    <div className="pb-6 md:max-w-content-medium mx-auto">
+    <PageWithPanel panelPosition="left" heading="The Chambers" subheading="Four Inns of Court, one standard of excellence">
+    <div className="pb-6 lg:max-w-none md:max-w-content-medium mx-auto">
       {/* Header */}
       <div className="px-4 md:px-6 lg:px-8 pt-3 pb-4">
         <h1 className="font-serif text-2xl font-bold text-court-text">Chambers</h1>
@@ -137,7 +141,7 @@ export default function ChambersPage() {
         <h3 className="text-court-xs font-bold text-court-text-ter uppercase tracking-widest mb-3 px-1">
           All Chambers
         </h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-2 xl:grid-cols-2 gap-3">
           {chamberData.map((chamber: typeof DEMO_CHAMBER_DATA[number]) => {
             const isMine = chamber.name === myChamberName;
             return (
@@ -220,5 +224,6 @@ export default function ChambersPage() {
         </Card>
       </section>
     </div>
+    </PageWithPanel>
   );
 }

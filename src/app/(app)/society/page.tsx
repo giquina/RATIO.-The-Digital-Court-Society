@@ -9,6 +9,7 @@ import { DEMO_ADVOCATES, DEMO_LEADERBOARD } from "@/lib/constants/demo-data";
 import { Search, Scale, Medal, Trophy, Users } from "lucide-react";
 import { courtToast } from "@/lib/utils/toast";
 import { analytics } from "@/lib/analytics";
+import PageWithPanel from "@/components/shared/PageWithPanel";
 import type { Id } from "../../../../convex/_generated/dataModel";
 
 function getInitials(name: string) {
@@ -93,6 +94,11 @@ export default function SocietyPage() {
     : "";
 
   return (
+    <PageWithPanel
+      panelPosition="right"
+      heading="The Society"
+      subheading="Connect with fellow advocates across the United Kingdom"
+    >
     <div className="pb-6">
       <div className="px-4 pt-3 pb-4">
         <h1 className="font-serif text-2xl font-bold text-court-text mb-1">Society</h1>
@@ -342,5 +348,6 @@ export default function SocietyPage() {
         </div>
       )}
     </div>
+    </PageWithPanel>
   );
 }
