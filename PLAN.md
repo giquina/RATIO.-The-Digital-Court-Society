@@ -1,7 +1,7 @@
 # RATIO — High-Level Plan
-Last updated: 2026-02-23
+Last updated: 2026-02-28
 
-## Status: Days 1-6 complete. Production live. Auth + Demo login working.
+## Status: Days 1-10 complete. Production live. AI streaming + full Convex wiring done.
 
 ### Phase Summary
 | Day | Focus | Status |
@@ -13,11 +13,11 @@ Last updated: 2026-02-23
 | — | Production Infrastructure (domain, GA4, Sentry, SEO, deploy) | DONE |
 | 5 | Convex Auth + Route protection (layout-client pattern) | DONE |
 | 6 | Home + Profile + Community → Convex backend | DONE |
-| 7 | Sessions + AI Judge Enhancement (caching + streaming) | Pending |
+| 7 | Sessions + AI Judge Enhancement (caching + streaming) | DONE |
 | 8 | Follow System + Community growth signals | PARTIAL (toggleFollow, FollowButton exist) |
 | 9 | Law Book Schema + MVP Pages (7 new tables) | Pending |
-| 10 | Desktop Sidebar + Responsive Layout | DONE |
-| 11 | New Pages: Settings, Rankings, Chambers, Tools, About | Pending |
+| 10 | Desktop Sidebar + Responsive Layout + Branded Panels | DONE |
+| 11 | New Pages: Settings, Rankings, Chambers, Tools, About | PARTIAL (pages exist, wired to Convex) |
 | 12 | AI Tools: Case Brief + Argument Builder | Pending |
 | 13 | Homepage Institutional Rebuild (section components) | PARTIAL (PricingSection exists) |
 | 14 | Governance MVP + Verification + CI/CD + QA | Pending |

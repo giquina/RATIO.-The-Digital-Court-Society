@@ -49,14 +49,19 @@ export const getParticipants = query({
       .withIndex("by_session", (q) => q.eq("sessionId", args.sessionId))
       .collect();
 
-    // Hydrate with profile data
-    const hydrated = await Promise.all(
-      participants.map(async (p) => {
-        const profile = await ctx.db.get(p.profileId);
-        return { ...p, profile };
-      })
+    // Batch-fetch unique profiles to avoid redundant lookups
+    const uniqueProfileIds = [...new Set(participants.map((p) => p.profileId))];
+    const profiles = await Promise.all(
+      uniqueProfileIds.map((id) => ctx.db.get(id))
     );
-    return hydrated;
+    const profileMap = new Map(
+      uniqueProfileIds.map((id, i) => [id, profiles[i]])
+    );
+
+    return participants.map((p) => ({
+      ...p,
+      profile: profileMap.get(p.profileId) ?? null,
+    }));
   },
 });
 
@@ -265,5 +270,104 @@ export const updateStatus = mutation({
     if (!userId) throw new Error("Not authenticated");
 
     await ctx.db.patch(args.sessionId, { status: args.status });
+  },
+});
+
+export const update = mutation({
+  args: {
+    sessionId: v.id("sessions"),
+    title: v.optional(v.string()),
+    description: v.optional(v.string()),
+    issueSummary: v.optional(v.string()),
+    module: v.optional(v.string()),
+    type: v.optional(v.string()),
+    date: v.optional(v.string()),
+    startTime: v.optional(v.string()),
+    endTime: v.optional(v.string()),
+    location: v.optional(v.string()),
+    maxParticipants: v.optional(v.number()),
+    isCrossUniversity: v.optional(v.boolean()),
+  },
+  handler: async (ctx, args) => {
+    // Auth: verify caller is the session creator
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const callerProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!callerProfile) throw new Error("Profile not found");
+
+    const session = await ctx.db.get(args.sessionId);
+    if (!session) throw new Error("Session not found");
+    if (session.createdBy !== callerProfile._id) {
+      throw new Error("Only the session creator can edit this session");
+    }
+
+    // Input validation for optional fields
+    const { sessionId, ...updates } = args;
+    if (updates.title !== undefined) validateStringLength(updates.title, "Title", LIMITS.TITLE);
+    if (updates.description !== undefined) validateOptionalStringLength(updates.description, "Description", LIMITS.DESCRIPTION);
+    if (updates.issueSummary !== undefined) validateOptionalStringLength(updates.issueSummary, "Issue summary", LIMITS.DESCRIPTION);
+    if (updates.module !== undefined) validateStringLength(updates.module, "Module", LIMITS.NAME);
+    if (updates.type !== undefined) validateStringLength(updates.type, "Type", LIMITS.NAME);
+    if (updates.location !== undefined) validateOptionalStringLength(updates.location, "Location", LIMITS.SHORT_TEXT);
+
+    // Strip undefined values so we only patch provided fields
+    const patch: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(updates)) {
+      if (value !== undefined) {
+        patch[key] = value;
+      }
+    }
+
+    if (Object.keys(patch).length === 0) {
+      throw new Error("No fields to update");
+    }
+
+    await ctx.db.patch(sessionId, patch);
+    return sessionId;
+  },
+});
+
+export const remove = mutation({
+  args: { sessionId: v.id("sessions") },
+  handler: async (ctx, args) => {
+    // Auth: verify caller is the session creator
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const callerProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+    if (!callerProfile) throw new Error("Profile not found");
+
+    const session = await ctx.db.get(args.sessionId);
+    if (!session) throw new Error("Session not found");
+    if (session.createdBy !== callerProfile._id) {
+      throw new Error("Only the session creator can delete this session");
+    }
+
+    // Delete associated roles
+    const roles = await ctx.db
+      .query("sessionRoles")
+      .withIndex("by_session", (q) => q.eq("sessionId", args.sessionId))
+      .collect();
+    for (const role of roles) {
+      await ctx.db.delete(role._id);
+    }
+
+    // Delete associated participants
+    const participants = await ctx.db
+      .query("sessionParticipants")
+      .withIndex("by_session", (q) => q.eq("sessionId", args.sessionId))
+      .collect();
+    for (const participant of participants) {
+      await ctx.db.delete(participant._id);
+    }
+
+    // Delete the session itself
+    await ctx.db.delete(args.sessionId);
+    return args.sessionId;
   },
 });

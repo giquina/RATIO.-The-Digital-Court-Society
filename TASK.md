@@ -155,18 +155,38 @@ Last updated: 2026-02-26
 - [x] Update `.env.example` with active ElevenLabs docs — 2026-02-27
 - [x] Verify production: landing, login, home, AI Practice all load — 2026-02-27
 
+### Completed (Loading States + Branded Panels — 2026-02-28)
+- [x] AI Practice session start skeleton ("The court is now in session..." with gold accents) — `ai-practice/page.tsx` — 2026-02-28
+- [x] Enhanced feedback loading interstitial (rotating messages, skeleton scores, session stats) — `ai-practice/page.tsx` — 2026-02-28
+- [x] Reduced post-feedback delay from 4s → 1.5s — `ai-practice/page.tsx` — 2026-02-28
+- [x] Research page skeleton rows (replaced Loader2 spinner) — `research/page.tsx` — 2026-02-28
+- [x] 6 route-level loading.tsx files (home, sessions, ai-practice, profile, society, rankings) — 2026-02-28
+- [x] SideVisualPanel component (sticky branded panel, gradient overlay, texture) — `SideVisualPanel.tsx` — 2026-02-28
+- [x] PageWithPanel wrapper (60/40 split layout) — `PageWithPanel.tsx` — 2026-02-28
+- [x] Branded panels on 4 pages: Society (right), Chambers (left), Rankings (right), Sessions (left) — 2026-02-28
+- [x] Install CTA overlap fix (moved to bottom-left offset by sidebar) — `InstallBanner.tsx` — 2026-02-28
+
+### Completed (Feature Build — Sessions + AI Streaming + PWA + Verification — 2026-02-28)
+- [x] Fix sessions demo data schema mismatch (scheduledAt→date, mode→type, area→module) — `demo-data.ts`, `sessions/page.tsx` — 2026-02-28
+- [x] Add session edit (update) mutation — `convex/sessions.ts` — 2026-02-28
+- [x] Add session remove (delete) mutation with cascading cleanup — `convex/sessions.ts` — 2026-02-28
+- [x] Fix N+1 query in getParticipants (batched profile lookups via Map) — `convex/sessions.ts` — 2026-02-28
+- [x] AI Judge streaming (SSE, token-by-token) — `api/ai/chat/route.ts` — 2026-02-28
+- [x] AI prompt caching (cache_control: ephemeral on system prompts) — `api/ai/chat/route.ts`, `api/ai/feedback/route.ts` — 2026-02-28
+- [x] Frontend streaming consumer (progressive message rendering) — `ai-practice/page.tsx` — 2026-02-28
+- [x] Generate favicon.ico (32x32 from existing logo) — `public/favicon.ico` — 2026-02-28
+- [x] Generate icon-144x144.png — `public/icons/icon-144x144.png` — 2026-02-28
+- [x] Generate OG image (1200x630, navy+gold branded) — `public/og-image.png` — 2026-02-28
+- [x] Update manifest.json with 144px icon entry — `public/manifest.json` — 2026-02-28
+- [x] Update layout.tsx icon metadata (favicon + 144px + OG image) — `src/app/layout.tsx` — 2026-02-28
+- [x] Verify Rankings page Convex wiring (already done — useDemoQuery + getLeaderboard) — 2026-02-28
+- [x] Verify Chambers page Convex wiring (already done — useDemoQuery + getChamberStats) — 2026-02-28
+- [x] Verify Badges page Convex wiring (already done — useDemoQuery + getAll/getMyBadges) — 2026-02-28
+- [x] Verify Library page Convex wiring (already done — useDemoQuery + list/getCategoryCounts) — 2026-02-28
+- [x] Verify FeatureGate + useSubscription (already implemented — 4 tiers, 8 gated features) — 2026-02-28
+- [x] Sentry auth token already on Vercel (confirmed Session 9 env vars) — 2026-02-28
+
 ### Pending
-- [ ] Connect sessions CRUD fully to Convex
-- [ ] Enhance AI Judge with prompt caching + streaming
-- [ ] Wire Rankings page to Convex (replace hardcoded data)
-- [ ] Wire Chambers page to Convex (replace hardcoded data)
-- [ ] Wire Badges page to Convex (replace hardcoded data)
-- [ ] Wire Library page to Convex (replace hardcoded data)
-- [ ] Stripe payment infrastructure (checkout, webhooks, billing)
-- [ ] Feature gating by subscription plan
-- [ ] Generate PWA icons / favicon set
-- [ ] Create OG image (public/og-image.png)
-- [ ] Add Sentry auth token to Vercel env vars
 - [ ] Render remaining 5 retimed videos with Charlie voice
 - [ ] 16:9 landscape video variants for LinkedIn/YouTube
 - [ ] Verify page wired to real Convex mutations (remote merge — needs testing)

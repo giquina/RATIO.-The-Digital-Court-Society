@@ -286,12 +286,12 @@ export default function SessionsPage() {
                     <div className="flex justify-between items-start mb-2">
                       <div>
                         <p className="text-court-sm font-bold text-court-text">{s.title}</p>
-                        <p className="text-court-xs text-court-text-ter">{s.area} · {s.mode}</p>
+                        <p className="text-court-xs text-court-text-ter">{s.module} · {formatSessionType(s.type)}</p>
                       </div>
                       <Tag color="green">Upcoming</Tag>
                     </div>
                     <p className="text-court-xs text-court-text-sec">
-                      {new Date(s.scheduledAt).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+                      {new Date(s.date).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
                       {" · "}{s.participantCount} advocates · Hosted by {s.hostName}
                     </p>
                   </Card>
@@ -325,7 +325,7 @@ export default function SessionsPage() {
                     <div className="flex justify-between items-start mb-2">
                       <div>
                         <p className="text-court-sm font-bold text-court-text">{s.title}</p>
-                        <p className="text-court-xs text-court-text-ter">{s.area} · {s.personaName}</p>
+                        <p className="text-court-xs text-court-text-ter">{s.module} · {s.personaName}</p>
                       </div>
                       <Tag color="gold">{s.overallScore}/5.0</Tag>
                     </div>

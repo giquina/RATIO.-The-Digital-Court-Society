@@ -413,3 +413,99 @@
 - Verify TTS works end-to-end on production after redeploy
 - Test AI Practice with real Anthropic API key
 - Wire remaining demo data pages to Convex
+
+---
+
+## Session 10 — 2026-02-28
+**Phase**: Loading States + Branded Panels + Feature Build (AI Streaming, Sessions CRUD, PWA, Verification)
+**Duration**: ~4 hours (across 2 continuation sessions)
+
+### What Was Done
+
+**Loading States (commit 391c035):**
+- AI Practice session start skeleton: gold accent line + pulsing Scale icon + "The court is now in session..." with skeleton message lines
+- Enhanced feedback loading interstitial: 5 rotating courtroom-themed messages (3.5s cycle), skeleton score bars for FEEDBACK_DIMENSIONS, session summary stats (duration, exchanges, case area)
+- Reduced post-feedback delay from 4s to 1.5s with "Judgment ready..." final message
+- Research page: replaced Loader2 spinner with 3 skeleton card rows
+- Created 6 route-level loading.tsx files (home, sessions, ai-practice, profile, society, rankings)
+
+**Branded Visual Panels (commit ad97b44):**
+- Created SideVisualPanel.tsx: sticky full-height panel with dark navy gradient, dot-texture overlay, gold accent lines, Scale icon, heading/subheading
+- Created PageWithPanel.tsx: 60/40 split layout wrapper (panel lg:40%, content flex-1)
+- Applied to 4 pages: Society (right), Chambers (left), Rankings (right), Sessions (left)
+- Fixed Install CTA / Clerk overlap: moved InstallBanner to bottom-left offset by sidebar width
+
+**Sessions CRUD Fix:**
+- Fixed demo data schema mismatch in demo-data.ts: scheduledAt→date, mode→type (with valid values), area→module
+- Fixed rendering in sessions/page.tsx to use correct field names
+- Added `update` mutation to convex/sessions.ts (creator-only auth, partial field updates, input validation)
+- Added `remove` mutation to convex/sessions.ts (creator-only auth, cascading delete of roles + participants)
+- Fixed N+1 query in getParticipants: batched profile lookups via Set + Map
+
+**AI Judge Streaming + Prompt Caching:**
+- Added SSE streaming to /api/ai/chat/route.ts: Anthropic stream:true, ReadableStream response, text/event-stream, data:[DONE] sentinel
+- Added prompt caching (cache_control: ephemeral) to system prompts in both chat and feedback routes (~90% input token savings)
+- Updated ai-practice/page.tsx: readChatStream helper with SSE parsing, progressive message rendering (tokens appear as they stream), JSON fallback for backward compatibility
+- sendMessage now adds empty AI message immediately, updates progressively via onToken callback
+- Error handling for mid-stream failures (detects empty AI message, replaces vs duplicates)
+- Usage tracking preserved (input/output tokens from stream events)
+- Timeout increased to 60s for streaming
+
+**PWA Icons + OG Image:**
+- Generated favicon.ico (32x32) from existing icon-192.png
+- Generated icon-144x144.png from existing icon-192.png
+- Generated og-image.png (1200x630): navy gradient, gold scale-of-justice, "RATIO." branding, decorative accents
+- Updated manifest.json with 144px icon entry
+- Updated layout.tsx metadata with favicon, 144px icon, and OG image fallback
+- Added sharp as devDependency for asset generation
+
+**Verification (all confirmed already done):**
+- Rankings: useDemoQuery + anyApi.profiles.getLeaderboard + DEMO_ADVOCATES fallback
+- Chambers: useDemoQuery + anyApi.profiles.getChamberStats + DEMO_CHAMBER_DATA fallback
+- Badges: useDemoQuery + anyApi.badges_queries.getAll/getMyBadges + BADGE_DEFINITIONS fallback
+- Library: useDemoQuery + anyApi.resources_queries.list/getCategoryCounts + useDemoMutation for trackDownload
+- FeatureGate: useSubscription hook, canAccess(), 4 plan tiers, 8 gated features, locked overlay with upgrade link
+- Sentry auth token: already set in Vercel env vars (confirmed from Session 9)
+
+### Key Files Modified
+- `src/app/(app)/ai-practice/page.tsx` — session start skeleton, feedback interstitial, streaming consumer
+- `src/app/api/ai/chat/route.ts` — SSE streaming + prompt caching
+- `src/app/api/ai/feedback/route.ts` — prompt caching
+- `src/app/(app)/sessions/page.tsx` — demo data field name fix
+- `src/lib/constants/demo-data.ts` — schema mismatch fix
+- `convex/sessions.ts` — update/remove mutations, N+1 fix
+- `src/app/(app)/research/page.tsx` — skeleton rows
+- `src/components/shared/SideVisualPanel.tsx` — new component
+- `src/components/shared/PageWithPanel.tsx` — new component
+- `src/components/shared/InstallBanner.tsx` — position fix
+- `src/app/(app)/society/page.tsx` — wrapped in PageWithPanel
+- `src/app/(app)/chambers/page.tsx` — wrapped in PageWithPanel
+- `src/app/(app)/rankings/page.tsx` — wrapped in PageWithPanel
+- 6 new loading.tsx files
+- `public/favicon.ico`, `public/icons/icon-144x144.png`, `public/og-image.png` — new assets
+- `public/manifest.json` — 144px icon entry
+- `src/app/layout.tsx` — favicon + icon + OG metadata
+- `TASK.md`, `PLAN.md`, `LOGS.md` — session tracking
+
+### Commits
+- `391c035` — feat: add loading states and skeleton UX across the app
+- `ad97b44` — feat: add branded side visual panels on desktop + fix Install CTA overlap
+- (pending) — feat: AI streaming, sessions CRUD, PWA icons, OG image
+
+### Decisions Made
+- **Streaming over batch**: AI responses now stream token-by-token via SSE. Gives perceived instant response instead of 2-8s blank wait.
+- **Prompt caching**: Anthropic's ephemeral cache on system prompts saves ~90% input tokens after first call in a session. Zero code complexity cost.
+- **No streaming for feedback**: Feedback returns structured JSON scores that must be parsed as a whole. Caching only.
+- **Session mutations**: Added update/remove with creator-only auth checks and cascading deletes for roles/participants.
+- **Many tasks already done**: Exploration revealed Rankings/Chambers/Badges/Library were already Convex-wired, FeatureGate + Stripe already implemented, Sentry token already set. Saved significant time.
+- **Deferred video rendering**: Remotion rendering is CPU-intensive (10-30 min per video). Better as separate dedicated session.
+
+### Issues Encountered
+- None significant — all agents completed successfully, build expected to pass
+
+### Next Session Should
+- Verify build passes and deploy to production
+- Test AI streaming end-to-end on production
+- Render remaining 5 promo videos (dedicated rendering session)
+- Law Book Schema + MVP Pages (Day 9)
+- Governance MVP (Day 14)

@@ -240,7 +240,14 @@ export async function POST(request: Request): Promise<Response> {
       body: JSON.stringify({
         model: "claude-haiku-4-5-20251001",
         max_tokens: MAX_TOKENS_FEEDBACK,
-        system: systemPrompt,
+        // Prompt caching: wrap system prompt in content-block with cache_control
+        system: [
+          {
+            type: "text",
+            text: systemPrompt,
+            cache_control: { type: "ephemeral" },
+          },
+        ],
         messages: [
           {
             role: "user",

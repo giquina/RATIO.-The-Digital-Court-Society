@@ -158,6 +158,60 @@ function AIPracticePageInner() {
     []
   );
 
+  /**
+   * Read an SSE stream from /api/ai/chat.
+   * Calls `onToken` for each text delta and returns the full accumulated text.
+   * If the response is not a stream (fallback to JSON), reads the JSON body instead.
+   */
+  const readChatStream = useCallback(
+    async (
+      res: Response,
+      onToken?: (accumulated: string) => void,
+    ): Promise<string> => {
+      const contentType = res.headers.get("Content-Type") || "";
+
+      // Non-streaming fallback: if the API returned JSON (e.g. older endpoint)
+      if (contentType.includes("application/json")) {
+        const data = await res.json();
+        return data.content || "";
+      }
+
+      // SSE streaming
+      const reader = res.body!.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let accumulated = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
+
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue;
+          const data = line.slice(6).trim();
+          if (data === "[DONE]") continue;
+
+          try {
+            const parsed = JSON.parse(data);
+            if (parsed.text) {
+              accumulated += parsed.text;
+              onToken?.(accumulated);
+            }
+          } catch {
+            // Skip malformed SSE data
+          }
+        }
+      }
+
+      return accumulated;
+    },
+    [],
+  );
+
   // Tell the layout to hide header/nav when in active session
   useEffect(() => {
     if (screen === "session") enterSession();
@@ -355,14 +409,14 @@ function AIPracticePageInner() {
           temperament: mode === "judge" ? temperament : "standard",
           userContext: aiUserContext,
         }),
-      });
+      }, 60_000); // streaming needs longer timeout
 
       if (!mountedRef.current) return;
 
       if (res.ok) {
-        const data = await res.json();
-        if (data.content) {
-          openingText = stripEmotes(data.content);
+        const streamedText = await readChatStream(res);
+        if (streamedText) {
+          openingText = stripEmotes(streamedText);
           setApiMessages([
             { role: 'user', content: 'Begin the session. Provide your opening statement in character.' },
             { role: 'assistant', content: openingText },
@@ -447,6 +501,8 @@ function AIPracticePageInner() {
       { role: 'user', content: inputText },
     ];
 
+    const aiMsgTime = new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+
     try {
       const res = await fetchWithTimeout('/api/ai/chat', {
         method: 'POST',
@@ -458,7 +514,7 @@ function AIPracticePageInner() {
           temperament: mode === "judge" ? temperament : "standard",
           userContext: aiUserContext,
         }),
-      });
+      }, 60_000); // streaming needs longer timeout
 
       if (!mountedRef.current) return;
 
@@ -479,21 +535,43 @@ function AIPracticePageInner() {
 
       if (!res.ok) throw new Error(`Server error: ${res.status}`);
 
-      const data = await res.json();
-      const rawAiText = data.content || AI_RESPONSES[Math.min(exchangeCount, AI_RESPONSES.length - 1)];
-      const aiText = stripEmotes(rawAiText);
+      // Add an empty AI message immediately so the user sees streaming text
+      setMessages((prev) => [
+        ...prev,
+        { role: "ai", text: "", time: aiMsgTime },
+      ]);
+
+      // Read the SSE stream and progressively update the last message
+      const rawAiText = await readChatStream(res, (accumulated) => {
+        if (!mountedRef.current) return;
+        const cleaned = stripEmotes(accumulated);
+        setMessages((prev) => {
+          const updated = [...prev];
+          updated[updated.length - 1] = {
+            ...updated[updated.length - 1],
+            text: cleaned,
+          };
+          return updated;
+        });
+      });
+
+      if (!mountedRef.current) return;
+
+      const aiText = stripEmotes(rawAiText) || AI_RESPONSES[Math.min(exchangeCount, AI_RESPONSES.length - 1)];
+
+      // Finalize the message with the complete text
+      setMessages((prev) => {
+        const updated = [...prev];
+        updated[updated.length - 1] = {
+          ...updated[updated.length - 1],
+          text: aiText,
+        };
+        return updated;
+      });
 
       setApiMessages([...updatedApiMessages, { role: 'assistant', content: aiText }]);
       setExchangeCount((c) => c + 1);
       setLastAiResponse(aiText);
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "ai",
-          text: aiText,
-          time: new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }),
-        },
-      ]);
 
       playJudgeResponse();
       tts.speak(aiText);
@@ -512,14 +590,27 @@ function AIPracticePageInner() {
       setApiMessages([...updatedApiMessages, { role: 'assistant', content: fallbackText }]);
       setExchangeCount((c) => c + 1);
       setLastAiResponse(fallbackText);
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "ai",
-          text: fallbackText,
-          time: new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }),
-        },
-      ]);
+      setMessages((prev) => {
+        // Check if we already added an empty AI message (stream started but failed)
+        const last = prev[prev.length - 1];
+        if (last?.role === "ai" && last.text === "") {
+          const updated = [...prev];
+          updated[updated.length - 1] = {
+            role: "ai",
+            text: fallbackText,
+            time: aiMsgTime,
+          };
+          return updated;
+        }
+        return [
+          ...prev,
+          {
+            role: "ai",
+            text: fallbackText,
+            time: aiMsgTime,
+          },
+        ];
+      });
       setError("The court is experiencing difficulties. Your submissions have been noted.");
       setAiSpeaking(false);
       setIsLoading(false);

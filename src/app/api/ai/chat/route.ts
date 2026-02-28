@@ -1,15 +1,22 @@
 /**
- * POST /api/ai/chat — AI Practice Chat Endpoint
+ * POST /api/ai/chat — AI Practice Chat Endpoint (Streaming SSE)
  *
- * Sends the advocate's message history to Claude Haiku 4.5 and returns
- * the AI persona's response. Every request passes through 5 guardrail
- * layers before touching the LLM:
+ * Sends the advocate's message history to Claude Haiku 4.5 and streams
+ * the AI persona's response token-by-token via Server-Sent Events.
+ * Uses prompt caching (cache_control: ephemeral) on the system prompt
+ * to reduce input token costs by ~90% after the first call per session.
+ *
+ * Every request passes through 5 guardrail layers before touching the LLM:
  *
  *   1. Global rate limit  (1 000 req/hr across all IPs)
  *   2. Per-IP rate limit   (20 req/60 s)
  *   3. Body-size guard     (256 KB max)
  *   4. Zod schema validation + input sanitisation
  *   5. Token budget check  (daily spend ceiling)
+ *
+ * Response format: text/event-stream
+ *   data: {"text":"token"}\n\n   — for each text delta
+ *   data: [DONE]\n\n             — stream complete
  *
  * Edge Runtime compatible — no Node.js-only APIs.
  */
@@ -163,7 +170,7 @@ export async function POST(request: Request): Promise<Response> {
   }));
   const windowedMessages = truncateTranscript(sanitisedMessages);
 
-  // ── Call Anthropic API ─────────────────────────────────────────────────
+  // ── Call Anthropic API (streaming) ────────────────────────────────────
   const apiKey = process.env.ANTHROPIC_API_KEY ?? "";
 
   try {
@@ -177,18 +184,25 @@ export async function POST(request: Request): Promise<Response> {
       body: JSON.stringify({
         model: "claude-haiku-4-5-20251001",
         max_tokens: MAX_TOKENS_CHAT,
-        system: systemPrompt,
+        stream: true,
+        // Prompt caching: wrap system prompt in content-block with cache_control
+        system: [
+          {
+            type: "text",
+            text: systemPrompt,
+            cache_control: { type: "ephemeral" },
+          },
+        ],
         messages: windowedMessages.map((m) => ({
           role: m.role,
           content: m.content,
         })),
       }),
-      signal: AbortSignal.timeout(40_000), // 40s server-side timeout
+      signal: AbortSignal.timeout(60_000), // 60s — streaming needs longer
     });
 
-    const latencyMs = Date.now() - startTime;
-
     if (!anthropicRes.ok) {
+      const latencyMs = Date.now() - startTime;
       const errorBody = await anthropicRes.text().catch(() => "");
       logAiRequest({
         endpoint: "chat",
@@ -217,36 +231,93 @@ export async function POST(request: Request): Promise<Response> {
       );
     }
 
-    const data = await anthropicRes.json();
-    const content =
-      data?.content?.[0]?.type === "text" ? data.content[0].text : "";
-    const inputTokens = data?.usage?.input_tokens ?? 0;
-    const outputTokens = data?.usage?.output_tokens ?? 0;
+    // ── Stream SSE from Anthropic to the client ───────────────────────
+    const encoder = new TextEncoder();
+    const decoder = new TextDecoder();
+    let inputTokens = 0;
+    let outputTokens = 0;
 
-    // Track usage
-    trackUsage(inputTokens, outputTokens);
-    logAiRequest({
-      endpoint: "chat",
-      mode,
-      inputTokens,
-      outputTokens,
-      latencyMs,
-      success: true,
+    const readableStream = new ReadableStream({
+      async start(controller) {
+        const reader = anthropicRes.body!.getReader();
+        let buffer = "";
+
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split("\n");
+            // Keep the last (potentially incomplete) line in the buffer
+            buffer = lines.pop() || "";
+
+            for (const line of lines) {
+              if (!line.startsWith("data: ")) continue;
+              const jsonStr = line.slice(6).trim();
+              if (!jsonStr || jsonStr === "[DONE]") continue;
+
+              try {
+                const event = JSON.parse(jsonStr);
+
+                // Extract usage from message_start
+                if (event.type === "message_start" && event.message?.usage) {
+                  inputTokens = event.message.usage.input_tokens ?? 0;
+                }
+
+                // Stream text deltas to the client
+                if (
+                  event.type === "content_block_delta" &&
+                  event.delta?.type === "text_delta" &&
+                  event.delta.text
+                ) {
+                  controller.enqueue(
+                    encoder.encode(`data: ${JSON.stringify({ text: event.delta.text })}\n\n`),
+                  );
+                }
+
+                // Extract final usage from message_delta
+                if (event.type === "message_delta" && event.usage) {
+                  outputTokens = event.usage.output_tokens ?? 0;
+                }
+              } catch {
+                // Skip malformed JSON lines in the stream
+              }
+            }
+          }
+        } catch (streamErr) {
+          console.error(
+            "[AI_CHAT] Stream read error:",
+            streamErr instanceof Error ? streamErr.message : "unknown",
+          );
+        } finally {
+          // Track usage after stream completes
+          const latencyMs = Date.now() - startTime;
+          trackUsage(inputTokens, outputTokens);
+          logAiRequest({
+            endpoint: "chat",
+            mode,
+            inputTokens,
+            outputTokens,
+            latencyMs,
+            success: true,
+          });
+
+          controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+          controller.close();
+        }
+      },
     });
 
-    return new Response(
-      JSON.stringify({
-        content,
-        usage: { inputTokens, outputTokens },
-      }),
-      {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json",
-          "X-RateLimit-Remaining": String(ipCheck.remaining),
-        },
+    return new Response(readableStream, {
+      status: 200,
+      headers: {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
+        "X-RateLimit-Remaining": String(ipCheck.remaining),
       },
-    );
+    });
   } catch (err) {
     const latencyMs = Date.now() - startTime;
     logAiRequest({
