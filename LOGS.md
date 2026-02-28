@@ -509,3 +509,69 @@
 - Render remaining 5 promo videos (dedicated rendering session)
 - Law Book Schema + MVP Pages (Day 9)
 - Governance MVP (Day 14)
+
+## Session 11 — 2026-02-28
+**Phase**: "AI Practice" → "Moot Court" Rename + Branded Side Panels
+**Duration**: ~2 hours
+
+### What Was Done
+
+**"AI Practice" → "Moot Court" Rename (89 files):**
+- Route folder: `src/app/(app)/ai-practice/` → `moot-court/`
+- Component directory: `src/components/ai-practice/` (7 files) → `moot-court/`
+- Navigation: Sidebar, BottomNav, tour steps — all paths, labels, variable names updated
+- Analytics: `aiPracticeStarted`/`aiPracticeCompleted` → `mootCourtStarted`/`mootCourtCompleted`, event names `ai_practice_*` → `moot_court_*`
+- Backend: convex/sidebar.ts `aiDrafts` → `mootDrafts`, email/discord notification text, useSidebarCounts type
+- Config: sitemap.ts route updated, next.config.js 301 redirect added
+- Stores: authStore LOCKED_FEATURES, sessionStore comments
+- 12+ page files updated (home, tools, portfolio, cpd, share/result, careers, code-of-conduct, etc.)
+- API route comments updated (paths `/api/ai/chat` stay unchanged — backend endpoints, not user-facing)
+- Remotion: 4 files renamed (AIPractice* → MootCourt*), 7 files updated internally
+- Documentation: CLAUDE.md, CHANGELOG.md, README.md, TASK.md, PLAN.md, ARCHITECTURE.md, UPOS.md, promo docs, security docs
+- Assets: 8 files renamed (screenshots, thumbnails, videos, scripts)
+- AI library: system prompts, scenario bank, token budget, validation comments
+- User-facing text: clerk guides, clerk help, ModeSelector, visitor chat, careers page, code of conduct
+
+**Branded Side Panel Content (5 new files):**
+- Created `src/components/panels/` directory with barrel export
+- ChambersPanel.tsx: Animated heraldic shield crest (SVG pathLength draw-on), inner cross, 6 floating gold particles, glow ring, institutional motto
+- SessionsPanel.tsx: Minimalist courtroom bench line-art (SVG pathLength), gavel, floor, counsel positions, 5 particles
+- RankingsPanel.tsx: 5 animated gold bars (spring physics), highlighted "your" bar, 4 particles
+- SocietyPanel.tsx: Network graph (8 nodes, 14 connections), center pulse, spring-animated nodes
+- Modified SideVisualPanel.tsx: Added `children` prop — renders custom content when provided, falls back to generic Scale icon
+- Modified PageWithPanel.tsx: Added `panelContent` prop, passes through as children to SideVisualPanel
+- Wired into all 4 pages: Chambers, Sessions, Rankings, Society
+
+### Key Files Created
+- `src/components/panels/ChambersPanel.tsx`
+- `src/components/panels/SessionsPanel.tsx`
+- `src/components/panels/RankingsPanel.tsx`
+- `src/components/panels/SocietyPanel.tsx`
+- `src/components/panels/index.ts`
+
+### Key Files Modified
+- 89 files total (see commit 6338aba for full diff)
+- Route + component renames via git mv (history preserved)
+- SideVisualPanel.tsx + PageWithPanel.tsx — children/panelContent prop added
+- 4 page files — panelContent wired
+
+### Commits
+- `6338aba` — feat: rename AI Practice → Moot Court + add branded side panels
+
+### Decisions Made
+- **"Moot Court" over alternatives**: "Practice Court", "Advocacy", "The Court" all considered. "Moot Court" wins because every UK law student knows the term — it's the exact legal term for practice advocacy.
+- **Database field `ai_practice` unchanged**: The `activityType: "ai_practice"` value in Convex schema stays as-is. It's a stored string enum, not user-facing. Renaming it would require a data migration with no user benefit.
+- **API route paths unchanged**: `/api/ai/chat` and `/api/ai/feedback` are backend endpoints. Renaming them provides no user value and risks breaking existing sessions.
+- **Panel animations are decorative only**: Panels show static institutional content with Framer Motion animations. No live Convex data wired yet — deferred to when real user counts/ranks exist.
+- **SVG pathLength for institutional feel**: The "drawing itself" line-art effect feels like a courtroom sketch being drawn, not a tech startup loading animation.
+
+### Issues Encountered
+- Build initially failed: `analytics.aiPracticeStarted()` still called in moot-court/page.tsx after analytics functions were renamed. Fixed manually.
+- Some "AI practice" references in clerk help, visitor chat, careers, and code of conduct pages were missed by initial agents. Caught by final git grep pass.
+
+### Next Session Should
+- Test /moot-court route on production
+- Verify /ai-practice 301 redirects correctly
+- Wire live Convex data into panel components (when real data exists)
+- Law Book Schema + MVP Pages (Day 9)
+- Render remaining 5 promo videos
