@@ -87,7 +87,7 @@ export const HELP_SECTIONS: HelpSection[] = [
       },
       {
         q: "What AI modes are available?",
-        a: "Ratio offers four AI practice modes: Judge (simulates a High Court judge hearing your submissions), Mentor (provides guided coaching on your technique), Examiner (runs SQE2-focused oral assessments), and Opponent (acts as opposing counsel to test your arguments).",
+        a: "Ratio offers four Moot Court modes: Judge (simulates a High Court judge hearing your submissions), Mentor (provides guided coaching on your technique), Examiner (runs SQE2-focused oral assessments), and Opponent (acts as opposing counsel to test your arguments).",
       },
       {
         q: "Is my audio recorded during AI sessions?",
@@ -110,7 +110,7 @@ export const HELP_SECTIONS: HelpSection[] = [
       },
       {
         q: "What are streaks?",
-        a: "A streak tracks consecutive days on which you have completed at least one advocacy activity, such as a session or an AI practice. Maintaining streaks earns bonus advocacy points and unlocks streak-based badges at 7, 30, and 100 days.",
+        a: "A streak tracks consecutive days on which you have completed at least one advocacy activity, such as a session or a Moot Court practice. Maintaining streaks earns bonus advocacy points and unlocks streak-based badges at 7, 30, and 100 days.",
       },
       {
         q: "What are commendations?",

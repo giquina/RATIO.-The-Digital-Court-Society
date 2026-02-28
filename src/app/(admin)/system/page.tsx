@@ -388,7 +388,7 @@ export default function SystemPage() {
                 { category: "Users & Profiles", tables: 2 },
                 { category: "Social", tables: 3 },
                 { category: "Sessions", tables: 3 },
-                { category: "AI Practice", tables: 2 },
+                { category: "Moot Court", tables: 2 },
                 { category: "Law Book", tables: 7 },
                 { category: "Governance", tables: 12 },
                 { category: "Tournaments", tables: 3 },

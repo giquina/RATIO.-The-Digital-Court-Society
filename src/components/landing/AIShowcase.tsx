@@ -41,7 +41,7 @@ export function AIShowcase({ id }: { id?: string }) {
               session.
             </p>
             <Link
-              href="/ai-practice"
+              href="/moot-court"
               className="inline-flex items-center gap-2 bg-gold text-navy font-bold rounded-xl px-6 py-3 text-court-base tracking-wide hover:bg-gold/90 transition-colors"
             >
               Start Practice

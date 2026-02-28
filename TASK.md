@@ -127,13 +127,13 @@ Last updated: 2026-02-26
 - [x] Voice switch: Daniel → Charlie for all 30 narrator clips — 2026-02-26
 - [x] Recruitment promo video (48s, 6 scenes, 1440 frames) — `remotion/RecruitmentPromo.tsx` — 2026-02-26
 - [x] App feedback feature (floating button + modal + Convex backend) — `FeedbackButton.tsx`, `convex/appFeedback.ts` — 2026-02-26
-- [x] AI Practice nav bug fix (AbortController + mountedRef) — 2026-02-26
+- [x] Moot Court nav bug fix (AbortController + mountedRef) — 2026-02-26
 - [x] Law-first positioning overhaul: careers page + CLAUDE.md rules — 2026-02-26
 - [x] 4 video thumbnails created — 2026-02-26
 
 ### Completed (Production Stability + GA4 Fix — 2026-02-26)
 - [x] Fix parallelRoutes crash (RATIO-7): replaced all cross-group `router.push()` with `window.location.href` across 8 files — 2026-02-26
-- [x] AI disclaimers added to AI Practice + landing page — 2026-02-26
+- [x] AI disclaimers added to Moot Court + landing page — 2026-02-26
 - [x] Promo banner integrated on landing page — 2026-02-26
 - [x] Security review completed — no vulnerabilities found — 2026-02-26
 - [x] GA4 consent sequencing fix: consent `granted` before `page_view` fires — `layout.tsx`, `Analytics.tsx` — 2026-02-26
@@ -145,7 +145,7 @@ Last updated: 2026-02-26
 - [x] Merge conflicts resolved (verify page Convex upgrade + page-client.tsx refactor) — 2026-02-26
 
 ### Completed (TTS Audio Fix + Production Verification — 2026-02-27)
-- [x] Diagnose silent AI Practice audio: msedge-tts hangs forever, no timeouts — 2026-02-27
+- [x] Diagnose silent Moot Court audio: msedge-tts hangs forever, no timeouts — 2026-02-27
 - [x] Add 8s client fetch timeout (AbortController) — `src/hooks/useSpeechSynthesis.ts` — 2026-02-27
 - [x] Add 10s server-side timeout (Promise.race) — `src/app/api/ai/tts/edge/route.ts` — 2026-02-27
 - [x] Merge PR #10 conflict: combine retry logic + timeout fix — 2026-02-27
@@ -153,14 +153,14 @@ Last updated: 2026-02-26
 - [x] Voice preloading + iOS audio unlock + 30s safety timeout — 2026-02-27
 - [x] Update ELEVENLABS_API_KEY in Vercel (old key 401) + redeploy — 2026-02-27
 - [x] Update `.env.example` with active ElevenLabs docs — 2026-02-27
-- [x] Verify production: landing, login, home, AI Practice all load — 2026-02-27
+- [x] Verify production: landing, login, home, Moot Court all load — 2026-02-27
 
 ### Completed (Loading States + Branded Panels — 2026-02-28)
-- [x] AI Practice session start skeleton ("The court is now in session..." with gold accents) — `ai-practice/page.tsx` — 2026-02-28
-- [x] Enhanced feedback loading interstitial (rotating messages, skeleton scores, session stats) — `ai-practice/page.tsx` — 2026-02-28
-- [x] Reduced post-feedback delay from 4s → 1.5s — `ai-practice/page.tsx` — 2026-02-28
+- [x] Moot Court session start skeleton ("The court is now in session..." with gold accents) — `moot-court/page.tsx` — 2026-02-28
+- [x] Enhanced feedback loading interstitial (rotating messages, skeleton scores, session stats) — `moot-court/page.tsx` — 2026-02-28
+- [x] Reduced post-feedback delay from 4s → 1.5s — `moot-court/page.tsx` — 2026-02-28
 - [x] Research page skeleton rows (replaced Loader2 spinner) — `research/page.tsx` — 2026-02-28
-- [x] 6 route-level loading.tsx files (home, sessions, ai-practice, profile, society, rankings) — 2026-02-28
+- [x] 6 route-level loading.tsx files (home, sessions, moot-court, profile, society, rankings) — 2026-02-28
 - [x] SideVisualPanel component (sticky branded panel, gradient overlay, texture) — `SideVisualPanel.tsx` — 2026-02-28
 - [x] PageWithPanel wrapper (60/40 split layout) — `PageWithPanel.tsx` — 2026-02-28
 - [x] Branded panels on 4 pages: Society (right), Chambers (left), Rankings (right), Sessions (left) — 2026-02-28
@@ -173,7 +173,7 @@ Last updated: 2026-02-26
 - [x] Fix N+1 query in getParticipants (batched profile lookups via Map) — `convex/sessions.ts` — 2026-02-28
 - [x] AI Judge streaming (SSE, token-by-token) — `api/ai/chat/route.ts` — 2026-02-28
 - [x] AI prompt caching (cache_control: ephemeral on system prompts) — `api/ai/chat/route.ts`, `api/ai/feedback/route.ts` — 2026-02-28
-- [x] Frontend streaming consumer (progressive message rendering) — `ai-practice/page.tsx` — 2026-02-28
+- [x] Frontend streaming consumer (progressive message rendering) — `moot-court/page.tsx` — 2026-02-28
 - [x] Generate favicon.ico (32x32 from existing logo) — `public/favicon.ico` — 2026-02-28
 - [x] Generate icon-144x144.png — `public/icons/icon-144x144.png` — 2026-02-28
 - [x] Generate OG image (1200x630, navy+gold branded) — `public/og-image.png` — 2026-02-28

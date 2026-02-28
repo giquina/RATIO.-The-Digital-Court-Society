@@ -30,7 +30,7 @@ interface Scene {
 const SCENES: Scene[] = [
   { id: "intro", startFrame: 0, durationFrames: 80 },        // 0–2.7s
   { id: "dashboard", startFrame: 70, durationFrames: 80 },    // 2.3–5s
-  { id: "ai-practice", startFrame: 140, durationFrames: 80 }, // 4.7–7.3s
+  { id: "moot-court", startFrame: 140, durationFrames: 80 }, // 4.7–7.3s
   { id: "ai-session", startFrame: 210, durationFrames: 80 },  // 7–9.7s
   { id: "sessions", startFrame: 280, durationFrames: 80 },    // 9.3–12s
   { id: "law-book", startFrame: 350, durationFrames: 80 },    // 11.7–14.3s
@@ -461,13 +461,13 @@ export const RatioShowcase: React.FC = () => {
         screenshotSrc={staticFile("screenshots/mobile/dashboard-mobile.png")}
       />
 
-      {/* AI Practice — Mode Selection */}
+      {/* Moot Court — Mode Selection */}
       <FeatureScene
         frame={frame}
         scene={SCENES[2]}
         title="AI Advocacy Training"
         description="Choose your AI persona. Adversarial judge, supportive mentor, or SQE2 examiner."
-        screenshotSrc={staticFile("screenshots/mobile/ai-practice-mobile.png")}
+        screenshotSrc={staticFile("screenshots/mobile/moot-court-mobile.png")}
       />
 
       {/* AI Session — Live Courtroom */}

@@ -533,7 +533,7 @@ export const ConstitutionalLaw: React.FC = () => {
             textTransform: "uppercase", letterSpacing: 2,
             marginBottom: 14, fontWeight: 600,
           }}>
-            AI Practice Session
+            Moot Court Session
           </div>
         </TextReveal>
 

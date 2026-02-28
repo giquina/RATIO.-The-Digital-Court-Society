@@ -275,10 +275,10 @@ export const ThumbnailGeneral: React.FC = () => {
 };
 
 /* ═══════════════════════════════════════════════════════════════════
-   THUMBNAIL 2 — AI Practice Thumbnail
+   THUMBNAIL 2 — Moot Court Thumbnail
    ═══════════════════════════════════════════════════════════════════ */
 
-export const ThumbnailAIPractice: React.FC = () => {
+export const ThumbnailMootCourt: React.FC = () => {
   return (
     <AbsoluteFill
       style={{

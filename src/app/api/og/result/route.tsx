@@ -4,7 +4,7 @@ import { NextRequest } from "next/server";
 export const runtime = "edge";
 
 /**
- * Dynamic OG image for shared AI Practice results.
+ * Dynamic OG image for shared Moot Court results.
  *
  * Query params:
  *   s  = overall score (e.g. "3.5")
@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
 
   const score = searchParams.get("s") || "—";
-  const area = searchParams.get("a") || "AI Practice";
+  const area = searchParams.get("a") || "Moot Court";
   const judge = searchParams.get("j") || "AI Judge";
   const s1 = searchParams.get("s1") || "—";
   const s2 = searchParams.get("s2") || "—";

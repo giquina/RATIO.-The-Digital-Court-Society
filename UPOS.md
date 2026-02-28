@@ -95,7 +95,7 @@ RATIO.-The-Digital-Court-Society/
 |   |-- governance/             # Governance-related backend functions
 |   |-- schema.ts               # Single source of truth for all database tables
 |   |-- ai.ts                   # AI Judge logic (Claude Sonnet -> GPT-4o-mini fallback)
-|   |-- aiSessions.ts           # AI practice session CRUD
+|   |-- aiSessions.ts           # Moot court session CRUD
 |   |-- daily.ts                # Daily.co video integration
 |   |-- notifications.ts        # Notification system
 |   |-- profiles.ts             # Advocate profile CRUD
@@ -115,7 +115,7 @@ RATIO.-The-Digital-Court-Society/
 |   |   |-- (app)/              # Authenticated route group
 |   |   |   |-- home/
 |   |   |   |-- sessions/
-|   |   |   |-- ai-practice/
+|   |   |   |-- moot-court/
 |   |   |   |-- law-book/
 |   |   |   |-- community/
 |   |   |   |-- profile/
@@ -504,7 +504,7 @@ RATIO employs AI across multiple surfaces. The AI Judge is the centrepiece -- a 
 | Skill | Location | Provider | Status |
 |-------|----------|----------|--------|
 | AI Judge | `convex/ai.ts` | Claude Sonnet / GPT-4o-mini | Active |
-| AI Practice Sessions | `convex/aiSessions.ts` | Claude Sonnet | Active |
+| Moot Court Sessions | `convex/aiSessions.ts` | Claude Sonnet | Active |
 | Case Brief Generator | `src/app/(app)/tools/` | Claude Sonnet | Planned (Day 12) |
 | Argument Builder | `src/app/(app)/tools/` | Claude Sonnet | Planned (Day 12) |
 | Research Assistant | `src/app/(app)/research/` | Claude Sonnet | Planned |
@@ -516,7 +516,7 @@ RATIO employs AI across multiple surfaces. The AI Judge is the centrepiece -- a 
 ```
 convex/
 |-- ai.ts                    # Core AI Judge logic
-|-- aiSessions.ts            # AI practice session CRUD and scoring
+|-- aiSessions.ts            # Moot court session CRUD and scoring
 |-- ai/
 |   |-- router.ts            # Multi-provider routing and fallback logic
 |   |-- prompts/
@@ -1038,7 +1038,7 @@ MINUTE 40-55: Run Through Key Flows
   - Landing page (src/app/page.tsx)
   - Home dashboard (src/app/(app)/home/page.tsx)
   - Session creation (src/app/(app)/sessions/create/page.tsx)
-  - AI Practice (src/app/(app)/ai-practice/page.tsx)
+  - Moot Court (src/app/(app)/moot-court/page.tsx)
   - Profile (src/app/(app)/profile/page.tsx)
 
 MINUTE 55-60: Orientation Complete

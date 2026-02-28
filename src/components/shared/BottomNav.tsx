@@ -10,7 +10,7 @@ import { useSessionStore } from "@/stores/sessionStore";
 const tabs = [
   { href: "/home", label: "Home", Icon: Home },
   { href: "/sessions", label: "The Bench", Icon: Scale },
-  { href: "/ai-practice", label: "Advocacy", Icon: Target },
+  { href: "/moot-court", label: "Advocacy", Icon: Target },
   { href: "/law-book", label: "Law Book", Icon: BookOpen },
   { href: "/society", label: "Society", Icon: Users },
 ];
@@ -28,8 +28,8 @@ export function BottomNav() {
       <div className="mx-auto flex px-1 pt-2 pb-[max(env(safe-area-inset-bottom,0px),6px)]">
         {tabs.map((tab) => {
           const isActive = pathname?.startsWith(tab.href);
-          const isAIPractice = tab.href === "/ai-practice";
-          const showLiveDot = isAIPractice && isSessionActive;
+          const isMootCourt = tab.href === "/moot-court";
+          const showLiveDot = isMootCourt && isSessionActive;
 
           return (
             <Link

@@ -1,5 +1,5 @@
 /**
- * RATIO. AI Practice — 30-Second High-Impact Cut
+ * RATIO. Moot Court — 30-Second High-Impact Cut
  *
  * Designed for: Instagram Reels, TikTok, WhatsApp Status
  * Pacing: Punchy but still breathing — no scene shorter than 3 seconds
@@ -406,7 +406,7 @@ function ChooseJudgeScene({ frame }: { frame: number }) {
       </TextReveal>
       <GoldLine width={30} delay={12} frame={local} />
       <div style={{ marginTop: 10 }}>
-        <PhoneMockup src={staticFile("screenshots/mobile/ai-practice-mobile.png")} frame={local} delay={12} tiltDirection="left" />
+        <PhoneMockup src={staticFile("screenshots/mobile/moot-court-mobile.png")} frame={local} delay={12} tiltDirection="left" />
       </div>
     </AbsoluteFill>
   );
@@ -562,7 +562,7 @@ const SHORT_CAPTIONS: CaptionPhrase[] = [
 
 // ── Main ──
 
-export const AIPracticeShort: React.FC = () => {
+export const MootCourtShort: React.FC = () => {
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
 

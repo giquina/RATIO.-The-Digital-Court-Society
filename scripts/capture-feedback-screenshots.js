@@ -40,8 +40,8 @@ async function main() {
   });
 
   // Navigate & click through to session
-  console.log("1/5  Loading AI practice...");
-  await page.goto(`${BASE}/ai-practice`, { waitUntil: "networkidle2", timeout: 60000 });
+  console.log("1/5  Loading Moot Court...");
+  await page.goto(`${BASE}/moot-court`, { waitUntil: "networkidle2", timeout: 60000 });
   await sleep(3000);
 
   console.log("2/5  Selecting Judge...");

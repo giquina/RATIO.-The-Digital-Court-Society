@@ -92,9 +92,9 @@ const SCORE_DIMENSIONS = [
 
 const SESSION_HISTORY = [
   { date: "13 Feb", module: "Constitutional Law", type: "Moot",        score: 78 },
-  { date: "10 Feb", module: "Criminal Law",       type: "AI Practice", score: 72 },
+  { date: "10 Feb", module: "Criminal Law",       type: "Moot Court", score: 72 },
   { date: "7 Feb",  module: "Tort Law",            type: "Moot",        score: 81 },
-  { date: "3 Feb",  module: "Administrative Law",  type: "AI Practice", score: 65 },
+  { date: "3 Feb",  module: "Administrative Law",  type: "Moot Court", score: 65 },
   { date: "30 Jan", module: "Contract Law",        type: "Moot",        score: 74 },
 ];
 

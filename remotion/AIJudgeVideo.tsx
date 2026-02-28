@@ -614,8 +614,8 @@ function PhoneStatusBar() {
   );
 }
 
-/** AI Practice screen content for phone mockup */
-function AIPracticeScreenContent({ frame }: { frame: number }) {
+/** Moot Court screen content for phone mockup */
+function MootCourtScreenContent({ frame }: { frame: number }) {
   const modules = [
     { name: "Constitutional Law", highlighted: true },
     { name: "Criminal Law", highlighted: false },
@@ -643,7 +643,7 @@ function AIPracticeScreenContent({ frame }: { frame: number }) {
         <div style={{
           fontFamily: SERIF, fontSize: 16, fontWeight: 700, color: TEXT,
         }}>
-          AI Practice
+          Moot Court
         </div>
       </div>
 
@@ -1292,7 +1292,7 @@ export const AIJudgeVideo: React.FC = () => {
       {/* ═══════════════════════════════════════════════════════════════════
           SCENE 3 — Phone Mockup
           "RATIO puts a courtroom in your pocket."
-          CSS-built phone showing AI Practice screen
+          CSS-built phone showing Moot Court screen
           ═══════════════════════════════════════════════════════════════════ */}
       {isVisible(S[2], frame) && (
         <AbsoluteFill style={{
@@ -1334,7 +1334,7 @@ export const AIJudgeVideo: React.FC = () => {
                     mockupWidth={240}
                     tiltDirection="left"
                   >
-                    <AIPracticeScreenContent frame={Math.max(0, local - 15)} />
+                    <MootCourtScreenContent frame={Math.max(0, local - 15)} />
                   </PhoneMockupCSS>
                 </div>
               </>

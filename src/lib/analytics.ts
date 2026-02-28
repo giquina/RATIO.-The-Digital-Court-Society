@@ -56,12 +56,12 @@ export const analytics = {
   sessionJoined: (sessionId: string) =>
     trackEvent("session_joined", { session_id: sessionId }),
 
-  // ── AI Practice ──
-  aiPracticeStarted: (mode: string) =>
-    trackEvent("ai_practice_started", { mode }),
+  // ── Moot Court ──
+  mootCourtStarted: (mode: string) =>
+    trackEvent("moot_court_started", { mode }),
 
-  aiPracticeCompleted: (mode: string, durationSeconds: number) =>
-    trackEvent("ai_practice_completed", { mode, duration_seconds: durationSeconds }),
+  mootCourtCompleted: (mode: string, durationSeconds: number) =>
+    trackEvent("moot_court_completed", { mode, duration_seconds: durationSeconds }),
 
   // ── Governance ──
   caseSubmitted: () =>

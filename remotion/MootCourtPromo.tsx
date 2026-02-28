@@ -422,7 +422,7 @@ function CTAScene({ frame }: { frame: number }) {
 
 // ── Main Composition ──
 
-export const AIPracticePromo: React.FC = () => {
+export const MootCourtPromo: React.FC = () => {
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
 
@@ -448,7 +448,7 @@ export const AIPracticePromo: React.FC = () => {
         sceneIdx={2}
         title="Choose Your AI Judge"
         description="Four judicial temperaments. Adversarial, strict, pragmatist, or Socratic."
-        screenshotSrc={staticFile("screenshots/mobile/ai-practice-mobile.png")}
+        screenshotSrc={staticFile("screenshots/mobile/moot-court-mobile.png")}
       />
 
       {/* Scene 4: Case briefing */}

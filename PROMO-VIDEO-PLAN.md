@@ -11,9 +11,9 @@
 
 | # | Composition ID | Duration | Frames | File | Description |
 |---|----------------|----------|--------|------|-------------|
-| 1 | `AIPracticePromo` | 20s | 600 | `ai-practice-promo.mp4` | Original AI practice promo (screenshot-based, no VO) |
-| 2 | `AIPracticeCinematic` | 73s | 2190 | `ai-practice-cinematic.mp4` | Cinematic AI practice walkthrough — Charlie VO, captions, SFX, courtroom ambiance |
-| 3 | `AIPracticeShort` | ~32s | 950 | `ai-practice-short.mp4` | High-impact social cut — Charlie VO (hook + intro + CTA) |
+| 1 | `MootCourtPromo` | 20s | 600 | `moot-court-promo.mp4` | Original moot court promo (screenshot-based, no VO) |
+| 2 | `MootCourtCinematic` | 73s | 2190 | `moot-court-cinematic.mp4` | Cinematic moot court walkthrough — Charlie VO, captions, SFX, courtroom ambiance |
+| 3 | `MootCourtShort` | ~32s | 950 | `moot-court-short.mp4` | High-impact social cut — Charlie VO (hook + intro + CTA) |
 | 4 | `FeatureShowcase` | 70s | 2100 | `feature-showcase.mp4` | Rapid-fire tour of RATIO ecosystem — Charlie VO, 9 scenes |
 | 5 | `LiveSessionSnippet` | 55s | 1650 | `live-session-snippet.mp4` | Simulated courtroom exchange — Charlie narrator + George judge |
 | 6 | `ConstitutionalLaw` | 55s | 1650 | `constitutional-law.mp4` | Constitutional law showcase — topics, key cases, practice demo |
@@ -36,8 +36,8 @@ npx remotion render <CompositionId> promo/videos/<filename>.mp4 --codec h264
 
 ### Render All Videos
 ```bash
-npx remotion render AIPracticeCinematic promo/videos/ai-practice-cinematic.mp4 --codec h264
-npx remotion render AIPracticeShort promo/videos/ai-practice-short.mp4 --codec h264
+npx remotion render MootCourtCinematic promo/videos/moot-court-cinematic.mp4 --codec h264
+npx remotion render MootCourtShort promo/videos/moot-court-short.mp4 --codec h264
 npx remotion render FeatureShowcase promo/videos/feature-showcase.mp4 --codec h264
 npx remotion render LiveSessionSnippet promo/videos/live-session-snippet.mp4 --codec h264
 npx remotion render ConstitutionalLaw promo/videos/constitutional-law.mp4 --codec h264
@@ -91,7 +91,7 @@ ffmpeg -i input.mp3 -af "afade=t=out:st=<duration-0.15>:d=0.15" -y output.mp3
 
 ### Voiceover Clips (`public/audio/voiceover/`)
 
-**AIPracticeCinematic (9 clips — Charlie voice):**
+**MootCourtCinematic (9 clips — Charlie voice):**
 - `cinematic-01-cold-open.mp3` — "Every advocate starts somewhere."
 - `cinematic-02-preparation.mp3` — "Long before the courtroom..."
 - `cinematic-03-choose-judge.mp3` — "RATIO pairs you with an AI Judge..."
@@ -102,7 +102,7 @@ ffmpeg -i input.mp3 -af "afade=t=out:st=<duration-0.15>:d=0.15" -y output.mp3
 - `cinematic-08-improvement.mp3` — "Detailed written feedback..."
 - `cinematic-09-cta.mp3` — "RATIO. The Digital Court Society..."
 
-**AIPracticeShort (3 clips — Charlie voice):**
+**MootCourtShort (3 clips — Charlie voice):**
 - `short-01-hook.mp3`, `short-02-intro.mp3`, `short-03-cta.mp3`
 
 **FeatureShowcase (9 clips — Charlie voice):**
@@ -128,11 +128,11 @@ ffmpeg -i input.mp3 -af "afade=t=out:st=<duration-0.15>:d=0.15" -y output.mp3
 
 ### Background Music (`public/audio/music/`)
 Synthesized ambient pads (ffmpeg sine wave + tremolo + lowpass):
-- `ambient-pad-30s.mp3` — for AIPracticeShort
+- `ambient-pad-30s.mp3` — for MootCourtShort
 - `ambient-pad-45s.mp3` — for ConstitutionalLaw, RecruitmentPromo
 - `ambient-pad-55s.mp3` — for LiveSessionSnippet, ConstitutionalLaw
 - `ambient-pad-60s.mp3` — for FeatureShowcase
-- `ambient-pad-75s.mp3` — for AIPracticeCinematic
+- `ambient-pad-75s.mp3` — for MootCourtCinematic
 
 ### Sound Effects (`public/audio/sfx/`)
 - `whoosh.mp3` — scene transitions (volume: 0.04)
@@ -233,9 +233,9 @@ ffmpeg -f lavfi -i "sine=frequency=85:duration=<DURATION>" \
 remotion/
   Root.tsx                 # Registers all compositions
   index.ts                 # Remotion entry point
-  AIPracticePromo.tsx      # Original 20s promo (screenshots)
-  AIPracticeCinematic.tsx  # 73s cinematic walkthrough
-  AIPracticeShort.tsx      # ~32s social cut
+  MootCourtPromo.tsx      # Original 20s promo (screenshots)
+  MootCourtCinematic.tsx  # 73s cinematic walkthrough
+  MootCourtShort.tsx      # ~32s social cut
   FeatureShowcase.tsx      # 70s ecosystem tour
   LiveSessionSnippet.tsx   # 55s voice-acted courtroom session
   ConstitutionalLaw.tsx    # 55s constitutional law showcase
@@ -288,5 +288,5 @@ These are nice-to-haves that would streamline production:
 - **Subject-specific videos** — ConstitutionalLaw is the template. Extend to Criminal Law, Human Rights, Commercial Law, etc.
 - **16:9 landscape variants** — For LinkedIn, YouTube, Twitter.
 - **1:1 square variants** — For Instagram feed posts.
-- **Courtroom ambiance in the actual app** — The ambient tone/murmur should also play in the real AI practice interface.
+- **Courtroom ambiance in the actual app** — The ambient tone/murmur should also play in the real moot court interface.
 - **Recruitment video variants** — Seasonal updates for different hiring rounds (Michaelmas, Easter, Summer).

@@ -65,7 +65,7 @@
 
 ## SECTION 4 — UI Changes
 
-- [ ] Add session limit reached state to AI Practice page
+- [ ] Add session limit reached state to Moot Court page
   - Owner: Agent E
   - Status: Pending
 

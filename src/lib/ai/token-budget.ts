@@ -3,7 +3,7 @@
  *
  * Centralised constants and utilities for managing AI token budgets,
  * transcript windowing, and daily spend tracking across Ratio's
- * AI practice sessions.
+ * Moot Court sessions.
  *
  * All functions are Edge Runtime compatible with no external dependencies.
  * The daily budget tracker is the sole stateful piece (in-memory);

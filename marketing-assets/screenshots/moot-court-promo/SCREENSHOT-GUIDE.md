@@ -1,8 +1,8 @@
-# AI Practice Sessions - Screenshot Guide for Promo Content
+# Moot Court Sessions - Screenshot Guide for Promo Content
 
 ## User Flow to Capture (in order)
 
-Take these screenshots to show the full journey from landing to AI practice:
+Take these screenshots to show the full journey from landing to Moot Court:
 
 ### 1. Landing Page - AI Showcase Section
 - **File:** `01-landing-ai-showcase.png`

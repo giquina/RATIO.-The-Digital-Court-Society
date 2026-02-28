@@ -51,9 +51,9 @@ describe("analytics helpers", () => {
     });
   });
 
-  it("aiPracticeCompleted includes duration", () => {
-    analytics.aiPracticeCompleted("mentor", 300);
-    expect(window.gtag).toHaveBeenCalledWith("event", "ai_practice_completed", {
+  it("mootCourtCompleted includes duration", () => {
+    analytics.mootCourtCompleted("mentor", 300);
+    expect(window.gtag).toHaveBeenCalledWith("event", "moot_court_completed", {
       mode: "mentor",
       duration_seconds: 300,
     });

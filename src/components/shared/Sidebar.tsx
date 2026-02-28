@@ -71,7 +71,7 @@ const sections: NavSection[] = [
     items: [
       { href: "/home", label: "Home", icon: Home, tooltip: "Dashboard" },
       { href: "/sessions", label: "The Bench", icon: Scale, countKey: "upcomingSessions", tooltip: "Moot court sessions", subtitle: "Appear before the court", tourId: "nav-sessions" },
-      { href: "/ai-practice", label: "Advocacy", icon: Mic, countKey: "aiDrafts", tooltip: "Train your advocacy", subtitle: "Train your advocacy skills", tourId: "nav-ai-practice" },
+      { href: "/moot-court", label: "Advocacy", icon: Mic, countKey: "mootDrafts", tooltip: "Train your advocacy", subtitle: "Train your advocacy skills", tourId: "nav-moot-court" },
       { href: "/notifications", label: "Notifications", icon: Bell, countKey: "unreadNotifications", tooltip: "Notifications" },
     ],
   },

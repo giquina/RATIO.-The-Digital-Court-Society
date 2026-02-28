@@ -1,5 +1,5 @@
 /**
- * POST /api/ai/chat — AI Practice Chat Endpoint (Streaming SSE)
+ * POST /api/ai/chat — Moot Court Chat Endpoint (Streaming SSE)
  *
  * Sends the advocate's message history to Claude Haiku 4.5 and streams
  * the AI persona's response token-by-token via Server-Sent Events.

@@ -281,7 +281,7 @@ export default function HomePage() {
           {([
             { Icon: Scale, label: "Create Session", sub: "Host a moot or trial", href: "/sessions/create" },
             { Icon: Calendar, label: "View Timetable", sub: "This week's sessions", href: "/sessions" },
-            { Icon: Target, label: "Advocacy", sub: "Train your advocacy skills", href: "/ai-practice" },
+            { Icon: Target, label: "Advocacy", sub: "Train your advocacy skills", href: "/moot-court" },
             { Icon: Trophy, label: "League Table", sub: "National rankings", href: "/society" },
           ] as { Icon: LucideIcon; label: string; sub: string; href: string }[]).map((a) => (
             <Link key={a.label} href={a.href}>

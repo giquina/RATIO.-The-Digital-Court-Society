@@ -83,7 +83,7 @@ export const sendWelcome = internalAction({
   <p style="color:rgba(242,237,230,0.6);font-size:14px;line-height:22px;margin:0 0 12px">Here is how to get started:</p>
   <p style="color:rgba(242,237,230,0.6);font-size:14px;line-height:22px;margin:0 0 4px;padding-left:8px">1. Complete your profile in Settings</p>
   <p style="color:rgba(242,237,230,0.6);font-size:14px;line-height:22px;margin:0 0 4px;padding-left:8px">2. Join or create a moot court session</p>
-  <p style="color:rgba(242,237,230,0.6);font-size:14px;line-height:22px;margin:0 0 4px;padding-left:8px">3. Try AI Practice for solo preparation</p>
+  <p style="color:rgba(242,237,230,0.6);font-size:14px;line-height:22px;margin:0 0 4px;padding-left:8px">3. Try Moot Court for solo preparation</p>
   <div style="text-align:center;margin:24px 0">
     <a href="https://ratiothedigitalcourtsociety.com/home" style="background-color:#C9A84C;color:#0C1220;font-size:14px;font-weight:700;padding:12px 28px;border-radius:12px;text-decoration:none;display:inline-block">Enter the Court</a>
   </div>

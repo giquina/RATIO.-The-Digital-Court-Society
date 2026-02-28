@@ -12,7 +12,7 @@ import { courtToast } from "@/lib/utils/toast";
 import { FeatureGate } from "@/components/shared/FeatureGate";
 
 const ACTIVITY_LABELS: Record<string, { label: string; icon: React.ReactNode; color: string }> = {
-  ai_practice: { label: "AI Practice", icon: <Bot size={14} />, color: "text-blue-400" },
+  ai_practice: { label: "Moot Court", icon: <Bot size={14} />, color: "text-blue-400" },
   live_moot: { label: "Live Moot", icon: <Scale size={14} />, color: "text-gold" },
   research: { label: "Legal Research", icon: <BookOpen size={14} />, color: "text-green-400" },
   manual: { label: "Other CPD", icon: <Briefcase size={14} />, color: "text-purple-400" },
@@ -222,7 +222,7 @@ export default function CPDPage() {
                       className="w-full bg-white/[0.05] border border-court-border rounded-xl px-3 py-2.5 text-court-base text-court-text focus:outline-none focus:border-gold/40"
                     >
                       <option value="manual">Other CPD</option>
-                      <option value="ai_practice">AI Practice</option>
+                      <option value="ai_practice">Moot Court</option>
                       <option value="live_moot">Live Moot</option>
                       <option value="research">Legal Research</option>
                     </select>
@@ -248,7 +248,7 @@ export default function CPDPage() {
             {entries.length === 0 ? (
               <Card className="p-6 text-center">
                 <p className="text-court-sm text-court-text-ter">
-                  No CPD entries for {year}. Complete an AI practice session or log an activity to get started.
+                  No CPD entries for {year}. Complete a Moot Court session or log an activity to get started.
                 </p>
               </Card>
             ) : (

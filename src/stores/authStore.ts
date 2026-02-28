@@ -75,7 +75,7 @@ export function getProfileCompletion(profile: Profile | null): {
 // ── Features that require profile completion ──
 export const LOCKED_FEATURES = [
   { path: "/sessions/create", label: "Create Session" },
-  { path: "/ai-practice", label: "AI Practice" },
+  { path: "/moot-court", label: "Moot Court" },
   { path: "/tools/argument-builder", label: "Argument Builder" },
   { path: "/tools/case-brief", label: "Case Brief Generator" },
   { path: "/parliament", label: "Parliament" },

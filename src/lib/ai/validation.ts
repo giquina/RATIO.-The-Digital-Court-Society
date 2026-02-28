@@ -2,7 +2,7 @@
  * AI API Validation & Security Utilities
  *
  * Zod schemas and helper functions for validating, sanitising, and securing
- * requests/responses flowing through the AI practice API routes.
+ * requests/responses flowing through the Moot Court API routes.
  *
  * Exports:
  *  - Zod schemas for chat, feedback, and score payloads
@@ -19,7 +19,7 @@ import { z } from "zod";
 /** Maximum allowed raw body size in bytes (256 KB). */
 const MAX_BODY_SIZE = 256 * 1024;
 
-/** The four AI practice modes available in Ratio. */
+/** The four Moot Court modes available in Ratio. */
 const AI_MODES = ["judge", "mentor", "examiner", "opponent"] as const;
 
 /** Judge temperament variants. */

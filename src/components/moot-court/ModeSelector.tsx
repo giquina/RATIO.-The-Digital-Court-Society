@@ -269,7 +269,7 @@ export default function ModeSelector({
                 Free tier: 3 sessions per month
               </p>
               <p className="text-court-xs text-court-text-ter">
-                Upgrade to Premium for unlimited AI practice
+                Upgrade to Premium for unlimited Moot Court practice
               </p>
             </div>
           </div>

@@ -39,9 +39,9 @@ export const TOUR_STEPS: TourStep[] = [
     position: "right",
   },
   {
-    id: "ai-practice",
-    target: "[data-tour='nav-ai-practice']",
-    title: "AI Practice",
+    id: "moot-court",
+    target: "[data-tour='nav-moot-court']",
+    title: "Moot Court",
     description:
       "Practise oral advocacy with an AI judge. Receive structured feedback on your legal reasoning, case citation, and persuasion.",
     position: "right",

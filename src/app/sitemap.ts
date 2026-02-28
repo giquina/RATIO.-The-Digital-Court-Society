@@ -19,7 +19,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/home", priority: 0.9, changeFrequency: "daily" as const },
     { path: "/sessions", priority: 0.8, changeFrequency: "daily" as const },
     { path: "/society", priority: 0.7, changeFrequency: "daily" as const },
-    { path: "/ai-practice", priority: 0.8, changeFrequency: "weekly" as const },
+    { path: "/moot-court", priority: 0.8, changeFrequency: "weekly" as const },
     { path: "/library", priority: 0.7, changeFrequency: "weekly" as const },
     { path: "/law-book", priority: 0.8, changeFrequency: "weekly" as const },
     { path: "/parliament", priority: 0.7, changeFrequency: "weekly" as const },

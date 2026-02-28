@@ -71,6 +71,11 @@ const nextConfig = {
         destination: "/society",
         permanent: true,
       },
+      {
+        source: "/ai-practice",
+        destination: "/moot-court",
+        permanent: true,
+      },
     ];
   },
 

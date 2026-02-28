@@ -37,7 +37,7 @@ export const ROUTE_GUIDES: RouteGuide[] = [
         icon: "Zap",
         title: "Quick Actions",
         description:
-          "Access common tasks directly from the dashboard: start an AI practice session, browse upcoming moots, or review your latest feedback.",
+          "Access common tasks directly from the dashboard: start a Moot Court session, browse upcoming moots, or review your latest feedback.",
       },
     ],
   },

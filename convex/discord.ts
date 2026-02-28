@@ -80,7 +80,7 @@ export const notifyNewSession = internalAction({
   },
 });
 
-// ── AI Judge session started ──
+// ── Moot Court session started ──
 export const notifyAiSessionStarted = internalAction({
   args: {
     advocateName: v.string(),
@@ -97,8 +97,8 @@ export const notifyAiSessionStarted = internalAction({
 
     await notifyDiscord(
       webhookUrl,
-      "\ud83e\uddd1\u200d\u2696\ufe0f AI Practice Started",
-      `**${args.advocateName}** started an AI **${modeLabel}** session.`,
+      "\ud83e\uddd1\u200d\u2696\ufe0f Moot Court Started",
+      `**${args.advocateName}** started a Moot Court **${modeLabel}** session.`,
       0xeb459e, // fuchsia
       [
         { name: "Area of Law", value: args.areaOfLaw, inline: true },
@@ -108,7 +108,7 @@ export const notifyAiSessionStarted = internalAction({
   },
 });
 
-// ── AI Judge session completed ──
+// ── Moot Court session completed ──
 export const notifyAiSessionCompleted = internalAction({
   args: {
     advocateName: v.string(),
@@ -125,8 +125,8 @@ export const notifyAiSessionCompleted = internalAction({
 
     await notifyDiscord(
       webhookUrl,
-      "\u2705 AI Session Completed",
-      `**${args.advocateName}** completed an AI **${modeLabel}** session with a score of **${args.overallScore}/5**.`,
+      "\u2705 Moot Court Session Completed",
+      `**${args.advocateName}** completed a Moot Court **${modeLabel}** session with a score of **${args.overallScore}/5**.`,
       0xfee75c, // yellow
       [{ name: "Area of Law", value: args.areaOfLaw, inline: true }]
     );

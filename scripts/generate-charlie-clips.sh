@@ -52,7 +52,7 @@ generate() {
 echo "=== Generating 30 Charlie voice clips ==="
 echo ""
 
-# ── AIPracticeCinematic (9 clips) ──
+# ── MootCourtCinematic (9 clips) ──
 generate "cinematic-01-cold-open.mp3" "Every advocate starts somewhere." 1
 generate "cinematic-02-preparation.mp3" "Long before the courtroom. Before the wig, the gown, any of it. There's the work you do when nobody's watching." 2
 generate "cinematic-03-choose-judge.mp3" "RATIO pairs you with an AI Judge. Four temperaments — strict, Socratic, pragmatic, or standard. You pick the bench." 3
@@ -63,7 +63,7 @@ generate "cinematic-07-feedback.mp3" "When it's over, you get a proper judgment.
 generate "cinematic-08-improvement.mp3" "Detailed written feedback. What worked, what didn't, and a clear sense of where to go next." 8
 generate "cinematic-09-cta.mp3" "RATIO. The Digital Court Society. It's free for UK law students. You can start today." 9
 
-# ── AIPracticeShort (3 clips) ──
+# ── MootCourtShort (3 clips) ──
 generate "short-01-hook.mp3" "Can you argue before a judge?" 10
 generate "short-02-intro.mp3" "RATIO trains you with AI." 11
 generate "short-03-cta.mp3" "RATIO. The Digital Court Society. Free for UK law students. Start practice today." 12

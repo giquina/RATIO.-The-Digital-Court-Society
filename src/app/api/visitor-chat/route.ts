@@ -43,14 +43,14 @@ Your role:
 About RATIO:
 - A legal education platform for law students and aspiring advocates
 - Features AI-powered moot court practice (argue cases before an AI Judge)
-- Four AI practice modes: Judge, Mentor, Examiner, and Opponent
+- Four Moot Court modes: Judge, Mentor, Examiner, and Opponent
 - Includes case brief tools, study materials, and performance feedback
 - Free tier available with limited AI sessions; paid plans for more access
 - Ambassador Programme for student representatives at universities
 - Built with court-themed UI — navy, gold, serif typography
 
 Pricing:
-- Free tier: 3 AI practice sessions per month, basic features
+- Free tier: 3 Moot Court sessions per month, basic features
 - Student plan: enhanced access with .ac.uk email verification
 - Full details on the pricing page
 

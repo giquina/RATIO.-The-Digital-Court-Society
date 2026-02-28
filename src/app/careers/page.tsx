@@ -97,7 +97,7 @@ const POSITIONS: Position[] = [
     compensation: "\u00A318-22k/yr (placement) or \u00A312-15k/yr (apprenticeship)",
     description: "Build and maintain the technology behind RATIO\u2019s AI courtroom, moot scoring, case law search engine, and legal research tools. Legal tech experience that stands out on any training contract or pupillage application.",
     responsibilities: [
-      "Implement features for AI practice sessions, moot scoring, and legal research tools",
+      "Implement features for Moot Court sessions, moot scoring, and legal research tools",
       "Build and improve the case law search engine and Law Book interface",
       "Write tests for critical advocacy and courtroom session flows",
       "Work on the legal research API integrations (case law, legislation, parliament)",
@@ -112,7 +112,7 @@ const POSITIONS: Position[] = [
     compensation: "\u00A312-15/hr + free Premium+",
     description: "Test how law students interact with AI courtroom sessions, moot preparation tools, and legal research features. Identify where the advocacy experience breaks down and recommend improvements.",
     responsibilities: [
-      "Run user testing sessions with law students during AI practice and moot preparation",
+      "Run user testing sessions with law students during Moot Court and moot preparation",
       "Map the advocate journey from case brief to oral submission to written feedback",
       "Analyse session data to identify where advocacy preparation breaks down",
       "Write UX reports with recommendations grounded in how law students actually work",

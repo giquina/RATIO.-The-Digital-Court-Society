@@ -11,7 +11,7 @@ const TOOLS = [
       "Practice oral advocacy with an AI-powered judge. Present your arguments, face interventions, and receive detailed scoring across 7 dimensions.",
     icon: <Mic size={24} />,
     accentColor: "#C9A84C",
-    href: "/ai-practice",
+    href: "/moot-court",
     available: true,
     tag: "Try Now",
     tagColor: "gold" as const,

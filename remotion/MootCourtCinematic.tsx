@@ -1,5 +1,5 @@
 /**
- * RATIO. AI Practice — Cinematic Promo (73 seconds)
+ * RATIO. Moot Court — Cinematic Promo (73 seconds)
  *
  * Creative Direction:
  *   - Apple-style minimal pacing: let every frame breathe
@@ -825,7 +825,7 @@ function ChooseJudgeScene({ frame }: { frame: number }) {
       {/* Phone mockup — mode selection screen */}
       <div style={{ marginTop: 16 }}>
         <PhoneMockup
-          src={staticFile("screenshots/mobile/ai-practice-mobile.png")}
+          src={staticFile("screenshots/mobile/moot-court-mobile.png")}
           frame={local}
           delay={25}
           kenBurns="zoom-in"
@@ -1406,7 +1406,7 @@ const CINEMATIC_CAPTIONS: CaptionPhrase[] = [
   { text: "You can start today.", from: 2080, to: 2138 },
 ];
 
-export const AIPracticeCinematic: React.FC = () => {
+export const MootCourtCinematic: React.FC = () => {
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
 

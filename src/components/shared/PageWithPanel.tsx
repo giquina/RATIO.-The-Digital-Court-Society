@@ -19,6 +19,8 @@ interface PageWithPanelProps {
   heading?: string;
   /** Optional overlay subheading */
   subheading?: string;
+  /** Custom panel content — replaces the default Scale icon + heading when provided */
+  panelContent?: ReactNode;
 }
 
 /**
@@ -43,6 +45,7 @@ export default function PageWithPanel({
   priority = false,
   heading,
   subheading,
+  panelContent,
 }: PageWithPanelProps) {
   const panel = (
     <div className="hidden lg:block lg:w-[40%] xl:w-[38%] 2xl:w-[35%] shrink-0">
@@ -54,7 +57,9 @@ export default function PageWithPanel({
         priority={priority}
         heading={heading}
         subheading={subheading}
-      />
+      >
+        {panelContent}
+      </SideVisualPanel>
     </div>
   );
 

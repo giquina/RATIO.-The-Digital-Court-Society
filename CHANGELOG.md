@@ -5,6 +5,14 @@
 
 ---
 
+## 2026-02-28 — "Moot Court" Rename
+
+- **BREAKING**: Route `/ai-practice` renamed to `/moot-court` (301 redirect in place)
+- All UI labels, navigation, and documentation updated from "AI Practice" to "Moot Court"
+- Component directory renamed: `src/components/ai-practice/` → `src/components/moot-court/`
+
+---
+
 ## 2026-02-24 — Animated Scales Judge Avatar
 
 ### What Changed
@@ -26,7 +34,7 @@ Replaced the real human photo avatar with a fully animated SVG scales-of-justice
 - **Approving** — Barely tipped (+2°), green glow + green sparkles
 
 ### Files Changed
-- `src/components/ai-practice/JudgeAvatar.tsx` — complete rewrite (photo → animated SVG)
+- `src/components/moot-court/JudgeAvatar.tsx` — complete rewrite (photo → animated SVG)
 - `public/images/judge-avatar.jpg` — no longer used (can be deleted)
 
 ---
@@ -115,10 +123,10 @@ migration above. Subtitles added to Sessions and Society pages for consistency.
 
 ---
 
-## 2026-02-24 — Fix: Chat Scroll in AI Practice
+## 2026-02-24 — Fix: Chat Scroll in Moot Court
 
 ### What Changed
-Chat messages in AI Practice sessions couldn't be scrolled upward. The `justify-end`
+Chat messages in Moot Court sessions couldn't be scrolled upward. The `justify-end`
 CSS on the flex container was pinning content to the bottom and blocking overflow scroll.
 
 ### Fix
@@ -126,4 +134,4 @@ Replaced `justify-end` with a `flex-1` spacer div that pushes messages down when
 but collapses when content overflows, allowing normal scroll behaviour.
 
 ### File Changed
-- `src/app/(app)/ai-practice/page.tsx`
+- `src/app/(app)/moot-court/page.tsx`

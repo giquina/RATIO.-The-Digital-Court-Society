@@ -248,9 +248,9 @@ export default function PortfolioPage() {
           <EmptyState
             icon={<BarChart3 size={28} />}
             title="No Sessions Yet"
-            description="Complete your first AI practice session to start building your portfolio."
+            description="Complete your first Moot Court session to start building your portfolio."
             action={
-              <Link href="/ai-practice">
+              <Link href="/moot-court">
                 <Button variant="outline" size="sm">Start Practice</Button>
               </Link>
             }

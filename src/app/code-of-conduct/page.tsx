@@ -282,7 +282,7 @@ export default function CodeOfConductPage() {
               platform, including but not limited to:
             </p>
             <ul className="list-disc list-inside space-y-1.5 text-court-base text-court-text-sec mb-4">
-              <li>Moot sessions, parliamentary debates, and AI practice sessions</li>
+              <li>Moot sessions, parliamentary debates, and Moot Court sessions</li>
               <li>Law Book contributions, reviews, and editorial discussions</li>
               <li>Chamber activities and inter-Chamber communications</li>
               <li>Tribunal proceedings</li>

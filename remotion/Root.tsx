@@ -1,9 +1,9 @@
 import React from "react";
 import { Composition } from "remotion";
 import { RatioShowcase } from "./Showcase";
-import { AIPracticePromo } from "./AIPracticePromo";
-import { AIPracticeCinematic } from "./AIPracticeCinematic";
-import { AIPracticeShort } from "./AIPracticeShort";
+import { MootCourtPromo } from "./MootCourtPromo";
+import { MootCourtCinematic } from "./MootCourtCinematic";
+import { MootCourtShort } from "./MootCourtShort";
 import { FeatureShowcase } from "./FeatureShowcase";
 import { LiveSessionSnippet } from "./LiveSessionSnippet";
 import { ConstitutionalLaw } from "./ConstitutionalLaw";
@@ -12,7 +12,7 @@ import { AIJudgeVideo } from "./AIJudgeVideo";
 import { AnalyticsFeedbackVideo } from "./AnalyticsFeedbackVideo";
 import {
   ThumbnailGeneral,
-  ThumbnailAIPractice,
+  ThumbnailMootCourt,
   ThumbnailConstitutionalLaw,
   ThumbnailLiveSession,
 } from "./Thumbnail";
@@ -35,8 +35,8 @@ export const RemotionRoot: React.FC = () => {
       />
 
       <Composition
-        id="AIPracticePromo"
-        component={AIPracticePromo}
+        id="MootCourtPromo"
+        component={MootCourtPromo}
         durationInFrames={FPS * 20}
         fps={FPS}
         width={393}
@@ -47,8 +47,8 @@ export const RemotionRoot: React.FC = () => {
 
       {/* 73-second cinematic version — voiceover-paced, Apple-style */}
       <Composition
-        id="AIPracticeCinematic"
-        component={AIPracticeCinematic}
+        id="MootCourtCinematic"
+        component={MootCourtCinematic}
         durationInFrames={FPS * 73}
         fps={FPS}
         width={393}
@@ -57,8 +57,8 @@ export const RemotionRoot: React.FC = () => {
 
       {/* ~32-second high-impact cut — social media optimised (950 frames for Charlie) */}
       <Composition
-        id="AIPracticeShort"
-        component={AIPracticeShort}
+        id="MootCourtShort"
+        component={MootCourtShort}
         durationInFrames={950}
         fps={FPS}
         width={393}
@@ -143,8 +143,8 @@ export const RemotionRoot: React.FC = () => {
       />
 
       <Composition
-        id="ThumbnailAIPractice"
-        component={ThumbnailAIPractice}
+        id="ThumbnailMootCourt"
+        component={ThumbnailMootCourt}
         durationInFrames={1}
         fps={FPS}
         width={393}

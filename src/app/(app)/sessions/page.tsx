@@ -11,6 +11,7 @@ import { DEMO_UPCOMING_SESSIONS, DEMO_PAST_SESSIONS } from "@/lib/constants/demo
 import { Calendar, Clock, Check, BookOpen } from "lucide-react";
 import { courtToast } from "@/lib/utils/toast";
 import PageWithPanel from "@/components/shared/PageWithPanel";
+import SessionsPanel from "@/components/panels/SessionsPanel";
 
 function formatSessionDate(isoDate: string) {
   const d = new Date(isoDate);
@@ -252,7 +253,7 @@ export default function SessionsPage() {
   );
 
   return (
-    <PageWithPanel panelPosition="left" heading="The Bench" subheading="Schedule, join, and review your moot court sessions">
+    <PageWithPanel panelPosition="left" heading="The Bench" subheading="Schedule, join, and review your moot court sessions" panelContent={<SessionsPanel />}>
     <div className="pb-6">
       <div className="px-4 pt-3 pb-4">
         <h1 className="font-serif text-2xl font-bold text-court-text mb-1">Sessions</h1>

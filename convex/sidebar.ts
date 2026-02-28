@@ -46,12 +46,12 @@ export const getCounts = query({
         .collect()
     ).length;
 
-    // AI sessions in progress
+    // Moot court sessions in progress
     const allAiSessions = await ctx.db
       .query("aiSessions")
       .withIndex("by_profile", (q) => q.eq("profileId", profile._id))
       .collect();
-    const aiDrafts = allAiSessions.filter(
+    const mootDrafts = allAiSessions.filter(
       (s) => s.status === "in_progress"
     ).length;
 
@@ -59,7 +59,7 @@ export const getCounts = query({
       unreadNotifications,
       upcomingSessions,
       savedAuthorities,
-      aiDrafts,
+      mootDrafts,
     };
   },
 });

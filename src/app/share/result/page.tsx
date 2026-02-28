@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 /**
- * /share/result — Public page for shared AI Practice results.
+ * /share/result — Public page for shared Moot Court results.
  *
  * This page is what people see when they click a RATIO result link
  * shared via WhatsApp, email, etc. It doesn't require login.
@@ -30,7 +30,7 @@ type Props = {
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const params = await searchParams;
   const score = params.s || "—";
-  const area = params.a || "AI Practice";
+  const area = params.a || "Moot Court";
   const judge = params.j || "AI Judge";
 
   const title = `${score}/5.0 in ${area} — RATIO.`;
@@ -87,7 +87,7 @@ const CATEGORIES = [
 export default async function ShareResultPage({ searchParams }: Props) {
   const params = await searchParams;
   const score = params.s || "—";
-  const area = params.a || "AI Practice";
+  const area = params.a || "Moot Court";
   const judge = params.j || "AI Judge";
 
   const scoreNum = parseFloat(score);

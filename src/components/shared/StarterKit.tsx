@@ -69,10 +69,10 @@ export function StarterKit({ profile, onDismiss }: StarterKitProps) {
       isComplete: hasVisited("/law-book"),
     },
     {
-      id: "ai-practice",
+      id: "moot-court",
       title: "Try an Advocacy session",
       description: "Argue a case before the Judge",
-      href: "/ai-practice",
+      href: "/moot-court",
       actionLabel: "Start practice",
       isComplete: (profile?.totalMoots ?? 0) > 0,
     },

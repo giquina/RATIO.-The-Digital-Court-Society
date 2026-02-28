@@ -7,6 +7,7 @@ import { Users, Trophy, ChevronRight, Star, Crown } from "lucide-react";
 import { anyApi } from "convex/server";
 import { useDemoQuery } from "@/hooks/useDemoSafe";
 import PageWithPanel from "@/components/shared/PageWithPanel";
+import ChambersPanel from "@/components/panels/ChambersPanel";
 
 const CONVEX_URL = process.env.NEXT_PUBLIC_CONVEX_URL;
 
@@ -56,7 +57,7 @@ export default function ChambersPage() {
 
   if (isLoading) {
     return (
-      <PageWithPanel panelPosition="left" heading="The Chambers" subheading="Four Inns of Court, one standard of excellence">
+      <PageWithPanel panelPosition="left" heading="The Chambers" subheading="Four Inns of Court, one standard of excellence" panelContent={<ChambersPanel />}>
       <div className="pb-6 lg:max-w-none md:max-w-content-medium mx-auto">
         <div className="px-4 md:px-6 lg:px-8 pt-3 pb-4">
           <h1 className="font-serif text-2xl font-bold text-court-text">Chambers</h1>
@@ -73,7 +74,7 @@ export default function ChambersPage() {
   }
 
   return (
-    <PageWithPanel panelPosition="left" heading="The Chambers" subheading="Four Inns of Court, one standard of excellence">
+    <PageWithPanel panelPosition="left" heading="The Chambers" subheading="Four Inns of Court, one standard of excellence" panelContent={<ChambersPanel />}>
     <div className="pb-6 lg:max-w-none md:max-w-content-medium mx-auto">
       {/* Header */}
       <div className="px-4 md:px-6 lg:px-8 pt-3 pb-4">

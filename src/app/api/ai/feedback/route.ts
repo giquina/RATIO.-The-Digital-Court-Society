@@ -1,5 +1,5 @@
 /**
- * POST /api/ai/feedback — AI Practice Feedback Endpoint
+ * POST /api/ai/feedback — Moot Court Feedback Endpoint
  *
  * Analyses the full session transcript and returns scored feedback across
  * 7 advocacy dimensions (1.0-5.0) plus qualitative commentary.

@@ -63,7 +63,7 @@ User → /api/ai/feedback (per-session) → Anthropic Claude Haiku 4.5
 | `src/lib/ai/token-budget.ts` | CREATE | Agent B |
 | `src/lib/ai/validation.ts` | CREATE | Agent C |
 | `src/lib/ai/usage-tracker.ts` | CREATE | Agent D |
-| `src/app/(app)/ai-practice/page.tsx` | MODIFY | Agent E |
+| `src/app/(app)/moot-court/page.tsx` | MODIFY | Agent E |
 
 ## Constraints
 

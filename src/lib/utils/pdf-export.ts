@@ -328,7 +328,7 @@ export async function generatePortfolioPDF(data: PDFExportData): Promise<Uint8Ar
     y -= 20;
 
     const TYPE_LABELS: Record<string, string> = {
-      ai_practice: "AI Practice",
+      ai_practice: "Moot Court",
       live_moot: "Live Moot",
       research: "Research",
       manual: "Other",

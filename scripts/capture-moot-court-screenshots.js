@@ -1,7 +1,7 @@
 /**
- * Capture AI Practice mobile screenshots for Remotion promo video.
+ * Capture Moot Court mobile screenshots for Remotion promo video.
  *
- * Usage:  node scripts/capture-ai-practice-screenshots.js
+ * Usage:  node scripts/capture-moot-court-screenshots.js
  *
  * Prerequisites:
  *   - Dev server running at http://localhost:3000  (npm run dev:frontend)
@@ -62,10 +62,10 @@ async function main() {
 
   // ── 1. Mode Selection ──────────────────────────────────────────────
   console.log("1/7  Mode selection...");
-  await page.goto(`${BASE}/ai-practice`, { waitUntil: "networkidle2", timeout: 60000 });
+  await page.goto(`${BASE}/moot-court`, { waitUntil: "networkidle2", timeout: 60000 });
   await sleep(3000);
-  await page.screenshot({ path: path.join(OUT_DIR, "ai-practice-mobile.png"), type: "png" });
-  console.log("     ✓ ai-practice-mobile.png");
+  await page.screenshot({ path: path.join(OUT_DIR, "moot-court-mobile.png"), type: "png" });
+  console.log("     ✓ moot-court-mobile.png");
 
   // ── 2. Briefing — click Judge card ─────────────────────────────────
   console.log("2/7  Briefing (temperament)...");

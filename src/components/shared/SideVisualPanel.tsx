@@ -1,5 +1,6 @@
 "use client";
 
+import { type ReactNode } from "react";
 import Image from "next/image";
 import { Scale } from "lucide-react";
 
@@ -18,6 +19,8 @@ interface SideVisualPanelProps {
   heading?: string;
   /** Optional overlay subheading text */
   subheading?: string;
+  /** Custom panel content — when provided, replaces the default Scale icon + heading */
+  children?: ReactNode;
 }
 
 /**
@@ -35,6 +38,7 @@ export default function SideVisualPanel({
   priority = false,
   heading,
   subheading,
+  children,
 }: SideVisualPanelProps) {
   // Compute overlay gradient based on strength
   const overlayTop = Math.min(overlayStrength + 0.1, 1);
@@ -86,32 +90,38 @@ export default function SideVisualPanel({
       />
 
       {/* Content overlay */}
-      <div className="relative h-full flex flex-col items-center justify-center px-8">
-        {/* Gold accent line */}
-        <div className="w-8 h-[2px] bg-gold/30 mb-6" />
-
-        {/* Scale icon */}
-        <Scale size={28} className="text-gold/20 mb-4" strokeWidth={1.5} />
-
-        {/* Heading */}
-        {heading && (
-          <h2 className="font-serif text-xl text-court-text/30 text-center leading-snug mb-2">
-            {heading}
-          </h2>
-        )}
-
-        {/* Subheading */}
-        {subheading && (
-          <p className="text-court-xs text-court-text-ter/40 text-center max-w-[200px] leading-relaxed">
-            {subheading}
-          </p>
-        )}
-
-        {/* Bottom accent */}
-        <div className="absolute bottom-12 left-1/2 -translate-x-1/2">
-          <div className="w-6 h-[1px] bg-gold/15" />
+      {children ? (
+        <div className="relative h-full flex flex-col items-center justify-center px-8">
+          {children}
         </div>
-      </div>
+      ) : (
+        <div className="relative h-full flex flex-col items-center justify-center px-8">
+          {/* Gold accent line */}
+          <div className="w-8 h-[2px] bg-gold/30 mb-6" />
+
+          {/* Scale icon */}
+          <Scale size={28} className="text-gold/20 mb-4" strokeWidth={1.5} />
+
+          {/* Heading */}
+          {heading && (
+            <h2 className="font-serif text-xl text-court-text/30 text-center leading-snug mb-2">
+              {heading}
+            </h2>
+          )}
+
+          {/* Subheading */}
+          {subheading && (
+            <p className="text-court-xs text-court-text-ter/40 text-center max-w-[200px] leading-relaxed">
+              {subheading}
+            </p>
+          )}
+
+          {/* Bottom accent */}
+          <div className="absolute bottom-12 left-1/2 -translate-x-1/2">
+            <div className="w-6 h-[1px] bg-gold/15" />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

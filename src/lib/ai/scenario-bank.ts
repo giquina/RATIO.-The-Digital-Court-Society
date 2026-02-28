@@ -1,5 +1,5 @@
 /**
- * AI Practice Scenario Bank
+ * Moot Court Scenario Bank
  *
  * Contains case briefs for each AI mode, categorised by practice area.
  * When a professional user has declared practice areas, the system
@@ -202,7 +202,7 @@ const AREA_SCENARIOS: Record<string, Partial<Record<Mode, CaseBrief[]>>> = {
  * Pick a scenario that's relevant to the user's practice areas.
  * Falls back to the default brief if no match is found.
  *
- * @param mode - The AI practice mode (judge, mentor, examiner, opponent)
+ * @param mode - The Moot Court mode (judge, mentor, examiner, opponent)
  * @param practiceAreas - The user's declared practice areas (from profile)
  * @param userType - "student" or "professional"
  */

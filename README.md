@@ -48,7 +48,7 @@ src/
 │   │   ├── home/        # Dashboard, streak, activity feed
 │   │   ├── sessions/    # Browse, create, detail with role claiming
 │   │   ├── society/     # Discover, rankings, chambers
-│   │   ├── ai-practice/ # AI Judge, Mentor, SQE2 Examiner
+│   │   ├── moot-court/  # AI Judge, Mentor, SQE2 Examiner
 │   │   ├── library/     # Templates, guides, case bank
 │   │   └── profile/     # Stats, skills, portfolio
 │   └── page.tsx         # Landing page

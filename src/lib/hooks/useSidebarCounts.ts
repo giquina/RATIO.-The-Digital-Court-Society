@@ -9,14 +9,14 @@ export interface SidebarCounts {
   unreadNotifications: number;
   upcomingSessions: number;
   savedAuthorities: number;
-  aiDrafts: number;
+  mootDrafts: number;
 }
 
 const DEMO_COUNTS: SidebarCounts = {
   unreadNotifications: 3,
   upcomingSessions: 2,
   savedAuthorities: 5,
-  aiDrafts: 1,
+  mootDrafts: 1,
 };
 
 /**

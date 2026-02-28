@@ -20,8 +20,8 @@ export function TheClerk() {
   const panelRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
 
-  // Hide on AI practice page — the session UI needs the full screen
-  const isAiPractice = pathname?.startsWith("/ai-practice");
+  // Hide on moot court page — the session UI needs the full screen
+  const isMootCourt = pathname?.startsWith("/moot-court");
 
   // Close on Escape
   useEffect(() => {
@@ -43,7 +43,7 @@ export function TheClerk() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen, close]);
 
-  if (isAiPractice) return null;
+  if (isMootCourt) return null;
 
   return (
     <>

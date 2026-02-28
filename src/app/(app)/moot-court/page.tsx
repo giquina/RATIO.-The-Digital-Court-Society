@@ -7,13 +7,13 @@ import { courtToast } from "@/lib/utils/toast";
 import { Lightbulb, Book, Mic, MicOff, Pause, ArrowUp, Scale, AlertCircle, Volume2, VolumeX } from "lucide-react";
 import { motion } from "framer-motion";
 import { analytics } from "@/lib/analytics";
-import ModeSelector from "@/components/ai-practice/ModeSelector";
-import JudgeAvatar from "@/components/ai-practice/JudgeAvatar";
-import ObjectionButtons from "@/components/ai-practice/ObjectionButtons";
-import TranscriptPanel from "@/components/ai-practice/TranscriptPanel";
-import CaseNotePanel from "@/components/ai-practice/CaseNotePanel";
-import SpectatorShare from "@/components/ai-practice/SpectatorShare";
-import SessionDock from "@/components/ai-practice/SessionDock";
+import ModeSelector from "@/components/moot-court/ModeSelector";
+import JudgeAvatar from "@/components/moot-court/JudgeAvatar";
+import ObjectionButtons from "@/components/moot-court/ObjectionButtons";
+import TranscriptPanel from "@/components/moot-court/TranscriptPanel";
+import CaseNotePanel from "@/components/moot-court/CaseNotePanel";
+import SpectatorShare from "@/components/moot-court/SpectatorShare";
+import SessionDock from "@/components/moot-court/SessionDock";
 import { useVoiceInput } from "@/hooks/useVoiceInput";
 import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
 import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
@@ -72,9 +72,9 @@ function stripEmotes(text: string): string {
   return text.replace(/\*[^*]+\*/g, "").replace(/\s{2,}/g, " ").trim();
 }
 
-// ── Local error boundary — catches runtime errors within the AI Practice page
+// ── Local error boundary — catches runtime errors within the Moot Court page
 //    so that the app shell (sidebar, nav) stays intact and navigable ──
-class AIPracticeErrorBoundary extends React.Component<
+class MootCourtErrorBoundary extends React.Component<
   { children: React.ReactNode },
   { hasError: boolean }
 > {
@@ -113,15 +113,15 @@ class AIPracticeErrorBoundary extends React.Component<
   }
 }
 
-export default function AIPracticePageWrapper() {
+export default function MootCourtPageWrapper() {
   return (
-    <AIPracticeErrorBoundary>
-      <AIPracticePageInner />
-    </AIPracticeErrorBoundary>
+    <MootCourtErrorBoundary>
+      <MootCourtPageInner />
+    </MootCourtErrorBoundary>
   );
 }
 
-function AIPracticePageInner() {
+function MootCourtPageInner() {
   const [screen, setScreen] = useState<Screen>("select");
   const aiUserContext = useAIUserContext();
   // Select stable Zustand function references (won't re-create on render)
@@ -369,7 +369,7 @@ function AIPracticePageInner() {
 
   // ── Start session ──
   const startSession = async () => {
-    analytics.aiPracticeStarted(mode);
+    analytics.mootCourtStarted(mode);
     setScreen("session");
     setSessionStarting(true);
     setTimerActive(true);
@@ -625,7 +625,7 @@ function AIPracticePageInner() {
     setScreen("loading-feedback");
 
     const sessionDuration = 900 - timer;
-    analytics.aiPracticeCompleted(mode, sessionDuration);
+    analytics.mootCourtCompleted(mode, sessionDuration);
 
     try {
       const res = await fetchWithTimeout('/api/ai/feedback', {

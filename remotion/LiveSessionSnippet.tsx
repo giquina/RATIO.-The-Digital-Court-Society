@@ -732,7 +732,7 @@ export const LiveSessionSnippet: React.FC = () => {
             fontFamily: SANS, fontSize: 13, color: TEXT_SEC,
             textAlign: "center",
           }}>
-            AI Practice — Constitutional Law
+            Moot Court — Constitutional Law
           </div>
         </TextReveal>
       </AbsoluteFill>

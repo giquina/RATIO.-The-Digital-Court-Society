@@ -18,7 +18,7 @@ export function WelcomeEmail({ name }: WelcomeEmailProps) {
       <Text style={paragraph}>Here is how to get started:</Text>
       <Text style={listItem}>1. Complete your profile in Settings</Text>
       <Text style={listItem}>2. Join or create a moot court session</Text>
-      <Text style={listItem}>3. Try AI Practice for solo preparation</Text>
+      <Text style={listItem}>3. Try Moot Court for solo preparation</Text>
       <Section style={ctaSection}>
         <Button style={ctaButton} href="https://ratiothedigitalcourtsociety.com/home">
           Enter the Court

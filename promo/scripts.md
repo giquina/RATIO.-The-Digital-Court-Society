@@ -6,7 +6,7 @@ reading. Sounds like they're remembering.
 
 ---
 
-## Video 1: AI Practice Cinematic (75s)
+## Video 1: Moot Court Cinematic (75s)
 
 **Scene 1 — Cold Open [0–3s]**
 "Every advocate starts somewhere."
@@ -45,7 +45,7 @@ It's free for UK law students. You can start today."
 
 ---
 
-## Video 2: AI Practice Short (30s)
+## Video 2: Moot Court Short (30s)
 
 Currently silent (on-screen text only). No voiceover needed.
 

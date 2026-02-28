@@ -1,6 +1,6 @@
 # RATIO. Promo Assets
 
-All promotional video and screenshot assets for the AI Practice feature.
+All promotional video and screenshot assets for the Moot Court feature.
 
 ---
 
@@ -8,15 +8,15 @@ All promotional video and screenshot assets for the AI Practice feature.
 
 | File | Duration | Size | Use |
 |------|----------|------|-----|
-| `ai-practice-cinematic-75s.mp4` | 75s | 10.7 MB | Website hero, LinkedIn, YouTube |
-| `ai-practice-short-30s.mp4` | 30s | 2.8 MB | Instagram Reels, TikTok, WhatsApp Status |
-| `ai-practice-promo.mp4` | 20s | 2.4 MB | Original quick version (reference) |
+| `moot-court-cinematic-75s.mp4` | 75s | 10.7 MB | Website hero, LinkedIn, YouTube |
+| `moot-court-short-30s.mp4` | 30s | 2.8 MB | Instagram Reels, TikTok, WhatsApp Status |
+| `moot-court-promo.mp4` | 20s | 2.4 MB | Original quick version (reference) |
 
 ## Screenshots (`screenshots/`)
 
 | File | Shows |
 |------|-------|
-| `ai-practice-mobile.png` | Mode selection — 4 AI persona cards |
+| `moot-court-mobile.png` | Mode selection — 4 AI persona cards |
 | `ai-briefing-temperament.png` | Judge temperament picker |
 | `ai-briefing-case.png` | Case brief with authorities |
 | `ai-session-live.png` | Live courtroom, Judge opening statement |
@@ -32,17 +32,17 @@ All screenshots are 2x Retina PNGs (786x1704 actual pixels).
 
 ```bash
 # 75-second cinematic
-npx remotion render remotion/index.ts AIPracticeCinematic --output promo/videos/ai-practice-cinematic-75s.mp4 --codec h264
+npx remotion render remotion/index.ts MootCourtCinematic --output promo/videos/moot-court-cinematic-75s.mp4 --codec h264
 
 # 30-second social cut
-npx remotion render remotion/index.ts AIPracticeShort --output promo/videos/ai-practice-short-30s.mp4 --codec h264
+npx remotion render remotion/index.ts MootCourtShort --output promo/videos/moot-court-short-30s.mp4 --codec h264
 ```
 
 ## How to re-capture screenshots
 
 ```bash
 npm run dev:frontend
-node scripts/capture-ai-practice-screenshots.js
+node scripts/capture-moot-court-screenshots.js
 node scripts/capture-feedback-screenshots.js
 ```
 
@@ -50,9 +50,9 @@ node scripts/capture-feedback-screenshots.js
 
 | File | Purpose |
 |------|---------|
-| `remotion/AIPracticeCinematic.tsx` | 75s cinematic composition |
-| `remotion/AIPracticeShort.tsx` | 30s social cut composition |
-| `remotion/AIPracticePromo.tsx` | Original 20s composition |
+| `remotion/MootCourtCinematic.tsx` | 75s cinematic composition |
+| `remotion/MootCourtShort.tsx` | 30s social cut composition |
+| `remotion/MootCourtPromo.tsx` | Original 20s composition |
 | `remotion/Root.tsx` | Registers all compositions |
-| `scripts/capture-ai-practice-screenshots.js` | Puppeteer screenshot automation |
+| `scripts/capture-moot-court-screenshots.js` | Puppeteer screenshot automation |
 | `scripts/capture-feedback-screenshots.js` | Puppeteer feedback screenshots |
