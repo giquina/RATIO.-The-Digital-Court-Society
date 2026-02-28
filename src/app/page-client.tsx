@@ -167,7 +167,7 @@ function LandingShell({ isAuthenticated }: { isAuthenticated: boolean }) {
 
       {/* Floating "Join Free" pill + Back to Top button */}
       <FloatingActions isAuthenticated={isAuthenticated} />
-      <PromoBanner />
+      {/* <PromoBanner /> — hidden for now, uncomment to re-enable recruitment popup */}
     </div>
     </FirstVisitSplash>
   );
