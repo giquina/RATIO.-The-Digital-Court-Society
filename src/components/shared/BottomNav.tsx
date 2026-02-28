@@ -9,8 +9,8 @@ import { useSessionStore } from "@/stores/sessionStore";
 
 const tabs = [
   { href: "/home", label: "Home", Icon: Home },
-  { href: "/sessions", label: "Sessions", Icon: Scale },
-  { href: "/ai-practice", label: "AI Practice", Icon: Target },
+  { href: "/sessions", label: "The Bench", Icon: Scale },
+  { href: "/ai-practice", label: "Advocacy", Icon: Target },
   { href: "/law-book", label: "Law Book", Icon: BookOpen },
   { href: "/society", label: "Society", Icon: Users },
 ];

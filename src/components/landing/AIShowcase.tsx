@@ -58,7 +58,7 @@ export function AIShowcase({ id }: { id?: string }) {
                 </div>
                 <div className="bg-white/[0.03] border border-court-border-light rounded-lg rounded-tl-none px-3 py-2.5 max-w-[85%]">
                   <p className="text-court-xs text-gold font-semibold mb-1">
-                    The Hon. Justice AI
+                    The Hon. Justice Blake
                   </p>
                   <p className="text-court-sm text-court-text-sec leading-relaxed">
                     Counsel, you rely on Carlill v Carbolic Smoke Ball Co for

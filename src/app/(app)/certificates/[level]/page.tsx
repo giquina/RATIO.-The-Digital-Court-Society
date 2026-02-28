@@ -277,7 +277,7 @@ export default function CertificateLevelPage() {
             </div>
             <div className="grid grid-cols-2 gap-2">
               <Link href="/ai-practice">
-                <Button variant="outline" size="sm" className="w-full text-court-xs">AI Practice →</Button>
+                <Button variant="outline" size="sm" className="w-full text-court-xs">Advocacy →</Button>
               </Link>
               <Link href="/sessions">
                 <Button variant="outline" size="sm" className="w-full text-court-xs">Group Moots →</Button>

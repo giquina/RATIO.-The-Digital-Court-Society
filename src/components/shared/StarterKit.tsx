@@ -70,8 +70,8 @@ export function StarterKit({ profile, onDismiss }: StarterKitProps) {
     },
     {
       id: "ai-practice",
-      title: "Try an AI Practice session",
-      description: "Argue a case before the AI Judge",
+      title: "Try an Advocacy session",
+      description: "Argue a case before the Judge",
       href: "/ai-practice",
       actionLabel: "Start practice",
       isComplete: (profile?.totalMoots ?? 0) > 0,

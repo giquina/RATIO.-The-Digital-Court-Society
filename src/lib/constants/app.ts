@@ -88,28 +88,28 @@ export const BADGE_DEFINITIONS = [
 // ── AI Personas ──
 export const AI_PERSONAS = {
   judge: {
-    name: "The Honourable Justice AI",
+    name: "The Honourable Justice Blake",
     subtitle: "High Court Judge",
     icon: "Scale",
     color: "#C9A84C",
     gradient: ["#2C1810", "#4A2C20"],
   },
   mentor: {
-    name: "Senior Counsel AI",
+    name: "Senior Counsel Morgan",
     subtitle: "Chambers Mentor",
     icon: "BookOpen",
     color: "#4A8FE7",
     gradient: ["#1A2744", "#2E5090"],
   },
   examiner: {
-    name: "SQE2 Examiner AI",
+    name: "The SQE2 Examiner",
     subtitle: "Assessment Panel",
     icon: "Target",
     color: "#6B2D3E",
     gradient: ["#3D1A2A", "#6B2D3E"],
   },
   opponent: {
-    name: "Opposing Counsel AI",
+    name: "Opposing Counsel",
     subtitle: "Adversary",
     icon: "Mic",
     color: "#4CAF50",

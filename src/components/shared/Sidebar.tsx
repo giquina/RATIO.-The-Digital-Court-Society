@@ -70,8 +70,8 @@ const sections: NavSection[] = [
     title: "MAIN",
     items: [
       { href: "/home", label: "Home", icon: Home, tooltip: "Dashboard" },
-      { href: "/sessions", label: "Sessions", icon: Scale, countKey: "upcomingSessions", tooltip: "Moot court sessions", subtitle: "Join a moot court hearing", tourId: "nav-sessions" },
-      { href: "/ai-practice", label: "AI Practice", icon: Mic, countKey: "aiDrafts", tooltip: "Practice with AI", subtitle: "Practice with an AI judge", tourId: "nav-ai-practice" },
+      { href: "/sessions", label: "The Bench", icon: Scale, countKey: "upcomingSessions", tooltip: "Moot court sessions", subtitle: "Appear before the court", tourId: "nav-sessions" },
+      { href: "/ai-practice", label: "Advocacy", icon: Mic, countKey: "aiDrafts", tooltip: "Train your advocacy", subtitle: "Train your advocacy skills", tourId: "nav-ai-practice" },
       { href: "/notifications", label: "Notifications", icon: Bell, countKey: "unreadNotifications", tooltip: "Notifications" },
     ],
   },
